@@ -1,0 +1,18 @@
+php_flag magic_quotes_gpc off
+php_flag magic_quotes_runtime off
+
+AddDefaultCharset UTF-8
+
+# Enable browser site caching
+#<IfModule mod_expires.c>
+#  ExpiresActive On
+#  ExpiresDefault A3600
+#  ExpiresByType text/html A1
+#</IfModule>
+
+RewriteEngine on
+
+RewriteRule ^(assets|static|protected/utils/(adminer|dumper|gitLog|gitPull)|var/(dumper)) - [L]
+RewriteRule ^(favicon.ico|robots.txt|index\.php)$ - [L]
+
+RewriteRule ^.*$ index.php [L]

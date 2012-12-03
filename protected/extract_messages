@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./yiic message config/message.php
