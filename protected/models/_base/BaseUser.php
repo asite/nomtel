@@ -7,7 +7,7 @@
  * property or method in class "User".
  *
  * Columns in table "user" available as properties of the model,
- * and there are no model relations.
+ * followed by relations of table "user" available as properties of the model.
  *
  * @property string $id
  * @property string $status
@@ -16,6 +16,7 @@
  * @property integer $failed_logins
  * @property string $blocked_until
  *
+ * @property Agent[] $agents
  */
 abstract class BaseUser extends BaseGxActiveRecord {
 
@@ -49,6 +50,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
+			'agents' => array(self::HAS_MANY, 'Agent', 'user_id'),
 		);
 	}
 
@@ -65,6 +67,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			'password' => Yii::t('app', 'Password'),
 			'failed_logins' => Yii::t('app', 'Failed Logins'),
 			'blocked_until' => Yii::t('app', 'Blocked Until'),
+			'agents' => null,
 		);
 	}
 
