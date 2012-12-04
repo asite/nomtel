@@ -1,0 +1,107 @@
+body {
+	text-align: left;
+}
+
+.grid-view .summary {
+    margin: 0 0 5px 0;
+    text-align: right;
+}
+
+.grid-view th {
+    text-align: center;
+}
+
+.grid-view table th a.desc {
+    background: url(down.gif) right center no-repeat;
+    padding-right: 10px;
+}
+
+.grid-view table th a.asc {
+    background: url(up.gif) right center no-repeat;
+    padding-right: 10px;
+}
+
+.grid-view table th span.caret {
+    display: none;
+}
+
+.grid-view .pager {
+    margin: 5px 0 0 0;
+    text-align: right;
+}
+
+.grid-view {
+	padding:0;
+}
+
+h1 {
+    padding-bottom: 20px;
+}
+
+.container {
+	text-align: center;
+}
+
+.inner_container {
+	width: 1200px;
+	text-align: left;
+	padding-bottom: 50px;
+}
+
+.treeview ul {
+    background-color: transparent;
+}
+
+
+
+.form-label-width-80 label.control-label {
+    width: 80px;
+}
+
+.form-label-width-80 div.controls {
+    margin-left: 100px;
+}
+
+.form-label-width-100 label.control-label {
+    width: 100px;
+}
+
+.form-label-width-100 div.controls {
+    margin-left: 120px;
+}
+
+.form-label-width-120 label.control-label {
+    width: 120px;
+}
+
+.form-label-width-120 div.controls {
+    margin-left: 140px;
+}
+
+.form-label-width-140 label.control-label {
+    width: 140px;
+}
+
+.form-label-width-140 div.controls {
+    margin-left: 160px;
+}
+
+.form-label-width-160 label.control-label {
+    width: 160px;
+}
+
+.form-label-width-160 div.controls {
+    margin-left: 180px;
+}
+
+.form-container-horizontal {
+    clear:both;
+}
+
+.form-container-horizontal .help-inline {
+    display: none;
+}
+
+.form-container-horizontal .form-container-item{
+    float: left;
+}

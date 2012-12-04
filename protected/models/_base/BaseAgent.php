@@ -14,9 +14,9 @@
  * @property string $name
  * @property string $surname
  * @property string $middle_name
- * @property string $phone1
- * @property string $phone2
- * @property string $phone3
+ * @property string $phone_1
+ * @property string $phone_2
+ * @property string $phone_3
  * @property string $email
  * @property string $skype
  * @property string $icq
@@ -26,7 +26,7 @@
  * @property string $passport_issuer
  * @property string $birthday_date
  * @property string $birthday_place
- * @property string $registration_place
+ * @property string $registration_address
  * @property double $balance
  *
  * @property User $user
@@ -54,15 +54,15 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('user_id, name, surname, middle_name, phone1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_place', 'required'),
+			array('user_id, name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
 			array('balance', 'numerical'),
 			array('user_id, icq, passport_number', 'length', 'max'=>20),
 			array('name, surname, middle_name, email, skype', 'length', 'max'=>100),
-			array('phone1, phone2, phone3', 'length', 'max'=>50),
+			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('passport_series', 'length', 'max'=>10),
-			array('passport_issuer, birthday_place, registration_place', 'length', 'max'=>200),
-			array('phone2, phone3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, user_id, name, surname, middle_name, phone1, phone2, phone3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_place, balance', 'safe', 'on'=>'search'),
+			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
+			array('phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -87,9 +87,9 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'name' => Yii::t('app', 'Name'),
 			'surname' => Yii::t('app', 'Surname'),
 			'middle_name' => Yii::t('app', 'Middle Name'),
-			'phone1' => Yii::t('app', 'Phone1'),
-			'phone2' => Yii::t('app', 'Phone2'),
-			'phone3' => Yii::t('app', 'Phone3'),
+			'phone_1' => Yii::t('app', 'Phone 1'),
+			'phone_2' => Yii::t('app', 'Phone 2'),
+			'phone_3' => Yii::t('app', 'Phone 3'),
 			'email' => Yii::t('app', 'Email'),
 			'skype' => Yii::t('app', 'Skype'),
 			'icq' => Yii::t('app', 'Icq'),
@@ -99,7 +99,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'passport_issuer' => Yii::t('app', 'Passport Issuer'),
 			'birthday_date' => Yii::t('app', 'Birthday Date'),
 			'birthday_place' => Yii::t('app', 'Birthday Place'),
-			'registration_place' => Yii::t('app', 'Registration Place'),
+			'registration_address' => Yii::t('app', 'Registration Address'),
 			'balance' => Yii::t('app', 'Balance'),
 			'user' => null,
 			'deliveryReports' => null,
@@ -116,9 +116,9 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('name', $this->name, true);
 		$criteria->compare('surname', $this->surname, true);
 		$criteria->compare('middle_name', $this->middle_name, true);
-		$criteria->compare('phone1', $this->phone1, true);
-		$criteria->compare('phone2', $this->phone2, true);
-		$criteria->compare('phone3', $this->phone3, true);
+		$criteria->compare('phone_1', $this->phone_1, true);
+		$criteria->compare('phone_2', $this->phone_2, true);
+		$criteria->compare('phone_3', $this->phone_3, true);
 		$criteria->compare('email', $this->email, true);
 		$criteria->compare('skype', $this->skype, true);
 		$criteria->compare('icq', $this->icq, true);
@@ -128,7 +128,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('passport_issuer', $this->passport_issuer, true);
 		$criteria->compare('birthday_date', $this->birthday_date, true);
 		$criteria->compare('birthday_place', $this->birthday_place, true);
-		$criteria->compare('registration_place', $this->registration_place, true);
+		$criteria->compare('registration_address', $this->registration_address, true);
 		$criteria->compare('balance', $this->balance);
 
 		return new CActiveDataProvider($this, array(

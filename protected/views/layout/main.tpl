@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>{CHtml::encode($this->pageTitle)}</title>
+    {$d=Yii::app()->clientScript->registerCssFile('/static/style.css')}
 </head>
 <body>
 	<div class="container">
@@ -14,6 +15,15 @@
 				'brandUrl'=>$this->createUrl('site/index'),
 				'collapse'=>true,
 				'items'=> [
+                    [
+                        'class'=>'bootstrap.widgets.TbMenu',
+                        'items'=>[
+                            [
+                                'label'=>Yii::t('app','Agents'),
+                                'url'=>$this->createUrl('agent/admin')
+                            ]
+                        ]
+                    ],
                     [
                         'class'=>'bootstrap.widgets.TbMenu',
                         'htmlOptions'=>['class'=>'pull-right'],
