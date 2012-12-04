@@ -27,9 +27,11 @@
  * @property string $birthday_date
  * @property string $birthday_place
  * @property string $registration_place
+ * @property double $balance
  *
  * @property User $user
  * @property DeliveryReport[] $deliveryReports
+ * @property Payment[] $payments
  * @property Sim[] $sims
  */
 abstract class BaseAgent extends BaseGxActiveRecord {
@@ -53,13 +55,14 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('user_id, name, surname, middle_name, phone1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_place', 'required'),
+			array('balance', 'numerical'),
 			array('user_id, icq, passport_number', 'length', 'max'=>20),
 			array('name, surname, middle_name, email, skype', 'length', 'max'=>100),
 			array('phone1, phone2, phone3', 'length', 'max'=>50),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_place', 'length', 'max'=>200),
-			array('phone2, phone3, email, skype, icq', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, user_id, name, surname, middle_name, phone1, phone2, phone3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_place', 'safe', 'on'=>'search'),
+			array('phone2, phone3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, user_id, name, surname, middle_name, phone1, phone2, phone3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_place, balance', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -67,6 +70,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		return array(
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'deliveryReports' => array(self::HAS_MANY, 'DeliveryReport', 'agent_id'),
+			'payments' => array(self::HAS_MANY, 'Payment', 'agent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'agent_id'),
 		);
 	}
@@ -96,8 +100,10 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'birthday_date' => Yii::t('app', 'Birthday Date'),
 			'birthday_place' => Yii::t('app', 'Birthday Place'),
 			'registration_place' => Yii::t('app', 'Registration Place'),
+			'balance' => Yii::t('app', 'Balance'),
 			'user' => null,
 			'deliveryReports' => null,
+			'payments' => null,
 			'sims' => null,
 		);
 	}
@@ -123,6 +129,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('birthday_date', $this->birthday_date, true);
 		$criteria->compare('birthday_place', $this->birthday_place, true);
 		$criteria->compare('registration_place', $this->registration_place, true);
+		$criteria->compare('balance', $this->balance);
 
 		return new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
