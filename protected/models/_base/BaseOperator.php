@@ -69,4 +69,5 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 			'criteria' => $criteria,
 		));
 	}
+
 }
