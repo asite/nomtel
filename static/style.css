@@ -38,12 +38,13 @@ h1 {
     padding-bottom: 20px;
 }
 
-.container {
+.content {
 	text-align: center;
 }
 
 .inner_container {
 	width: 1200px;
+    margin: 0 auto;
 	text-align: left;
 	padding-bottom: 50px;
 }
@@ -95,7 +96,6 @@ h1 {
 }
 
 .form-container-horizontal {
-    clear:both;
 }
 
 .form-container-horizontal .help-inline {
@@ -104,4 +104,15 @@ h1 {
 
 .form-container-horizontal .form-container-item{
     float: left;
+}
+
+
+.cfix:after, .clear {
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+    *zoom: 1;
+    *display: block;
 }

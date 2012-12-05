@@ -90,4 +90,10 @@ return array (
   'Your account blocked by admin' => 'Ваш аккаунт заблокирован администратором',
   'Your account blocked for :m minutes due to invalid logins.' => 'Ваш аккаунт заблокирован на :m минут из-за неуспешных попыток авторизации',
   'are required' => 'обязательны для заполнения',
+
+  'MenuSim' => 'Сим карты',
+  'addDeliveryReport' => 'Загрузка накладной',
+  'addSim' => 'Добавселие сим карт',
+  'buttonAddSim'=>'Добавить симкарты',
+  'buttonProcessSim' => 'Обработать',
 );

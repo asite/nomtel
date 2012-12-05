@@ -11,6 +11,7 @@
  *
  * @property string $id
  * @property string $operator_id
+ * @property string $title
  * @property double $price_agent_sim
  * @property double $price_license_fee
  *
@@ -32,15 +33,16 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'id';
+		return 'title';
 	}
 
 	public function rules() {
 		return array(
-			array('operator_id, price_agent_sim, price_license_fee', 'required'),
+			array('operator_id, title, price_agent_sim, price_license_fee', 'required'),
 			array('price_agent_sim, price_license_fee', 'numerical'),
 			array('operator_id', 'length', 'max'=>20),
-			array('id, operator_id, price_agent_sim, price_license_fee', 'safe', 'on'=>'search'),
+			array('title', 'length', 'max'=>50),
+			array('id, operator_id, title, price_agent_sim, price_license_fee', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,6 +62,7 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'operator_id' => null,
+			'title' => Yii::t('app', 'Title'),
 			'price_agent_sim' => Yii::t('app', 'Price Agent Sim'),
 			'price_license_fee' => Yii::t('app', 'Price License Fee'),
 			'sims' => null,
@@ -72,6 +75,7 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('operator_id', $this->operator_id);
+		$criteria->compare('title', $this->title, true);
 		$criteria->compare('price_agent_sim', $this->price_agent_sim);
 		$criteria->compare('price_license_fee', $this->price_license_fee);
 
@@ -79,4 +83,5 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 			'criteria' => $criteria,
 		));
 	}
+
 }

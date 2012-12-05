@@ -20,9 +20,9 @@
  * @property string $operator_id
  * @property string $tariff_id
  *
- * @property Tariff $tariff
  * @property Agent $agent
  * @property DeliveryReport $deliveryReport
+ * @property Tariff $tariff
  */
 abstract class BaseSim extends BaseGxActiveRecord {
 
@@ -44,10 +44,10 @@ abstract class BaseSim extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('id, state, personal_account, number_price, icc', 'required'),
+			array('state, personal_account, number_price, icc', 'required'),
 			array('number_price', 'numerical'),
-			array('id, agent_id, delivery_report_id, operator_id, tariff_id', 'length', 'max'=>20),
-			array('state', 'length', 'max'=>21),
+			array('state', 'length', 'max'=>18),
+			array('agent_id, delivery_report_id, operator_id, tariff_id', 'length', 'max'=>20),
 			array('personal_account, number, icc', 'length', 'max'=>50),
 			array('agent_id, delivery_report_id, number, operator_id, tariff_id', 'default', 'setOnEmpty' => true, 'value' => null),
 			array('id, state, agent_id, delivery_report_id, personal_account, number, number_price, icc, operator_id, tariff_id', 'safe', 'on'=>'search'),
@@ -56,9 +56,9 @@ abstract class BaseSim extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
-			'tariff' => array(self::BELONGS_TO, 'Tariff', 'tariff_id'),
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
 			'deliveryReport' => array(self::BELONGS_TO, 'DeliveryReport', 'delivery_report_id'),
+			'tariff' => array(self::BELONGS_TO, 'Tariff', 'tariff_id'),
 		);
 	}
 
@@ -79,9 +79,9 @@ abstract class BaseSim extends BaseGxActiveRecord {
 			'icc' => Yii::t('app', 'Icc'),
 			'operator_id' => Yii::t('app', 'Operator'),
 			'tariff_id' => null,
-			'tariff' => null,
 			'agent' => null,
 			'deliveryReport' => null,
+			'tariff' => null,
 		);
 	}
 

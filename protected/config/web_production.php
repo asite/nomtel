@@ -90,6 +90,7 @@ return array(
     'params' => array(
         'varUrl' => '/var/',
         'varDir' => dirname(__FILE__) . '/../../var/',
+        'numberPrice' => 100,
     ),
 );
 

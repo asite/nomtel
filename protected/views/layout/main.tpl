@@ -6,7 +6,7 @@
     {$d=Yii::app()->clientScript->registerCssFile('/static/style.css')}
 </head>
 <body>
-	<div class="container">
+	<div class="content">
 		<div class="inner_container">
 			{$d=$this->widget('bootstrap.widgets.TbNavbar', [
 				'fixed'=>false,
@@ -21,6 +21,20 @@
                             [
                                 'label'=>Yii::t('app','Agents'),
                                 'url'=>$this->createUrl('agent/admin')
+                            ]
+                        ]
+                    ],
+                    [
+                        'class'=>'bootstrap.widgets.TbMenu',
+                        'items'=>[
+                            [
+                              'label'=>Yii::t('app','MenuSim'),
+                              'url'=>'#',
+                              'items'=>
+                                [
+                                  ['label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery')],
+                                  ['label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add')]
+                                ]
                             ]
                         ]
                     ],
