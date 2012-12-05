@@ -62,6 +62,8 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
 			array('phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
+            array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
+            array('birthday_date','date','format'=>'dd.MM.yyyy'),
 			array('id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance', 'safe', 'on'=>'search'),
 		);
 	}
@@ -135,4 +137,46 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'criteria' => $criteria,
 		));
 	}
+
+    public function convertDateTimeFieldsToEDateTime() {
+        // rest of work will do setAttribute() routine
+        $this->setAttribute('passport_issue_date',strval($this->passport_issue_date));
+        $this->setAttribute('birthday_date',strval($this->birthday_date));
+    }
+
+    public function convertDateTimeFieldsToString() {
+        if (is_object($this->passport_issue_date) && get_class($this->passport_issue_date)=='EDateTime') $this->passport_issue_date=new EString($this->passport_issue_date->format(self::$mySqlDateFormat));
+        if (is_object($this->birthday_date) && get_class($this->birthday_date)=='EDateTime') $this->birthday_date=new EString($this->birthday_date->format(self::$mySqlDateFormat));
+    }
+
+    public function afterFind() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
+
+    private function convertStringToEDateTime($val,$type) {
+        if (!$val) return null;
+        try {
+            $val=new EDateTime($val,null,$type);
+        } catch (Exception $e) {
+        }
+        return $val;
+    }
+
+    public function setAttribute($column,$val) {
+        if (is_string($val)) {
+            if ($column=='passport_issue_date') $val=$this->convertStringToEDateTime($val,'date');
+            if ($column=='birthday_date') $val=$this->convertStringToEDateTime($val,'date');
+        }
+        parent::setAttribute($column,$val);
+    }
+
+    public function beforeSave() {
+        $this->convertDateTimeFieldsToString();
+
+        return true;
+    }
+
+    public function afterSave() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
 }

@@ -6,7 +6,15 @@
  */
 class EDateTime extends DateTime {
 
-    public static $DBFormat = 'Y-m-d H:i:s';
+    public static $formatDateTime = 'd.m.Y H:i:s';
+    public static $formatDate = 'd.m.Y';
+
+    public $type;
+
+    public function __construct($time = "now", $timezone = null,$type='datetime') {
+        parent::__construct($time,$timezone);
+        $this->type=$type;
+    }
 
     public function getTimestamp() {
         return method_exists('DateTime', 'getTimestamp') ? parent::getTimestamp() : $this->format('U');
@@ -31,7 +39,7 @@ class EDateTime extends DateTime {
     }
 
     public function __toString() {
-        return (string) parent::format(self::$DBFormat);
+        return (string) parent::format($this->type=='date' ? self::$formatDate:self::$formatDateTime);
     }
 
 }

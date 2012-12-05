@@ -7,7 +7,7 @@
 ?>
 <?php echo "<?php\n"; ?>
 
-class <?php echo $this->controllerClass; ?> extends <?php echo $this->baseControllerClass; ?> {
+class <?php echo $this->controllerClass; ?> extends <?php echo 'BaseGxController'/*$this->baseControllerClass;*/ ?> {
 
 <?php
   $authpath = 'ext.giix-core.giixCrud.templates.default.auth.';

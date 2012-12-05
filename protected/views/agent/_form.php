@@ -5,7 +5,7 @@
 	'id' => 'agent-form',
     'type' => 'horizontal',
 	'enableAjaxValidation' => false,
-        //'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false),
+        'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false),
     	//'htmlOptions'=>array('enctype'=>'multipart/form-data')
 ));
 ?>
