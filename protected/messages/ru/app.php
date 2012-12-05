@@ -59,7 +59,7 @@ return array (
   'Can\'t delete this object because it is used by another object(s)' => 'Не могу удалить данный объект, т.к. он используется',
   'Cancel' => 'Отменить',
   'Create' => 'Добавить',
-  'Creating Agent' => 'Добавление Агента',
+  'Creating Agent' => 'Добавление агента',
   'Dt' => 'Дата',
   'Enter' => 'Войти',
   'Fields with' => 'Поля, отмеченные',
@@ -83,7 +83,7 @@ return array (
   'Remember me' => 'Запомнить меня',
   'Save' => 'Сохранение',
   'Surname' => 'Фамилия',
-  'Updating Agent' => 'Редактирование Агента',
+  'Updating Agent' => 'Редактирование агента',
   'User with this username already exists' => 'Пользователь с данным именем уже существует',
   'Username' => 'Имя пользователя',
   'User|Users' => 'Пользователь|Пользователи',
@@ -93,7 +93,7 @@ return array (
 
   'MenuSim' => 'Сим карты',
   'addDeliveryReport' => 'Загрузка накладной',
-  'addSim' => 'Добавселие сим карт',
+  'addSim' => 'Добавление сим карт',
   'buttonAddSim'=>'Добавить симкарты',
   'buttonProcessSim' => 'Обработать',
 );

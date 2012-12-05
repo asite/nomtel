@@ -42,6 +42,7 @@ class User extends BaseUser {
     public function rules() {
         return array_merge(parent::rules(), array(
                     array('username', 'unique', 'message' => Yii::t('app', 'User with this username already exists'), 'skipOnError' => true),
+                    array('password', 'required', 'on'=>'create')
                 ));
     }
 

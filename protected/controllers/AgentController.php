@@ -1,71 +1,105 @@
 <?php
 
-class AgentController extends BaseGxController {
+class AgentController extends BaseGxController
+{
 
+    public function actionCreate()
+    {
+        $model = new Agent;
+        $user = new User('create');
+        $user->status = ModelLoggableBehavior::STATUS_ACTIVE;
 
-  public function actionCreate() {
-    $model = new Agent;
+        $this->performAjaxValidation(array($model,$user));
 
-    $this->performAjaxValidation($model, 'agent-form');
+        if (isset($_POST['Agent'])) {
+            $model->setAttributes($_POST['Agent']);
+            $user->setAttributes($_POST['User']);
 
-    if (isset($_POST['Agent'])) {
-      $model->setAttributes($_POST['Agent']);
+            $validated=true;
+            if (!$model->validate()) $validated=false;
+            if (!$user->validate()) $validated=false;
 
-      if ($model->validate()) {
-        $model->save();
-        if (Yii::app()->getRequest()->getIsAjaxRequest())
-          Yii::app()->end();
-        else
-          $this->redirect(array('admin'));
-      }
+            if ($validated) {
+                $user->encryptPwd();
+                $user->save();
+                $model->user_id = $user->id;
+                $model->save();
+                if (Yii::app()->getRequest()->getIsAjaxRequest())
+                    Yii::app()->end();
+                else
+                    $this->redirect(array('admin'));
+            }
+        }
+
+        $this->render('create', array('model' => $model,'user'=>$user));
     }
 
-    $this->render('create', array( 'model' => $model));
-  }
+    public function actionUpdate($id)
+    {
+        $model = $this->loadModel($id, 'Agent');
+        $user = $model->user;
+        $password = $user->password;
 
-  public function actionUpdate($id) {
-    $model = $this->loadModel($id, 'Agent');
+        $this->performAjaxValidation(array($model,$user));
 
-    $this->performAjaxValidation($model, 'agent-form');
+        if (isset($_POST['Agent'])) {
+            $model->setAttributes($_POST['Agent']);
+            $user->setAttributes($_POST['User']);
 
-    if (isset($_POST['Agent'])) {
-      $model->setAttributes($_POST['Agent']);
+            $validated=true;
+            if (!$model->validate()) $validated=false;
+            if (!$user->validate()) $validated=false;
 
-      if ($model->validate()) {
-        $model->save();
-        $this->redirect(array('admin'));
-      }
-    }
+            if ($validated) {
+                $model->save();
 
-    $this->render('update', array(
-        'model' => $model,
+                if ($user->password != '') {
+                    $user->encryptPwd();
+                } else {
+                    $user->password = $password;
+                }
+
+                $user->save();
+                $this->redirect(array('admin'));
+            }
+        }
+
+        $user->password = '';
+        $this->render('update', array(
+            'model' => $model,
+            'user' => $model->user
         ));
-  }
+    }
 
-  public function actionDelete($id) {
-    if (Yii::app()->getRequest()->getIsPostRequest()) {
-	  try {
-        $this->loadModel($id, 'Agent')->delete();
-	  } catch (CDbException $e) {
-		$this->ajaxError(Yii::t("app","Can't delete this object because it is used by another object(s)"));
-	  }
+    public function actionDelete($id)
+    {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $model = $this->loadModel($id, 'Agent');
+                $user = $model->user;
+                $model->delete();
+                $user->delete();
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+            }
 
-      if (!Yii::app()->getRequest()->getIsAjaxRequest())
-        $this->redirect(array('admin'));
-    } else
-      throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
-  }
+            if (!Yii::app()->getRequest()->getIsAjaxRequest())
+                $this->redirect(array('admin'));
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
 
-  public function actionAdmin() {
-    $model = new Agent('search');
-    $model->unsetAttributes();
+    public function actionAdmin()
+    {
+        $model = new Agent('search');
+        $model->unsetAttributes();
 
-    if (isset($_GET['Agent']))
-      $model->setAttributes($_GET['Agent']);
+        if (isset($_GET['Agent']))
+            $model->setAttributes($_GET['Agent']);
 
-    $this->render('admin', array(
-      'model' => $model,
-    ));
-  }
+        $this->render('admin', array(
+            'model' => $model,
+        ));
+    }
 
 }

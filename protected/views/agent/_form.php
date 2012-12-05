@@ -4,9 +4,9 @@
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
 	'id' => 'agent-form',
     'type' => 'horizontal',
-	'enableAjaxValidation' => false,
-        'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false),
-    	//'htmlOptions'=>array('enctype'=>'multipart/form-data')
+	'enableAjaxValidation' => true,
+    'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false),
+    //'htmlOptions'=>array('enctype'=>'multipart/form-data')
 ));
 ?>
 
@@ -14,9 +14,16 @@
 		<?php echo Yii::t('app', 'Fields with'); ?> <span class="required">*</span> <?php echo Yii::t('app', 'are required'); ?>.
 	</p>
 
-	<?php echo $form->errorSummary($model); ?>
+    <?php echo $form->errorSummary(array($user,$model)); ?>
 <fieldset><legend><?php echo Yii::t('app','Authorization data');?></legend>
-    <?php echo $form->textFieldRow($model,'user_id',array('class'=>'span3','maxlength'=>20)); ?>
+    <div class="form-container-horizontal">
+        <div class="form-container-item form-label-width-140">
+            <?php echo $form->textFieldRow($user,'username',array('autocomplete'=>'off','class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+        </div>
+        <div class="form-container-item form-label-width-100">
+            <?php echo $form->passwordFieldRow($user,'password',array('autocomplete'=>'off','class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+        </div>
+    </div>
 </fieldset>
     <fieldset><legend><?php echo Yii::t('app','Agent');?></legend>
 <div class="form-container-horizontal">
@@ -58,7 +65,7 @@
 
         <div class="form-container-horizontal">
             <div class="form-container-item form-label-width-140">
-                <?php echo $form->textFieldRow($model,'passport_issuer',array('class'=>'span8','maxlength'=>200)); ?>
+                <?php echo $form->textFieldRow($model,'passport_issuer',array('class'=>'span8','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
             </div>
         </div>
 

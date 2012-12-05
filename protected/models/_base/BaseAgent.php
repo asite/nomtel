@@ -54,14 +54,14 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('user_id, name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
+			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
 			array('balance', 'numerical'),
 			array('user_id, icq, passport_number', 'length', 'max'=>20),
 			array('name, surname, middle_name, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
-			array('phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('user_id, phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birthday_date','date','format'=>'dd.MM.yyyy'),
 			array('id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance', 'safe', 'on'=>'search'),
