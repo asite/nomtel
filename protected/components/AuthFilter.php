@@ -8,6 +8,12 @@ class AuthFilter extends CFilter {
 			return false;
 		}
 
+        if (!Yii::app()->user->getState('isAdmin') &&
+            !preg_match('%^(site)%',Yii::app()->controller->route)) {
+            Yii::app()->request->redirect(Yii::app()->createUrl('site/index'));
+            return false;
+        }
+
 		return true;
 	}
 
