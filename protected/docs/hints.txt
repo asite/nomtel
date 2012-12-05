@@ -1,0 +1,45 @@
+создание админки подчиненных объектов:
+скопировать в actionUpdate кусок actionAdmin и переименовать $model в $model2, передать $model2 в шаблон. после model2->unsetAttributes присвоить полю $model2 значение родительского аттрибута
+после create родительского объекта редиректить на update
+скопировать в update.php определение грида, переименовать $model в $model2. Прописать в гриде ссылки для update и delete кнопок
+добавить в update.php заголовок h2 и ссылку create
+в update.php и create.php прописать breadcrumb
+в _form.php поле с id сделать скрытым
+в контроллере после update и create сделать redirect на actionUpdate родительского объекта, в create добавить присвоение значения родительскому аттрибуту
+
+создание сортируемого CGridView:
+скопировать в модель методы moveUp moveDown
+скопировать в контроллер экшены actionMoveUp actionMoveDown, изменить названия моделей
+перед гридом добавить js функцию move
+в гриде заменить определение колонки CButtonColumn
+в actionCreate сделать автозаполнение поля sort_order
+в модели установить порядок сортировки по sortorder
+
+upload file в форме объекта:
+установить тип формы 'htmlOptions'=>array('enctype'=>'multipart/form-data')
+	<?php $form = $this->beginWidget('BaseBootActiveForm', array(
+		'id' => 'font-form',
+		'type' => 'horizontal',
+		'enableAjaxValidation' => false,
+		'htmlOptions'=>array('enctype'=>'multipart/form-data')
+	));
+	?>
+изменить тип поля в форме на file
+в rules поля поставить unsafe
+	public function rules() {
+		return array_merge(parent::rules(),array(
+			array('file_r','unsafe'),
+			array('file_b','unsafe'),
+			array('file_i','unsafe'),
+			array('file_bi','unsafe')
+		));
+	}
+после setAttributes вставить вызов preProcessUploadedFile
+	  $this->preProcessUploadedFile($_FILES['Font'], $model, 'file_r', "fonts/{$model->id}/",'r');
+после save() вставить вызов postProcessUploadedFile и save()
+	    $this->postProcessUploadedFile($_FILES['Font'], $model, 'file_r', "fonts/{$model->id}/",'r');
+	    $this->postProcessUploadedFile($_FILES['Font'], $model, 'file_b', "fonts/{$model->id}/",'b');
+	    $this->postProcessUploadedFile($_FILES['Font'], $model, 'file_i', "fonts/{$model->id}/",'i');
+	    $this->postProcessUploadedFile($_FILES['Font'], $model, 'file_bi', "fonts/{$model->id}/",'bi');
+
+		$model->save();

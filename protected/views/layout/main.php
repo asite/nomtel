@@ -19,6 +19,20 @@
                         'class'=>'bootstrap.widgets.TbMenu',
                         'items'=>array(
                             array(
+                              'label'=>Yii::t('app','MenuSim'),
+                              'url'=>'#',
+                              'items'=>
+                                array(
+                                  array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery')),
+                                  array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add'))
+                                )
+                            )
+                        )
+                    ),
+                    array(
+                        'class'=>'bootstrap.widgets.TbMenu',
+                        'items'=>array(
+                            array(
                                 'label'=>Yii::t('app','Agents'),
                                 'url'=>$this->createUrl('agent/admin')
                             )
@@ -28,13 +42,8 @@
                         'class'=>'bootstrap.widgets.TbMenu',
                         'items'=>array(
                             array(
-                              'label'=>Yii::t('app','MenuSim'),
-                              'url'=>'#',
-                              'items'=>
-                                array(
-                                  array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery')),
-                                  array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add'))
-                                )
+                                'label'=>Yii::t('app','Operators'),
+                                'url'=>$this->createUrl('operator/admin')
                             )
                         )
                     ),

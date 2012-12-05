@@ -95,6 +95,22 @@ h1 {
     margin-left: 180px;
 }
 
+.form-label-width-180 label.control-label {
+    width: 180px;
+}
+
+.form-label-width-180 div.controls {
+    margin-left: 200px;
+}
+
+.form-label-width-200 label.control-label {
+    width: 200px;
+}
+
+.form-label-width-200 div.controls {
+    margin-left: 220px;
+}
+
 .form-container-horizontal {
 }
 
@@ -115,4 +131,8 @@ h1 {
     visibility: hidden;
     *zoom: 1;
     *display: block;
+}
+
+input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .uneditable-input {
+    color: #544E4F;
 }
