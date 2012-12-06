@@ -63,29 +63,30 @@ $this->breadcrumbs = array(
 <?php
 
   if (Yii::app()->user->hasFlash('deliveryReport')) {
-  $deliveryReport = unserialize(Yii::app()->user->getFlash('deliveryReport'));
+    $deliveryReport = unserialize(Yii::app()->user->getFlash('deliveryReport'));
 
-  echo "<h2>Добавленые данные</h2>";
+    echo "<h2>Добавленые данные</h2>";
 
-  $dataProvider = new CArrayDataProvider(
-    $deliveryReport,
-    array(
-      'pagination'=>array(
-        'pageSize'=>14,
+    $dataProvider = new CArrayDataProvider(
+      $deliveryReport,
+      array(
+        'pagination'=>array(
+          'pageSize'=>14,
+        ),
+      )
+    );
+
+    $this->widget('bootstrap.widgets.TbGridView', array(
+      'dataProvider' => $dataProvider,
+      'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+      'columns' => array(
+        'id',
+        'personalAccount',
+        'icc',
+        'phoneNumber'
       ),
-    )
-  );
-
-  $this->widget('bootstrap.widgets.TbGridView', array(
-    'dataProvider' => $dataProvider,
-    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'columns' => array(
-      'id',
-      'personalAccount',
-      'icc',
-      'phoneNumber'
-    ),
-  )); }
+    ));
+  }
 
  ?>
 

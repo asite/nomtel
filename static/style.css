@@ -136,3 +136,9 @@ h1 {
 input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .uneditable-input {
     color: #544E4F;
 }
+
+.iconplussim {
+    position: absolute;
+    left: 450px;
+    bottom: 15px;
+}

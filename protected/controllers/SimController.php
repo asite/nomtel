@@ -52,18 +52,14 @@ class SimController extends BaseGxController {
   public function actionAdd() {
     $model = new AddSim;
 
-    if ($_POST['AddSim']) {
-      $model->attributes = $_POST['AddSim'];
-      $this->performAjaxValidation($model, $_POST['simMethod']);
-    }
-
     $opList = Operator::model()->findAll();
     $opListArray = array();
     foreach($opList as $v) {
       $opListArray[$v['id']]=$v['title'];
     }
 
-    $tariffList = Tariff::model()->findAll();
+    if (isset($_POST['AddSim']['operator'])) $operator_id = $_POST['AddSim']['operator']; else $operator_id = key($opListArray);
+    $tariffList = Tariff::model()->findAllByAttributes(array('operator_id'=>$operator_id));
     $tariffListArray = array();
     foreach($tariffList as $v) {
       $tariffListArray[$v['id']]=$v['title'];
@@ -75,7 +71,81 @@ class SimController extends BaseGxController {
       $whereListArray[$v['id']]=$v['surname'].' '.$v['name'].' '.$v['middle_name'];
     }
 
-    $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray));
+    if ($_POST['AddSim']) {
+      $activeTabs = array('tab1'=>false,'tab2'=>false);
+
+      $model->attributes = $_POST['AddSim'];
+      $this->performAjaxValidation($model, $_POST['simMethod']);
+
+
+      if ($_POST['simMethod'] == 'add-much-sim') {
+        $result = Sim::model()->findAllByAttributes(
+          array(),
+          $condition = 'icc >= :iccBegin AND icc <= :iccEnd',
+          $params = array(
+              ':iccBegin' => $_POST['AddSim']['ICCFirst'].$_POST['AddSim']['ICCBegin'],
+              ':iccEnd' => $_POST['AddSim']['ICCFirst'].$_POST['AddSim']['ICCEnd'],
+          )
+        );
+        if (isset($_POST['buttonProcessSim'])) {
+          $activeTabs['tab1'] = true;
+          $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportMany'=>$result, 'activeTabs'=>$activeTabs));
+          exit;
+        } else {
+          foreach($result as $v) {
+            $model = Sim::model()->findByAttributes(array('icc'=>$v->icc));
+            $model->state = 'IN_BASE';
+            $model->operator_id = $_POST['AddSim']['operator'];
+            $model->tariff_id = $_POST['AddSim']['tariff'];
+            $model->save();
+          }
+          Yii::app()->user->setFlash('successMany', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+          $this->refresh();
+          exit;
+        }
+      }
+
+      if ($_POST['simMethod'] == 'add-few-sim') {
+        $condition = ' icc="'.$_POST['AddSim']['ICCBeginFew'].$_POST['AddSim']['ICCEndFew'].'" ';
+        for($i=1; $i<=count($_POST['AddNewSim']['ICCBeginFew']);$i++) {
+          if ($_POST['AddNewSim']['ICCBeginFew'][$i] && $_POST['AddNewSim']['ICCEndFew'][$i])
+          $condition .= ' OR icc = "'.$_POST['AddNewSim']['ICCBeginFew'][$i].$_POST['AddNewSim']['ICCEndFew'][$i].'"';
+        }
+
+        $result = Sim::model()->findAllBySql('select * from sim where '.$condition);
+        if (isset($_POST['buttonProcessSim'])) {
+          $activeTabs['tab2'] = true;
+          $this->render('add', array('model'=>$model, 'data'=>$_POST, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportFew'=>$result, 'activeTabs'=>$activeTabs));
+          exit;
+        } else {
+
+           foreach($result as $v) {
+            $model = Sim::model()->findByAttributes(array('icc'=>$v->icc));
+            $model->state = 'IN_BASE';
+            $model->operator_id = $_POST['AddSim']['operator'];
+            $model->tariff_id = $_POST['AddSim']['tariff'];
+            $model->save();
+          }
+          Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+          Yii::app()->user->setFlash('tab2', true);
+          $this->refresh();
+          exit;
+        }
+      }
+    }
+
+    if (Yii::app()->user->hasFlash('tab2')) $activeTabs['tab2'] = true; else $activeTabs['tab1'] = true;
+    $this->render('add', array('model'=>$model, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'activeTabs'=>$activeTabs));
+  }
+
+  public function actionAjaxcombo() {
+    $tariffList = Tariff::model()->findAllByAttributes(array('operator_id'=>$_POST['operatorId']));
+    $tariffListArray = array();
+    $res = '';
+    foreach($tariffList as $v) {
+      $res .= '<option value="'.$v['id'].'">'.$v['title'].'</option>';
+    }
+    echo $res;
   }
 
 }

@@ -9,6 +9,47 @@ $this->breadcrumbs = array(
 
 <h1><?php echo Yii::t('app','addSim'); ?></h1>
 
+<script type="text/javascript">
+
+  function changeOperator(mode) {
+    $.ajax({
+      type: "POST",
+      url: "<?php echo $this->createUrl('ajaxcombo') ?>",
+      data: { YII_CSRF_TOKEN: $('[name="YII_CSRF_TOKEN"]').val(), operatorId: $(mode).val() }
+    }).done(function( msg ) {
+      $(mode).siblings('[name="AddSim[tariff]"]').html(msg);
+    });
+  }
+
+  jQuery(document).ready(function(){
+    $('.iconplussim').live('click',function(){
+      clone = $('#addFewSims').clone();
+      index = $('#boxSims').children('div').length;
+      clone.find('input').each(function(){
+        //$(this).attr('id',$(this).attr('id')+index);
+        $(this).attr('name',$(this).attr('name')+'['+index+']');
+      })
+
+      clone.css({'display':'block'}).attr('id','').appendTo('#boxSims');
+      $(this).remove();
+      return false;
+    })
+  })
+</script>
+
+<?php
+
+  $this->widget('bootstrap.widgets.TbAlert', array(
+    'block'=>true, // display a larger alert block?
+    'fade'=>true, // use transitions?
+    'closeText'=>'×', // close link text - if set to false, no close link is displayed
+    'alerts'=>array( // configurations per alert type
+      'success'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+    ),
+  ));
+
+?>
+
 
 <?php ob_start(); ?>
 
@@ -39,7 +80,8 @@ $this->breadcrumbs = array(
 
 <br/><br/>
 <div class="cfix">
-  <?php echo $form->dropDownListRow($model, 'operator', $opListArray); ?>
+
+  <?php echo $form->dropDownListRow($model, 'operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
 
   <?php echo $form->dropDownListRow($model, 'tariff', $tariffListArray); ?>
 
@@ -50,6 +92,33 @@ $this->breadcrumbs = array(
 
 <?php $this->endWidget(); ?>
 
+<?php
+if ($deliveryReportMany) {
+
+    foreach($deliveryReportMany as $k=>$v) {
+      $dataProvider[$k]['personal_account'] = $v->personal_account;
+      $dataProvider[$k]['icc'] = $v->icc;
+      $dataProvider[$k]['number'] = $v->number;
+    }
+
+    $dataProvider = new CArrayDataProvider(
+      $dataProvider,
+      array(
+        'pagination'=>array(
+          'pageSize'=>14,
+        ),
+      )
+    );
+
+    echo "<h2>Найденные данные</h2>";
+
+    $this->widget('bootstrap.widgets.TbGridView', array(
+      'id' => 'sim-grid',
+      'dataProvider' => $dataProvider,
+      'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+     ));
+  }
+?>
 
 <?php $tab1 = ob_get_contents();  ob_end_clean(); ?>
 
@@ -66,25 +135,37 @@ $this->breadcrumbs = array(
 
 <?php echo $form->errorSummary($model); ?>
 
-<div class="cfix">
-  <div style="float: left; margin-right: 5px;">
-    <?php echo $form->textFieldRow($model,'ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+<div id="boxSims">
+  <div class="cfix" style="position: relative;">
+    <!--<div style="float: left; margin-right: 5px;">
+      <?php //echo $form->textFieldRow($model,'ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+    </div>-->
+    <div style="float: left; margin-right: 5px;">
+      <?php echo $form->textFieldRow($model,'ICCBeginFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+    </div>
+    <div style="float: left; margin-right: 5px;">
+      <?php echo $form->textFieldRow($model,'ICCEndFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+    </div>
+    <!--<div style="float: left; margin-right: 5px;">
+      <?php //echo $form->textFieldRow($model,'phone',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+    </div>-->
+    <?php if (!isset($_POST['AddNewSim']['ICCBeginFew'])): ?> <a href="#" class="iconplussim"><i class="icon-plus"></i></a><?php endif; ?>
   </div>
-  <div style="float: left; margin-right: 5px;">
-    <?php echo $form->textFieldRow($model,'ICCBeginFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
-  </div>
-  <div style="float: left; margin-right: 5px;">
-    <?php echo $form->textFieldRow($model,'ICCEndFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
-  </div>
-  <div style="float: left; margin-right: 5px;">
-    <?php echo $form->textFieldRow($model,'phone',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
-  </div>
+  <?php $count=count($_POST['AddNewSim']['ICCBeginFew']); for($k=1;$k<=$count;$k++): ?>
+    <div class="cfix" style="position: relative;">
+      <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCPersonalAccount]" type="text"></div>-->
+      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCBeginFew][<?php echo $k ?>]" type="text" maxlength="15" value="<?php echo $_POST['AddNewSim']['ICCBeginFew'][$k] ?>"></div>
+      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCEndFew][<?php echo $k ?>]" type="text" maxlength="3" value="<?php echo $_POST['AddNewSim']['ICCEndFew'][$k] ?>"></div>
+      <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[phone]" type="text"></div>-->
+      <?php if ($k==$count): ?><a href="#" class="iconplussim"><i class="icon-plus"></i></a><?php endif; ?>
+    </div>
+  <?php endfor; ?>
 </div>
 <?php echo CHtml::htmlButton(Yii::t('app', 'buttonProcessSim'), array('class'=>'btn btn-primary','name'=>'buttonProcessSim', 'type'=>'submit')); ?>
 
 <br/><br/>
 <div class="cfix">
-  <?php echo $form->dropDownListRow($model, 'operator', $opListArray); ?>
+  <?php echo $form->dropDownListRow($model, 'operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
 
   <?php echo $form->dropDownListRow($model, 'tariff', $tariffListArray); ?>
 
@@ -95,15 +176,56 @@ $this->breadcrumbs = array(
 
 <?php $this->endWidget(); ?>
 
+<?php
+if ($deliveryReportFew) {
+
+    $dataProvider = array();
+
+    foreach($deliveryReportFew as $k=>$v) {
+      $dataProvider[$k]['personal_account'] = $v->personal_account;
+      $dataProvider[$k]['icc'] = $v->icc;
+      $dataProvider[$k]['number'] = $v->number;
+    }
+
+
+
+    $dataProvider = new CArrayDataProvider(
+      $dataProvider,
+      array(
+        'pagination'=>array(
+          'pageSize'=>14,
+        ),
+      )
+    );
+
+    echo "<h2>Найденные данные</h2>";
+
+    $this->widget('bootstrap.widgets.TbGridView', array(
+      'id' => 'sim-grid',
+      'dataProvider' => $dataProvider,
+      'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+     ));
+  }
+?>
+
 <?php $tab2 = ob_get_contents(); ob_end_clean(); ?>
 
 <?php
 $this->widget('bootstrap.widgets.TbTabs', array(
   'type'=>'tabs', // 'tabs' or 'pills'
   'tabs'=>array(
-    array('label'=>'Много симкарт', 'content'=>$tab1, 'active'=>true),
-    array('label'=>'Несколько симкарт', 'content'=>$tab2),
-  ),
+    array('label'=>'Много симкарт', 'content'=>$tab1, 'active'=>$activeTabs['tab1']),
+    array('label'=>'Несколько симкарт', 'content'=>$tab2, 'active'=>$activeTabs['tab2']),
+   )
 ));
 
 ?>
+
+
+<div class="cfix" id="addFewSims" style="display: none; position: relative;">
+  <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCPersonalAccount]" type="text"></div>-->
+  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCBeginFew]" type="text" maxlength="15"></div>
+  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCEndFew]" type="text" maxlength="3"></div>
+  <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[phone]" type="text"></div>-->
+  <a href="#" class="iconplussim"><i class="icon-plus"></i></a>
+</div>

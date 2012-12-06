@@ -16,10 +16,10 @@ class AddSim extends CFormModel {
 
   public function rules() {
     return array(
-      array('ICCFirst, ICCBegin, ICCEnd, ICCPersonalAccount, ICCBeginFew, ICCEndFew, phone', 'required'),
+      array('ICCFirst, ICCBegin, ICCEnd, ICCPersonalAccount, ICCBeginFew, ICCEndFew, phone, operator, tariff', 'required'),
       array('ICCFirst, ICCBegin, ICCEnd, ICCPersonalAccount, ICCBeginFew, ICCEndFew', 'numerical'),
-      array('ICCFirst', 'length', 'max'=>8),
-      array('ICCBegin, ICCEnd', 'length', 'max'=>4),
+      array('ICCFirst', 'length'),
+      array('ICCBegin, ICCEnd', 'length'),
       array('ICCBeginFew', 'length', 'max'=>15),
       array('ICCEndFew', 'length', 'max'=>3),
     );
