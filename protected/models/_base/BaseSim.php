@@ -20,9 +20,10 @@
  * @property string $operator_id
  * @property string $tariff_id
  *
- * @property Agent $agent
+ * @property Operator $operator
  * @property DeliveryReport $deliveryReport
  * @property Tariff $tariff
+ * @property Agent $agent
  */
 abstract class BaseSim extends BaseGxActiveRecord {
 
@@ -56,9 +57,10 @@ abstract class BaseSim extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
-			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
+			'operator' => array(self::BELONGS_TO, 'Operator', 'operator_id'),
 			'deliveryReport' => array(self::BELONGS_TO, 'DeliveryReport', 'delivery_report_id'),
 			'tariff' => array(self::BELONGS_TO, 'Tariff', 'tariff_id'),
+			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
 		);
 	}
 
@@ -77,11 +79,12 @@ abstract class BaseSim extends BaseGxActiveRecord {
 			'number' => Yii::t('app', 'Number'),
 			'number_price' => Yii::t('app', 'Number Price'),
 			'icc' => Yii::t('app', 'Icc'),
-			'operator_id' => Yii::t('app', 'Operator'),
+			'operator_id' => null,
 			'tariff_id' => null,
-			'agent' => null,
+			'operator' => null,
 			'deliveryReport' => null,
 			'tariff' => null,
+			'agent' => null,
 		);
 	}
 
@@ -96,11 +99,12 @@ abstract class BaseSim extends BaseGxActiveRecord {
 		$criteria->compare('number', $this->number, true);
 		$criteria->compare('number_price', $this->number_price);
 		$criteria->compare('icc', $this->icc, true);
-		$criteria->compare('operator_id', $this->operator_id, true);
+		$criteria->compare('operator_id', $this->operator_id);
 		$criteria->compare('tariff_id', $this->tariff_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
 	}
+
 }

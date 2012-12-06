@@ -31,7 +31,6 @@ class SimController extends BaseGxController {
                 $sims[$i++]['phoneNumber'] = $sim[2];
                 $model = new Sim;
                 $model->state = 'NOT_RECEIVED';
-                $model->number_price = Yii::app()->params->numberPrice;
                 $model->personal_account = $sim[0];
                 $model->icc = $sim[1];
                 $model->number = $sim[2];
@@ -106,7 +105,7 @@ class SimController extends BaseGxController {
       }
 
       if ($_POST['simMethod'] == 'add-few-sim') {
-        $condition = ' icc="'.$_POST['AddSim']['ICCBeginFew'].$_POST['AddSim']['ICCEndFew'].'" ';
+        /*$condition = ' icc="'.$_POST['AddSim']['ICCBeginFew'].$_POST['AddSim']['ICCEndFew'].'" ';
         for($i=1; $i<=count($_POST['AddNewSim']['ICCBeginFew']);$i++) {
           if ($_POST['AddNewSim']['ICCBeginFew'][$i] && $_POST['AddNewSim']['ICCEndFew'][$i])
           $condition .= ' OR icc = "'.$_POST['AddNewSim']['ICCBeginFew'][$i].$_POST['AddNewSim']['ICCEndFew'][$i].'"';
@@ -117,20 +116,31 @@ class SimController extends BaseGxController {
           $activeTabs['tab2'] = true;
           $this->render('add', array('model'=>$model, 'data'=>$_POST, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportFew'=>$result, 'activeTabs'=>$activeTabs));
           exit;
-        } else {
+        } else {*/
+          $model = new Sim;
+          $model->state = 'IN_BASE';
+          $model->operator_id = $_POST['AddSim']['operator'];
+          $model->tariff_id = $_POST['AddSim']['tariff'];
+          $model->personal_account = $_POST['AddSim']['ICCPersonalAccount'];
+          $model->icc = $_POST['AddSim']['ICCBeginFew'].$_POST['AddSim']['ICCEndFew'];
+          $model->number = $_POST['AddSim']['phone'];
+          $model->save();
 
-           foreach($result as $v) {
-            $model = Sim::model()->findByAttributes(array('icc'=>$v->icc));
+          for($o=1;$o<=count($_POST['AddNewSim']['ICCPersonalAccount']);$o++) {
+            $model = new Sim;
             $model->state = 'IN_BASE';
             $model->operator_id = $_POST['AddSim']['operator'];
             $model->tariff_id = $_POST['AddSim']['tariff'];
+            $model->personal_account = $_POST['AddNewSim']['ICCPersonalAccount'][$o];
+            $model->icc = $_POST['AddNewSim']['ICCBeginFew'][$o].$_POST['AddNewSim']['ICCEndFew'][$o];
+            $model->number = $_POST['AddNewSim']['phone'][$o];
             $model->save();
           }
           Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
           Yii::app()->user->setFlash('tab2', true);
           $this->refresh();
           exit;
-        }
+        //}
       }
     }
 

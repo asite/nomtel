@@ -110,12 +110,17 @@ if ($deliveryReportMany) {
       )
     );
 
-    echo "<h2>Найденные данные</h2>";
+    echo "<h2>".Yii::t('app', 'foundDataSim')."</h2>";
 
     $this->widget('bootstrap.widgets.TbGridView', array(
       'id' => 'sim-grid',
       'dataProvider' => $dataProvider,
       'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+      'columns' => array(
+        'personal_account::Личный счёт',
+        'icc::ICC',
+        'number::Телефон',
+      )
      ));
   }
 ?>
@@ -186,8 +191,6 @@ if ($deliveryReportFew) {
       $dataProvider[$k]['number'] = $v->number;
     }
 
-
-
     $dataProvider = new CArrayDataProvider(
       $dataProvider,
       array(
@@ -197,12 +200,17 @@ if ($deliveryReportFew) {
       )
     );
 
-    echo "<h2>Найденные данные</h2>";
+    echo "<h2>".Yii::t('app', 'foundDataSim')."</h2>";
 
     $this->widget('bootstrap.widgets.TbGridView', array(
       'id' => 'sim-grid',
       'dataProvider' => $dataProvider,
       'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+      'columns' => array(
+        'personal_account::Личный счёт',
+        'icc::ICC',
+        'number::Телефон',
+      )
      ));
   }
 ?>
@@ -213,8 +221,8 @@ if ($deliveryReportFew) {
 $this->widget('bootstrap.widgets.TbTabs', array(
   'type'=>'tabs', // 'tabs' or 'pills'
   'tabs'=>array(
-    array('label'=>'Много симкарт', 'content'=>$tab1, 'active'=>$activeTabs['tab1']),
-    array('label'=>'Несколько симкарт', 'content'=>$tab2, 'active'=>$activeTabs['tab2']),
+    array('label'=>Yii::t('app', 'manySims'), 'content'=>$tab1, 'active'=>$activeTabs['tab1']),
+    array('label'=>Yii::t('app', 'fewSims'), 'content'=>$tab2, 'active'=>$activeTabs['tab2']),
    )
 ));
 

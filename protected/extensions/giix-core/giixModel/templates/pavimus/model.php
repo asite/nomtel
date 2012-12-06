@@ -23,11 +23,4 @@ class <?php echo $modelClass; ?> extends <?php echo $this->baseModelClass."\n"; 
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}
-<?php
-foreach($columns as $column)
-    if ($column->dbType=='date' || $column->dbType=='datetime' || $column->dbType=='timestamp') { ?>
-    public function behaviors() {
-        return array('edatetimebehavior' => array('class' => 'EDateTimeBehavior'));
-    }
-<?php break;} ?>
 }

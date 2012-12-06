@@ -38,6 +38,15 @@ $menu=array(
         'class'=>'bootstrap.widgets.TbMenu',
         'items'=>array(
             array(
+                'label'=>Yii::t('app','DeliveryReports'),
+                'url'=>$this->createUrl('deliveryReport/list')
+            )
+        )
+    ),
+    array(
+        'class'=>'bootstrap.widgets.TbMenu',
+        'items'=>array(
+            array(
                 'label'=>Yii::t('app','Operators'),
                 'url'=>$this->createUrl('operator/admin')
             )

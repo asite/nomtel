@@ -55,7 +55,7 @@ $this->breadcrumbs = array(
   </div>
 </div>
 
-<?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Add'), array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
+<?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'AddDelivery'), array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
 
 <?php $this->endWidget(); ?>
 

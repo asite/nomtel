@@ -16,9 +16,20 @@ class Agent extends BaseAgent
         $data_provider = parent::search();
 
         $data_provider->setSort(array(
-            'defaultOrder' => 'surname asc'
+            'defaultOrder' => 'surname,name,middle_name'
         ));
         return $data_provider;
     }
 
+    public static function getComboList() {
+        $agents=Yii::app()->db->createCommand("select id,name,surname,middle_name from ".
+            self::model()->tableName()." order by surname,name,middle_name")->queryAll();
+
+        $data=array();
+        foreach($agents as $v) {
+            $data[$v['id']]=$v['surname'].' '.$v['name'].' '.$v['middle_name'];
+        }
+
+        return $data;
+    }
 }

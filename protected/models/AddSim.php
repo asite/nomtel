@@ -29,7 +29,11 @@ class AddSim extends CFormModel {
     return array(
       'ICCFirst'=>'ICC Первые цифры',
       'ICCBegin'=>'ICC Начало',
+      'ICCBeginFew'=>'ICC Начало',
       'ICCEnd'=>'ICC Конец',
+      'ICCEndFew'=>'ICC Конец',
+      'phone'=>'Телефон',
+      'ICCPersonalAccount'=>'Личный счёт ',
       'operator'=>'Выбор оператора',
       'tariff'=>'Тарифный план',
       'where'=>'Куда передать карты?',
