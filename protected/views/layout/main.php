@@ -38,7 +38,7 @@ $menu=array(
         'class'=>'bootstrap.widgets.TbMenu',
         'items'=>array(
             array(
-                'label'=>Yii::t('app','DeliveryReports'),
+                'label'=>DeliveryReport::model()->label(2),
                 'url'=>$this->createUrl('deliveryReport/list')
             )
         )
@@ -65,6 +65,15 @@ $menu=array(
 );
 } else {
     $menu=array(
+        array(
+            'class'=>'bootstrap.widgets.TbMenu',
+            'items'=>array(
+                array(
+                    'label'=>DeliveryReport::model()->label(2),
+                    'url'=>$this->createUrl('deliveryReport/list')
+                )
+            )
+        ),
         array(
             'class'=>'bootstrap.widgets.TbMenu',
             'htmlOptions'=>array('class'=>'pull-right'),

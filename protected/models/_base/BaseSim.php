@@ -102,9 +102,12 @@ abstract class BaseSim extends BaseGxActiveRecord {
 		$criteria->compare('operator_id', $this->operator_id);
 		$criteria->compare('tariff_id', $this->tariff_id);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
 
 }

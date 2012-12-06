@@ -19,7 +19,22 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1><?php echo GxHtml::encode(Sim::model()->label(2)); ?></h1>
+<h1><?php echo GxHtml::encode($model->label(1)); ?></h1>
+
+<?php $this->widget('bootstrap.widgets.TbDetailView',array(
+    'data'=>$model,
+    'attributes'=>array(
+        'id',
+        array(
+            'name'=>'agent_id',
+            'value'=>$model->agent
+        ),
+        'dt',
+        'summ',
+    ),
+)); ?>
+
+<h2><?php echo GxHtml::encode(Sim::model()->label(2)); ?></h2>
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'delivery-report-grid',
@@ -27,27 +42,38 @@ $('.search-form form').submit(function(){
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'filter' => $sim,
     'columns' => array(
-        'number',
-        'icc',
+        array(
+            'name'=>'number',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+        ),
+        array(
+            'name'=>'icc',
+            'value'=>'$data->shortIcc',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+        ),
         array(
             'name'=>'operator_id',
             'value'=>'$data->operator->title',
             'sortable'=>false,
+            'htmlOptions' => array('style'=>'text-align:center;'),
         ),
         array(
             'name'=>'tariff_id',
             'value'=>'$data->tariff->title',
             'sortable'=>false,
+            'htmlOptions' => array('style'=>'text-align:center;'),
         ),
         array(
             'name'=>'number_price',
-            'sortable'=>false
+            'sortable'=>false,
+            'htmlOptions' => array('style'=>'text-align:center;'),
             ),
         array(
             'class' => 'bootstrap.widgets.TbDataColumn',
             'header' => Yii::t('app','Sim Price'),
             'value' => '$data->deliveryReport->sim_price',
             'sortable'=>true,
+            'htmlOptions' => array('style'=>'text-align:center;'),
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',

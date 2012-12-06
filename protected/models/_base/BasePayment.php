@@ -69,8 +69,12 @@ abstract class BasePayment extends BaseGxActiveRecord {
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('summ', $this->summ);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
+
 }

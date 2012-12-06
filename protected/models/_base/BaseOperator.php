@@ -12,6 +12,7 @@
  * @property string $id
  * @property string $title
  *
+ * @property Sim[] $sims
  * @property Tariff[] $tariffs
  */
 abstract class BaseOperator extends BaseGxActiveRecord {
@@ -42,6 +43,7 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
+			'sims' => array(self::HAS_MANY, 'Sim', 'operator_id'),
 			'tariffs' => array(self::HAS_MANY, 'Tariff', 'operator_id'),
 		);
 	}
@@ -55,6 +57,7 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'title' => Yii::t('app', 'Title'),
+			'sims' => null,
 			'tariffs' => null,
 		);
 	}
@@ -65,9 +68,12 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('title', $this->title, true);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
 
 }

@@ -79,9 +79,12 @@ abstract class BaseDeliveryReport extends BaseGxActiveRecord {
 		$criteria->compare('sim_price', $this->sim_price);
 		$criteria->compare('summ', $this->summ);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
 
     public function convertDateTimeFieldsToEDateTime() {
@@ -106,11 +109,11 @@ abstract class BaseDeliveryReport extends BaseGxActiveRecord {
         return $val;
     }
 
-    public function setAttribute($column,$val) {
-        if (is_string($val)) {
-            if ($column=='dt') $val=$this->convertStringToEDateTime($val,'datetime');
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='dt') $value=$this->convertStringToEDateTime($value,'datetime');
         }
-        parent::setAttribute($column,$val);
+        return parent::setAttribute($name,$value);
     }
 
     public function beforeSave() {

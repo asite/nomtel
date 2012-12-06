@@ -79,9 +79,12 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 		$criteria->compare('price_agent_sim', $this->price_agent_sim);
 		$criteria->compare('price_license_fee', $this->price_license_fee);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
 
 }

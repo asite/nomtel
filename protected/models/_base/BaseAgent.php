@@ -133,9 +133,12 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('registration_address', $this->registration_address, true);
 		$criteria->compare('balance', $this->balance);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
 
     public function convertDateTimeFieldsToEDateTime() {
@@ -162,12 +165,12 @@ abstract class BaseAgent extends BaseGxActiveRecord {
         return $val;
     }
 
-    public function setAttribute($column,$val) {
-        if (is_string($val)) {
-            if ($column=='passport_issue_date') $val=$this->convertStringToEDateTime($val,'date');
-            if ($column=='birthday_date') $val=$this->convertStringToEDateTime($val,'date');
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='passport_issue_date') $value=$this->convertStringToEDateTime($value,'date');
+            if ($name=='birthday_date') $value=$this->convertStringToEDateTime($value,'date');
         }
-        parent::setAttribute($column,$val);
+        return parent::setAttribute($name,$value);
     }
 
     public function beforeSave() {

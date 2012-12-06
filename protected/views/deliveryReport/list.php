@@ -1,7 +1,7 @@
 <?php
 
 $this->breadcrumbs = array(
-	$model->label(2) => array('admin'),
+	$model->label(2) => array('list'),
 	Yii::t('app', 'List'),
 );
 
@@ -35,7 +35,8 @@ $('.search-form form').submit(function(){
 				'name'=>'agent_id',
 				'value'=>'GxHtml::valueEx($data->agent)',
 				'filter'=>Agent::getComboList(),
-				),
+                'visible'=>Yii::app()->user->getState('isAdmin'),
+		),
         array(
 		        'name'=>'dt',
                 'filter'=>false,

@@ -130,9 +130,12 @@ abstract class <?php echo $this->baseModelClass; ?> extends <?php echo 'BaseGxAc
 		$criteria->compare('<?php echo $name; ?>', $this-><?php echo $name; ?><?php echo $partial ? ', true' : ''; ?>);
 <?php endforeach; ?>
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
 
 <?php
@@ -168,16 +171,16 @@ abstract class <?php echo $this->baseModelClass; ?> extends <?php echo 'BaseGxAc
         return $val;
     }
 
-    public function setAttribute($column,$val) {
-        if (is_string($val)) {
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
 <?php foreach ($columns as $name=>$column) if ($column->dbType=='date') {?>
-            if ($column=='<?php echo $name; ?>') $val=$this->convertStringToEDateTime($val,'date');
+            if ($name=='<?php echo $name; ?>') $value=$this->convertStringToEDateTime($value,'date');
 <?php } ?>
 <?php foreach ($columns as $name=>$column) if ($column->dbType=='datetime' || $column->dbType=='timestamp') {?>
-            if ($column=='<?php echo $name; ?>') $val=$this->convertStringToEDateTime($val,'datetime');
+            if ($name=='<?php echo $name; ?>') $value=$this->convertStringToEDateTime($value,'datetime');
 <?php } ?>
         }
-        parent::setAttribute($column,$val);
+        return parent::setAttribute($name,$value);
     }
 
     public function beforeSave() {

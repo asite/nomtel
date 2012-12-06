@@ -44,6 +44,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			array('username, password', 'length', 'max'=>200),
 			array('blocked_until', 'safe'),
 			array('password, failed_logins, blocked_until', 'default', 'setOnEmpty' => true, 'value' => null),
+            array('blocked_until','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, status, username, password, failed_logins, blocked_until', 'safe', 'on'=>'search'),
 		);
 	}
@@ -81,8 +82,50 @@ abstract class BaseUser extends BaseGxActiveRecord {
 		$criteria->compare('failed_logins', $this->failed_logins);
 		$criteria->compare('blocked_until', $this->blocked_until, true);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
+
+    public function convertDateTimeFieldsToEDateTime() {
+        // rest of work will do setAttribute() routine
+        $this->setAttribute('blocked_until',strval($this->blocked_until));
+    }
+
+    public function convertDateTimeFieldsToString() {
+        if (is_object($this->blocked_until) && get_class($this->blocked_until)=='EDateTime') $this->blocked_until=new EString($this->blocked_until->format(self::$mySqlDateTimeFormat));
+    }
+
+    public function afterFind() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
+
+    private function convertStringToEDateTime($val,$type) {
+        if (!$val) return null;
+        try {
+            $val=new EDateTime($val,null,$type);
+        } catch (Exception $e) {
+        }
+        return $val;
+    }
+
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='blocked_until') $value=$this->convertStringToEDateTime($value,'datetime');
+        }
+        return parent::setAttribute($name,$value);
+    }
+
+    public function beforeSave() {
+        $this->convertDateTimeFieldsToString();
+
+        return true;
+    }
+
+    public function afterSave() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
 }

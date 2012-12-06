@@ -9,7 +9,7 @@ class Agent extends BaseAgent
 	}
 
     public function __toString() {
-        return $this->surname.' '.$this->name;
+        return $this->surname.' '.$this->name.' '.$this->middle_name;
     }
 
     public function search() {
