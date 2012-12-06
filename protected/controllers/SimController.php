@@ -98,9 +98,19 @@ class SimController extends BaseGxController {
             $model->tariff_id = $_POST['AddSim']['tariff'];
             $model->save();
           }
-          Yii::app()->user->setFlash('successMany', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
-          $this->refresh();
-          exit;
+          if ($_POST['AddSim']['where']) {
+            $key = rand();
+            $_SESSION['moveAgent'][$key]=$_POST['AddSim']['where'];
+            foreach($result as $v) {
+              $_SESSION['moveSims'][$key][$v->id]=$v->id;
+            }
+            $this->redirect(array('move','key'=>$key));
+            exit;
+          } else {
+            Yii::app()->user->setFlash('successMany', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+            $this->refresh();
+            exit;
+          }
         }
       }
 
@@ -148,6 +158,16 @@ class SimController extends BaseGxController {
     $this->render('add', array('model'=>$model, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'activeTabs'=>$activeTabs));
   }
 
+  public function actionMove($key) {
+    $criteria = new CDbCriteria();
+    $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+    $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
+
+    //$sims = Sim::model()->findAllByPk($_SESSION['moveSims'][$key]);
+    $agent = Agent::model()->findByPk($_SESSION['moveAgent'][$key]);
+    $this->render('move', array('model'=>$model,'dataProvider'=>$dataProvider,'agent'=>$agent));
+  }
+
   public function actionAjaxcombo() {
     $tariffList = Tariff::model()->findAllByAttributes(array('operator_id'=>$_POST['operatorId']));
     $tariffListArray = array();
@@ -158,4 +178,31 @@ class SimController extends BaseGxController {
     echo $res;
   }
 
+  public function actionUpdatePrice($id) {
+    if (Yii::app()->getRequest()->getIsPostRequest()) {
+      try {
+        Yii::import('bootstrap.widgets.TbEditableSaver'); //or you can add import 'ext.editable.*' to config
+        $model = new TbEditableSaver('Sim');  // 'User' is classname of model to be updated
+        $model->update();
+        //echo CJSON::encode(array('success' => true, 'count' => '155'));
+      } catch (CDbException $e) {
+        $this->ajaxError(Yii::t("app", "Can't edit this object because it is used by another object(s)"));
+      }
+    } else
+      throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+  }
+
+  public function actionRemove($id, $key) {
+    if (Yii::app()->getRequest()->getIsPostRequest()) {
+      try {
+        unset($_SESSION['moveSims'][$key][$id]);
+        //echo "155";
+      } catch (CDbException $e) {
+        $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+      }
+      if (!Yii::app()->getRequest()->getIsAjaxRequest())
+        $this->redirect(array('move','key'=>$key));
+    } else
+      throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+  }
 }

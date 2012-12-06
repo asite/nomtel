@@ -1,9 +1,9 @@
 <?php
 /**
  * EditableColumn class file.
- * 
+ *
  * This widget makes editable column in GridView
- * 
+ *
  * @author Vitaliy Potapov <noginsk@rambler.ru>
  * @link https://github.com/vitalets/yii-bootstrap-editable
  * @copyright Copyright &copy; Vitaliy Potapov 2012
@@ -33,7 +33,7 @@ class TbEditableColumn extends CDataColumn
         }
 
         parent::init();
-        
+
         if($this->isEditable($this->grid->dataProvider->model)) {
             $this->attachAjaxUpdateEvent();
         }
@@ -43,14 +43,14 @@ class TbEditableColumn extends CDataColumn
     {
         if(!$this->isEditable($data)) {
             parent::renderDataCellContent($row, $data);
-            return; 
+            return;
         }
-        
+
         $options = CMap::mergeArray($this->editable, array(
             'model'     => $data,
             'attribute' => $this->name,
         ));
-        
+
         //if value defined for column --> use it as element text
         if(strlen($this->value)) {
             ob_start();
@@ -59,7 +59,7 @@ class TbEditableColumn extends CDataColumn
             $options['text'] = $text;
             $options['encode'] = false;
         }
-       
+
         $editable = $this->grid->controller->createWidget('TbEditableField', $options);
 
         //manually make selector non unique to match all cells in column
@@ -77,21 +77,21 @@ class TbEditableColumn extends CDataColumn
             $this->isScriptRendered = true;
         }
     }
-    
+
    /**
-   * Unfortunatly Yii yet does not support custom js events in it's widgets. 
+   * Unfortunatly Yii yet does not support custom js events in it's widgets.
    * So we need to invoke it manually to ensure update of editables on grid ajax update.
-   * 
+   *
    * issue in Yii github: https://github.com/yiisoft/yii/issues/1313
-   * 
+   *
    */
     protected function attachAjaxUpdateEvent()
     {
         $trigger = '$("#"+id).trigger("ajaxUpdate");';
-        
+
         //check if trigger already inserted by another column
         if(strpos($this->grid->afterAjaxUpdate, $trigger) !== false) return;
-        
+
         //inserting trigger
         if(strlen($this->grid->afterAjaxUpdate)) {
             $orig = $this->grid->afterAjaxUpdate;
@@ -104,10 +104,10 @@ class TbEditableColumn extends CDataColumn
             $trigger $orig
         }";
     }
-    
+
     /**
     * determines wether column currently editable or not
-    * 
+    *
     * @param mixed $model
     */
     protected function isEditable($model)

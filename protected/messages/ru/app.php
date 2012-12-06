@@ -111,4 +111,9 @@ return array (
   'foundDataSim' => 'Найденные данные',
   'from' => ' от ',
   'manySims' => 'Много симкарт',
+  'escape' => 'Отменить',
+  'moveSim' => 'Передача симкарт',
+  'options' => 'Опции',
+  'total cost simcard' => 'Общая стоимость симкарт:',
+  'price for one sim' => 'Цена за одну симкарту:',
 );

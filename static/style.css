@@ -142,3 +142,27 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
     left: 890px;
     bottom: 15px;
 }
+
+.left-label {}
+
+.left-label label {
+  margin: 0;
+  padding: 0;
+  float: left;
+  width: 185px;
+  line-height: 30px;
+  text-align: right;
+  margin-right: 10px;
+}
+
+.left-label .controls {
+  float: left;
+  margin-right: 80px;
+}
+
+.left-label .controls input {
+  margin: 0;
+}
+
+.left-label .controls input.width70 { width: 70px; }
+.left-label .controls input.width100{ width: 100px; }
