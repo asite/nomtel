@@ -9,15 +9,15 @@ class AgentController extends BaseGxController
         $user = new User('create');
         $user->status = ModelLoggableBehavior::STATUS_ACTIVE;
 
-        $this->performAjaxValidation(array($model,$user));
+        $this->performAjaxValidation(array($model, $user));
 
         if (isset($_POST['Agent'])) {
             $model->setAttributes($_POST['Agent']);
             $user->setAttributes($_POST['User']);
 
-            $validated=true;
-            if (!$model->validate()) $validated=false;
-            if (!$user->validate()) $validated=false;
+            $validated = true;
+            if (!$model->validate()) $validated = false;
+            if (!$user->validate()) $validated = false;
 
             if ($validated) {
                 $user->encryptPwd();
@@ -31,7 +31,7 @@ class AgentController extends BaseGxController
             }
         }
 
-        $this->render('create', array('model' => $model,'user'=>$user));
+        $this->render('create', array('model' => $model, 'user' => $user));
     }
 
     public function actionUpdate($id)
@@ -40,15 +40,15 @@ class AgentController extends BaseGxController
         $user = $model->user;
         $password = $user->password;
 
-        $this->performAjaxValidation(array($model,$user));
+        $this->performAjaxValidation(array($model, $user));
 
         if (isset($_POST['Agent'])) {
             $model->setAttributes($_POST['Agent']);
             $user->setAttributes($_POST['User']);
 
-            $validated=true;
-            if (!$model->validate()) $validated=false;
-            if (!$user->validate()) $validated=false;
+            $validated = true;
+            if (!$model->validate()) $validated = false;
+            if (!$user->validate()) $validated = false;
 
             if ($validated) {
                 $model->save();
@@ -68,6 +68,49 @@ class AgentController extends BaseGxController
         $this->render('update', array(
             'model' => $model,
             'user' => $model->user
+        ));
+    }
+
+    public function actionView($id)
+    {
+        if (!Yii::app()->user->getState('isAdmin') && $id!=Yii::app()->user->getState('agentId'))
+            throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
+
+        $model = $this->loadModel($id, 'Agent');
+
+        if (Yii::app()->user->getState('isAdmin')) {
+            $paymentNew= new Payment();
+            $paymentNew->dt=new EDateTime();
+            $paymentNew->agent_id=$model->id;
+            $this->performAjaxValidation($paymentNew);
+
+            if (isset($_POST['Payment'])) {
+                $paymentNew->setAttributes($_POST['Payment']);
+                if ($paymentNew->validate()) {
+                    $paymentNew->save();
+                    $model->recalcBalance();
+                    $model->save();
+                    $this->redirect(array('view','id'=>$model->id));
+                }
+            }
+        }
+
+        $payment = new Payment('search');
+        if (isset($_GET['Payment']))
+            $payment->setAttributes($_GET['Payment']);
+        $payment->agent_id = $id;
+
+        $deliveryReport = new DeliveryReport('search');
+        if (isset($_GET['DeliveryReport']))
+            $deliveryReport->setAttributes($_GET['DeliveryReport']);
+        $deliveryReport->agent_id = $id;
+
+
+        $this->render('view', array(
+            'model' => $model,
+            'payment' => $payment,
+            'deliveryReport' => $deliveryReport,
+            'paymentNew' => $paymentNew
         ));
     }
 

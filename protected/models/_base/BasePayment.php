@@ -11,6 +11,7 @@
  *
  * @property string $id
  * @property string $agent_id
+ * @property string $dt
  * @property double $summ
  *
  * @property Agent $agent
@@ -30,15 +31,16 @@ abstract class BasePayment extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'id';
+		return 'dt';
 	}
 
 	public function rules() {
 		return array(
-			array('agent_id, summ', 'required'),
+			array('agent_id, dt, summ', 'required'),
 			array('summ', 'numerical'),
 			array('agent_id', 'length', 'max'=>20),
-			array('id, agent_id, summ', 'safe', 'on'=>'search'),
+            array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+			array('id, agent_id, dt, summ', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -57,6 +59,7 @@ abstract class BasePayment extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'agent_id' => null,
+			'dt' => Yii::t('app', 'Dt'),
 			'summ' => Yii::t('app', 'Summ'),
 			'agent' => null,
 		);
@@ -67,6 +70,7 @@ abstract class BasePayment extends BaseGxActiveRecord {
 
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('agent_id', $this->agent_id);
+		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('summ', $this->summ);
 
 		$dataProvider=new CActiveDataProvider($this, array(
@@ -77,4 +81,42 @@ abstract class BasePayment extends BaseGxActiveRecord {
         return $dataProvider;
 	}
 
+    public function convertDateTimeFieldsToEDateTime() {
+        // rest of work will do setAttribute() routine
+        $this->setAttribute('dt',strval($this->dt));
+    }
+
+    public function convertDateTimeFieldsToString() {
+        if (is_object($this->dt) && get_class($this->dt)=='EDateTime') $this->dt=new EString($this->dt->format(self::$mySqlDateTimeFormat));
+    }
+
+    public function afterFind() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
+
+    private function convertStringToEDateTime($val,$type) {
+        if (!$val) return null;
+        try {
+            $val=new EDateTime($val,null,$type);
+        } catch (Exception $e) {
+        }
+        return $val;
+    }
+
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='dt') $value=$this->convertStringToEDateTime($value,'datetime');
+        }
+        return parent::setAttribute($name,$value);
+    }
+
+    public function beforeSave() {
+        $this->convertDateTimeFieldsToString();
+
+        return true;
+    }
+
+    public function afterSave() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
 }

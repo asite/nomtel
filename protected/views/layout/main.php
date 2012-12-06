@@ -69,6 +69,15 @@ $menu=array(
             'class'=>'bootstrap.widgets.TbMenu',
             'items'=>array(
                 array(
+                    'label'=>Yii::t('app','My Profile'),
+                    'url'=>$this->createUrl('agent/view',array('id'=>Yii::app()->user->getState('agentId')))
+                )
+            )
+        ),
+        array(
+            'class'=>'bootstrap.widgets.TbMenu',
+            'items'=>array(
+                array(
                     'label'=>DeliveryReport::model()->label(2),
                     'url'=>$this->createUrl('deliveryReport/list')
                 )

@@ -1,7 +1,7 @@
 <?php
 
 $this->breadcrumbs = array(
-    Sim::model()->label(2)=>array('list'),
+    DeliveryReport::model()->label(2)=>array('list'),
     $model->adminLabel($model->label(1)) => array('view','id'=>$model->id),
 );
 

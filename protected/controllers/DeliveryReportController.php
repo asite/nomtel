@@ -33,8 +33,6 @@ class DeliveryReportController extends BaseGxController
 
         if (isset($_GET['Sim']))
             $sim->setAttributes($_GET['Sim']);
-
-
         $sim->delivery_report_id = $id;
 
         $this->render('view', array(
