@@ -11,4 +11,14 @@ class Agent extends BaseAgent
     public function __toString() {
         return $this->surname.' '.$this->name;
     }
+
+    public function search() {
+        $data_provider = parent::search();
+
+        $data_provider->setSort(array(
+            'defaultOrder' => 'surname asc'
+        ));
+        return $data_provider;
+    }
+
 }
