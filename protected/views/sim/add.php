@@ -137,18 +137,18 @@ if ($deliveryReportMany) {
 
 <div id="boxSims">
   <div class="cfix" style="position: relative;">
-    <!--<div style="float: left; margin-right: 5px;">
-      <?php //echo $form->textFieldRow($model,'ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
-    </div>-->
+    <div style="float: left; margin-right: 5px;">
+      <?php echo $form->textFieldRow($model,'ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+    </div>
     <div style="float: left; margin-right: 5px;">
       <?php echo $form->textFieldRow($model,'ICCBeginFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
     </div>
     <div style="float: left; margin-right: 5px;">
       <?php echo $form->textFieldRow($model,'ICCEndFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
     </div>
-    <!--<div style="float: left; margin-right: 5px;">
-      <?php //echo $form->textFieldRow($model,'phone',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
-    </div>-->
+    <div style="float: left; margin-right: 5px;">
+      <?php echo $form->textFieldRow($model,'phone',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+    </div>
     <?php if (!isset($_POST['AddNewSim']['ICCBeginFew'])): ?> <a href="#" class="iconplussim"><i class="icon-plus"></i></a><?php endif; ?>
   </div>
   <?php $count=count($_POST['AddNewSim']['ICCBeginFew']); for($k=1;$k<=$count;$k++): ?>
@@ -161,9 +161,8 @@ if ($deliveryReportMany) {
     </div>
   <?php endfor; ?>
 </div>
-<?php echo CHtml::htmlButton(Yii::t('app', 'buttonProcessSim'), array('class'=>'btn btn-primary','name'=>'buttonProcessSim', 'type'=>'submit')); ?>
 
-<br/><br/>
+<br/>
 <div class="cfix">
   <?php echo $form->dropDownListRow($model, 'operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
 
@@ -223,9 +222,9 @@ $this->widget('bootstrap.widgets.TbTabs', array(
 
 
 <div class="cfix" id="addFewSims" style="display: none; position: relative;">
-  <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCPersonalAccount]" type="text"></div>-->
+  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCPersonalAccount]" type="text"></div>
   <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCBeginFew]" type="text" maxlength="15"></div>
   <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCEndFew]" type="text" maxlength="3"></div>
-  <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[phone]" type="text"></div>-->
+  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[phone]" type="text"></div>
   <a href="#" class="iconplussim"><i class="icon-plus"></i></a>
 </div>
