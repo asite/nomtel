@@ -116,4 +116,5 @@ return array (
   'options' => 'Опции',
   'total cost simcard' => 'Общая стоимость симкарт:',
   'price for one sim' => 'Цена за одну симкарту:',
+  'moveSim' => 'Передать',
 );

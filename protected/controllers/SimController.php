@@ -12,7 +12,7 @@ class SimController extends BaseGxController {
   public function actionDelivery() {
     if (isset($_FILES['Delivery'])) {
       $sims = array();
-      $transaction = Yii::app()->db->beginTransaction();
+      //$transaction = Yii::app()->db->beginTransaction();
       $i=1;
       foreach ($_FILES['Delivery']['tmp_name']['fileField'] as $file) {
         if ($file) {
@@ -25,12 +25,12 @@ class SimController extends BaseGxController {
               $text = preg_replace('/(\s){2,}/', "$1", $text);
               $sim=explode(" ", $text);
               if ($sim[0] && $sim[1] && $sim[2]) {
-                $sims[$i]['id'] = $i;
                 $sims[$i]['personalAccount'] = $sim[0];
                 $sims[$i]['icc'] = $sim[1];
                 $sims[$i++]['phoneNumber'] = $sim[2];
                 $model = new Sim;
                 $model->state = 'NOT_RECEIVED';
+                $model->number_price = 0;
                 $model->personal_account = $sim[0];
                 $model->icc = $sim[1];
                 $model->number = $sim[2];
@@ -40,7 +40,7 @@ class SimController extends BaseGxController {
           } catch(Exception $e) {}
         }
       }
-      $transaction->commit();
+      //$transaction->commit();
       Yii::app()->user->setFlash('deliveryReport',serialize($sims));
       $this->refresh();
       exit;
@@ -76,14 +76,14 @@ class SimController extends BaseGxController {
       $model->attributes = $_POST['AddSim'];
       $this->performAjaxValidation($model, $_POST['simMethod']);
 
-
       if ($_POST['simMethod'] == 'add-much-sim') {
         $result = Sim::model()->findAllByAttributes(
           array(),
-          $condition = 'icc >= :iccBegin AND icc <= :iccEnd',
+          $condition = 'icc >= :iccBegin AND icc <= :iccEnd AND state = :state',
           $params = array(
               ':iccBegin' => $_POST['AddSim']['ICCFirst'].$_POST['AddSim']['ICCBegin'],
               ':iccEnd' => $_POST['AddSim']['ICCFirst'].$_POST['AddSim']['ICCEnd'],
+              ':state' => 'NOT_RECEIVED',
           )
         );
         if (isset($_POST['buttonProcessSim'])) {
@@ -107,7 +107,7 @@ class SimController extends BaseGxController {
             $this->redirect(array('move','key'=>$key));
             exit;
           } else {
-            Yii::app()->user->setFlash('successMany', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+            Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
             $this->refresh();
             exit;
           }
@@ -127,29 +127,50 @@ class SimController extends BaseGxController {
           $this->render('add', array('model'=>$model, 'data'=>$_POST, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportFew'=>$result, 'activeTabs'=>$activeTabs));
           exit;
         } else {*/
+
+
           $model = new Sim;
           $model->state = 'IN_BASE';
+          $model->number_price = 0;
           $model->operator_id = $_POST['AddSim']['operator'];
           $model->tariff_id = $_POST['AddSim']['tariff'];
           $model->personal_account = $_POST['AddSim']['ICCPersonalAccount'];
           $model->icc = $_POST['AddSim']['ICCBeginFew'].$_POST['AddSim']['ICCEndFew'];
           $model->number = $_POST['AddSim']['phone'];
-          $model->save();
+          try {
+            $model->save();
+            $ids = array();
+            $ids[$model->id] = $model->id;
+          } catch(Exception $e) {}
 
           for($o=1;$o<=count($_POST['AddNewSim']['ICCPersonalAccount']);$o++) {
             $model = new Sim;
             $model->state = 'IN_BASE';
+            $model->number_price = 0;
             $model->operator_id = $_POST['AddSim']['operator'];
             $model->tariff_id = $_POST['AddSim']['tariff'];
             $model->personal_account = $_POST['AddNewSim']['ICCPersonalAccount'][$o];
             $model->icc = $_POST['AddNewSim']['ICCBeginFew'][$o].$_POST['AddNewSim']['ICCEndFew'][$o];
             $model->number = $_POST['AddNewSim']['phone'][$o];
-            $model->save();
+
+            try {
+              $model->save();
+              $ids[$model->id] = $model->id;
+            } catch(Exception $e) {}
+
           }
-          Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
-          Yii::app()->user->setFlash('tab2', true);
-          $this->refresh();
-          exit;
+          if ($_POST['AddSim']['where']) {
+            $key = rand();
+            $_SESSION['moveAgent'][$key]=$_POST['AddSim']['where'];
+            $_SESSION['moveSims'][$key]=$ids;
+            $this->redirect(array('move','key'=>$key));
+            exit;
+          } else {
+            Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+            Yii::app()->user->setFlash('tab2', true);
+            $this->refresh();
+            exit;
+          }
         //}
       }
     }
@@ -159,13 +180,33 @@ class SimController extends BaseGxController {
   }
 
   public function actionMove($key) {
-    $criteria = new CDbCriteria();
-    $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
-    $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
+    if ($_POST['Move']) {
+      $totalNumberPrice = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
+      $totalSimPrice = count($_SESSION['moveSims'][$key])*$_POST['Move']['PriceForSim'];
+      $model = new deliveryReport;
+      $model->agent_id = $_SESSION['moveAgent'][$key];
+      $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
+      $model->sim_price = $_POST['Move']['PriceForSim'];
+      $model->summ = $totalNumberPrice + $totalSimPrice;
+      $model->save();
 
-    //$sims = Sim::model()->findAllByPk($_SESSION['moveSims'][$key]);
-    $agent = Agent::model()->findByPk($_SESSION['moveAgent'][$key]);
-    $this->render('move', array('model'=>$model,'dataProvider'=>$dataProvider,'agent'=>$agent));
+      $criteria = new CDbCriteria();
+      $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+      Sim::model()->updateAll(array('agent_id'=>$_SESSION['moveAgent'][$key], 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
+      Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
+      unset($_SESSION['moveSims'][$key]);
+      unset($_SESSION['moveAgent'][$key]);
+      $this->redirect(Yii::app()->createUrl('site/index'));
+    } else {
+      $criteria = new CDbCriteria();
+      $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+      $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
+
+      $total = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
+
+      $agent = Agent::model()->findByPk($_SESSION['moveAgent'][$key]);
+      $this->render('move', array('model'=>$model,'dataProvider'=>$dataProvider,'agent'=>$agent, 'totalNumberPrice'=>$total));
+    }
   }
 
   public function actionAjaxcombo() {
@@ -178,13 +219,14 @@ class SimController extends BaseGxController {
     echo $res;
   }
 
-  public function actionUpdatePrice($id) {
+  public function actionUpdatePrice($id, $key) {
     if (Yii::app()->getRequest()->getIsPostRequest()) {
       try {
         Yii::import('bootstrap.widgets.TbEditableSaver'); //or you can add import 'ext.editable.*' to config
         $model = new TbEditableSaver('Sim');  // 'User' is classname of model to be updated
         $model->update();
-        //echo CJSON::encode(array('success' => true, 'count' => '155'));
+        $price = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
+        echo CJSON::encode(array('success' => true, 'count' => count($model), 'price'=>$price));
       } catch (CDbException $e) {
         $this->ajaxError(Yii::t("app", "Can't edit this object because it is used by another object(s)"));
       }
@@ -196,7 +238,8 @@ class SimController extends BaseGxController {
     if (Yii::app()->getRequest()->getIsPostRequest()) {
       try {
         unset($_SESSION['moveSims'][$key][$id]);
-        //echo "155";
+        $price = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
+        echo CJSON::encode(array('count' => count($_SESSION['moveSims'][$key]), 'price'=>$price));
       } catch (CDbException $e) {
         $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
       }

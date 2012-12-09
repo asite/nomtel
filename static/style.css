@@ -166,3 +166,10 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
 
 .left-label .controls input.width70 { width: 70px; }
 .left-label .controls input.width100{ width: 100px; }
+
+.total_items_price {
+    text-align: right;
+    font-size: 20px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
