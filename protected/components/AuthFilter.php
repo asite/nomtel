@@ -9,7 +9,7 @@ class AuthFilter extends CFilter {
 		}
 
         if (!Yii::app()->user->getState('isAdmin') &&
-            !preg_match('%^(site|deliveryReport|agent/view)%',Yii::app()->controller->route)) {
+            !preg_match('%^(site|deliveryReport|agent/view|sim/list)%',Yii::app()->controller->route)) {
             Yii::app()->request->redirect(Yii::app()->createUrl('site/index'));
             return false;
         }

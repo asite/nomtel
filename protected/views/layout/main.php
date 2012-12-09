@@ -20,7 +20,8 @@ $menu=array(
                 'items'=>
                 array(
                     array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery')),
-                    array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add'))
+                    array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add')),
+                    array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list'))
                 )
             )
         )
@@ -73,6 +74,14 @@ $menu=array(
                     'url'=>$this->createUrl('agent/view',array('id'=>Yii::app()->user->getState('agentId')))
                 )
             )
+        ),
+        array(
+            'class'=>'bootstrap.widgets.TbMenu',
+            'items'=>array(
+                array(
+                    'label'=>Yii::t('app','Sim List'),
+                    'url'=>$this->createUrl('sim/list'))
+                )
         ),
         array(
             'class'=>'bootstrap.widgets.TbMenu',

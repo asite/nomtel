@@ -76,7 +76,7 @@ class ModelLoggableBehavior extends CModelBehavior {
 
         if ($user->failed_logins > 0) {
             $user->failed_logins = 0;
-            $user->blocked_until = new CDbExpression("NULL");
+            $user->blocked_until = null;//new CDbExpression("NULL");
             $user->save();
         }
 

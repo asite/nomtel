@@ -109,5 +109,4 @@ abstract class BaseSim extends BaseGxActiveRecord {
         $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
         return $dataProvider;
 	}
-
 }

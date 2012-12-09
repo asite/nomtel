@@ -24,7 +24,8 @@ class SimController extends BaseGxController {
               $text = preg_replace('/\r\n|\r|\n/u', "", $text);
               $text = preg_replace('/(\s){2,}/', "$1", $text);
               $sim=explode(" ", $text);
-              if ($sim[0] && $sim[1] && $sim[2]) {
+              if (!isset($sim[2])) $sim[2]='';
+              if ($sim[0] && $sim[1]) {
                 $sims[$i]['personalAccount'] = $sim[0];
                 $sims[$i]['icc'] = $sim[1];
                 $sims[$i++]['phoneNumber'] = $sim[2];
@@ -184,7 +185,7 @@ class SimController extends BaseGxController {
       $totalNumberPrice = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
       $totalSimPrice = count($_SESSION['moveSims'][$key])*$_POST['Move']['PriceForSim'];
       $model = new deliveryReport;
-      $model->agent_id = $_SESSION['moveAgent'][$key];
+      $model->agent_id = $_POST['Move']['agent_id'];//$_SESSION['moveAgent'][$key];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
       $model->sim_price = $_POST['Move']['PriceForSim'];
       $model->summ = $totalNumberPrice + $totalSimPrice;
@@ -192,7 +193,7 @@ class SimController extends BaseGxController {
 
       $criteria = new CDbCriteria();
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
-      Sim::model()->updateAll(array('agent_id'=>$_SESSION['moveAgent'][$key], 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
+      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id']/*$_SESSION['moveAgent'][$key]*/, 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
       Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
       unset($_SESSION['moveSims'][$key]);
       unset($_SESSION['moveAgent'][$key]);
@@ -203,8 +204,7 @@ class SimController extends BaseGxController {
       $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
 
       $total = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
-
-      $agent = Agent::model()->findByPk($_SESSION['moveAgent'][$key]);
+      $agent = Agent::model()->getComboList();
       $this->render('move', array('model'=>$model,'dataProvider'=>$dataProvider,'agent'=>$agent, 'totalNumberPrice'=>$total));
     }
   }
@@ -248,4 +248,36 @@ class SimController extends BaseGxController {
     } else
       throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
   }
+
+  public function actionFindAgent($term) {
+    if (Yii::app()->request->isAjaxRequest && $term) {
+      $agent = Agent::model()->getComboList();
+      $mass = array();
+      foreach($agent as $k=>$v) {
+        if (strpos($v, $term)!==false) $mass[]=array('label'=>$v,'id'=>$k);
+      }
+      echo CJSON::encode($mass);
+    }
+    Yii::app()->end();
+  }
+
+    public function actionList()
+    {
+        $model = new Sim('search');
+        $model->unsetAttributes();
+
+        if (isset($_GET['Sim']))
+            $model->setAttributes($_GET['Sim']);
+
+        if (!Yii::app()->user->getState('isAdmin'))
+            $model->agent_id=Yii::app()->user->getState('agentId');
+
+        $dataProvider=$model->search();
+        $dataProvider->criteria->addCondition("state!='NOT_RECEIVED'");
+
+        $this->render('list', array(
+            'model' => $model,
+            'dataProvider' => $dataProvider
+        ));
+    }
 }

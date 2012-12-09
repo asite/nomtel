@@ -44,7 +44,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			array('username, password', 'length', 'max'=>200),
 			array('blocked_until', 'safe'),
 			array('password, failed_logins, blocked_until', 'default', 'setOnEmpty' => true, 'value' => null),
-            array('blocked_until','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+            //array('blocked_until','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, status, username, password, failed_logins, blocked_until', 'safe', 'on'=>'search'),
 		);
 	}
