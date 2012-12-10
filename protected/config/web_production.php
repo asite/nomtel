@@ -26,7 +26,7 @@ return array(
         'application.components.*',
         'application.commands.*',
         'application.vendors.*',
-        'application.extensions.yii-mail.Message',
+        'application.extensions.yii-mail.YiiMailMessage',
     ),
     'modules' => array(
     ),
@@ -80,7 +80,6 @@ return array(
             'class' => 'application.extensions.yii-mail.YiiMail',
             'transportType' => 'php',
             'viewPath' => 'application.views.mail',
-            'debug' => false,
         ),
         'bootstrap' => array(
             'class' => 'ext.bootstrap.components.Bootstrap',

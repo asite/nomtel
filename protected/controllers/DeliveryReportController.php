@@ -41,4 +41,33 @@ class DeliveryReportController extends BaseGxController
         ));
     }
 
+    public function actionReport($id) {
+        $model = $this->loadModel($id, 'Sim');
+        $this->checkDeliveryReportPermissions($model->deliveryReport);
+
+        $report=new SimReport();
+        $this->performAjaxValidation($report);
+
+        if (isset($_POST['SimReport'])) {
+            $report->setAttributes($_POST['SimReport']);
+
+            if ($report->validate()) {
+                $body=$this->renderPartial('mailReport',array(
+                    'model' => $model,
+                    'report' => $report
+                ),true);
+                $mail=new YiiMailMessage(Yii::t('app','Problem with sim card'),$body);
+                $mail->addTo(Yii::app()->params['adminEmail']);
+                Yii::app()->mail->send($mail);
+
+                Yii::app()->user->setFlash('success',Yii::t('app','Problem report sent to admin'));
+                $this->redirect(array('view','id'=>$model->delivery_report_id));
+            }
+        }
+
+        $this->render('report', array(
+            'model' => $model,
+            'report' => $report
+        ));
+    }
 }

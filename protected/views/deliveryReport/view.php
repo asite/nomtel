@@ -2,7 +2,7 @@
 
 $this->breadcrumbs = array(
     DeliveryReport::model()->label(2)=>array('list'),
-    $model->adminLabel($model->label(1)) => array('view','id'=>$model->id),
+    $model->adminLabel($model->label(1)),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -17,6 +17,17 @@ $('.search-form form').submit(function(){
 	return false;
 });
 ");
+?>
+
+<?php
+$this->widget('bootstrap.widgets.TbAlert', array(
+'block'=>true, // display a larger alert block?
+'fade'=>true, // use transitions?
+'closeText'=>'×', // close link text - if set to false, no close link is displayed
+'alerts'=>array( // configurations per alert type
+'success'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+),
+));
 ?>
 
 <h1><?php echo GxHtml::encode($model->label(1)); ?></h1>
@@ -78,7 +89,14 @@ $('.search-form form').submit(function(){
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
-            'template'=>'',
+            'template'=>'{feedback}',
+            'buttons'=>array(
+                'feedback'=>array(
+                    'label'=>Yii::t('app','Report problem'),
+                    'icon'=>'envelope',
+                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))'
+                )
+            )
         ),
     ),
 )); ?>

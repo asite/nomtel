@@ -20,9 +20,6 @@ $('.search-form form').submit(function(){
 
 <h1><?php echo GxHtml::encode($model->label(2)); ?></h1>
 
-<?php if (!Yii::app()->user->getState('isAdmin')) { ?>
-<a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#Sim_agent_id').val('<?php echo Yii::t('app','WITHOUT AGENT');?>').trigger(jQuery.Event('keydown', {keyCode: 13}));""><?php echo Yii::t('app', 'Without agent') ?></a>
-<?php } ?>
 <a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#Sim_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('keydown', {keyCode: 13}));"><?php echo Yii::t('app', 'Without number') ?></a>
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
@@ -61,7 +58,14 @@ $('.search-form form').submit(function(){
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
-            'template'=>'',
+            'template'=>'{feedback}',
+            'buttons'=>array(
+                'feedback'=>array(
+                        'label'=>Yii::t('app','Report problem'),
+                        'icon'=>'envelope',
+                        'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))'
+                )
+            )
         ),
     ),
 )); ?>

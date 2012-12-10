@@ -50,4 +50,7 @@ class Sim extends BaseSim
         return $dataProvider;
     }
 
+    public function __toString() {
+        return $this->shortIcc;
+    }
 }

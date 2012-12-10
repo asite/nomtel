@@ -24,7 +24,7 @@ $config['components']['log']=array(
     'routes' => array(
         array(
             'class' => 'CFileLogRoute',
-            'levels' => 'error, warning',
+            'levels' => 'info, error, warning',
         ),
         array(
             'class' => 'CWebLogRoute',

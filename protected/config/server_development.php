@@ -9,6 +9,9 @@ $config = CMap::mergeArray(
                     'password' => 'root',
                 ),
             ),
+            'params' => array(
+                'adminEmail'=>'pavimus@gmail.com'
+            )
         )
 );
 
