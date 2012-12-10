@@ -117,9 +117,9 @@ if ($deliveryReportMany) {
       'dataProvider' => $dataProvider,
       'itemsCssClass' => 'table table-striped table-bordered table-condensed',
       'columns' => array(
-        'personal_account::Личный счёт',
-        'icc::ICC',
-        'number::Телефон',
+        'personal_account::'.Yii::t('app','personal_account'),
+        'icc::'.Yii::t('app','icc'),
+        'number::'.Yii::t('app','number'),
       )
      ));
   }
@@ -207,9 +207,9 @@ if ($deliveryReportFew) {
       'dataProvider' => $dataProvider,
       'itemsCssClass' => 'table table-striped table-bordered table-condensed',
       'columns' => array(
-        'personal_account::Личный счёт',
-        'icc::ICC',
-        'number::Телефон',
+        'personal_account::'.Yii::t('app','personal_account'),
+        'icc::'.Yii::t('app','icc'),
+        'number::'.Yii::t('app','number'),
       )
      ));
   }

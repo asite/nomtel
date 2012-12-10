@@ -12,28 +12,34 @@
     countS = countS || countSim;
     if (countSim != countS) {
       countSim = countS;
-      $('#Move_totalCostSim').val(countSim * $('#Move_PriceForSim').val());
+      jQuery('#Move_totalCostSim').val(countSim * jQuery('#Move_PriceForSim').val());
     }
     priseS = $('#Move_totalCostSim').val();
-    $('#totalNumberPrice').html(Number(priceN)+Number(priseS));
+    jQuery('#totalNumberPrice').html(Number(priceN)+Number(priseS));
+  }
+
+  function renderGridPriceSim(priceS) {
+    priceS = priceS || jQuery('#Move_PriceForSim').val();
+    jQuery('[data-info="sim-price"]').html(priceS);
   }
 
   jQuery(document).ready(function(){
-    $('#Move_totalCostSim').live('change', function(){
-      $('#Move_PriceForSim').val($(this).val()/countSim);
+    jQuery('#Move_totalCostSim').live('change', function(){
+      jQuery('#Move_PriceForSim').val(jQuery(this).val()/countSim);
+      renderGridPriceSim(jQuery('#Move_PriceForSim').val());
       newPrice(totalNumberPrice);
     })
-    $('#Move_PriceForSim').live('change', function(){
-      $('#Move_totalCostSim').val($(this).val()*countSim);
+    jQuery('#Move_PriceForSim').live('change', function(){
+      jQuery('#Move_totalCostSim').val(jQuery(this).val()*countSim);
+      renderGridPriceSim(jQuery(this).val());
       newPrice(totalNumberPrice);
     })
-
   })
 </script>
 
 <h1><?php echo Yii::t('app','moveSim'); ?></h1>
 <?php $date = time(); ?>
-<h3 style="margin-bottom: 0; padding-bottom: 0;">Акт - Передачи сим карт <span><?php echo date('d.m.Y - H:i:s', $date) ?></span></h3>
+<h3 style="margin-bottom: 0; padding-bottom: 0;"><?php echo Yii::t('app','Act sims move'); ?> <span><?php echo date('d.m.Y - H:i:s', $date) ?></span></h3>
 
 <?php
   $form = $this->beginWidget('BaseTbActiveForm', array(
@@ -105,13 +111,14 @@ $this->widget('bootstrap.widgets.TbGridView', array(
       'buttons'=>array(
         'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
         'delete' => array(
-          'label'=>Yii::t('app','Remove from list'),
+          'label'=>Yii::t('app','remove from transmit list'),
           'imageUrl'=>'../img/glyphicons-halflings.png',
-          'url'=>'Yii::app()->createUrl("sim/remove", array("id"=>$data->id,"key" => $_GET["key"]))',
+          'url'=>'Yii::app()->createUrl("sim/remove", array("id"=>$data->id,"key"=>$_GET["key"]))',
         ),
       ),
     ),
   ),
+  'afterAjaxUpdate'=>'function(id, data){renderGridPriceSim();}',
 ));
 
 ?>

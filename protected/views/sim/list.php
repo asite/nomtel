@@ -1,7 +1,6 @@
 <?php
 
 $this->breadcrumbs = array(
-    $model->label(2) => array('list'),
     Yii::t('app', 'List'),
 );
 

@@ -80,10 +80,10 @@ $this->breadcrumbs = array(
       'dataProvider' => $dataProvider,
       'itemsCssClass' => 'table table-striped table-bordered table-condensed',
       'columns' => array(
-        'id',
-        'personalAccount',
-        'icc',
-        'phoneNumber'
+        'id::ID',
+        'personal_account::'.Yii::t('app','personal_account'),
+        'icc::'.Yii::t('app','icc'),
+        'number::'.Yii::t('app','number'),
       ),
     ));
   }

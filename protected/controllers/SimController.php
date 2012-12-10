@@ -26,9 +26,6 @@ class SimController extends BaseGxController {
               $sim=explode(" ", $text);
               if (!isset($sim[2])) $sim[2]='';
               if ($sim[0] && $sim[1]) {
-                $sims[$i]['personalAccount'] = $sim[0];
-                $sims[$i]['icc'] = $sim[1];
-                $sims[$i++]['phoneNumber'] = $sim[2];
                 $model = new Sim;
                 $model->state = 'NOT_RECEIVED';
                 $model->number_price = 0;
@@ -36,6 +33,9 @@ class SimController extends BaseGxController {
                 $model->icc = $sim[1];
                 $model->number = $sim[2];
                 $model->save();
+                $sims[$i]['personal_account'] = $sim[0];
+                $sims[$i]['icc'] = $sim[1];
+                $sims[$i++]['number'] = $sim[2];
               }
             }
           } catch(Exception $e) {}

@@ -125,4 +125,10 @@ return array (
   'options' => 'Опции',
   'price for one sim' => 'Цена за одну симкарту:',
   'total cost simcard' => 'Общая стоимость симкарт:',
+  'personal_account' => 'Личный счёт',
+  'icc' => 'ICC',
+  'number' => 'Телефон',
+  'Act sims move' => 'Акт - Передачи сим карт',
+  'remove from transmit list' => 'Удалить из списка передачи',
+  'to Agent'=>'АГЕНТУ:',
 );

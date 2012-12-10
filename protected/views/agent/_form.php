@@ -28,9 +28,9 @@
     <fieldset><legend><?php echo Yii::t('app','Agent');?></legend>
 <div class="form-container-horizontal">
 <div class="form-container-item form-label-width-140">
-                <?php echo $form->textFieldRow($model,'name',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
-
                 <?php echo $form->textFieldRow($model,'surname',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+
+                <?php echo $form->textFieldRow($model,'name',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
                 <?php echo $form->textFieldRow($model,'middle_name',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 </div>
