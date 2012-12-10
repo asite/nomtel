@@ -184,7 +184,7 @@ class SimController extends BaseGxController {
     if ($_POST['Move']) {
       $totalNumberPrice = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
       $totalSimPrice = count($_SESSION['moveSims'][$key])*$_POST['Move']['PriceForSim'];
-      $model = new deliveryReport;
+      $model = new DeliveryReport;
       $model->agent_id = $_POST['Move']['agent_id'];//$_SESSION['moveAgent'][$key];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
       $model->sim_price = $_POST['Move']['PriceForSim'];
@@ -194,6 +194,9 @@ class SimController extends BaseGxController {
       $criteria = new CDbCriteria();
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
       Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id']/*$_SESSION['moveAgent'][$key]*/, 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
+
+      $model->agent->recalcBalance();
+      $model->agent->save();
       Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
       unset($_SESSION['moveSims'][$key]);
       unset($_SESSION['moveAgent'][$key]);
