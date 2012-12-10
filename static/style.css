@@ -173,3 +173,9 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
     text-transform: uppercase;
     margin-bottom: 15px;
 }
+
+/*
+.grid-view .selected td {
+    background: gray !important;
+}
+*/

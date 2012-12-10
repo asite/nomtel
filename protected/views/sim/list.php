@@ -27,6 +27,7 @@ $('.search-form form').submit(function(){
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'filter' => $model,
+    'selectableRows' => 2,
     'columns' => array(
         array(
             'name'=>'delivery_report_id',
