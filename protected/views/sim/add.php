@@ -93,8 +93,8 @@ $this->breadcrumbs = array(
 <?php $this->endWidget(); ?>
 
 <?php
-if ($deliveryReportMany) {
 
+    $dataProvider = array();
     foreach($deliveryReportMany as $k=>$v) {
       $dataProvider[$k]['personal_account'] = $v->personal_account;
       $dataProvider[$k]['icc'] = $v->icc;
@@ -122,7 +122,6 @@ if ($deliveryReportMany) {
         'number::'.Yii::t('app','number'),
       )
      ));
-  }
 ?>
 
 <?php $tab1 = ob_get_contents();  ob_end_clean(); ?>
