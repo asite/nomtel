@@ -94,6 +94,10 @@ $this->breadcrumbs = array(
 
 <?php
 
+  if (isset($deliveryReportMany)) {
+
+    if (empty($deliveryReportMany)) $deliveryReportMany = array();
+
     $dataProvider = array();
     foreach($deliveryReportMany as $k=>$v) {
       $dataProvider[$k]['personal_account'] = $v->personal_account;
@@ -122,6 +126,7 @@ $this->breadcrumbs = array(
         'number::'.Yii::t('app','number'),
       )
      ));
+  }
 ?>
 
 <?php $tab1 = ob_get_contents();  ob_end_clean(); ?>
@@ -180,7 +185,7 @@ $this->breadcrumbs = array(
 <?php $this->endWidget(); ?>
 
 <?php
-if ($deliveryReportFew) {
+if (isset($deliveryReportFew)) {
 
     $dataProvider = array();
 
