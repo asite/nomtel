@@ -270,6 +270,12 @@ class SimController extends BaseGxController {
 
     public function actionList()
     {
+        if (isset($_REQUEST['passSIM'])) {
+            $key=rand();
+            $_SESSION['moveSims'][$key]=explode(',',$_POST['ids']);
+            $this->redirect(array('sim/move','key'=>$key));
+        }
+
         $model = new Sim('search');
         $model->unsetAttributes();
 
@@ -282,7 +288,7 @@ class SimController extends BaseGxController {
         $dataProvider=$model->search();
         $dataProvider->criteria->addCondition("state!='NOT_RECEIVED'");
 
-        $this->render('list', array(
+        $this->render(Yii::app()->user->getState('isAdmin') ? 'list':'listForAgent', array(
             'model' => $model,
             'dataProvider' => $dataProvider
         ));

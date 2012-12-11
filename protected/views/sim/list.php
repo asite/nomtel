@@ -22,23 +22,44 @@ $('.search-form form').submit(function(){
 
 <a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#Sim_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('keydown', {keyCode: 13}));"><?php echo Yii::t('app', 'Without number') ?></a>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('bootstrap.widgets.TbButton', array(
+    'type'=>'button',
+    'label'=>Yii::t('app','Pass selected SIM to agent'),
+    'htmlOptions'=>array(
+        'onclick'=>'passSIM();return false;',
+        'style'=>"margin-bottom:10px;"
+    )
+)) ?>
+
+<style>
+    #sim-grid tfoot {
+        display:none;
+    }
+</style>
+<?php $this->widget('bootstrap.widgets.TbExtendedGridView', array(
     'id' => 'sim-grid',
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'filter' => $model,
-    'selectableRows' => 2,
+    'afterAjaxUpdate' => 'js:function(id,data){multiPageSelRestore(id)}',
+    'bulkActions' => array(
+        'actionButtons' => array(
+        ),
+        'checkBoxColumnConfig' => array(
+            'name' => 'id',
+            'disabled' => '$data->agent_id ? true:false'
+        ),
+    ),
     'columns' => array(
         array(
             'name'=>'delivery_report_id',
-            'value'=>'$data->deliveryReport->dt',
+            'value'=>'$data->deliveryReport->dt ? $data->deliveryReport->dt->format("d.m.Y"):"";    ',
             'filter'=>false,
         ),
         array(
             'name'=>'agent_id',
             'value'=>'GxHtml::valueEx($data->agent)',
             'filter'=>array_merge(array(0=>Yii::t('app','WITHOUT AGENT')),Agent::getComboList()),
-            'visible'=>Yii::app()->user->getState('isAdmin'),
         ),
         array(
             'name'=>'number',
@@ -58,7 +79,7 @@ $('.search-form form').submit(function(){
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
-            'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
+            'htmlOptions' => array('style'=>'width:40px;text-align:center;vertical-align:middle'),
             'template'=>'{feedback}',
             'buttons'=>array(
                 'feedback'=>array(
@@ -70,3 +91,53 @@ $('.search-form form').submit(function(){
         ),
     ),
 )); ?>
+
+<script>
+    var multiPageSel={};
+
+    function multiPageSelInit(id) {
+        $(":checkbox").attr("autocomplete", "off");
+        multiPageSel[id]={};
+        jQuery(document).on('change click','input[name="'+id+'_c0[]"]',function(){
+            if (this.checked) {
+                multiPageSel[id][this.value]=true;
+            } else {
+                delete multiPageSel[id][this.value];
+            }
+        });
+        jQuery(document).on('click','input[name="'+id+'_c0_all"]',function(){
+            var checked=this.checked;
+            jQuery('input[name="'+id+'_c0[]"]:enabled').each(function(){
+                if (checked) {
+                    multiPageSel[id][this.value]=true;
+                } else {
+                    delete multiPageSel[id][this.value];
+                }
+            });
+        });
+    }
+
+    function multiPageSelRestore(id) {
+        jQuery('input[name="'+id+'_c0[]"]').each(function() {
+            this.checked=multiPageSel[id][this.value] ? true:false;
+        });
+    }
+
+    multiPageSelInit('sim-grid');
+</script>
+
+<form method="post" action="?passSIM" id="ids-form">
+    <input type="hidden" name="YII_CSRF_TOKEN" value="<?php echo Yii::app()->request->csrfToken ?>">
+    <input type="hidden" id="ids-input" name="ids" value="">
+</form>
+<script>
+    function passSIM() {
+        var ids='';
+        for(var id in multiPageSel['sim-grid']) {
+            if (ids!='') ids+=',';
+            ids+=id;
+        }
+        jQuery('#ids-input').val(ids);
+        jQuery('#ids-form').submit();
+    }
+</script>

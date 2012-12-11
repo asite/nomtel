@@ -21,7 +21,7 @@
             <?php echo $form->textFieldRow($user,'username',array('autocomplete'=>'off','class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         </div>
         <div class="form-container-item form-label-width-100">
-            <?php echo $form->passwordFieldRow($user,'password',array('autocomplete'=>'off','class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+            <?php echo $form->passwordFieldRow($user,'password',array('autocomplete'=>'off','class'=>'span2`','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         </div>
     </div>
 </fieldset>
