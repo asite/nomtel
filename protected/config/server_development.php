@@ -10,7 +10,8 @@ $config = CMap::mergeArray(
                 ),
             ),
             'params' => array(
-                'adminEmail'=>'pavimus@gmail.com'
+                'adminEmail'=>'pavimus@gmail.com',
+		'adminEmailFrom'=>'info@nomtel.com'
             )
         )
 );

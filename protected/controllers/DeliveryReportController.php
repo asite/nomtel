@@ -56,11 +56,18 @@ class DeliveryReportController extends BaseGxController
                     'model' => $model,
                     'report' => $report
                 ),true);
-                $mail=new YiiMailMessage(Yii::t('app','Problem with sim card'),$body);
-                $mail->addTo(Yii::app()->params['adminEmail']);
-                Yii::app()->mail->send($mail);
 
-                Yii::app()->user->setFlash('success',Yii::t('app','Problem report sent to admin'));
+                $mail=new YiiMailMessage();
+		$mail->setSubject(Yii::t('app','Problem with sim card'));
+		$mail->setFrom(Yii::app()->params['adminEmailFrom']);
+		$mail->setTo(Yii::app()->params['adminEmail']);
+		$mail->setBody($body);
+
+		if (Yii::app()->mail->send($mail))
+            	    Yii::app()->user->setFlash('success',Yii::t('app','Problem report sent to admin'));
+		else
+            	    Yii::app()->user->setFlash('error',Yii::t('app','Problem sending email'));
+
                 $this->redirect(array('view','id'=>$model->delivery_report_id));
             }
         }
