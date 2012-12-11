@@ -18,35 +18,35 @@
 <fieldset><legend><?php echo Yii::t('app','Authorization data');?></legend>
     <div class="form-container-horizontal">
         <div class="form-container-item form-label-width-140">
-            <?php echo $form->textFieldRow($user,'username',array('autocomplete'=>'off','class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+            <?php echo $form->textFieldRow($user,'username',array('autocomplete'=>'off','class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         </div>
         <div class="form-container-item form-label-width-100">
-            <?php echo $form->passwordFieldRow($user,'password',array('autocomplete'=>'off','class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+            <?php echo $form->passwordFieldRow($user,'password',array('autocomplete'=>'off','class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         </div>
     </div>
 </fieldset>
     <fieldset><legend><?php echo Yii::t('app','Agent');?></legend>
 <div class="form-container-horizontal">
 <div class="form-container-item form-label-width-140">
-                <?php echo $form->textFieldRow($model,'surname',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'surname',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                <?php echo $form->textFieldRow($model,'name',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'name',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                <?php echo $form->textFieldRow($model,'middle_name',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'middle_name',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 </div>
 <div class="form-container-item form-label-width-100">
-                <?php echo $form->textFieldRow($model,'phone_1',array('class'=>'span3','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'phone_1',array('class'=>'span2','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                <?php echo $form->textFieldRow($model,'phone_2',array('class'=>'span3','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'phone_2',array('class'=>'span2','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                <?php echo $form->textFieldRow($model,'phone_3',array('class'=>'span3','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'phone_3',array('class'=>'span2','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 </div>
 <div class="form-container-item form-label-width-80">
-                <?php echo $form->textFieldRow($model,'email',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'email',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                <?php echo $form->textFieldRow($model,'skype',array('class'=>'span3','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'skype',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                <?php echo $form->textFieldRow($model,'icq',array('class'=>'span3','maxlength'=>20,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'icq',array('class'=>'span2','maxlength'=>20,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 </div>
 </div>
     </fieldset>
