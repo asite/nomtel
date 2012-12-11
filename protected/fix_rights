@@ -1,0 +1,6 @@
+#!/bin/bash
+
+find .. -type d | xargs chmod 755
+find .. -type f | xargs chmod 644
+chmod 755 extract_messages yiic fix_rights
+

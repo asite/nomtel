@@ -134,25 +134,12 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 <div class="control-group left-label cfix">
   <label class="control-label" for="agent_id"><?php echo Yii::t('app','to Agent'); ?></label>
   <div class="controls"><input type="hidden" id="agent_id" name="Move[agent_id]" value="<?php echo isset($_SESSION['moveAgent'][$_GET['key']])?$_SESSION['moveAgent'][$_GET['key']]:''; ?>">
-  <?php
-    $this->widget('zii.widgets.jui.CJuiAutoComplete', array(
-        'name'=>'name',
-        'source' => Yii::app()->createUrl('sim/findAgent'),
-        'value'=>isset($_SESSION['moveAgent'][$_GET['key']])?$agent[$_SESSION['moveAgent'][$_GET['key']]]:'',
-        'options'=>array(
-            'minLength'=>'0',
-            'select'=>'js:function( event, ui ) {
-              this.value = ui.item.label;
-              $("#agent_id").val(ui.item.id);
-              return false;
-            }',
-            'change'=>'js:function(event, ui) {
-              if (!this.value)$("#agent_id").val("");
-            }'
-        ),
-
-    ));
-  ?>
+    <?php
+      $this->widget('bootstrap.widgets.TbSelect2', array(
+        'name' => 'Move[agent]',
+        'data' => $agent,
+       ));
+    ?>
   </div>
 </div>
 
