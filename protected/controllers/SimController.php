@@ -65,11 +65,7 @@ class SimController extends BaseGxController {
       $tariffListArray[$v['id']]=$v['title'];
     }
 
-    $whereList = Agent::model()->findAll();
-    $whereListArray = array(0=>'БАЗА');
-    foreach($whereList as $v) {
-      $whereListArray[$v['id']]=$v['surname'].' '.$v['name'].' '.$v['middle_name'];
-    }
+    $whereListArray = array(0=>'БАЗА',1=>'АГЕНТ');
 
     if ($_POST['AddSim']) {
       $activeTabs = array('tab1'=>false,'tab2'=>false);
@@ -101,7 +97,6 @@ class SimController extends BaseGxController {
           }
           if ($_POST['AddSim']['where']) {
             $key = rand();
-            $_SESSION['moveAgent'][$key]=$_POST['AddSim']['where'];
             foreach($result as $v) {
               $_SESSION['moveSims'][$key][$v->id]=$v->id;
             }
@@ -162,7 +157,6 @@ class SimController extends BaseGxController {
           }
           if ($_POST['AddSim']['where']) {
             $key = rand();
-            $_SESSION['moveAgent'][$key]=$_POST['AddSim']['where'];
             $_SESSION['moveSims'][$key]=$ids;
             $this->redirect(array('move','key'=>$key));
             exit;
@@ -182,10 +176,20 @@ class SimController extends BaseGxController {
 
   public function actionMove($key) {
     if ($_POST['Move']) {
+      if (!$_POST['Move']['agent_id']) {
+        Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не выбран агент.');
+        $this->refresh();
+        exit;
+      }
       $totalNumberPrice = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
       $totalSimPrice = count($_SESSION['moveSims'][$key])*$_POST['Move']['PriceForSim'];
+      if (count($_SESSION['moveSims'][$key])==0) {
+        Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
+        $this->redirect(Yii::app()->createUrl('sim/add'));
+        exit;
+      }
       $model = new DeliveryReport;
-      $model->agent_id = $_POST['Move']['agent_id'];//$_SESSION['moveAgent'][$key];
+      $model->agent_id = $_POST['Move']['agent_id'];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
       $model->sim_price = $_POST['Move']['PriceForSim'];
       $model->summ = $totalNumberPrice + $totalSimPrice;
@@ -193,13 +197,12 @@ class SimController extends BaseGxController {
 
       $criteria = new CDbCriteria();
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
-      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id']/*$_SESSION['moveAgent'][$key]*/, 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
+      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
 
       $model->agent->recalcBalance();
       $model->agent->save();
       Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
       unset($_SESSION['moveSims'][$key]);
-      unset($_SESSION['moveAgent'][$key]);
       $this->redirect(Yii::app()->createUrl('site/index'));
     } else {
       $criteria = new CDbCriteria();
@@ -208,6 +211,7 @@ class SimController extends BaseGxController {
 
       $total = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
       $agent = Agent::model()->getComboList();
+      $agent = array(0=>Yii::t('app','Select Agent'))+$agent;
       $this->render('move', array('model'=>$model,'dataProvider'=>$dataProvider,'agent'=>$agent, 'totalNumberPrice'=>$total));
     }
   }

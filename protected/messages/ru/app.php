@@ -131,4 +131,5 @@ return array (
   'remove from transmit list' => 'Удалить из списка передачи',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
+  'Select Agent' => 'Выбор агента',
 );

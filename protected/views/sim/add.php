@@ -45,6 +45,7 @@ $this->breadcrumbs = array(
     'closeText'=>'×', // close link text - if set to false, no close link is displayed
     'alerts'=>array( // configurations per alert type
       'success'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+      'error'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
     ),
   ));
 

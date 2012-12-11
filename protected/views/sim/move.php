@@ -38,6 +38,20 @@
 </script>
 
 <h1><?php echo Yii::t('app','moveSim'); ?></h1>
+
+<?php
+
+  $this->widget('bootstrap.widgets.TbAlert', array(
+    'block'=>true, // display a larger alert block?
+    'fade'=>true, // use transitions?
+    'closeText'=>'×', // close link text - if set to false, no close link is displayed
+    'alerts'=>array( // configurations per alert type
+      'error'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+    ),
+  ));
+
+?>
+
 <?php $date = time(); ?>
 <h3 style="margin-bottom: 0; padding-bottom: 0;"><?php echo Yii::t('app','Act sims move'); ?> <span><?php echo date('d.m.Y - H:i:s', $date) ?></span></h3>
 
@@ -132,17 +146,20 @@ $this->widget('bootstrap.widgets.TbGridView', array(
   <div class="controls"><input class="width70" name="Move[PriceForSim]" id="Move_PriceForSim" type="text" value="<?php echo Yii::app()->params->simPrice; ?>"></div>
 </div>
 <div class="control-group left-label cfix">
-  <label class="control-label" for="agent_id"><?php echo Yii::t('app','to Agent'); ?></label>
-  <div class="controls"><input type="hidden" id="agent_id" name="Move[agent_id]" value="<?php echo isset($_SESSION['moveAgent'][$_GET['key']])?$_SESSION['moveAgent'][$_GET['key']]:''; ?>">
+  <label class="control-label" for="Move_agent_id"><?php echo Yii::t('app','to Agent'); ?></label>
+  <div class="controls">
     <?php
       $this->widget('bootstrap.widgets.TbSelect2', array(
-        'name' => 'Move[agent]',
+        'name' => 'Move[agent_id]',
         'data' => $agent,
-       ));
+        'options' => array(
+          'placeholder' => 'better',
+          'width' => '400px',
+        )
+      ));
     ?>
   </div>
 </div>
-
 
 
 <div class="total_items_price" >
