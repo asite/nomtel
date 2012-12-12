@@ -14,31 +14,32 @@ class SimController extends BaseGxController {
       $sims = array();
       //$transaction = Yii::app()->db->beginTransaction();
       $i=1;
+
       foreach ($_FILES['Delivery']['tmp_name']['fileField'] as $file) {
         if ($file) {
           $f=fopen($file, 'r') or die("Невозможно открыть файл!");
-          try {
-            while(!feof($f)) {
-              $text = fgets($f);
-              $text = preg_replace('/\t/', " ", $text);
-              $text = preg_replace('/\r\n|\r|\n/u', "", $text);
-              $text = preg_replace('/(\s){2,}/', "$1", $text);
-              $sim=explode(" ", $text);
-              if (!isset($sim[2])) $sim[2]='';
-              if ($sim[0] && $sim[1]) {
-                $model = new Sim;
-                $model->state = 'NOT_RECEIVED';
-                $model->number_price = 0;
-                $model->personal_account = $sim[0];
-                $model->icc = $sim[1];
-                $model->number = $sim[2];
+          while(!feof($f)) {
+            $text = fgets($f);
+            $text = preg_replace('/\t/', " ", $text);
+            $text = preg_replace('/\r\n|\r|\n/u', "", $text);
+            $text = preg_replace('/(\s){2,}/', "$1", $text);
+            $sim=explode(" ", $text);
+            if (!isset($sim[2])) $sim[2]='';
+            if ($sim[0] && $sim[1]) {
+              $model = new Sim;
+              $model->state = 'NOT_RECEIVED';
+              $model->number_price = 0;
+              $model->personal_account = $sim[0];
+              $model->icc = $sim[1];
+              $model->number = $sim[2];
+              try {
                 $model->save();
                 $sims[$i]['personal_account'] = $sim[0];
                 $sims[$i]['icc'] = $sim[1];
                 $sims[$i++]['number'] = $sim[2];
-              }
+               } catch(Exception $e) {}
             }
-          } catch(Exception $e) {}
+          }
         }
       }
       //$transaction->commit();
