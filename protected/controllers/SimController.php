@@ -95,6 +95,14 @@ class SimController extends BaseGxController {
             $model->tariff_id = $_POST['AddSim']['tariff'];
             $model->save();
           }
+
+          if (empty($result)) {
+            Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления!');
+            $activeTabs['tab1'] = true;
+            $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportMany'=>$result, 'activeTabs'=>$activeTabs));
+            exit;
+          }
+
           if ($_POST['AddSim']['where']) {
             $key = rand();
             foreach($result as $v) {
@@ -123,7 +131,7 @@ class SimController extends BaseGxController {
           $this->render('add', array('model'=>$model, 'data'=>$_POST, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportFew'=>$result, 'activeTabs'=>$activeTabs));
           exit;
         } else {*/
-
+          $old_model = $model;
 
           $model = new Sim;
           $model->state = 'IN_BASE';
@@ -155,6 +163,14 @@ class SimController extends BaseGxController {
             } catch(Exception $e) {}
 
           }
+
+          if (empty($ids)) {
+            Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления(возможно данные уже есть в базе)!');
+            $activeTabs['tab2'] = true;
+            $this->render('add', array('model'=>$old_model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportMany'=>$result, 'activeTabs'=>$activeTabs));
+            exit;
+          }
+
           if ($_POST['AddSim']['where']) {
             $key = rand();
             $_SESSION['moveSims'][$key]=$ids;

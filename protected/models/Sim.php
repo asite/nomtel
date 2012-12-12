@@ -13,6 +13,7 @@ class Sim extends BaseSim
     }
 
   public function getTotalNumberPrice($ids='') {
+    if (empty($ids) || !is_array($ids)) return 0;
     $criteria=new CDbCriteria;
       $criteria->select='sum(number_price) as number_price';
     if (is_array($ids)) $criteria->addInCondition('id', $ids);
