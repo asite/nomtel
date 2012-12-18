@@ -68,7 +68,7 @@ $this->breadcrumbs = array(
 <div class="cfix"></div>
 
 
-<?php         if (Yii::app()->user->getState('isAdmin')) {   ?>
+<?php         if ($this->addPaymentAllowed($model)) {   ?>
 
     <h2><?php echo Yii::t('app', 'Create Payment');?></h2>
 

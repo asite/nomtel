@@ -33,6 +33,12 @@ class Agent extends BaseAgent
         return $data;
     }
 
+    public function rules() {
+        return array_merge(parent::rules(),array(
+            array('parent_id','unsafe')
+        ));
+    }
+
     public function recalcBalance() {
         $this->balance=$this->getPaymentsSum()-$this->getDeliveryReportsSum();
     }

@@ -2,6 +2,10 @@
 
 class AgentController extends BaseGxController
 {
+    public function checkAgentPermissions($agent) {
+        if (!Yii::app()->user->getState('isAdmin') &&
+            Yii::app()->user->getState('agentId')!=$agent->parent_id) $this->redirect(array('list'));
+    }
 
     public function actionCreate()
     {
@@ -14,6 +18,7 @@ class AgentController extends BaseGxController
         if (isset($_POST['Agent'])) {
             $model->setAttributes($_POST['Agent']);
             $user->setAttributes($_POST['User']);
+            if (!Yii::app()->user->getState('isAdmin')) $model->parent_id=Yii::app()->user->getState('agentId');
 
             $validated = true;
             if (!$model->validate()) $validated = false;
@@ -37,6 +42,7 @@ class AgentController extends BaseGxController
     public function actionUpdate($id)
     {
         $model = $this->loadModel($id, 'Agent');
+        $this->checkAgentPermissions($model);
         $user = $model->user;
         $password = $user->password;
 
@@ -71,14 +77,18 @@ class AgentController extends BaseGxController
         ));
     }
 
+    public function addPaymentAllowed($model) {
+        return (Yii::app()->user->getState('isAdmin') && $model->parent_id=='') ||
+            (Yii::app()->user->getState('agentId')==$model->parent_id);
+    }
+
     public function actionView($id)
     {
-        if (!Yii::app()->user->getState('isAdmin') && $id!=Yii::app()->user->getState('agentId'))
-            throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
-
         $model = $this->loadModel($id, 'Agent');
+        if ($model->id!=Yii::app()->user->getState('agentId'))
+            $this->checkAgentPermissions($model);
 
-        if (Yii::app()->user->getState('isAdmin')) {
+        if ($this->addPaymentAllowed($model)) {
             $paymentNew= new Payment();
             $paymentNew->dt=new EDateTime();
             $paymentNew->agent_id=$model->id;
@@ -122,6 +132,7 @@ class AgentController extends BaseGxController
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
                 $model = $this->loadModel($id, 'Agent');
+                $this->checkAgentPermissions($model);
                 $user = $model->user;
                 $model->delete();
                 $user->delete();
@@ -143,8 +154,18 @@ class AgentController extends BaseGxController
         if (isset($_GET['Agent']))
             $model->setAttributes($_GET['Agent']);
 
+        $dataProvider=$model->search();
+
+        if (Yii::app()->user->getState('isAdmin')) {
+            $dataProvider->criteria->addCondition('parent_id is null');
+        } else {
+            $dataProvider->criteria->addColumnCondition(array('parent_id'=>
+            Yii::app()->user->getState('agentId')));
+        }
+
         $this->render('admin', array(
             'model' => $model,
+            'dataProvider' => $dataProvider
         ));
     }
 

@@ -10,6 +10,7 @@
  * followed by relations of table "agent" available as properties of the model.
  *
  * @property string $id
+ * @property string $parent_id
  * @property string $user_id
  * @property string $name
  * @property string $surname
@@ -29,6 +30,7 @@
  * @property string $registration_address
  * @property double $balance
  *
+ * @property User $parent
  * @property User $user
  * @property DeliveryReport[] $deliveryReports
  * @property Payment[] $payments
@@ -56,20 +58,21 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		return array(
 			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
 			array('balance', 'numerical'),
-			array('user_id, icq, passport_number', 'length', 'max'=>20),
+			array('parent_id, user_id, icq, passport_number', 'length', 'max'=>20),
 			array('name, surname, middle_name, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
-			array('user_id, phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('parent_id, user_id, phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birthday_date','date','format'=>'dd.MM.yyyy'),
-			array('id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance', 'safe', 'on'=>'search'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'parent' => array(self::BELONGS_TO, 'User', 'parent_id'),
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'deliveryReports' => array(self::HAS_MANY, 'DeliveryReport', 'agent_id'),
 			'payments' => array(self::HAS_MANY, 'Payment', 'agent_id'),
@@ -85,6 +88,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id' => Yii::t('app', 'ID'),
+			'parent_id' => null,
 			'user_id' => null,
 			'name' => Yii::t('app', 'Name'),
 			'surname' => Yii::t('app', 'Surname'),
@@ -103,6 +107,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'birthday_place' => Yii::t('app', 'Birthday Place'),
 			'registration_address' => Yii::t('app', 'Registration Address'),
 			'balance' => Yii::t('app', 'Balance'),
+			'parent' => null,
 			'user' => null,
 			'deliveryReports' => null,
 			'payments' => null,
@@ -114,6 +119,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);
+		$criteria->compare('parent_id', $this->parent_id);
 		$criteria->compare('user_id', $this->user_id);
 		$criteria->compare('name', $this->name, true);
 		$criteria->compare('surname', $this->surname, true);

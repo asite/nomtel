@@ -79,6 +79,15 @@ $menu=array(
             'class'=>'bootstrap.widgets.TbMenu',
             'items'=>array(
                 array(
+                    'label'=>Yii::t('app','Agents'),
+                    'url'=>$this->createUrl('agent/admin')
+                )
+            )
+        ),
+        array(
+            'class'=>'bootstrap.widgets.TbMenu',
+            'items'=>array(
+                array(
                     'label'=>Yii::t('app','Sim List'),
                     'url'=>$this->createUrl('sim/list'))
                 )
