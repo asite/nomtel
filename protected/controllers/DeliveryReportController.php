@@ -19,8 +19,13 @@ class DeliveryReportController extends BaseGxController
         if (!Yii::app()->user->getState('isAdmin'))
             $model->agent_id=Yii::app()->user->getState('agentId');
 
+            $dataProvider=$model->search();
+            if (Yii::app()->user->getState('isAdmin')) {
+                $dataProvider->criteria->addInCondition('agent_id',array_keys(Agent::getComboList()));
+            }
             $this->render('list', array(
                 'model' => $model,
+                'dataProvider' => $dataProvider
             ));
     }
 

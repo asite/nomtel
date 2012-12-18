@@ -293,21 +293,49 @@ class SimController extends BaseGxController {
             $this->redirect(array('sim/move','key'=>$key));
         }
 
-        $model = new Sim('search');
-        $model->unsetAttributes();
+        $params=array(
+            ':parent_id'=>Yii::app()->user->getState('agentId'),
+            ':agent_id'=>Yii::app()->user->getState('agentId')
+        );
+        $sql="select sim.*,agent.id as agent_id,CONCAT_WS(' ',agent.surname,agent.name,agent.middle_name) as agent_name,dr.dt as delivery_report_dt,o.title as operator,t.title as tariff
+             from sim ";
+        // agents must view only sim, that they received from admin/parent agent
+        if (!Yii::app()->user->getState('isAdmin')) {
+             $sql.="join sim_delivery_report sdrc on (sdrc.sim_id=sim.id)
+             join delivery_report drc on (drc.id=sdrc.delivery_report_id and drc.agent_id=:agent_id)";
+        }
+        // in agent column show only direct child agents
+        $sql.="left outer join sim_delivery_report sdr on (sdr.sim_id=sim.id)
+             left outer join delivery_report dr on (dr.id=sdr.delivery_report_id)
+             left outer join agent on (agent.id=dr.agent_id and agent.parent_id ".
+                (Yii::app()->user->getState('isAdmin') ? 'is null':'=:parent_id').")";
+        // attach operator and tariff
+        $sql.="left outer join tariff t on (t.id=sim.tariff_id)
+               left outer join operator o on (o.id=t.operator_id)";
 
-        if (isset($_GET['Sim']))
-            $model->setAttributes($_GET['Sim']);
+        $criteria=new CDbCriteria();
+        $criteria->addCondition("sim.state!='NOT_RECEIVED'");
+        $criteria->addCondition("((dr.id is not null and agent.id is not null) or (dr.id is null and agent.id is null))");
+        $sql.=' where '.$criteria->condition;
 
-        if (!Yii::app()->user->getState('isAdmin'))
-            $model->agent_id=Yii::app()->user->getState('agentId');
+        $count=Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
+        $dataProvider=new CSqlDataProvider($sql,
+            array(
+                'params'=>$params,
+                'totalItemCount'=>$count,
+                'sort'=>array(
+                    'defaultOrder'=>'id',
+                    'attributes'=>array('delivery_report_dt','agent_name','number','icc','operator','tariff')
+                ),
+                'pagination'=>array('pageSize'=>BaseGxActiveRecord::ITEMS_PER_PAGE)
+            ));
 
-        $dataProvider=$model->search();
-        $dataProvider->criteria->addCondition("state!='NOT_RECEIVED'");
+        $simSearch=new SimSearch();
 
-        $this->render(Yii::app()->user->getState('isAdmin') ? 'list':'listForAgent', array(
-            'model' => $model,
-            'dataProvider' => $dataProvider
+        $this->render('list', array(
+            'dataProvider' => $dataProvider,
+            'model' => new Sim(),
+            'dataModel' => $simSearch
         ));
     }
 }

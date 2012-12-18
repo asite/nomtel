@@ -40,42 +40,44 @@ $('.search-form form').submit(function(){
     'id' => 'sim-grid',
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'filter' => $model,
+    'filter' => $dataModel,
     'afterAjaxUpdate' => 'js:function(id,data){multiPageSelRestore(id)}',
     'bulkActions' => array(
         'actionButtons' => array(
         ),
         'checkBoxColumnConfig' => array(
             'name' => 'id',
-            'disabled' => '$data->agent_id ? true:false'
         ),
     ),
     'columns' => array(
         array(
-            'name'=>'delivery_report_id',
-            'value'=>'$data->deliveryReport->dt ? $data->deliveryReport->dt->format("d.m.Y"):"";    ',
+            'name'=>'delivery_report_dt',
+            'value'=>'$data["delivery_report_dt"]!="" ? new EDateTime($data["delivery_report_dt"]):""',
+            'header'=>DeliveryReport::model()->label(1),
             'filter'=>false,
         ),
         array(
-            'name'=>'agent_id',
-            'value'=>'GxHtml::valueEx($data->agent)',
+            'name'=>'agent_name',
+            'header'=>Agent::model()->label(1),
             'filter'=>array_merge(array(0=>Yii::t('app','WITHOUT AGENT')),Agent::getComboList()),
         ),
         array(
             'name'=>'number',
+            'header'=>Yii::t('app','Number'),
         ),
         array(
             'name'=>'icc',
+            'header'=>Yii::t('app','Icc'),
         ),
         array(
-            'name'=>'operator_id',
-            'value'=>'$data->operator',
+            'name'=>'operator',
             'filter'=>Operator::getComboList(),
+            'header'=>Operator::model()->label(1),
         ),
         array(
-            'name'=>'tariff_id',
-            'value'=>'$data->tariff',
+            'name'=>'tariff',
             'filter'=>Tariff::getComboList(),
+            'header'=>Tariff::model()->label(1),
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
@@ -85,7 +87,7 @@ $('.search-form form').submit(function(){
                 'feedback'=>array(
                         'label'=>Yii::t('app','Report problem'),
                         'icon'=>'envelope',
-                        'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))'
+                        'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data["id"]))'
                 )
             )
         ),
