@@ -99,6 +99,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
           'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
         ),
         'success'   => 'js: function(data) {
+          data = JSON.parse(data);
           newPrice(data.price);
         }'
       ),

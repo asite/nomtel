@@ -1,0 +1,4 @@
+#!/bin/bash
+
+git push
+curl http://nomtel.gushchas.com/protected/utils/gitPull/

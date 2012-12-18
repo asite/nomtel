@@ -43,7 +43,7 @@ $('.search-form form').submit(function(){
                 'htmlOptions' => array('style'=>'text-align:center;'),
              ),
         array(
-		        'name'=>'summ',
+		        'name'=>'sum',
                 'filter'=>false,
                 'htmlOptions' => array('style'=>'text-align:center;'),
             ),

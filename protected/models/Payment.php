@@ -10,7 +10,7 @@ class Payment extends BasePayment
 
     public function rules() {
         return array_merge(parent::rules(),array(
-            array('summ', 'numerical','integerOnly'=>true,'min'=>1),
+            array('sum', 'numerical','integerOnly'=>true,'min'=>1),
         ));
     }
 

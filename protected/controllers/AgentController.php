@@ -82,7 +82,7 @@ class AgentController extends BaseGxController
             $paymentNew= new Payment();
             $paymentNew->dt=new EDateTime();
             $paymentNew->agent_id=$model->id;
-            $this->performAjaxValidation($paymentNew);
+            $this->performAjaxValidation($paymentNew,'payment-form');
 
             if (isset($_POST['Payment'])) {
                 $paymentNew->setAttributes($_POST['Payment']);
@@ -95,21 +95,24 @@ class AgentController extends BaseGxController
             }
         }
 
-        $payment = new Payment('search');
-        if (isset($_GET['Payment']))
-            $payment->setAttributes($_GET['Payment']);
-        $payment->agent_id = $id;
-
-        $deliveryReport = new DeliveryReport('search');
-        if (isset($_GET['DeliveryReport']))
-            $deliveryReport->setAttributes($_GET['DeliveryReport']);
-        $deliveryReport->agent_id = $id;
-
+        $sql="(select id,dt,sum,0 as type from payment where agent_id=:agent_id) union
+         (select id,dt,-sum as sum,1 as type from delivery_report where agent_id=:agent_id)";
+        $params=array(':agent_id'=>$id,':agent_id'=>$id);
+        $count=Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
+        $logDataProvider=new CSqlDataProvider($sql,
+        array(
+            'params'=>$params,
+            'totalItemCount'=>$count,
+            'sort'=>array(
+                'defaultOrder'=>'dt',
+                'attributes'=>array('id','dt','sum')
+            ),
+            'pagination'=>array('pageSize'=>BaseGxActiveRecord::ITEMS_PER_PAGE)
+        ));
 
         $this->render('view', array(
             'model' => $model,
-            'payment' => $payment,
-            'deliveryReport' => $deliveryReport,
+            'logDataProvider'=>$logDataProvider,
             'paymentNew' => $paymentNew
         ));
     }

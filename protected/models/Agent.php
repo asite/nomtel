@@ -34,23 +34,23 @@ class Agent extends BaseAgent
     }
 
     public function recalcBalance() {
-        $this->balance=$this->getPaymentsSumm()-$this->getDeliveryReportsSumm();
+        $this->balance=$this->getPaymentsSum()-$this->getDeliveryReportsSum();
     }
 
-    public function getPaymentsSumm() {
-        return floatval(Yii::app()->db->createCommand('select sum(summ) from '.Payment::model()->tableName().
+    public function getPaymentsSum() {
+        return floatval(Yii::app()->db->createCommand('select sum(sum) from '.Payment::model()->tableName().
             ' where agent_id=:agent_id')->queryScalar(array('agent_id'=>$this->id)));
     }
 
-    public function getDeliveryReportsSumm() {
-        return floatval(Yii::app()->db->createCommand('select sum(summ) from '.DeliveryReport::model()->tableName().
+    public function getDeliveryReportsSum() {
+        return floatval(Yii::app()->db->createCommand('select sum(sum) from '.DeliveryReport::model()->tableName().
             ' where agent_id=:agent_id')->queryScalar(array('agent_id'=>$this->id)));
     }
 
     public function attributeLabels() {
         return array_merge(parent::attributeLabels(),array(
-            'paymentsSumm'=>Yii::t('app','Payments Summ'),
-            'deliveryReportsSumm'=>Yii::t('app','Delivery Reports Summ'),
+            'paymentsSum'=>Yii::t('app','Payments Sum'),
+            'deliveryReportsSum'=>Yii::t('app','Delivery Reports Sum'),
         ));
     }
 }

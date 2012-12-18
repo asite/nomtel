@@ -53,7 +53,7 @@ $this->breadcrumbs = array(
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'paymentsSumm',
+        'paymentsSum',
     ),
 )); ?>
 </div>
@@ -61,7 +61,7 @@ $this->breadcrumbs = array(
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'deliveryReportsSumm',
+        'deliveryReportsSum',
     ),
 )); ?>
 </div>
@@ -85,7 +85,7 @@ $this->breadcrumbs = array(
     ));
         ?>
 
-        <?php echo $form->textFieldRow($paymentNew,'summ',array('class'=>'span1')); ?>
+        <?php echo $form->textFieldRow($paymentNew,'sum',array('class'=>'span1')); ?>
 
         <?php
         echo '<div class="form-actions">';
@@ -96,63 +96,40 @@ $this->breadcrumbs = array(
     </div>    
 <?php } ?>
 
-<h2><?php echo GxHtml::encode(Payment::model()->label(2)); ?></h2>
+<h2><?php echo Yii::t('app','Account history'); ?></h2>
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
-    'id' => 'payment-grid',
-    'dataProvider' => $payment->search(),
+    'id' => 'log-grid',
+    'dataProvider' => $logDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     //'filter' => $payment,
     'columns' => array(
         array(
             'name'=>'id',
             'htmlOptions' => array('style'=>'text-align:center;'),
+            'header'=>Yii::t('app','Payment/Delivery Report Id'),
         ),
         array(
             'name'=>'dt',
             'htmlOptions' => array('style'=>'text-align:center;'),
+            'value'=>'new EDateTime($data["dt"])',
+            'header'=>Yii::t('app','Dt'),
         ),
         array(
-            'name'=>'summ',
+            'name'=>'sum',
             'htmlOptions' => array('style'=>'text-align:center;'),
-        ),
-        array(
-            'class' => 'bootstrap.widgets.TbButtonColumn',
-            'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
-            'template'=>'',
-        ),
-    ),
-)); ?>
-
-<?php         if (Yii::app()->user->getState('isAdmin')) {   ?>
-
-<h2><?php echo GxHtml::encode(DeliveryReport::model()->label(2)); ?></h2>
-
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
-    'id' => 'delivery-report-grid',
-    'dataProvider' => $deliveryReport->search(),
-    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    //'filter' => $deliveryReport,
-    'columns' => array(
-        array(
-            'name'=>'id',
-            'htmlOptions' => array('style'=>'text-align:center;'),
-        ),
-        array(
-            'name'=>'dt',
-            'htmlOptions' => array('style'=>'text-align:center;'),
-        ),
-        array(
-            'name'=>'summ',
-            'htmlOptions' => array('style'=>'text-align:center;'),
+            'header'=>Yii::t('app','Sum'),
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
             'template'=>'{view}',
-            'viewButtonUrl'=>'Yii::app()->controller->createUrl("deliveryReport/view",array("id"=>$data->id))',
+            'buttons'=>array(
+                'view'=>array(
+                    'visible'=>'$data["type"]==1',
+                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/view",array("id"=>$data["id"]))'
+                )
+            )
         ),
     ),
 )); ?>
-
-<?php } ?>

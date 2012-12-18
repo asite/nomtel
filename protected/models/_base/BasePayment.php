@@ -12,7 +12,7 @@
  * @property string $id
  * @property string $agent_id
  * @property string $dt
- * @property double $summ
+ * @property double $sum
  *
  * @property Agent $agent
  */
@@ -36,11 +36,11 @@ abstract class BasePayment extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('agent_id, dt, summ', 'required'),
-			array('summ', 'numerical'),
+			array('agent_id, dt, sum', 'required'),
+			array('sum', 'numerical'),
 			array('agent_id', 'length', 'max'=>20),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, agent_id, dt, summ', 'safe', 'on'=>'search'),
+			array('id, agent_id, dt, sum', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,7 +60,7 @@ abstract class BasePayment extends BaseGxActiveRecord {
 			'id' => Yii::t('app', 'ID'),
 			'agent_id' => null,
 			'dt' => Yii::t('app', 'Dt'),
-			'summ' => Yii::t('app', 'Summ'),
+			'sum' => Yii::t('app', 'Sum'),
 			'agent' => null,
 		);
 	}
@@ -71,7 +71,7 @@ abstract class BasePayment extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('dt', $this->dt, true);
-		$criteria->compare('summ', $this->summ);
+		$criteria->compare('sum', $this->sum);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

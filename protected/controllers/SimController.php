@@ -209,7 +209,7 @@ class SimController extends BaseGxController {
       $model->agent_id = $_POST['Move']['agent_id'];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
       $model->sim_price = $_POST['Move']['PriceForSim'];
-      $model->summ = $totalNumberPrice + $totalSimPrice;
+      $model->sum = $totalNumberPrice + $totalSimPrice;
       $model->save();
 
       $criteria = new CDbCriteria();
@@ -250,7 +250,7 @@ class SimController extends BaseGxController {
         $model = new TbEditableSaver('Sim');  // 'User' is classname of model to be updated
         $model->update();
         $price = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
-        echo CJSON::encode(array('success' => true, 'count' => count($model), 'price'=>$price));
+        echo CJSON::encode(array('price'=>$price));
       } catch (CDbException $e) {
         $this->ajaxError(Yii::t("app", "Can't edit this object because it is used by another object(s)"));
       }

@@ -41,7 +41,7 @@ $this->widget('bootstrap.widgets.TbAlert', array(
             'value'=>$model->agent
         ),
         'dt',
-        'summ',
+        'sum',
     ),
 )); ?>
 
