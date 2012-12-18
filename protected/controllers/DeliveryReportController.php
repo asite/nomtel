@@ -4,7 +4,7 @@ class DeliveryReportController extends BaseGxController
 {
     public function checkDeliveryReportPermissions($deliveryReport) {
         if (!Yii::app()->user->getState('isAdmin') &&
-            Yii::app()->user->getState('isAdmin')!=$deliveryReport->agent_id) $this->redirect(array('list'));
+            Yii::app()->user->getState('agentId')!=$deliveryReport->agent_id) $this->redirect(array('list'));
     }
 
     public function actionList()
