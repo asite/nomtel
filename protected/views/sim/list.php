@@ -47,6 +47,7 @@ $('.search-form form').submit(function(){
         ),
         'checkBoxColumnConfig' => array(
             'name' => 'id',
+            'disabled' => '$data["delivery_report_dt"]!=""',
         ),
     ),
     'columns' => array(
