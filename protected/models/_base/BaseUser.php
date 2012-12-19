@@ -9,7 +9,7 @@
  * Columns in table "user" available as properties of the model,
  * followed by relations of table "user" available as properties of the model.
  *
- * @property string $id
+ * @property integer $id
  * @property string $status
  * @property string $username
  * @property string $password
@@ -17,6 +17,7 @@
  * @property string $blocked_until
  *
  * @property Agent[] $agents
+ * @property Agent[] $agents1
  */
 abstract class BaseUser extends BaseGxActiveRecord {
 
@@ -44,7 +45,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			array('username, password', 'length', 'max'=>200),
 			array('blocked_until', 'safe'),
 			array('password, failed_logins, blocked_until', 'default', 'setOnEmpty' => true, 'value' => null),
-            //array('blocked_until','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+            array('blocked_until','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, status, username, password, failed_logins, blocked_until', 'safe', 'on'=>'search'),
 		);
 	}
@@ -52,6 +53,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 	public function relations() {
 		return array(
 			'agents' => array(self::HAS_MANY, 'Agent', 'user_id'),
+			'agents1' => array(self::HAS_MANY, 'Agent', 'parent_id'),
 		);
 	}
 
@@ -69,13 +71,14 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			'failed_logins' => Yii::t('app', 'Failed Logins'),
 			'blocked_until' => Yii::t('app', 'Blocked Until'),
 			'agents' => null,
+			'agents1' => null,
 		);
 	}
 
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		$criteria->compare('id', $this->id, true);
+		$criteria->compare('id', $this->id);
 		$criteria->compare('status', $this->status, true);
 		$criteria->compare('username', $this->username, true);
 		$criteria->compare('password', $this->password, true);

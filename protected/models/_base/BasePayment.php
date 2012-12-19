@@ -9,8 +9,8 @@
  * Columns in table "payment" available as properties of the model,
  * followed by relations of table "payment" available as properties of the model.
  *
- * @property string $id
- * @property string $agent_id
+ * @property integer $id
+ * @property integer $agent_id
  * @property string $dt
  * @property double $sum
  *
@@ -37,8 +37,8 @@ abstract class BasePayment extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('agent_id, dt, sum', 'required'),
+			array('agent_id', 'numerical', 'integerOnly'=>true),
 			array('sum', 'numerical'),
-			array('agent_id', 'length', 'max'=>20),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, agent_id, dt, sum', 'safe', 'on'=>'search'),
 		);
@@ -68,7 +68,7 @@ abstract class BasePayment extends BaseGxActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		$criteria->compare('id', $this->id, true);
+		$criteria->compare('id', $this->id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('sum', $this->sum);

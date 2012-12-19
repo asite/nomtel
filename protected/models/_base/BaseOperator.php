@@ -9,7 +9,7 @@
  * Columns in table "operator" available as properties of the model,
  * followed by relations of table "operator" available as properties of the model.
  *
- * @property string $id
+ * @property integer $id
  * @property string $title
  *
  * @property Sim[] $sims
@@ -65,7 +65,7 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		$criteria->compare('id', $this->id, true);
+		$criteria->compare('id', $this->id);
 		$criteria->compare('title', $this->title, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(

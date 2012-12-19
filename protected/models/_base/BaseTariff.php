@@ -9,8 +9,8 @@
  * Columns in table "tariff" available as properties of the model,
  * followed by relations of table "tariff" available as properties of the model.
  *
- * @property string $id
- * @property string $operator_id
+ * @property integer $id
+ * @property integer $operator_id
  * @property string $title
  * @property double $price_agent_sim
  * @property double $price_license_fee
@@ -39,8 +39,8 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('operator_id, title, price_agent_sim, price_license_fee', 'required'),
+			array('operator_id', 'numerical', 'integerOnly'=>true),
 			array('price_agent_sim, price_license_fee', 'numerical'),
-			array('operator_id', 'length', 'max'=>20),
 			array('title', 'length', 'max'=>50),
 			array('id, operator_id, title, price_agent_sim, price_license_fee', 'safe', 'on'=>'search'),
 		);
@@ -73,7 +73,7 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		$criteria->compare('id', $this->id, true);
+		$criteria->compare('id', $this->id);
 		$criteria->compare('operator_id', $this->operator_id);
 		$criteria->compare('title', $this->title, true);
 		$criteria->compare('price_agent_sim', $this->price_agent_sim);
