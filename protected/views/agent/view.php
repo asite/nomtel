@@ -93,10 +93,12 @@ $this->breadcrumbs = array(
         echo '</div>';
         $this->endWidget();
         ?>
-    </div>    
+    </div>
 <?php } ?>
 
 <h2><?php echo Yii::t('app','Account history'); ?></h2>
+
+<h3 class="h3-balance">Баланс: <?php echo $model->balance; ?></h3>
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'log-grid',

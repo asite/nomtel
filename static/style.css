@@ -186,3 +186,22 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
   font-size: 12px;
   color: red;
 }
+
+.h3-balance {
+  margin-bottom: 0;
+  color: #3A87AD;
+  background-color: #D9EDF7;
+  border: 1px solid #BCE8F1;
+  line-height: 1;
+  padding: 10px 20px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  overflow: hidden;
+
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
