@@ -26,6 +26,19 @@ $this->breadcrumbs = array(
 
 <h1><?php echo Yii::t('app','addDeliveryReport'); ?></h1>
 
+<?php
+  $this->widget('bootstrap.widgets.TbAlert', array(
+    'block'=>true, // display a larger alert block?
+    'fade'=>true, // use transitions?
+    'closeText'=>'×', // close link text - if set to false, no close link is displayed
+    'alerts'=>array( // configurations per alert type
+      'success'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+      'error'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+    ),
+  ));
+
+?>
+
 <div class="control-group cfix" style="display: none;" id="delivery">
   <label class="control-label" for="Delivery_fileField_">Добавте файл</label>
   <div class="controls">
@@ -54,6 +67,16 @@ $this->breadcrumbs = array(
     </div>
   </div>
 </div>
+
+<div class="cfix">
+  <label for="Delivery_operator" style="float: left; line-height: 30px; width: 160px; margin-right: 20px; text-align: right;"><?php echo Yii::t('app','Operator selection'); ?>:</label>
+  <select name="Delivery[operator]" id="Delivery_operator">
+    <option value="0">Выберете оператора...</option>
+    <option value="1">Билайн</option>
+    <option value="2">Мегафон</option>
+  </select>
+</div>
+<br/><br/>
 
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'AddDelivery'), array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
 

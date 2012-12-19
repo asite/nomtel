@@ -10,36 +10,76 @@ class SimController extends BaseGxController {
   }
 
   public function actionDelivery() {
-    if (isset($_FILES['Delivery'])) {
+    if (isset($_POST['Delivery']['operator']) && $_POST['Delivery']['operator']==0) {Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Не выбран оператор!'); $this->refresh(); exit; }
+    if (isset($_FILES['Delivery']) && $_FILES['Delivery']) {
       $sims = array();
       //$transaction = Yii::app()->db->beginTransaction();
       $i=1;
-
-      foreach ($_FILES['Delivery']['tmp_name']['fileField'] as $file) {
+      for($f=1;$f<=count($_FILES['Delivery']['tmp_name']['fileField']);$f++) {
+        $file = $_FILES['Delivery']['tmp_name']['fileField'][$f];
+        $file_name = $_FILES['Delivery']['name']['fileField'][$f];
         if ($file) {
-          $f=fopen($file, 'r') or die("Невозможно открыть файл!");
-          while(!feof($f)) {
-            $text = fgets($f);
-            $text = preg_replace('/\t/', " ", $text);
-            $text = preg_replace('/\r\n|\r|\n/u', "", $text);
-            $text = preg_replace('/(\s){2,}/', "$1", $text);
-            $sim=explode(" ", $text);
-            if (!isset($sim[2])) $sim[2]='';
-            if ($sim[0] && $sim[1]) {
-              $model = new Sim;
-              $model->state = 'NOT_RECEIVED';
-              $model->number_price = 0;
-              $model->personal_account = $sim[0];
-              $model->icc = $sim[1];
-              $model->number = $sim[2];
-              try {
-                $model->save();
-                $sims[$i]['personal_account'] = $sim[0];
-                $sims[$i]['icc'] = $sim[1];
-                $sims[$i++]['number'] = $sim[2];
-               } catch(Exception $e) {}
+          if ($_POST['Delivery']['operator']==1) {
+            $f=fopen($file, 'r') or die("Невозможно открыть файл!");
+            while(!feof($f)) {
+              $text = fgets($f);
+              $text = preg_replace('/\t/', " ", $text);
+              $text = preg_replace('/\r\n|\r|\n/u', "", $text);
+              $text = preg_replace('/(\s){2,}/', "$1", $text);
+              $sim=explode(" ", $text);
+              if (!isset($sim[2])) $sim[2]='';
+              if ($sim[0] && $sim[1]) {
+                $model = new Sim;
+                $model->state = 'NOT_RECEIVED';
+                $model->number_price = 0;
+                $model->personal_account = $sim[0];
+                $model->icc = $sim[1];
+                $model->number = $sim[2];
+                try {
+                  $model->save();
+                  $sims[$i]['personal_account'] = $sim[0];
+                  $sims[$i]['icc'] = $sim[1];
+                  $sims[$i++]['number'] = $sim[2];
+                 } catch(Exception $e) {}
+              }
             }
+          } elseif ($_POST['Delivery']['operator']==2) {
+            Yii::import('application.vendors.PHPExcel',true);
+            if (preg_match('%\.xls$%',$file_name)) {
+              $objReader = new PHPExcel_Reader_Excel5;
+              $file_type='xls';
+            }
+            elseif (preg_match('%\.xlsx$%',$file_name)) {
+              $objReader = new PHPExcel_Reader_Excel2007;
+              $file_type='xlsx';
+            }
+            else die('error');
+            $objPHPExcel = $objReader->load(@$file);
+            $objWorksheet = $objPHPExcel->getActiveSheet();
+            $highestRow = $objWorksheet->getHighestRow();
+            $highestColumn = $objWorksheet->getHighestColumn();
+            $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+
+            $sim = array();
+            for ($row = 2; $row <= $highestRow; ++$row) {
+              for ($col = 0; $col <= $highestColumnIndex; ++$col) {
+                $info = $objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
+                if ($col==0 && $info!='') $sim[$row][0] = $info;
+                if (preg_match('%- (\d{10})$%',$info,$matches)) $sim[$row][1] = $matches[1];
+              }
+            }
+
+            echo '<table>' . "\n";
+            for ($row = 2; $row <= $highestRow; ++$row) {
+              echo '<tr>' . "\n";
+              for ($col = 0; $col <= $highestColumnIndex; ++$col) {
+                echo '<td>' . $objWorksheet->getCellByColumnAndRow($col, $row)->getValue() . '</td>' . "\n";
+              }
+              echo '</tr>' . "\n";
+            }
+            echo '</table>' . "\n";
           }
+          exit;
         }
       }
       //$transaction->commit();
@@ -293,10 +333,6 @@ class SimController extends BaseGxController {
             $this->redirect(array('sim/move','key'=>$key));
         }
 
-        $params=array(
-            ':parent_id'=>Yii::app()->user->getState('agentId'),
-            ':agent_id'=>Yii::app()->user->getState('agentId')
-        );
         $sql="select sim.*,agent.id as agent_id,CONCAT_WS(' ',agent.surname,agent.name,agent.middle_name) as agent_name,dr.dt as delivery_report_dt,o.title as operator,t.title as tariff
              from sim ";
         // agents must view only sim, that they received from admin/parent agent
@@ -316,7 +352,34 @@ class SimController extends BaseGxController {
         $criteria=new CDbCriteria();
         $criteria->addCondition("sim.state!='NOT_RECEIVED'");
         $criteria->addCondition("((dr.id is not null and agent.id is not null) or (dr.id is null and agent.id is null))");
+
+        $simSearch=new SimSearch();
+        if (isset($_GET['SimSearch']))
+            $simSearch->setAttributes($_GET['SimSearch']);
+
+        if ($simSearch->agent_name!=='0')
+            $criteria->compare('agent.id', $simSearch->agent_name);
+        else
+            $criteria->addCondition("agent.id is null");
+
+        if ($simSearch->number!=Yii::t('app','WITHOUT NUMBER'))
+            $criteria->compare('number', $simSearch->number, true);
+        else
+            $criteria->addCondition("(number='' or number is null)");
+
+        $criteria->compare('icc',$simSearch->icc,true);
+        $criteria->compare('o.title',$simSearch->operator);
+        $criteria->compare('t.title',$simSearch->tariff);
+
+        $params=$criteria->params;
+        if (!Yii::app()->user->getState('isAdmin'))
+            $params=array_merge($params,array(
+                ':parent_id'=>Yii::app()->user->getState('agentId'),
+                ':agent_id'=>Yii::app()->user->getState('agentId')
+            ));
+
         $sql.=' where '.$criteria->condition;
+        //var_dump($sql);exit;
 
         $count=Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
         $dataProvider=new CSqlDataProvider($sql,
@@ -330,7 +393,6 @@ class SimController extends BaseGxController {
                 'pagination'=>array('pageSize'=>BaseGxActiveRecord::ITEMS_PER_PAGE)
             ));
 
-        $simSearch=new SimSearch();
 
         $this->render('list', array(
             'dataProvider' => $dataProvider,

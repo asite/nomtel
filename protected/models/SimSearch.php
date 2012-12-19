@@ -13,4 +13,8 @@ class SimSearch extends CFormModel
     public $icc;
     public $operator;
     public $tariff;
+
+    public function rules() {
+        return array(array('agent_name, number, icc, operator, tariff','safe'));
+    }
 }
