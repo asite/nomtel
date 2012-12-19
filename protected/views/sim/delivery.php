@@ -26,19 +26,6 @@ $this->breadcrumbs = array(
 
 <h1><?php echo Yii::t('app','addDeliveryReport'); ?></h1>
 
-<?php
-  $this->widget('bootstrap.widgets.TbAlert', array(
-    'block'=>true, // display a larger alert block?
-    'fade'=>true, // use transitions?
-    'closeText'=>'×', // close link text - if set to false, no close link is displayed
-    'alerts'=>array( // configurations per alert type
-      'success'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
-      'error'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
-    ),
-  ));
-
-?>
-
 <div class="control-group cfix" style="display: none;" id="delivery">
   <label class="control-label" for="Delivery_fileField_">Добавте файл</label>
   <div class="controls">

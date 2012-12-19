@@ -40,19 +40,6 @@
 
 <h1><?php echo Yii::t('app','moveSim'); ?></h1>
 
-<?php
-
-  $this->widget('bootstrap.widgets.TbAlert', array(
-    'block'=>true, // display a larger alert block?
-    'fade'=>true, // use transitions?
-    'closeText'=>'×', // close link text - if set to false, no close link is displayed
-    'alerts'=>array( // configurations per alert type
-      'error'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
-    ),
-  ));
-
-?>
-
 <?php $date = time(); ?>
 <h3 style="margin-bottom: 0; padding-bottom: 0;"><?php echo Yii::t('app','Act sims move'); ?> <span><?php echo date('d.m.Y - H:i:s', $date) ?></span></h3>
 

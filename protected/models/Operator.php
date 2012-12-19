@@ -17,11 +17,10 @@ class Operator extends BaseOperator
         return $data_provider;
     }
 
-    public static function getComboList() {
+    public static function getComboList($data=array()) {
         $agents=Yii::app()->db->createCommand("select id,title from ".
             self::model()->tableName()." order by title")->queryAll();
 
-        $data=array();
         foreach($agents as $v) {
             $data[$v['id']]=$v['title'];
         }

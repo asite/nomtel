@@ -39,6 +39,15 @@ $menu=array(
         'class'=>'bootstrap.widgets.TbMenu',
         'items'=>array(
             array(
+                'label'=>Yii::t('app','Load Bonuses'),
+                'url'=>$this->createUrl('bonus/load')
+            )
+        )
+    ),
+    array(
+        'class'=>'bootstrap.widgets.TbMenu',
+        'items'=>array(
+            array(
                 'label'=>DeliveryReport::model()->label(2),
                 'url'=>$this->createUrl('deliveryReport/list')
             )
@@ -128,7 +137,19 @@ $menu=array(
 				'links'=>$this->breadcrumbs));
 			?>
 
-			<?php echo $content;?>
+            <?php
+            $this->widget('bootstrap.widgets.TbAlert', array(
+                'block'=>true, // display a larger alert block?
+                'fade'=>true, // use transitions?
+                'closeText'=>'×', // close link text - if set to false, no close link is displayed
+                'alerts'=>array( // configurations per alert type
+                    'success'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+                    'error'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
+                ),
+            ));
+            ?>
+
+            <?php echo $content;?>
 		</div>
 	</div>
 </body>

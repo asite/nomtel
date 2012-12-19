@@ -19,17 +19,6 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<?php
-$this->widget('bootstrap.widgets.TbAlert', array(
-'block'=>true, // display a larger alert block?
-'fade'=>true, // use transitions?
-'closeText'=>'×', // close link text - if set to false, no close link is displayed
-'alerts'=>array( // configurations per alert type
-'success'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
-),
-));
-?>
-
 <h1><?php echo GxHtml::encode($model->label(1)); ?></h1>
 
 <?php $this->widget('bootstrap.widgets.TbDetailView',array(
