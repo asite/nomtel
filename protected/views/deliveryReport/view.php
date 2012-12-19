@@ -64,20 +64,20 @@ $this->widget('bootstrap.widgets.TbAlert', array(
         ),
         array(
             'name'=>'operator_id',
-            'value'=>'$data->operator->title',
-            'sortable'=>false,
+            'value'=>'$data->operator',
             'htmlOptions' => array('style'=>'text-align:center;'),
+            'filter'=>Operator::getComboList(),
         ),
         array(
             'name'=>'tariff_id',
-            'value'=>'$data->tariff->title',
-            'sortable'=>false,
+            'value'=>'$data->tariff',
             'htmlOptions' => array('style'=>'text-align:center;'),
+            'filter'=>Tariff::getComboList(),
         ),
         array(
             'name'=>'number_price',
-            'sortable'=>false,
             'htmlOptions' => array('style'=>'text-align:center;'),
+            'filter'=>false,
             ),
         array(
             'class' => 'bootstrap.widgets.TbDataColumn',

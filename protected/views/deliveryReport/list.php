@@ -23,7 +23,7 @@ $('.search-form form').submit(function(){
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'delivery-report-grid',
-	'dataProvider' => $model->search(),
+	'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'filter' => $model,
 	'columns' => array(

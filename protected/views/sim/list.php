@@ -40,45 +40,42 @@ $('.search-form form').submit(function(){
     'id' => 'sim-grid',
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'filter' => $dataModel,
+    'filter' => $model,
     'afterAjaxUpdate' => 'js:function(id,data){multiPageSelRestore(id)}',
     'bulkActions' => array(
         'actionButtons' => array(
         ),
         'checkBoxColumnConfig' => array(
             'name' => 'id',
-            'disabled' => '$data["delivery_report_dt"]!=""',
+            'disabled' => '$data->agent_id ? true:false'
         ),
     ),
     'columns' => array(
         array(
-            'name'=>'delivery_report_dt',
-            'value'=>'$data["delivery_report_dt"]!="" ? new EDateTime($data["delivery_report_dt"]):""',
-            'header'=>DeliveryReport::model()->label(1),
+            'name'=>'delivery_report_id',
+            'value'=>'$data->deliveryReport->dt ? $data->deliveryReport->dt->format("d.m.Y"):"";    ',
             'filter'=>false,
         ),
         array(
-            'name'=>'agent_name',
-            'header'=>Agent::model()->label(1),
-            'filter'=>array_merge(array(0=>Yii::t('app','WITHOUT AGENT')),Agent::getComboList()),
+            'name'=>'agent_id',
+            'value'=>'GxHtml::valueEx($data->agent)',
+            'filter'=>Agent::getComboList(array(0=>Yii::t('app','WITHOUT AGENT'))),
         ),
         array(
             'name'=>'number',
-            'header'=>Yii::t('app','Number'),
         ),
         array(
             'name'=>'icc',
-            'header'=>Yii::t('app','Icc'),
         ),
         array(
-            'name'=>'operator',
+            'name'=>'operator_id',
+            'value'=>'$data->operator',
             'filter'=>Operator::getComboList(),
-            'header'=>Operator::model()->label(1),
         ),
         array(
-            'name'=>'tariff',
+            'name'=>'tariff_id',
+            'value'=>'$data->tariff',
             'filter'=>Tariff::getComboList(),
-            'header'=>Tariff::model()->label(1),
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
@@ -86,9 +83,9 @@ $('.search-form form').submit(function(){
             'template'=>'{feedback}',
             'buttons'=>array(
                 'feedback'=>array(
-                        'label'=>Yii::t('app','Report problem'),
-                        'icon'=>'envelope',
-                        'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data["id"]))'
+                    'label'=>Yii::t('app','Report problem'),
+                    'icon'=>'envelope',
+                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))'
                 )
             )
         ),

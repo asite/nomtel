@@ -25,7 +25,7 @@ class Agent extends BaseAgent
         $agents=Yii::app()->db->createCommand("select id,name,surname,middle_name from ".
             self::model()->tableName()." where parent_id".
             (Yii::app()->user->getState('isAdmin') ? ' is null':'=:parent_id').
-            " order by surname,name,middle_name")->queryAll(true,   array(':parent_id'=>Yii::app()->user->getState('agentId')));
+            " order by surname,name,middle_name")->queryAll(true,array(':parent_id'=>Yii::app()->user->getState('agentId')));
 
         foreach($agents as $v) {
             $data[$v['id']]=$v['surname'].' '.$v['name'].' '.$v['middle_name'];

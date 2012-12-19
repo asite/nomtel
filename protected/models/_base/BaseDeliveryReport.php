@@ -49,13 +49,12 @@ abstract class BaseDeliveryReport extends BaseGxActiveRecord {
 	public function relations() {
 		return array(
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
-			'sims' => array(self::MANY_MANY, 'Sim', 'sim_delivery_report(delivery_report_id, sim_id)'),
+			'sims' => array(self::HAS_MANY, 'Sim', 'delivery_report_id'),
 		);
 	}
 
 	public function pivotModels() {
 		return array(
-			'sims' => 'SimDeliveryReport',
 		);
 	}
 
