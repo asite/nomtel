@@ -64,22 +64,23 @@ class SimController extends BaseGxController {
             for ($row = 2; $row <= $highestRow; ++$row) {
               for ($col = 0; $col <= $highestColumnIndex; ++$col) {
                 $info = $objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
-                if ($col==0 && $info!='') $sim[$row][0] = $info;
-                if (preg_match('%- (\d{10})$%',$info,$matches)) $sim[$row][1] = $matches[1];
+                if ($col==0 && $info!='') $sim[0] = $info;
+                if (preg_match('%- (\d{10})$%',$info,$matches)) $sim[1] = $matches[1];
+              }
+              if ($sim[0] && $sim[1]) {
+                $model = new Sim;
+                $model->state = 'IN_BASE';
+                $model->number_price = 0;
+                $model->personal_account = $sim[0];
+                $model->number = $sim[1];
+                try {
+                  $model->save();
+                  $sims[$i]['personal_account'] = $sim[0];
+                  $sims[$i++]['number'] = $sim[1];
+                } catch(Exception $e) { }
               }
             }
-
-            echo '<table>' . "\n";
-            for ($row = 2; $row <= $highestRow; ++$row) {
-              echo '<tr>' . "\n";
-              for ($col = 0; $col <= $highestColumnIndex; ++$col) {
-                echo '<td>' . $objWorksheet->getCellByColumnAndRow($col, $row)->getValue() . '</td>' . "\n";
-              }
-              echo '</tr>' . "\n";
-            }
-            echo '</table>' . "\n";
           }
-          exit;
         }
       }
       //$transaction->commit();
@@ -254,7 +255,16 @@ class SimController extends BaseGxController {
 
       $criteria = new CDbCriteria();
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+      $ids_string = implode(",", $_SESSION['moveSims'][$key]);
+
       Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
+
+      $sql = "INSERT INTO sim (state, personal_account, number,number_price, icc, parent_agent_id, agent_id, delivery_report_id, operator_id, tariff_id)
+              SELECT s.state, s.personal_account, s.number,s.number_price, s.icc, s.agent_id, NULL, NULL, s.operator_id, s.tariff_id
+              FROM sim as s
+              WHERE id IN ($ids_string)";
+
+      Yii::app()->db->createCommand($sql)->execute();
 
       $model->agent->recalcBalance();
       $model->agent->save();
@@ -333,71 +343,23 @@ class SimController extends BaseGxController {
             $this->redirect(array('sim/move','key'=>$key));
         }
 
-        $sql="select sim.*,agent.id as agent_id,CONCAT_WS(' ',agent.surname,agent.name,agent.middle_name) as agent_name,dr.dt as delivery_report_dt,o.title as operator,t.title as tariff
-             from sim ";
-        // agents must view only sim, that they received from admin/parent agent
-        if (!Yii::app()->user->getState('isAdmin')) {
-             $sql.="join sim_delivery_report sdrc on (sdrc.sim_id=sim.id)
-             join delivery_report drc on (drc.id=sdrc.delivery_report_id and drc.agent_id=:agent_id)";
-        }
-        // in agent column show only direct child agents
-        $sql.="left outer join sim_delivery_report sdr on (sdr.sim_id=sim.id)
-             left outer join delivery_report dr on (dr.id=sdr.delivery_report_id)
-             left outer join agent on (agent.id=dr.agent_id and agent.parent_id ".
-                (Yii::app()->user->getState('isAdmin') ? 'is null':'=:parent_id').")";
-        // attach operator and tariff
-        $sql.="left outer join tariff t on (t.id=sim.tariff_id)
-               left outer join operator o on (o.id=t.operator_id)";
+        $model = new Sim('search');
+        $model->unsetAttributes();
 
-        $criteria=new CDbCriteria();
-        $criteria->addCondition("sim.state!='NOT_RECEIVED'");
-        $criteria->addCondition("((dr.id is not null and agent.id is not null) or (dr.id is null and agent.id is null))");
+        if (isset($_GET['Sim']))
+            $model->setAttributes($_GET['Sim']);
 
-        $simSearch=new SimSearch();
-        if (isset($_GET['SimSearch']))
-            $simSearch->setAttributes($_GET['SimSearch']);
+        $dataProvider=$model->search();
+        $dataProvider->criteria->addCondition("state!='NOT_RECEIVED'");
 
-        if ($simSearch->agent_name!=='0')
-            $criteria->compare('agent.id', $simSearch->agent_name);
-        else
-            $criteria->addCondition("agent.id is null");
-
-        if ($simSearch->number!=Yii::t('app','WITHOUT NUMBER'))
-            $criteria->compare('number', $simSearch->number, true);
-        else
-            $criteria->addCondition("(number='' or number is null)");
-
-        $criteria->compare('icc',$simSearch->icc,true);
-        $criteria->compare('o.title',$simSearch->operator);
-        $criteria->compare('t.title',$simSearch->tariff);
-
-        $params=$criteria->params;
         if (!Yii::app()->user->getState('isAdmin'))
-            $params=array_merge($params,array(
-                ':parent_id'=>Yii::app()->user->getState('agentId'),
-                ':agent_id'=>Yii::app()->user->getState('agentId')
-            ));
-
-        $sql.=' where '.$criteria->condition;
-        //var_dump($sql);exit;
-
-        $count=Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
-        $dataProvider=new CSqlDataProvider($sql,
-            array(
-                'params'=>$params,
-                'totalItemCount'=>$count,
-                'sort'=>array(
-                    'defaultOrder'=>'id',
-                    'attributes'=>array('delivery_report_dt','agent_name','number','icc','operator','tariff')
-                ),
-                'pagination'=>array('pageSize'=>BaseGxActiveRecord::ITEMS_PER_PAGE)
-            ));
-
+            $dataProvider->criteria->addColumnCondition(array('parent_agent_id'=>Yii::app()->user->getState('agentId')));
+        else
+            $dataProvider->criteria->addCondition('parent_agent_id is null');
 
         $this->render('list', array(
-            'dataProvider' => $dataProvider,
-            'model' => new Sim(),
-            'dataModel' => $simSearch
+            'model' => $model,
+            'dataProvider' => $dataProvider
         ));
     }
 }

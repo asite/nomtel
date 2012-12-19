@@ -9,6 +9,7 @@
   var totalNumberPrice = <?php echo $totalNumberPrice ?>;
 
   function newPrice(priceN, countS) {
+    totalNumberPrice = priceN;
     countS = countS || countSim;
     if (countSim != countS) {
       countSim = countS;

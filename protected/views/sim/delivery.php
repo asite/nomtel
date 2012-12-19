@@ -70,11 +70,12 @@ $this->breadcrumbs = array(
 
 <div class="cfix">
   <label for="Delivery_operator" style="float: left; line-height: 30px; width: 160px; margin-right: 20px; text-align: right;"><?php echo Yii::t('app','Operator selection'); ?>:</label>
-  <select name="Delivery[operator]" id="Delivery_operator">
+  <select name="Delivery[operator]" id="Delivery_operator" onchange="if ($(this).val()==2) $('.delivery_help').show(); else $('.delivery_help').hide();">
     <option value="0">Выберете оператора...</option>
     <option value="1">Билайн</option>
     <option value="2">Мегафон</option>
   </select>
+  <div class="delivery_help">Симкарты добавляються в базу</div>
 </div>
 <br/><br/>
 

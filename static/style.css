@@ -179,3 +179,10 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
     background: gray !important;
 }
 */
+
+.delivery_help {
+  display: none;
+  padding-left: 160px;
+  font-size: 12px;
+  color: red;
+}
