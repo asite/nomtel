@@ -4,6 +4,8 @@ Yii::import('application.models._base.BasePayment');
 
 class Payment extends BasePayment
 {
+    const TYPE_NORMAL='NORMAL';
+
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}

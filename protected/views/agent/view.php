@@ -87,6 +87,8 @@ $this->breadcrumbs = array(
 
         <?php echo $form->textFieldRow($paymentNew,'sum',array('class'=>'span1')); ?>
 
+        <?php echo $form->textFieldRow($paymentNew,'comment',array('class'=>'span4')); ?>
+
         <?php
         echo '<div class="form-actions">';
         echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Create Payment'), array('class'=>'btn btn-primary', 'type'=>'submit'));
@@ -116,6 +118,11 @@ $this->breadcrumbs = array(
             'htmlOptions' => array('style'=>'text-align:center;'),
             'value'=>'new EDateTime($data["dt"])',
             'header'=>Yii::t('app','Dt'),
+        ),
+        array(
+            'name'=>'comment',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+            'header'=>Yii::t('app','Comment'),
         ),
         array(
             'name'=>'sum',

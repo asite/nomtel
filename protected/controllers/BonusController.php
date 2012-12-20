@@ -20,9 +20,11 @@ class BonusController extends BaseGxController
         $this->redirect(array());
     }
 
-    private function calculateBonuses($simBonus,$simAgent) {
+    private function calculateBonuses($simBonus,$simAgent,$comment) {
+        $db=Yii::app()->db;
+
         // get agents info
-        $agentsRaw=Yii::app()->db->createCommand("select id,parent_id,referral_percent from agent")->queryAll();
+        $agentsRaw=$db->createCommand("select id,parent_id,referral_percent from agent")->queryAll();
         $agents=array();
         foreach($agentsRaw as $row) {
             $agents[$row['id']]=array('referral_percent'=>$row['referral_percent'],'parent_id'=>$row['parent_id'] ? $row['parent_id']:0);
@@ -42,6 +44,7 @@ class BonusController extends BaseGxController
                 }
         } while ($modified);
 
+        // calculate earned bonuses
         $agentsBonuses=array();
         foreach($simAgent as $v) {
             $bonus=$simBonus[$v['sim_id']];
@@ -54,7 +57,21 @@ class BonusController extends BaseGxController
             }
         }
 
-        exit;
+        $trx=$db->beginTransaction();
+        $cmd=$db->createCommand('update agent set balance=balance+:sum where id=:agent_id');
+
+        $payments=array();
+        $comment=$db->quoteValue(Yii::t('app','Bonuses')." '".$comment."'");
+        foreach($agentsBonuses as $agent_id=>$bonus) {
+            $payments[]='('.$db->quoteValue($agent_id).",'BONUS',NOW(),$comment,".$db->quoteValue($bonus).')';
+            $cmd->execute(array(':agent_id'=>$agent_id,':sum'=>$bonus));
+        }
+
+        if (!empty($payments)) {
+            $db->createCommand("insert into payment (agent_id,type,dt,comment,sum) values ".implode(',',$payments))->execute();
+        }
+
+        $trx->commit();
     }
 
     private function processLoadBeeline($model,$reader,$file) {
@@ -99,7 +116,7 @@ class BonusController extends BaseGxController
             where operator_id=".OPERATOR_BEELINE_ID." and agent_id is null and personal_account in (".
             implode(',',$personal_accounts).")")->queryAll();
 
-        $this->calculateBonuses($simBonus,$simAgent);
+        $this->calculateBonuses($simBonus,$simAgent,$model->comment);
     }
 
     private function processLoad($model) {
@@ -115,8 +132,12 @@ class BonusController extends BaseGxController
         $reader->setReadDataOnly(true);
 
         switch ($model->operator) {
-            case OPERATOR_BEELINE_ID: $this->processLoadBeeline($model,$reader,$file);break;
-            default: Yii::app()->user->setFlash('success',Yii::t('app','Loading bonuses for this operator is not yet implemented'));
+            case OPERATOR_BEELINE_ID:
+                $this->processLoadBeeline($model,$reader,$file);
+                break;
+            default:
+                Yii::app()->user->setFlash('error',Yii::t('app','Loading bonuses for this operator is not yet implemented'));
+                $this->redirect(array());
         }
 
         Yii::app()->user->setFlash('success',Yii::t('app','Loading bonuses completed successfully'));
