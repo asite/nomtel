@@ -112,6 +112,20 @@ $menu=array(
         ),
         array(
             'class'=>'bootstrap.widgets.TbMenu',
+            'items'=>array(
+                array(
+                    'label'=>Yii::t('app','messages'),
+                    'url'=>'#',
+                    'items'=>
+                    array(
+                        array('label'=>Yii::t('app','message to agent up'), 'url'=>$this->createUrl('message/agentUp')),
+                        array('label'=>Yii::t('app','message to agent down'), 'url'=>$this->createUrl('message/agentDown'))
+                    )
+                )
+            )
+        ),
+        array(
+            'class'=>'bootstrap.widgets.TbMenu',
             'htmlOptions'=>array('class'=>'pull-right'),
             'items'=>array(
                 array(
