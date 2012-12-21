@@ -84,7 +84,12 @@
             </div>
         </div>
     </fieldset>
-        
+
+    <fieldset><legend><?php echo Yii::t('app','Referral Rate');?></legend>
+        <?php foreach($referralRates as $rate) { ?>
+            <?php echo $form->textFieldRow($rate,'['.$rate->operator_id.']rate',array('labelOptions'=>array('label'=>Yii::t('app','Rate').' '.$rate->operator),'class'=>'span1','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+        <?php } ?>
+    </fieldset>
 
 <?php
 echo '<div class="form-actions">';

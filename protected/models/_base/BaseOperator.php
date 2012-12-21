@@ -12,6 +12,8 @@
  * @property integer $id
  * @property string $title
  *
+ * @property AgentReferralRate[] $agentReferralRates
+ * @property BonusReport[] $bonusReports
  * @property Sim[] $sims
  * @property Tariff[] $tariffs
  */
@@ -43,6 +45,8 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
+			'agentReferralRates' => array(self::HAS_MANY, 'AgentReferralRate', 'operator_id'),
+			'bonusReports' => array(self::HAS_MANY, 'BonusReport', 'operator_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'operator_id'),
 			'tariffs' => array(self::HAS_MANY, 'Tariff', 'operator_id'),
 		);
@@ -57,6 +61,8 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'title' => Yii::t('app', 'Title'),
+			'agentReferralRates' => null,
+			'bonusReports' => null,
 			'sims' => null,
 			'tariffs' => null,
 		);

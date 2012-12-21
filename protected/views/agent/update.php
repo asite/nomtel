@@ -13,5 +13,6 @@ $this->breadcrumbs = array(
 $this->renderPartial('_form', array(
 		'model' => $model,
         'user' => $user,
+        'referralRates' => $referralRates
 ));
 ?>
