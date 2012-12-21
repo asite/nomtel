@@ -83,7 +83,8 @@ $('.search-form form').submit(function(){
                 'feedback'=>array(
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
-                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))'
+                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))',
+                    'visible'=>'!Yii::app()->user->getState("isAdmin")'
                 )
             )
         ),

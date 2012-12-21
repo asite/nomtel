@@ -2,12 +2,6 @@
 
 class DeliveryReportController extends BaseGxController
 {
-    public function checkDeliveryReportPermissions($deliveryReport) {
-        if (!Yii::app()->user->getState('isAdmin') &&
-            Yii::app()->user->getState('agentId')!=$deliveryReport->agent_id)
-            throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
-    }
-
     public function actionList()
     {
         $model = new DeliveryReport('search');
@@ -17,7 +11,10 @@ class DeliveryReportController extends BaseGxController
             $model->setAttributes($_GET['DeliveryReport']);
 
         $dataProvider=$model->search();
-        $dataProvider->criteria->addInCondition('agent_id',array_keys(Agent::getComboList()));
+        if (Yii::app()->user->getState('isAdmin'))
+            $dataProvider->criteria->addCondition("parent_agent_id is null");
+        else
+            $dataProvider->criteria->addColumnCondition(array("parent_agent_id"=>Yii::app()->user->getState('agentId')));
 
         $this->render('list', array(
             'model' => $model,
@@ -28,7 +25,9 @@ class DeliveryReportController extends BaseGxController
     public function actionView($id)
     {
         $model = $this->loadModel($id, 'DeliveryReport');
-        $this->checkDeliveryReportPermissions($model);
+        if (Yii::app()->user->getState('agentId')!=$model->parent_agent_id &&
+            Yii::app()->user->getState('agentId')!=$model->agent_id)
+            throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
 
         $sim = new Sim('search');
         $sim->unsetAttributes();
@@ -45,7 +44,9 @@ class DeliveryReportController extends BaseGxController
 
     public function actionReport($id) {
         $model = $this->loadModel($id, 'Sim');
-        $this->checkDeliveryReportPermissions($model->deliveryReport);
+
+        if (Yii::app()->user->getState('agentId')!=$model->parent_agent_id)
+            throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
 
         $report=new SimReport();
         $this->performAjaxValidation($report);

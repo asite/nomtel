@@ -15,14 +15,19 @@
  * @property string $number
  * @property double $number_price
  * @property string $icc
+ * @property string $parent_id
  * @property integer $parent_agent_id
+ * @property integer $parent_delivery_report_id
  * @property integer $agent_id
  * @property integer $delivery_report_id
  * @property integer $operator_id
  * @property integer $tariff_id
  *
+ * @property Sim $parent
+ * @property Sim[] $sims
  * @property DeliveryReport $deliveryReport
  * @property Agent $parentAgent
+ * @property DeliveryReport $parentDeliveryReport
  * @property Tariff $tariff
  * @property Operator $operator
  * @property Agent $agent
@@ -48,19 +53,23 @@ abstract class BaseSim extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('state, personal_account, number_price', 'required'),
-			array('parent_agent_id, agent_id, delivery_report_id, operator_id, tariff_id', 'numerical', 'integerOnly'=>true),
+			array('parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'numerical', 'integerOnly'=>true),
 			array('number_price', 'numerical'),
 			array('state', 'length', 'max'=>18),
 			array('personal_account, number, icc', 'length', 'max'=>50),
-			array('number, icc, parent_agent_id, agent_id, delivery_report_id, operator_id, tariff_id', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, state, personal_account, number, number_price, icc, parent_agent_id, agent_id, delivery_report_id, operator_id, tariff_id', 'safe', 'on'=>'search'),
+			array('parent_id', 'length', 'max'=>20),
+			array('number, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, state, personal_account, number, number_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'parent' => array(self::BELONGS_TO, 'Sim', 'parent_id'),
+			'sims' => array(self::HAS_MANY, 'Sim', 'parent_id'),
 			'deliveryReport' => array(self::BELONGS_TO, 'DeliveryReport', 'delivery_report_id'),
 			'parentAgent' => array(self::BELONGS_TO, 'Agent', 'parent_agent_id'),
+			'parentDeliveryReport' => array(self::BELONGS_TO, 'DeliveryReport', 'parent_delivery_report_id'),
 			'tariff' => array(self::BELONGS_TO, 'Tariff', 'tariff_id'),
 			'operator' => array(self::BELONGS_TO, 'Operator', 'operator_id'),
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
@@ -80,13 +89,18 @@ abstract class BaseSim extends BaseGxActiveRecord {
 			'number' => Yii::t('app', 'Number'),
 			'number_price' => Yii::t('app', 'Number Price'),
 			'icc' => Yii::t('app', 'Icc'),
+			'parent_id' => null,
 			'parent_agent_id' => null,
+			'parent_delivery_report_id' => null,
 			'agent_id' => null,
 			'delivery_report_id' => null,
 			'operator_id' => null,
 			'tariff_id' => null,
+			'parent' => null,
+			'sims' => null,
 			'deliveryReport' => null,
 			'parentAgent' => null,
+			'parentDeliveryReport' => null,
 			'tariff' => null,
 			'operator' => null,
 			'agent' => null,
@@ -102,7 +116,9 @@ abstract class BaseSim extends BaseGxActiveRecord {
 		$criteria->compare('number', $this->number, true);
 		$criteria->compare('number_price', $this->number_price);
 		$criteria->compare('icc', $this->icc, true);
+		$criteria->compare('parent_id', $this->parent_id);
 		$criteria->compare('parent_agent_id', $this->parent_agent_id);
+		$criteria->compare('parent_delivery_report_id', $this->parent_delivery_report_id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('delivery_report_id', $this->delivery_report_id);
 		$criteria->compare('operator_id', $this->operator_id);

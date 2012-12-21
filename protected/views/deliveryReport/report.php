@@ -2,7 +2,7 @@
 
 $this->breadcrumbs = array(
     DeliveryReport::model()->label(2)=>array('list'),
-    $model->deliveryReport->adminLabel($model->deliveryReport->label(1)) => array('view','id'=>$model->id),
+    $model->parentDeliveryReport->adminLabel($model->deliveryReport->label(1)) => array('view','id'=>$model->id),
     $model->adminLabel($model->label(1))
 );
 ?>
@@ -13,7 +13,7 @@ $this->breadcrumbs = array(
     'data'=>$model,
     'attributes'=>array(
         'agent',
-        'deliveryReport',
+        'parentDeliveryReport',
         'personal_account',
         'number',
         'number_price',
