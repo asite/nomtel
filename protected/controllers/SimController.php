@@ -231,8 +231,45 @@ class SimController extends BaseGxController {
     if (Yii::app()->user->hasFlash('tab2')) $activeTabs['tab2'] = true; else $activeTabs['tab1'] = true;
     $this->render('add', array('model'=>$model, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'activeTabs'=>$activeTabs));
   }
-
+    
+    
+  public function actionMassSelect() {
+    
+    if($_POST['ICCtoSelect']!='')
+    {
+        $icc_arr = explode("\n",  $_POST['ICCtoSelect']);
+      
+        foreach ($icc_arr as $icc)
+        {
+            if($icc!='')
+            {
+                if($sim = Sim::model()->findByAttributes(array('icc'=>trim($icc))))
+                {
+                    $ids[] = $sim->id;
+                   
+                }
+            }
+        }
+        
+       
+       
+        
+        if (count($ids)>0) {
+            $key=rand();
+            $_SESSION['moveSims'][$key]=$ids;
+           
+            $this->redirect(array('sim/move','key'=>$key));
+        }
+        else 
+            Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> не найдено сим в базе
+            .');
+    }
+    
+    $this->render('massselect');
+  }
   public function actionMove($key) {
+    
+   
     if ($_POST['Move']) {
       if (!$_POST['Move']['agent_id']) {
         Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не выбран агент.');
@@ -340,6 +377,7 @@ class SimController extends BaseGxController {
         if (isset($_REQUEST['passSIM'])) {
             $key=rand();
             $_SESSION['moveSims'][$key]=explode(',',$_POST['ids']);
+            
             $this->redirect(array('sim/move','key'=>$key));
         }
 

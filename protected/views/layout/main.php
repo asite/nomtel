@@ -21,7 +21,8 @@ $menu=array(
                 array(
                     array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery')),
                     array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add')),
-                    array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list'))
+                    array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list')),
+                    array('label'=>Yii::t('app','Mass select'), 'url'=>$this->createUrl('sim/massselect'))
                 )
             )
         )
