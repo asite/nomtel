@@ -29,10 +29,10 @@
  * @property string $birthday_place
  * @property string $registration_address
  * @property double $balance
- * @property double $referral_percent
  *
  * @property User $user
  * @property User $parent
+ * @property AgentReferralRate[] $agentReferralRates
  * @property DeliveryReport[] $deliveryReports
  * @property Payment[] $payments
  * @property Sim[] $sims
@@ -60,16 +60,16 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		return array(
 			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
 			array('parent_id, user_id', 'numerical', 'integerOnly'=>true),
-			array('balance, referral_percent', 'numerical'),
+			array('balance', 'numerical'),
 			array('name, surname, middle_name, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
-			array('parent_id, user_id, phone_2, phone_3, email, skype, icq, balance, referral_percent', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('parent_id, user_id, phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birthday_date','date','format'=>'dd.MM.yyyy'),
-			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance, referral_percent', 'safe', 'on'=>'search'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -77,6 +77,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		return array(
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'parent' => array(self::BELONGS_TO, 'User', 'parent_id'),
+			'agentReferralRates' => array(self::HAS_MANY, 'AgentReferralRate', 'agent_id'),
 			'deliveryReports' => array(self::HAS_MANY, 'DeliveryReport', 'agent_id'),
 			'payments' => array(self::HAS_MANY, 'Payment', 'agent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'parent_agent_id'),
@@ -111,9 +112,9 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'birthday_place' => Yii::t('app', 'Birthday Place'),
 			'registration_address' => Yii::t('app', 'Registration Address'),
 			'balance' => Yii::t('app', 'Balance'),
-			'referral_percent' => Yii::t('app', 'Referral Percent'),
 			'user' => null,
 			'parent' => null,
+			'agentReferralRates' => null,
 			'deliveryReports' => null,
 			'payments' => null,
 			'sims' => null,
@@ -144,7 +145,6 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('birthday_place', $this->birthday_place, true);
 		$criteria->compare('registration_address', $this->registration_address, true);
 		$criteria->compare('balance', $this->balance);
-		$criteria->compare('referral_percent', $this->referral_percent);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

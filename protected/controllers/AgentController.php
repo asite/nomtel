@@ -7,36 +7,104 @@ class AgentController extends BaseGxController
             Yii::app()->user->getState('agentId')!=$agent->parent_id) $this->redirect(array('list'));
     }
 
+    private function save($model,$user,$referralRates) {
+        $trx=Yii::app()->db->beginTransaction();
+
+        $user->save();
+
+        $model->user_id=$user->id;
+        $model->save();
+
+        foreach($referralRates as $rate) {
+            $rate->agent_id=$model->id;
+            $rate->parent_agent_id=$model->parent_id;
+            $rate->save();
+        }
+
+        $trx->commit();
+    }
+
+    private function getReferralRates($model) {
+        $referralRates=array();
+        foreach(Operator::getComboList() as $k=>$v) {
+            $m=AgentReferralRate::model()->findByAttributes(array('agent_id'=>$model->id,'operator_id'=>$k));
+
+            if (!$m) {
+                $m=new AgentReferralRate();
+                $m->operator_id=$k;
+            }
+
+            $referralRates[$k]=$m;
+        }
+
+        return $referralRates;
+    }
+
+    private function validate(&$model,&$user,&$referralRates) {
+        $result=array();
+
+        if (isset($_POST['Agent']))
+            $model->setAttributes($_POST['Agent']);
+
+        $model->validate();
+
+        foreach($model->getErrors() as $attribute=>$errors)
+            $result[CHtml::activeId($model,$attribute)]=$errors;
+
+        if (isset($_POST['User']))
+            $user->setAttributes($_POST['User']);
+
+        $user->validate();
+
+        foreach($user->getErrors() as $attribute=>$errors)
+            $result[CHtml::activeId($user,$attribute)]=$errors;
+
+        foreach($referralRates as $rate)
+        {
+            if (isset($_POST['AgentReferralRate'][$rate->operator_id]))
+                $rate->setAttributes($_POST['AgentReferralRate'][$rate->operator_id]);
+
+            if (!$model->id) $rate->agent_id=0;else $rate->agent_id=$model->id;
+
+            $rate->validate();
+            foreach($rate->getErrors() as $attribute=>$errors)
+                $result[CHtml::activeId($rate,'['.$rate->operator_id.']'.$attribute)]=$errors;
+        }
+
+        return $result;
+    }
+
     public function actionCreate()
     {
         $model = new Agent;
         $user = new User('create');
         $user->status = ModelLoggableBehavior::STATUS_ACTIVE;
 
-        $this->performAjaxValidation(array($model, $user));
+        $referralRates=$this->getReferralRates($model);
+
+        if (Yii::app()->getRequest()->getIsAjaxRequest()) {
+            $result=$this->validate($model,$user,$referralRates);
+            echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
+            Yii::app()->end();
+        }
 
         if (isset($_POST['Agent'])) {
-            $model->setAttributes($_POST['Agent']);
-            $user->setAttributes($_POST['User']);
             if (!Yii::app()->user->getState('isAdmin')) $model->parent_id=Yii::app()->user->getState('agentId');
 
-            $validated = true;
-            if (!$model->validate()) $validated = false;
-            if (!$user->validate()) $validated = false;
+            $errors=$this->validate($model,$user,$referralRates);
 
-            if ($validated) {
+            if (empty($errors)) {
                 $user->encryptPwd();
-                $user->save();
-                $model->user_id = $user->id;
-                $model->save();
-                if (Yii::app()->getRequest()->getIsAjaxRequest())
-                    Yii::app()->end();
-                else
-                    $this->redirect(array('admin'));
+                $this->save($model,$user,$referralRates);
+
+                $this->redirect(array('admin'));
             }
         }
 
-        $this->render('create', array('model' => $model, 'user' => $user));
+        $this->render('create', array(
+            'model' => $model,
+            'user' => $user,
+            'referralRates'=>$referralRates));
     }
 
     public function actionUpdate($id)
@@ -46,26 +114,26 @@ class AgentController extends BaseGxController
         $user = $model->user;
         $password = $user->password;
 
-        $this->performAjaxValidation(array($model, $user));
+        $referralRates=$this->getReferralRates($model);
+
+        if (Yii::app()->getRequest()->getIsAjaxRequest()) {
+            $result=$this->validate($model,$user,$referralRates);
+            echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
+            Yii::app()->end();
+        }
 
         if (isset($_POST['Agent'])) {
-            $model->setAttributes($_POST['Agent']);
-            $user->setAttributes($_POST['User']);
+            $errors=$this->validate($model,$user,$referralRates);
 
-            $validated = true;
-            if (!$model->validate()) $validated = false;
-            if (!$user->validate()) $validated = false;
-
-            if ($validated) {
-                $model->save();
-
+            if (empty($errors)) {
                 if ($user->password != '') {
                     $user->encryptPwd();
                 } else {
                     $user->password = $password;
                 }
 
-                $user->save();
+                $this->save($model,$user,$referralRates);
+
                 $this->redirect(array('admin'));
             }
         }
@@ -73,7 +141,8 @@ class AgentController extends BaseGxController
         $user->password = '';
         $this->render('update', array(
             'model' => $model,
-            'user' => $model->user
+            'user' => $model->user,
+            'referralRates' => $referralRates
         ));
     }
 

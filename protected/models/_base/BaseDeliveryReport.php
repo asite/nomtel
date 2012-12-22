@@ -11,12 +11,14 @@
  *
  * @property integer $id
  * @property integer $agent_id
+ * @property integer $bonus_report_id
  * @property string $dt
  * @property double $sim_price
  * @property double $sum
  *
  * @property Agent $agent
  * @property Sim[] $sims
+ * @property Sim[] $sims1
  */
 abstract class BaseDeliveryReport extends BaseGxActiveRecord {
 
@@ -39,10 +41,11 @@ abstract class BaseDeliveryReport extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('agent_id, dt, sim_price, sum', 'required'),
-			array('agent_id', 'numerical', 'integerOnly'=>true),
+			array('agent_id, bonus_report_id', 'numerical', 'integerOnly'=>true),
 			array('sim_price, sum', 'numerical'),
+			array('bonus_report_id', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, agent_id, dt, sim_price, sum', 'safe', 'on'=>'search'),
+			array('id, agent_id, bonus_report_id, dt, sim_price, sum', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -50,6 +53,7 @@ abstract class BaseDeliveryReport extends BaseGxActiveRecord {
 		return array(
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'delivery_report_id'),
+			'sims1' => array(self::HAS_MANY, 'Sim', 'parent_delivery_report_id'),
 		);
 	}
 
@@ -62,11 +66,13 @@ abstract class BaseDeliveryReport extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'agent_id' => null,
+			'bonus_report_id' => Yii::t('app', 'Bonus Report'),
 			'dt' => Yii::t('app', 'Dt'),
 			'sim_price' => Yii::t('app', 'Sim Price'),
 			'sum' => Yii::t('app', 'Sum'),
 			'agent' => null,
 			'sims' => null,
+			'sims1' => null,
 		);
 	}
 
@@ -75,6 +81,7 @@ abstract class BaseDeliveryReport extends BaseGxActiveRecord {
 
 		$criteria->compare('id', $this->id);
 		$criteria->compare('agent_id', $this->agent_id);
+		$criteria->compare('bonus_report_id', $this->bonus_report_id);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('sim_price', $this->sim_price);
 		$criteria->compare('sum', $this->sum);

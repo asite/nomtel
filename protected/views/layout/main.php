@@ -7,8 +7,59 @@
 </head>
 <body>
 	<div class="content">
-		<div class="inner_container">
+		<div class="inner_container cfix">
+            <div class="menuLeft well">
+              <?php
+                if (Yii::app()->user->getState('isAdmin')) {
+                  $menuLeft = array(
+                    array('label'=>Yii::app()->name, 'url'=>$this->createUrl('site/index'),'active'=>$this->route=='site/index'),
+                    '',
+                    array('label'=>Yii::t('app','MenuSim'), 'itemOptions'=>array('class'=>'nav-header')),
+                    array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery'),'active'=>$this->route=='sim/delivery'),
+                    array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add'),'active'=>$this->route=='sim/add'),
+                    array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list'),'active'=>$this->route=='sim/list'),
+                    '',
+                    array('label'=>Yii::t('app','Agents'), 'url'=>$this->createUrl('agent/admin'),'active'=>$this->route=='agent/admin'),
+                    array('label'=>Yii::t('app','Load Bonuses'), 'url'=>$this->createUrl('bonus/load'),'active'=>$this->route=='bonus/load'),
+                    array('label'=>BonusReport::model()->label(2), 'url'=>$this->createUrl('bonusReport/list'),'active'=>$this->route=='bonusReport/list'),
+                    array('label'=>DeliveryReport::model()->label(2), 'url'=>$this->createUrl('deliveryReport/list'),'active'=>$this->route=='deliveryReport/list'),
+                    array('label'=>Yii::t('app','Operators'), 'url'=>$this->createUrl('operator/admin'),'active'=>$this->route=='operator/admin'),
+                    '',
+                    array('label'=>Yii::t('app','messages'), 'itemOptions'=>array('class'=>'nav-header')),
+                    //array('label'=>Yii::t('app','message to agent up'), 'url'=>$this->createUrl('message/agentUp'),'active'=>$this->route=='message/agentUp'),
+                    array('label'=>Yii::t('app','message to agent down'), 'url'=>$this->createUrl('message/agentDown'),'active'=>$this->route=='message/agentDown'),
+                    '',
+                    array('label'=>Yii::t('app','Logout'), 'url'=>$this->createUrl('site/logout')),
+                  );
+                } else {
+                  $menuLeft = array(
+                    array('label'=>Yii::app()->name, 'url'=>$this->createUrl('site/index'),'active'=>$this->route=='site/index'),
+                    '',
+                    array('label'=>Yii::t('app','My Profile'), 'url'=>$this->createUrl('agent/view',array('id'=>Yii::app()->user->getState('agentId'))),'active'=>$this->route=='agent/view'),
+                    array('label'=>Yii::t('app','Agents'), 'url'=>$this->createUrl('agent/admin'),'active'=>$this->route=='agent/admin'),
+                    array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list'),'active'=>$this->route=='sim/list'),
+                      array('label'=>BonusReport::model()->label(2), 'url'=>$this->createUrl('bonusReport/list'),'active'=>$this->route=='bonusReport/list'),
+                    array('label'=>DeliveryReport::model()->label(2), 'url'=>$this->createUrl('deliveryReport/list'),'active'=>$this->route=='deliveryReport/list'),
+                    '',
+                    array('label'=>Yii::t('app','messages'), 'itemOptions'=>array('class'=>'nav-header')),
+                    array('label'=>Yii::t('app','message to agent up'), 'url'=>$this->createUrl('message/agentUp'),'active'=>$this->route=='message/agentUp'),
+                    array('label'=>Yii::t('app','message to agent down'), 'url'=>$this->createUrl('message/agentDown'),'active'=>$this->route=='message/agentDown'),
+                    '',
+                    array('label'=>Yii::t('app','Logout'), 'url'=>$this->createUrl('site/logout')),
+                  );
+                }
+
+                $this->widget('bootstrap.widgets.TbMenu', array(
+                    'type'=>'list',
+                    'items' => $menuLeft,
+                ));
+              ?>
+            </div>
+            <div class="contentRight">
+
+
 			<?php
+            /*
 if (Yii::app()->user->getState('isAdmin')) {
 $menu=array(
     array(
@@ -113,6 +164,20 @@ $menu=array(
         ),
         array(
             'class'=>'bootstrap.widgets.TbMenu',
+            'items'=>array(
+                array(
+                    'label'=>Yii::t('app','messages'),
+                    'url'=>'#',
+                    'items'=>
+                    array(
+                        array('label'=>Yii::t('app','message to agent up'), 'url'=>$this->createUrl('message/agentUp')),
+                        array('label'=>Yii::t('app','message to agent down'), 'url'=>$this->createUrl('message/agentDown'))
+                    )
+                )
+            )
+        ),
+        array(
+            'class'=>'bootstrap.widgets.TbMenu',
             'htmlOptions'=>array('class'=>'pull-right'),
             'items'=>array(
                 array(
@@ -124,6 +189,7 @@ $menu=array(
     );
 
 }
+
             $this->widget('bootstrap.widgets.TbNavbar', array(
 				'fixed'=>false,
                 'type'=>'inverse',
@@ -131,7 +197,9 @@ $menu=array(
 				'brandUrl'=>$this->createUrl('site/index'),
 				'collapse'=>true,
 				'items'=> $menu
-			)); ?>
+			));
+        */
+            ?>
 
             <?php $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
 				'homeLink'=>CHtml::link(Yii::t('app','Home'),$this->createUrl('site/index')),
@@ -148,9 +216,11 @@ $menu=array(
                     'error'=>array('block'=>true, 'fade'=>true, 'closeText'=>'×'), // success, info, warning, error or danger
                 ),
             ));
+
             ?>
 
             <?php echo $content;?>
+            </div>
 		</div>
 	</div>
 </body>

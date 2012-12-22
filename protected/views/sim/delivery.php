@@ -62,7 +62,7 @@ $this->breadcrumbs = array(
     <option value="1">Билайн</option>
     <option value="2">Мегафон</option>
   </select>
-  <div class="delivery_help">Симкарты добавляються в базу</div>
+  <div class="delivery_help">Симкарты добавляются в базу</div>
 </div>
 <br/><br/>
 
@@ -81,9 +81,7 @@ $this->breadcrumbs = array(
     $dataProvider = new CArrayDataProvider(
       $deliveryReport,
       array(
-        'pagination'=>array(
-          'pageSize'=>14,
-        ),
+        'pagination'=>false
       )
     );
 

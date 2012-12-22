@@ -109,6 +109,7 @@ class SimController extends BaseGxController {
 
     $whereListArray = array(0=>'БАЗА',1=>'АГЕНТ');
 
+
     if ($_POST['AddSim']) {
       $activeTabs = array('tab1'=>false,'tab2'=>false);
 
@@ -125,6 +126,7 @@ class SimController extends BaseGxController {
               ':state' => 'NOT_RECEIVED',
           )
         );
+
         if (isset($_POST['buttonProcessSim'])) {
           $activeTabs['tab1'] = true;
           $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportMany'=>$result, 'activeTabs'=>$activeTabs));
@@ -161,18 +163,6 @@ class SimController extends BaseGxController {
       }
 
       if ($_POST['simMethod'] == 'add-few-sim') {
-        /*$condition = ' icc="'.$_POST['AddSim']['ICCBeginFew'].$_POST['AddSim']['ICCEndFew'].'" ';
-        for($i=1; $i<=count($_POST['AddNewSim']['ICCBeginFew']);$i++) {
-          if ($_POST['AddNewSim']['ICCBeginFew'][$i] && $_POST['AddNewSim']['ICCEndFew'][$i])
-          $condition .= ' OR icc = "'.$_POST['AddNewSim']['ICCBeginFew'][$i].$_POST['AddNewSim']['ICCEndFew'][$i].'"';
-        }
-
-        $result = Sim::model()->findAllBySql('select * from sim where '.$condition);
-        if (isset($_POST['buttonProcessSim'])) {
-          $activeTabs['tab2'] = true;
-          $this->render('add', array('model'=>$model, 'data'=>$_POST, 'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportFew'=>$result, 'activeTabs'=>$activeTabs));
-          exit;
-        } else {*/
           $old_model = $model;
 
           $model = new Sim;
@@ -224,7 +214,6 @@ class SimController extends BaseGxController {
             $this->refresh();
             exit;
           }
-        //}
       }
     }
 
@@ -296,8 +285,8 @@ class SimController extends BaseGxController {
 
       Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
 
-      $sql = "INSERT INTO sim (state, personal_account, number,number_price, icc, parent_agent_id, agent_id, delivery_report_id, operator_id, tariff_id)
-              SELECT s.state, s.personal_account, s.number,s.number_price, s.icc, s.agent_id, NULL, NULL, s.operator_id, s.tariff_id
+      $sql = "INSERT INTO sim (state, personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id)
+              SELECT s.state, s.personal_account, s.number,s.number_price, s.icc, s.id ,s.agent_id, ".Yii::app()->db->quoteValue($model->id).", NULL, NULL, s.operator_id, s.tariff_id
               FROM sim as s
               WHERE id IN ($ids_string)";
 

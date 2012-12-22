@@ -2,6 +2,17 @@ body {
 	text-align: left;
 }
 
+.cfix:after, .clear {
+  content: "";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+
+  *zoom: 1;
+  *display: block;
+}
+
 .grid-view .summary {
     margin: 0 0 5px 0;
     text-align: right;
@@ -139,7 +150,7 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
 
 .iconplussim {
     position: absolute;
-    left: 890px;
+    left: 590px;
     bottom: 15px;
 }
 
@@ -204,4 +215,20 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
   display: inline-block;
   *display: inline;
   *zoom: 1;
+}
+
+.menuLeft {
+  float: left;
+  margin-top: 20px;
+  width: 182px;
+}
+
+.well {
+  padding: 10px 8px;
+}
+
+.contentRight {
+  float: right;
+  margin-top: 20px;
+  width: 760px;
 }

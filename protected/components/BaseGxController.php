@@ -10,6 +10,9 @@ class BaseGxController extends GxController {
         Yii::app()->end();
     }
 
+    public function getCurrentAgentIdSQL($field) {
+        return $field.(Yii::app()->user->getState('isAdmin') ? ' is null':'='.Yii::app()->db->quoteValue(Yii::app()->user->getState('agentId')));
+    }
 /*
     public function preProcessUploadedFile($file, &$model, $field, $force_name = '') {
         if (!isset($file['error'][$field]))

@@ -94,9 +94,7 @@ $this->breadcrumbs = array(
     $dataProvider = new CArrayDataProvider(
       $dataProvider,
       array(
-        'pagination'=>array(
-          'pageSize'=>14,
-        ),
+        'pagination'=>false
       )
     );
 
@@ -133,16 +131,16 @@ $this->breadcrumbs = array(
 <div id="boxSims">
   <div class="cfix" style="position: relative;">
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+      <?php echo $form->textFieldRow($model,'ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
     </div>
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'ICCBeginFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+      <?php echo $form->textFieldRow($model,'ICCBeginFew',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
     </div>
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'ICCEndFew',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+      <?php echo $form->textFieldRow($model,'ICCEndFew',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span1')); ?>
     </div>
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'phone',array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+      <?php echo $form->textFieldRow($model,'phone',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
     </div>
     <?php if (!isset($_POST['AddNewSim']['ICCBeginFew'])): ?> <a href="#" class="iconplussim"><i class="icon-plus"></i></a><?php endif; ?>
   </div>
@@ -184,9 +182,7 @@ if (isset($deliveryReportFew)) {
     $dataProvider = new CArrayDataProvider(
       $dataProvider,
       array(
-        'pagination'=>array(
-          'pageSize'=>14,
-        ),
+        'pagination'=>false
       )
     );
 
@@ -220,9 +216,9 @@ $this->widget('bootstrap.widgets.TbTabs', array(
 
 
 <div class="cfix" id="addFewSims" style="display: none; position: relative;">
-  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCPersonalAccount]" type="text"></div>
-  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCBeginFew]" type="text" maxlength="15"></div>
-  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCEndFew]" type="text" maxlength="3"></div>
-  <div style="float: left; margin-right: 5px;"><input name="AddNewSim[phone]" type="text"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddNewSim[ICCPersonalAccount]" type="text"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddNewSim[ICCBeginFew]" type="text" maxlength="15"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span1" name="AddNewSim[ICCEndFew]" type="text" maxlength="3"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddNewSim[phone]" type="text"></div>
   <a href="#" class="iconplussim"><i class="icon-plus"></i></a>
 </div>
