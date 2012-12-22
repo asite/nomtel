@@ -28,7 +28,8 @@ switch ($_SERVER['SERVER_NAME']) {
 }
 
 // include main yii file
-require_once(dirname(__FILE__) . '/protected/vendors/yii/'.(YII_DEBUG ? 'yii.php':'yiilite.php'));
+require_once('protected/vendors/yii/'.(YII_DEBUG ? 'yii.php':'yiilite.php'));
+require_once('protected/components/functions.php');
 
 date_default_timezone_set(TIMEZONE);
 

@@ -30,7 +30,6 @@ class SimController extends BaseGxController {
               if (!isset($sim[2])) $sim[2]='';
               if ($sim[0] && $sim[1]) {
                 $model = new Sim;
-                $model->state = 'NOT_RECEIVED';
                 $model->number_price = 0;
                 $model->personal_account = $sim[0];
                 $model->icc = $sim[1];
@@ -69,7 +68,7 @@ class SimController extends BaseGxController {
               }
               if ($sim[0] && $sim[1]) {
                 $model = new Sim;
-                $model->state = 'IN_BASE';
+                $model->parent_agent_id=adminAgentId();
                 $model->number_price = 0;
                 $model->personal_account = $sim[0];
                 $model->number = $sim[1];
@@ -119,11 +118,10 @@ class SimController extends BaseGxController {
       if ($_POST['simMethod'] == 'add-much-sim') {
         $result = Sim::model()->findAllByAttributes(
           array(),
-          $condition = 'icc >= :iccBegin AND icc <= :iccEnd AND state = :state',
+          $condition = 'icc >= :iccBegin AND icc <= :iccEnd AND parent_agent_id is null',
           $params = array(
               ':iccBegin' => $_POST['AddSim']['ICCFirst'].$_POST['AddSim']['ICCBegin'],
               ':iccEnd' => $_POST['AddSim']['ICCFirst'].$_POST['AddSim']['ICCEnd'],
-              ':state' => 'NOT_RECEIVED',
           )
         );
 
@@ -134,7 +132,7 @@ class SimController extends BaseGxController {
         } else {
           foreach($result as $v) {
             $model = Sim::model()->findByAttributes(array('icc'=>$v->icc));
-            $model->state = 'IN_BASE';
+            $model->parent_agent_id=adminAgentId();
             $model->operator_id = $_POST['AddSim']['operator'];
             $model->tariff_id = $_POST['AddSim']['tariff'];
             $model->save();
@@ -166,7 +164,7 @@ class SimController extends BaseGxController {
           $old_model = $model;
 
           $model = new Sim;
-          $model->state = 'IN_BASE';
+          $model->parent_agent_id=adminAgentId();
           $model->number_price = 0;
           $model->operator_id = $_POST['AddSim']['operator'];
           $model->tariff_id = $_POST['AddSim']['tariff'];
@@ -181,7 +179,7 @@ class SimController extends BaseGxController {
 
           for($o=1;$o<=count($_POST['AddNewSim']['ICCPersonalAccount']);$o++) {
             $model = new Sim;
-            $model->state = 'IN_BASE';
+            $model->parent_agent_id=adminAgentId();
             $model->number_price = 0;
             $model->operator_id = $_POST['AddSim']['operator'];
             $model->tariff_id = $_POST['AddSim']['tariff'];
@@ -238,7 +236,6 @@ class SimController extends BaseGxController {
       $model = new DeliveryReport;
       $model->agent_id = $_POST['Move']['agent_id'];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
-      $model->sim_price = $_POST['Move']['PriceForSim'];
       $model->sum = $totalNumberPrice + $totalSimPrice;
       $model->save();
 
@@ -246,10 +243,10 @@ class SimController extends BaseGxController {
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
       $ids_string = implode(",", $_SESSION['moveSims'][$key]);
 
-      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id, 'state'=>'DELIVERED_TO_AGENT'),$criteria);
+      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id),$criteria);
 
-      $sql = "INSERT INTO sim (state, personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id)
-              SELECT s.state, s.personal_account, s.number,s.number_price, s.icc, s.id ,s.agent_id, ".Yii::app()->db->quoteValue($model->id).", NULL, NULL, s.operator_id, s.tariff_id
+      $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id)
+              SELECT ".Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']).", s.personal_account, s.number,s.number_price, s.icc, s.id ,s.agent_id, ".Yii::app()->db->quoteValue($model->id).", NULL, NULL, s.operator_id, s.tariff_id
               FROM sim as s
               WHERE id IN ($ids_string)";
 
@@ -339,12 +336,7 @@ class SimController extends BaseGxController {
             $model->setAttributes($_GET['Sim']);
 
         $dataProvider=$model->search();
-        $dataProvider->criteria->addCondition("state!='NOT_RECEIVED'");
-
-        if (!Yii::app()->user->getState('isAdmin'))
-            $dataProvider->criteria->addColumnCondition(array('parent_agent_id'=>Yii::app()->user->getState('agentId')));
-        else
-            $dataProvider->criteria->addCondition('parent_agent_id is null');
+        $dataProvider->criteria->addColumnCondition(array('parent_agent_id'=>loggedAgentId()));
 
         $this->render('list', array(
             'model' => $model,

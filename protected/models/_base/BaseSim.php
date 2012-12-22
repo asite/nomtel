@@ -10,10 +10,10 @@
  * followed by relations of table "sim" available as properties of the model.
  *
  * @property string $id
- * @property string $state
  * @property string $personal_account
  * @property string $number
  * @property double $number_price
+ * @property double $sim_price
  * @property string $icc
  * @property string $parent_id
  * @property integer $parent_agent_id
@@ -23,11 +23,11 @@
  * @property integer $operator_id
  * @property integer $tariff_id
  *
- * @property Sim $parent
- * @property Sim[] $sims
  * @property DeliveryReport $deliveryReport
  * @property Agent $parentAgent
  * @property DeliveryReport $parentDeliveryReport
+ * @property Sim $parent
+ * @property Sim[] $sims
  * @property Tariff $tariff
  * @property Operator $operator
  * @property Agent $agent
@@ -47,29 +47,28 @@ abstract class BaseSim extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'state';
+		return 'personal_account';
 	}
 
 	public function rules() {
 		return array(
-			array('state, personal_account, number_price', 'required'),
+			array('personal_account', 'required'),
 			array('parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'numerical', 'integerOnly'=>true),
-			array('number_price', 'numerical'),
-			array('state', 'length', 'max'=>18),
+			array('number_price, sim_price', 'numerical'),
 			array('personal_account, number, icc', 'length', 'max'=>50),
 			array('parent_id', 'length', 'max'=>20),
-			array('number, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, state, personal_account, number, number_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'safe', 'on'=>'search'),
+			array('number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, personal_account, number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
-			'parent' => array(self::BELONGS_TO, 'Sim', 'parent_id'),
-			'sims' => array(self::HAS_MANY, 'Sim', 'parent_id'),
 			'deliveryReport' => array(self::BELONGS_TO, 'DeliveryReport', 'delivery_report_id'),
 			'parentAgent' => array(self::BELONGS_TO, 'Agent', 'parent_agent_id'),
 			'parentDeliveryReport' => array(self::BELONGS_TO, 'DeliveryReport', 'parent_delivery_report_id'),
+			'parent' => array(self::BELONGS_TO, 'Sim', 'parent_id'),
+			'sims' => array(self::HAS_MANY, 'Sim', 'parent_id'),
 			'tariff' => array(self::BELONGS_TO, 'Tariff', 'tariff_id'),
 			'operator' => array(self::BELONGS_TO, 'Operator', 'operator_id'),
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
@@ -84,10 +83,10 @@ abstract class BaseSim extends BaseGxActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id' => Yii::t('app', 'ID'),
-			'state' => Yii::t('app', 'State'),
 			'personal_account' => Yii::t('app', 'Personal Account'),
 			'number' => Yii::t('app', 'Number'),
 			'number_price' => Yii::t('app', 'Number Price'),
+			'sim_price' => Yii::t('app', 'Sim Price'),
 			'icc' => Yii::t('app', 'Icc'),
 			'parent_id' => null,
 			'parent_agent_id' => null,
@@ -96,11 +95,11 @@ abstract class BaseSim extends BaseGxActiveRecord {
 			'delivery_report_id' => null,
 			'operator_id' => null,
 			'tariff_id' => null,
-			'parent' => null,
-			'sims' => null,
 			'deliveryReport' => null,
 			'parentAgent' => null,
 			'parentDeliveryReport' => null,
+			'parent' => null,
+			'sims' => null,
 			'tariff' => null,
 			'operator' => null,
 			'agent' => null,
@@ -111,10 +110,10 @@ abstract class BaseSim extends BaseGxActiveRecord {
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);
-		$criteria->compare('state', $this->state, true);
 		$criteria->compare('personal_account', $this->personal_account, true);
 		$criteria->compare('number', $this->number, true);
 		$criteria->compare('number_price', $this->number_price);
+		$criteria->compare('sim_price', $this->sim_price);
 		$criteria->compare('icc', $this->icc, true);
 		$criteria->compare('parent_id', $this->parent_id);
 		$criteria->compare('parent_agent_id', $this->parent_agent_id);
