@@ -81,7 +81,7 @@ $form = $this->beginWidget('BaseTbActiveForm', array(
 <?php echo "<?php
 echo '<div class=\"form-actions\">';
 echo CHtml::htmlButton('<i class=\"icon-ok icon-white\"></i> '.Yii::t('app', 'Save'), array('class'=>'btn btn-primary', 'type'=>'submit'));
-echo '&nbsp;&nbsp;&nbsp;'.CHtml::htmlButton('<i class=\"icon-remove\"></i> '.Yii::t('app', 'Cancel'), array('class'=>'btn', 'type'=>'button', 'onclick'=>'window.location.href=\"'.\$this->createUrl('admin').'\"'));
+echo '&nbsp;&nbsp;&nbsp;'.CHtml::htmlButton('<i class=\"icon-remove\"></i> '.Yii::t('app', 'Cancel'), array('class'=>'btn', 'type'=>'button', 'onclick'=>'window.location.href=\''.\$this->createUrl('admin').'\''));
 echo '</div>';
 \$this->endWidget();
 ?>\n"; ?>
