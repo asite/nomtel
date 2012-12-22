@@ -254,6 +254,7 @@ class SimController extends BaseGxController {
     
     $this->render('massselect');
   }
+
   public function actionMove($key) {
     
    
@@ -280,7 +281,7 @@ class SimController extends BaseGxController {
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
       $ids_string = implode(",", $_SESSION['moveSims'][$key]);
 
-      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id),$criteria);
+      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id, 'sim_price'=>$_POST['Move']['PriceForSim']),$criteria);
 
       $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id)
               SELECT ".Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']).", s.personal_account, s.number,s.number_price, s.icc, s.id ,s.agent_id, ".Yii::app()->db->quoteValue($model->id).", NULL, NULL, s.operator_id, s.tariff_id

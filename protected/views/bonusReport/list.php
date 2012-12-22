@@ -41,7 +41,7 @@ $('.search-form form').submit(function(){
             'template'=>'{view} {delete}',
             'buttons'=>array(
                 'delete'=>array(
-                    'visible'=>"Yii::app()->user->getState('isAdmin')"
+                    'visible'=>"isAdmin()"
                 )
             ),
             'deleteConfirmation' => Yii::t('app','Are you sure to delete this Bonus Report?'),

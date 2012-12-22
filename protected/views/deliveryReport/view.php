@@ -69,11 +69,9 @@ $('.search-form form').submit(function(){
             'filter'=>false,
             ),
         array(
-            'class' => 'bootstrap.widgets.TbDataColumn',
-            'header' => Yii::t('app','Sim Price'),
-            'value' => '$data->deliveryReport->sim_price',
-            'sortable'=>true,
+            'name'=>'sim_price',
             'htmlOptions' => array('style'=>'text-align:center;'),
+            'filter'=>false,
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
@@ -84,7 +82,7 @@ $('.search-form form').submit(function(){
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
                     'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))',
-                    'visible'=>'!Yii::app()->user->getState("isAdmin")'
+                    'visible'=>'!isAdmin()'
                 )
             )
         ),

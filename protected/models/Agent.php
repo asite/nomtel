@@ -23,8 +23,8 @@ class Agent extends BaseAgent
 
     public static function getComboList($data=array()) {
         $agents=Yii::app()->db->createCommand("select id,name,surname,middle_name from ".
-            self::model()->tableName()." where parent_id=".loggedAgentId().
-            " order by surname,name,middle_name")->queryAll(true,array(':parent_id'=>Yii::app()->user->getState('agentId')));
+            self::model()->tableName()." where parent_id=:parent_id".
+            " order by surname,name,middle_name")->queryAll(true,array(':parent_id'=>loggedAgentId()));
 
         foreach($agents as $v) {
             $data[$v['id']]=$v['surname'].' '.$v['name'].' '.$v['middle_name'];

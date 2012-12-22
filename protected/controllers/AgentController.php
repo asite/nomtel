@@ -3,8 +3,7 @@
 class AgentController extends BaseGxController
 {
     public function checkAgentPermissions($agent) {
-        if (!Yii::app()->user->getState('isAdmin') &&
-            Yii::app()->user->getState('agentId')!=$agent->parent_id) $this->redirect(array('list'));
+        if (!isAdmin() && loggedAgentId()!=$agent->parent_id) $this->redirect(array('list'));
     }
 
     private function save($model,$user,$referralRates) {
@@ -89,7 +88,7 @@ class AgentController extends BaseGxController
         }
 
         if (isset($_POST['Agent'])) {
-            if (!Yii::app()->user->getState('isAdmin')) $model->parent_id=Yii::app()->user->getState('agentId');
+            $model->parent_id=loggedAgentId();
 
             $errors=$this->validate($model,$user,$referralRates);
 
@@ -147,14 +146,13 @@ class AgentController extends BaseGxController
     }
 
     public function addPaymentAllowed($model) {
-        return (Yii::app()->user->getState('isAdmin') && $model->parent_id=='') ||
-            (Yii::app()->user->getState('agentId')==$model->parent_id);
+        return (loggedAgentId()==$model->parent_id);
     }
 
     public function actionView($id)
     {
         $model = $this->loadModel($id, 'Agent');
-        if ($model->id!=Yii::app()->user->getState('agentId'))
+        if ($model->id!=loggedAgentId())
             $this->checkAgentPermissions($model);
 
         if ($this->addPaymentAllowed($model)) {
@@ -225,13 +223,7 @@ class AgentController extends BaseGxController
             $model->setAttributes($_GET['Agent']);
 
         $dataProvider=$model->search();
-
-        if (Yii::app()->user->getState('isAdmin')) {
-            $dataProvider->criteria->addCondition('parent_id is null');
-        } else {
-            $dataProvider->criteria->addColumnCondition(array('parent_id'=>
-            Yii::app()->user->getState('agentId')));
-        }
+        $dataProvider->criteria->addColumnCondition(array('parent_id'=>loggedAgentId()));
 
         $this->render('admin', array(
             'model' => $model,

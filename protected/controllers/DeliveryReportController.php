@@ -12,8 +12,7 @@ class DeliveryReportController extends BaseGxController
 
         $dataProvider=$model->search();
         $dataProvider->criteria->alias='delivery_report';
-        $dataProvider->criteria->join="join agent on (agent.id=delivery_report.agent_id and ".
-            $this->getCurrentAgentIdSQL('agent.parent_id').')';
+        $dataProvider->criteria->join="join agent on (agent.id=delivery_report.agent_id and agent.parent_id=".loggedAgentId().')';
 
         $this->render('list', array(
             'model' => $model,
@@ -24,8 +23,8 @@ class DeliveryReportController extends BaseGxController
     public function actionView($id)
     {
         $model = $this->loadModel($id, 'DeliveryReport');
-        if (Yii::app()->user->getState('agentId')!=$model->agent_id &&
-            Yii::app()->user->getState('agentId')!=$model->agent->parent_id)
+        if (loggedAgentId()!=$model->agent_id &&
+            loggedAgentId()!=$model->agent->parent_id)
             throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
 
         $sim = new Sim('search');
@@ -44,7 +43,7 @@ class DeliveryReportController extends BaseGxController
     public function actionReport($id) {
         $model = $this->loadModel($id, 'Sim');
 
-        if (Yii::app()->user->getState('agentId')!=$model->parent_agent_id)
+        if (loggedAgentId()!=$model->parent_agent_id)
             throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
 
         $report=new SimReport();
@@ -70,7 +69,7 @@ class DeliveryReportController extends BaseGxController
 		else
             	    Yii::app()->user->setFlash('error',Yii::t('app','Problem sending email'));
 
-                $this->redirect(array('view','id'=>$model->delivery_report_id));
+                $this->redirect(array('view','id'=>$model->parent_delivery_report_id));
             }
         }
 

@@ -24,7 +24,6 @@ class Sim extends BaseSim
         $criteria = new CDbCriteria;
 
         $criteria->compare('id', $this->id, true);
-        $criteria->compare('state', $this->state, true);
         $criteria->compare('delivery_report_id', $this->delivery_report_id);
         $criteria->compare('personal_account', $this->personal_account, true);
 

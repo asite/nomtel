@@ -35,7 +35,7 @@ $('.search-form form').submit(function(){
 				'name'=>'agent_id',
 				'value'=>'GxHtml::valueEx($data->agent)',
 				'filter'=>Agent::getComboList(),
-                'visible'=>Yii::app()->user->getState('isAdmin'),
+                'visible'=>isAdmin(),
 		),
         array(
 		        'name'=>'dt',

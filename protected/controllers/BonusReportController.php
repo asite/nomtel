@@ -5,7 +5,7 @@ class BonusReportController extends BaseGxController
 
     public function actionDelete($id)
     {
-        if (Yii::app()->getRequest()->getIsPostRequest() && Yii::app()->user->getState('isAdmin')) {
+        if (Yii::app()->getRequest()->getIsPostRequest() && isAdmin()) {
             $trx = Yii::app()->db->beginTransaction();
 
             $bonusReports = Yii::app()->db->createCommand("select agent_id,sum from payment where bonus_report_id=:bonus_report_id")->
@@ -39,7 +39,7 @@ class BonusReportController extends BaseGxController
         $dataProvider->criteria->alias = 'payment';
         $dataProvider->criteria->join = 'join bonus_report on (bonus_report.id=payment.bonus_report_id and bonus_report_id='.
             Yii::app()->db->quoteValue($id).') '.
-            'join agent on (agent.id=payment.agent_id and '.$this->getCurrentAgentIdSQL('agent.parent_id').')';
+            'join agent on (agent.id=payment.agent_id and agent.parent_id='.loggedAgentId().')';
 
         $this->render('view', array(
             'model' => $model,
@@ -59,10 +59,10 @@ class BonusReportController extends BaseGxController
 
         $dataProvider = $model->search();
 
-        if (!Yii::app()->user->getState('isAdmin')) {
+        if (!isAdmin()) {
             $dataProvider->criteria->alias = 'bonus_report';
             $dataProvider->criteria->join = 'join payment on (payment.bonus_report_id=bonus_report.id and ' .
-                $this->getCurrentAgentIdSQL('payment.agent_id') . ')';
+                'payment.agent_id='.loggedAgentId(). ')';
         }
 
         $this->render('list', array(

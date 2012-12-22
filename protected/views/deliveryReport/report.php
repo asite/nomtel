@@ -2,7 +2,7 @@
 
 $this->breadcrumbs = array(
     DeliveryReport::model()->label(2)=>array('list'),
-    $model->parentDeliveryReport->adminLabel($model->deliveryReport->label(1)) => array('view','id'=>$model->id),
+    $model->parentDeliveryReport->adminLabel($model->parentDeliveryReport->label(1)) => array('view','id'=>$model->id),
     $model->adminLabel($model->label(1))
 );
 ?>

@@ -10,7 +10,7 @@
 		<div class="inner_container cfix">
             <div class="menuLeft well">
               <?php
-                if (Yii::app()->user->getState('isAdmin')) {
+                if (isAdmin()) {
                   $menuLeft = array(
                     array('label'=>Yii::app()->name, 'url'=>$this->createUrl('site/index'),'active'=>$this->route=='site/index'),
                     '',
@@ -36,7 +36,7 @@
                   $menuLeft = array(
                     array('label'=>Yii::app()->name, 'url'=>$this->createUrl('site/index'),'active'=>$this->route=='site/index'),
                     '',
-                    array('label'=>Yii::t('app','My Profile'), 'url'=>$this->createUrl('agent/view',array('id'=>Yii::app()->user->getState('agentId'))),'active'=>$this->route=='agent/view'),
+                    array('label'=>Yii::t('app','My Profile'), 'url'=>$this->createUrl('agent/view',array('id'=>loggedAgentId())),'active'=>$this->route=='agent/view'),
                     array('label'=>Yii::t('app','Agents'), 'url'=>$this->createUrl('agent/admin'),'active'=>$this->route=='agent/admin'),
                     array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list'),'active'=>$this->route=='sim/list'),
                       array('label'=>BonusReport::model()->label(2), 'url'=>$this->createUrl('bonusReport/list'),'active'=>$this->route=='bonusReport/list'),
@@ -61,7 +61,7 @@
 
 			<?php
             /*
-if (Yii::app()->user->getState('isAdmin')) {
+if (isAdmin()) {
 $menu=array(
     array(
         'class'=>'bootstrap.widgets.TbMenu',
@@ -133,7 +133,7 @@ $menu=array(
             'items'=>array(
                 array(
                     'label'=>Yii::t('app','My Profile'),
-                    'url'=>$this->createUrl('agent/view',array('id'=>Yii::app()->user->getState('agentId')))
+                    'url'=>$this->createUrl('agent/view',array('id'=>loggedAgentId()))
                 )
             )
         ),
