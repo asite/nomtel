@@ -22,6 +22,18 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', true);
         $config = 'server_staging.php';
         break;
+    case 'crm.nomtel':
+        define('LANGUAGE', 'ru');
+        define('TIMEZONE', 'Europe/Minsk');
+        define('YII_DEBUG', true);
+        $config = 'local_asite.php';
+        break;
+    case 'nomtel.asiteapp.ru':
+        define('LANGUAGE', 'ru');
+        define('TIMEZONE', 'Europe/Minsk');
+        define('YII_DEBUG', true);
+        $config = 'server_asite.php';
+        break;
     default:
         die('unknown domain name');
         break;
