@@ -28,7 +28,7 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', true);
         $config = 'local_asite.php';
         break;
-    case 'nomtel.asiteap.ru':
+    case 'nomtel.asiteapp.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
