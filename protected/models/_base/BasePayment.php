@@ -12,12 +12,11 @@
  * @property integer $id
  * @property integer $agent_id
  * @property string $type
- * @property integer $bonus_report_id
  * @property string $comment
  * @property string $dt
  * @property double $sum
  *
- * @property BonusReport $bonusReport
+ * @property BonusReportAgent[] $bonusReportAgents
  * @property Agent $agent
  */
 abstract class BasePayment extends BaseGxActiveRecord {
@@ -41,19 +40,19 @@ abstract class BasePayment extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('agent_id, type, dt, sum', 'required'),
-			array('agent_id, bonus_report_id', 'numerical', 'integerOnly'=>true),
+			array('agent_id', 'numerical', 'integerOnly'=>true),
 			array('sum', 'numerical'),
 			array('type', 'length', 'max'=>6),
 			array('comment', 'length', 'max'=>200),
-			array('bonus_report_id, comment', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('comment', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, agent_id, type, bonus_report_id, comment, dt, sum', 'safe', 'on'=>'search'),
+			array('id, agent_id, type, comment, dt, sum', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
-			'bonusReport' => array(self::BELONGS_TO, 'BonusReport', 'bonus_report_id'),
+			'bonusReportAgents' => array(self::HAS_MANY, 'BonusReportAgent', 'payment_id'),
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
 		);
 	}
@@ -68,11 +67,10 @@ abstract class BasePayment extends BaseGxActiveRecord {
 			'id' => Yii::t('app', 'ID'),
 			'agent_id' => null,
 			'type' => Yii::t('app', 'Type'),
-			'bonus_report_id' => null,
 			'comment' => Yii::t('app', 'Comment'),
 			'dt' => Yii::t('app', 'Dt'),
 			'sum' => Yii::t('app', 'Sum'),
-			'bonusReport' => null,
+			'bonusReportAgents' => null,
 			'agent' => null,
 		);
 	}
@@ -83,7 +81,6 @@ abstract class BasePayment extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('type', $this->type, true);
-		$criteria->compare('bonus_report_id', $this->bonus_report_id);
 		$criteria->compare('comment', $this->comment, true);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('sum', $this->sum);

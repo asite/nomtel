@@ -1,8 +1,8 @@
 <?php
 
 $this->breadcrumbs = array(
-    BonusReport::model()->label(2) => array('list'),
-    $parentModel->adminLabel($parentModel->label(1)),
+    $bonusReport::model()->label(2) => array('list'),
+    $bonusReport->adminLabel($bonusReport->label(1)),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -19,7 +19,16 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1><?php echo GxHtml::encode($model->label(2)); ?></h1>
+<h1><?php echo $bonusReport->adminLabel($bonusReport->label(1)); ?></h1>
+
+<?php $this->widget('bootstrap.widgets.TbDetailView',array(
+    'data'=>$bonusReportAgent,
+    'attributes'=>array(
+        'sim_count',
+        'sum',
+        'sum_referrals',
+    ),
+)); ?>
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'payment-grid',
@@ -32,6 +41,13 @@ $('.search-form form').submit(function(){
             'value'=>'$data->agent',
             'filter'=>Agent::getComboList()
         ),
-        'sum'
+        array(
+            'name'=>'sim_count',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+        ),
+        array(
+            'name'=>'sum',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+        )
     ),
 )); ?>

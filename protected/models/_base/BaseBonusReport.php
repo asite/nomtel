@@ -15,8 +15,7 @@
  * @property string $comment
  *
  * @property Operator $operator
- * @property DeliveryReport[] $deliveryReports
- * @property Payment[] $payments
+ * @property BonusReportAgent[] $bonusReportAgents
  */
 abstract class BaseBonusReport extends BaseGxActiveRecord {
 
@@ -49,8 +48,7 @@ abstract class BaseBonusReport extends BaseGxActiveRecord {
 	public function relations() {
 		return array(
 			'operator' => array(self::BELONGS_TO, 'Operator', 'operator_id'),
-			'deliveryReports' => array(self::HAS_MANY, 'DeliveryReport', 'bonus_report_id'),
-			'payments' => array(self::HAS_MANY, 'Payment', 'bonus_report_id'),
+			'bonusReportAgents' => array(self::HAS_MANY, 'BonusReportAgent', 'bonus_report_id'),
 		);
 	}
 
@@ -66,8 +64,7 @@ abstract class BaseBonusReport extends BaseGxActiveRecord {
 			'operator_id' => null,
 			'comment' => Yii::t('app', 'Comment'),
 			'operator' => null,
-			'deliveryReports' => null,
-			'payments' => null,
+			'bonusReportAgents' => null,
 		);
 	}
 

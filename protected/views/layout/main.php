@@ -21,7 +21,7 @@
                     array('label'=>Yii::t('app','Mass select'), 'url'=>$this->createUrl('sim/massselect'),'active'=>$this->route=='sim/massselect'),
                     '',
                     array('label'=>Yii::t('app','Agents'), 'url'=>$this->createUrl('agent/admin'),'active'=>$this->route=='agent/admin'),
-                    array('label'=>Yii::t('app','Load Bonuses'), 'url'=>$this->createUrl('bonus/load'),'active'=>$this->route=='bonus/load'),
+                    array('label'=>Yii::t('app','Load Bonuses'), 'url'=>$this->createUrl('bonusReport/load'),'active'=>$this->route=='bonusReport/load'),
                     array('label'=>BonusReport::model()->label(2), 'url'=>$this->createUrl('bonusReport/list'),'active'=>$this->route=='bonusReport/list'),
                     array('label'=>DeliveryReport::model()->label(2), 'url'=>$this->createUrl('deliveryReport/list'),'active'=>$this->route=='deliveryReport/list'),
                     array('label'=>Yii::t('app','Operators'), 'url'=>$this->createUrl('operator/admin'),'active'=>$this->route=='operator/admin'),
