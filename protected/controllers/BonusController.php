@@ -1,6 +1,5 @@
 <?php
 
-define('NOMTEL_AGENT_PERCENT',5);
 define('OPERATOR_BEELINE_ID',1);
 
 Yii::import('application.vendors.PHPExcel',true);
@@ -20,26 +19,36 @@ class BonusController extends BaseGxController
         $this->redirect(array());
     }
 
-    private function calculateBonuses($simBonus,$simAgent,$comment) {
+    private function calculateBonuses($simBonus,$simAgent,$comment,$operator_id) {
         $db=Yii::app()->db;
 
         // get agents info
-        $agentsRaw=$db->createCommand("select id,parent_id,referral_percent from agent")->queryAll();
+        $agentsRaw=$db->createCommand(
+            "select a.parent_id,a.id,arr.rate
+            from agent a
+            left outer join agent_referral_rate arr on (arr.agent_id=a.id and arr.operator_id=:operator_id)"
+        )->queryAll(true,array(':operator_id'=>$operator_id));
+
         $agents=array();
         foreach($agentsRaw as $row) {
-            $agents[$row['id']]=array('referral_percent'=>$row['referral_percent'],'parent_id'=>$row['parent_id'] ? $row['parent_id']:0);
+            $agents[$row['id']]=array('rate'=>$row['rate']/100,'parent_id'=>$row['parent_id'] ? $row['parent_id']:0);
         }
-        $agents[0]=array('referral_percent'=>NOMTEL_AGENT_PERCENT,'multiplier'=>1,'multiplier_referral'=>1);
+        $agents[0]=array('payments'=>array());
 
         unset($agentsRaw);
 
-        // calculate agent bonus multiplier
+        // calculate agents payouts table
         do {
             $modified=false;
             foreach($agents as $k=>$v)
-                if (!isset($v['multiplier']) && isset($agents[$v['parent_id']]['multiplier'])) {
-                    $agents[$k]['multiplier']=$agents[$v['parent_id']]['multiplier']*$agents[$v['parent_id']]['referral_percent']/100;
-                    $agents[$k]['multiplier_referral']=$agents[$k]['multiplier']*(100-$v['referral_percent'])/100;
+                if (!isset($v['payments']) && isset($agents[$v['parent_id']]['payments'])) {
+                    $agents[$k]['payments']=$agents[$v['parent_id']]['payments'];
+
+                    $agents[$k]['payments'][]=array(
+                        'agent_id'=>$k,
+                        'rate'=>$v['rate']
+                        );
+
                     $modified=true;
                 }
         } while ($modified);
@@ -48,27 +57,40 @@ class BonusController extends BaseGxController
         $agentsBonuses=array();
         foreach($simAgent as $v) {
             $bonus=$simBonus[$v['sim_id']];
-            $agent_id=$v['agent_id'];
-            $field='multiplier';
-            while ($agent_id>0) {
-                $agentsBonuses[$agent_id]+=$agents[$agent_id][$field]*$bonus;
-                $agent_id=$agents[$agent_id]['parent_id'];
-                $field='multiplier_referral';
+
+            $lastPaymentIndex=count($agents[$v['agent_id']])-1;
+            foreach($agents[$v['agent_id']]['payments'] as $i=>$payment) {
+                $bonus*=$payment['rate'];
+                // for not last item we must substract provision of child agent
+                $agentsBonuses[$payment['agent_id']]+= $i==$lastPaymentIndex ? $bonus:
+                    $bonus*(1-$agents[$v['agent_id']]['payments'][$i+1]['rate']);
             }
         }
 
+        // store all info in database
         $trx=$db->beginTransaction();
-        $cmd=$db->createCommand('update agent set balance=balance+:sum where id=:agent_id');
 
-        $payments=array();
-        $comment=$db->quoteValue(Yii::t('app','Bonuses')." '".$comment."'");
+        $bonusReport=new BonusReport;
+        $bonusReport->dt=new EDateTime();
+        $bonusReport->operator_id=$operator_id;
+        $bonusReport->comment=$comment;
+        $bonusReport->save();
+
+        $cmdBalance=$db->createCommand('update agent set balance=balance+:sum where id=:agent_id');
+        $cmdReport=$db->createCommand(
+            'insert into payment (agent_id,bonus_report_id,type,dt,comment,sum) values
+            (:agent_id,'.$db->quoteValue($bonusReport->id).",'BONUS',NOW(),".
+            $db->quoteValue(Yii::t('app','Bonuses')." '".$comment."'").',:sum)');
+
         foreach($agentsBonuses as $agent_id=>$bonus) {
-            $payments[]='('.$db->quoteValue($agent_id).",'BONUS',NOW(),$comment,".$db->quoteValue($bonus).')';
-            $cmd->execute(array(':agent_id'=>$agent_id,':sum'=>$bonus));
-        }
-
-        if (!empty($payments)) {
-            $db->createCommand("insert into payment (agent_id,type,dt,comment,sum) values ".implode(',',$payments))->execute();
+            $cmdBalance->execute(array(
+                ':agent_id'=>$agent_id,
+                ':sum'=>$bonus
+            ));
+            $cmdReport->execute(array(
+                ':agent_id'=>$agent_id,
+                ':sum'=>$bonus)
+            );
         }
 
         $trx->commit();
@@ -116,7 +138,7 @@ class BonusController extends BaseGxController
             where operator_id=".OPERATOR_BEELINE_ID." and agent_id is null and personal_account in (".
             implode(',',$personal_accounts).")")->queryAll();
 
-        $this->calculateBonuses($simBonus,$simAgent,$model->comment);
+        $this->calculateBonuses($simBonus,$simAgent,$model->comment,OPERATOR_BEELINE_ID);
     }
 
     private function processLoad($model) {

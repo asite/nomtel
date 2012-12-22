@@ -11,10 +11,9 @@ class DeliveryReportController extends BaseGxController
             $model->setAttributes($_GET['DeliveryReport']);
 
         $dataProvider=$model->search();
-        if (Yii::app()->user->getState('isAdmin'))
-            $dataProvider->criteria->addCondition("parent_agent_id is null");
-        else
-            $dataProvider->criteria->addColumnCondition(array("parent_agent_id"=>Yii::app()->user->getState('agentId')));
+        $dataProvider->criteria->alias='delivery_report';
+        $dataProvider->criteria->join="join agent on (agent.id=delivery_report.agent_id and ".
+            $this->getCurrentAgentIdSQL('agent.parent_id').')';
 
         $this->render('list', array(
             'model' => $model,
@@ -25,8 +24,8 @@ class DeliveryReportController extends BaseGxController
     public function actionView($id)
     {
         $model = $this->loadModel($id, 'DeliveryReport');
-        if (Yii::app()->user->getState('agentId')!=$model->parent_agent_id &&
-            Yii::app()->user->getState('agentId')!=$model->agent_id)
+        if (Yii::app()->user->getState('agentId')!=$model->agent_id &&
+            Yii::app()->user->getState('agentId')!=$model->agent->parent_id)
             throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
 
         $sim = new Sim('search');

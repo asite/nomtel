@@ -236,7 +236,6 @@ class SimController extends BaseGxController {
         exit;
       }
       $model = new DeliveryReport;
-      $model->parent_agent_id = Yii::app()->user->getState('agentId');
       $model->agent_id = $_POST['Move']['agent_id'];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
       $model->sim_price = $_POST['Move']['PriceForSim'];
