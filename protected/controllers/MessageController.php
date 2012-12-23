@@ -38,7 +38,7 @@ class MessageController extends Controller {
     $model->ticketMessages = new TicketMessage;
 
     $agent = Agent::model()->getFullComboList();
-    $agent = array(0=>Yii::t('app','Select Agent'))+$agent;
+    $agent = array_merge(array(0=>Yii::t('app','Select Agent')),$agent);
 
     if (isset($_POST['Ticket'])) {
 
