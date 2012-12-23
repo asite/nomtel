@@ -27,8 +27,8 @@
                     array('label'=>Yii::t('app','Operators'), 'url'=>$this->createUrl('operator/admin'),'active'=>$this->route=='operator/admin'),
                     '',
                     array('label'=>Yii::t('app','messages'), 'itemOptions'=>array('class'=>'nav-header')),
-                    //array('label'=>Yii::t('app','message to agent up'), 'url'=>$this->createUrl('message/agentUp'),'active'=>$this->route=='message/agentUp'),
-                    array('label'=>Yii::t('app','message to agent down'), 'url'=>$this->createUrl('message/agentDown'),'active'=>$this->route=='message/agentDown'),
+                    array('label'=>Yii::t('app','Inbox'), 'url'=>$this->createUrl('message/inbox'),'active'=>$this->route=='message/inbox'),
+                    array('label'=>Yii::t('app','Outbox'), 'url'=>$this->createUrl('message/outbox'),'active'=>$this->route=='message/outbox'),
                     '',
                     array('label'=>Yii::t('app','Logout'), 'url'=>$this->createUrl('site/logout')),
                   );
@@ -43,8 +43,8 @@
                     array('label'=>DeliveryReport::model()->label(2), 'url'=>$this->createUrl('deliveryReport/list'),'active'=>$this->route=='deliveryReport/list'),
                     '',
                     array('label'=>Yii::t('app','messages'), 'itemOptions'=>array('class'=>'nav-header')),
-                    array('label'=>Yii::t('app','message to agent up'), 'url'=>$this->createUrl('message/agentUp'),'active'=>$this->route=='message/agentUp'),
-                    array('label'=>Yii::t('app','message to agent down'), 'url'=>$this->createUrl('message/agentDown'),'active'=>$this->route=='message/agentDown'),
+                    array('label'=>Yii::t('app','Inbox'), 'url'=>$this->createUrl('message/inbox'),'active'=>$this->route=='message/inbox'),
+                    array('label'=>Yii::t('app','Outbox'), 'url'=>$this->createUrl('message/outbox'),'active'=>$this->route=='message/outbox'),
                     '',
                     array('label'=>Yii::t('app','Logout'), 'url'=>$this->createUrl('site/logout')),
                   );

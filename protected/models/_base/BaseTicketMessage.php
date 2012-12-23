@@ -13,7 +13,7 @@
  * @property integer $ticket_id
  * @property integer $agent_id
  * @property string $message
- * @property string $date
+ * @property string $dt
  *
  * @property Ticket $ticket
  */
@@ -37,9 +37,9 @@ abstract class BaseTicketMessage extends GxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('ticket_id, agent_id, message, date', 'required'),
+			array('ticket_id, agent_id, message, dt', 'required'),
 			array('ticket_id, agent_id', 'numerical', 'integerOnly'=>true),
-			array('id, ticket_id, agent_id, message, date', 'safe', 'on'=>'search'),
+			array('id, ticket_id, agent_id, message, dt', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,7 +60,7 @@ abstract class BaseTicketMessage extends GxActiveRecord {
 			'ticket_id' => null,
 			'agent_id' => Yii::t('app', 'Agent'),
 			'message' => Yii::t('app', 'Message'),
-			'date' => Yii::t('app', 'Date'),
+			'dt' => Yii::t('app', 'Dt'),
 			'ticket' => null,
 		);
 	}
@@ -72,7 +72,7 @@ abstract class BaseTicketMessage extends GxActiveRecord {
 		$criteria->compare('ticket_id', $this->ticket_id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('message', $this->message, true);
-		$criteria->compare('date', $this->date, true);
+		$criteria->compare('dt', $this->dt, true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

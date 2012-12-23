@@ -1,10 +1,10 @@
 <?php
   $this->breadcrumbs = array(
-    Yii::t('app','message to agent down'),
+    Yii::t('app','Inbox'),
   );
 ?>
 
-<h1><?php echo Yii::t('app','message to agent down') ?></h1>
+<h1><?php echo Yii::t('app','Inbox') ?></h1>
 
 <?php
 $this->widget('bootstrap.widgets.TbGridView', array(
@@ -18,20 +18,23 @@ $this->widget('bootstrap.widgets.TbGridView', array(
       'header'=>Yii::t('app','ID'),
     ),
     array(
-      'name'=>'title',
+      'name'=>'dt',
       'sortable'=>true,
-      'header'=>Yii::t('app','Theme'),
-    ),
-    array(
-      'name'=>'date',
-      'sortable'=>true,
-      'value'=>'new EDateTime($data["date"])',
+      //'value'=>'new EDateTime($data["dt"])',
       'htmlOptions' => array('style'=>'text-align:center;vertical-align:middle'),
       'header'=>Yii::t('app','Date'),
     ),
     array(
+      'name'=>'title',
+      'sortable'=>true,
+
+      'htmlOptions' => array('style'=>'text-align:left;vertical-align:middle'),
+      'header'=>Yii::t('app','Message'),
+    ),
+    array(
       'name'=>'status',
       'sortable'=>true,
+      'value'=>'Yii::t("app",$data->status)',
       'htmlOptions' => array('style'=>'text-align:center;vertical-align:middle'),
       'header'=>Yii::t('app','Status'),
     ),
@@ -44,5 +47,3 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 ));
 
 ?>
-
-<a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('createTicket',array('to'=>'agentDown')); ?>"><?php echo Yii::t('app', 'Create ticket') ?></a>

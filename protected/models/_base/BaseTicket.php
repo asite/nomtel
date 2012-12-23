@@ -12,7 +12,7 @@
  * @property integer $id
  * @property integer $agent_id
  * @property string $title
- * @property string $date
+ * @property string $dt
  * @property integer $whom
  * @property string $status
  *
@@ -33,17 +33,17 @@ abstract class BaseTicket extends GxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'title';
+		return 'dt';
 	}
 
 	public function rules() {
 		return array(
-			array('agent_id, title, date', 'required'),
+			array('agent_id, dt, whom', 'required'),
 			array('agent_id, whom', 'numerical', 'integerOnly'=>true),
 			array('title', 'length', 'max'=>256),
 			array('status', 'length', 'max'=>6),
-			array('whom, status', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, agent_id, title, date, whom, status', 'safe', 'on'=>'search'),
+			array('title, status', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, agent_id, title, dt, whom, status', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -63,7 +63,7 @@ abstract class BaseTicket extends GxActiveRecord {
 			'id' => Yii::t('app', 'ID'),
 			'agent_id' => Yii::t('app', 'Agent'),
 			'title' => Yii::t('app', 'Title'),
-			'date' => Yii::t('app', 'Date'),
+			'dt' => Yii::t('app', 'Dt'),
 			'whom' => Yii::t('app', 'Whom'),
 			'status' => Yii::t('app', 'Status'),
 			'ticketMessages' => null,
@@ -76,7 +76,7 @@ abstract class BaseTicket extends GxActiveRecord {
 		$criteria->compare('id', $this->id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('title', $this->title, true);
-		$criteria->compare('date', $this->date, true);
+		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('whom', $this->whom);
 		$criteria->compare('status', $this->status, true);
 

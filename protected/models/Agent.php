@@ -33,6 +33,19 @@ class Agent extends BaseAgent
         return $data;
     }
 
+    public static function getFullComboList($withoutMe=true) {
+        if ($withoutMe) $id = loggedAgentId(); else $id = '';
+        $agents=Yii::app()->db->createCommand("select id,name,surname,middle_name from ".
+            self::model()->tableName()." where id!=:id".
+            " order by surname,name,middle_name")->queryAll(true,array(':id'=>$id));
+
+        foreach($agents as $v) {
+            $data[$v['id']]=$v['surname'].' '.$v['name'].' '.$v['middle_name'];
+        }
+
+        return $data;
+    }
+
     public function rules() {
         return array_merge(parent::rules(),array(
             array('parent_id','unsafe')
