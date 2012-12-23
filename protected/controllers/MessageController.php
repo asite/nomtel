@@ -46,7 +46,7 @@ class MessageController extends Controller {
       $this->performAjaxValidation(array($model,$model->ticketMessages), 'create-message');
 
       $model->attributes = $_POST['Ticket'];
-      $model->dt = time();
+      $model->dt = new EDateTime();
       $model->agent_id = loggedAgentId();
 
       $model->ticketMessages->agent_id = $model->agent_id;

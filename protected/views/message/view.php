@@ -7,18 +7,18 @@
 <h1><?php echo Yii::t('app','View message') ?></h1>
 
 
+<div class="message_views">
 <?php
   $agent = loggedAgentId();
 
   foreach($messages as $v)
     $this->widget('bootstrap.widgets.TbBox', array(
-      'title' => $agents[$v->agent_id],
-      //'headerIcon' => 'icon-home',
+      'title' => $agents[$v->agent_id].' - '.$v->dt,
+      'headerIcon' => 'icon-user',
       'content' => $v->message
     ));
-
 ?>
-
+</div>
 
 <?php
   $form = $this->beginWidget('BaseTbActiveForm', array(

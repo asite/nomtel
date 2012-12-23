@@ -232,3 +232,15 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
   margin-top: 20px;
   width: 760px;
 }
+
+.message_views {}
+
+.message_views .bootstrap-widget-header h3 {
+  position: relative;
+}
+
+.message_views .bootstrap-widget-header h3 span {
+  position: absolute;
+  right: 10px;
+  top: 12px;
+}
