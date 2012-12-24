@@ -15,10 +15,12 @@
  * @property string $dt
  * @property integer $whom
  * @property string $status
+ * @property double $prise
  *
+ * @property Agent $agent
  * @property TicketMessage[] $ticketMessages
  */
-abstract class BaseTicket extends GxActiveRecord {
+abstract class BaseTicket extends BaseGxActiveRecord {
 
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
@@ -40,15 +42,18 @@ abstract class BaseTicket extends GxActiveRecord {
 		return array(
 			array('agent_id, dt, whom', 'required'),
 			array('agent_id, whom', 'numerical', 'integerOnly'=>true),
+			array('prise', 'numerical'),
 			array('title', 'length', 'max'=>256),
 			array('status', 'length', 'max'=>6),
-			array('title, status', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, agent_id, title, dt, whom, status', 'safe', 'on'=>'search'),
+			array('title, status, prise', 'default', 'setOnEmpty' => true, 'value' => null),
+            array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+			array('id, agent_id, title, dt, whom, status, prise', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
 			'ticketMessages' => array(self::HAS_MANY, 'TicketMessage', 'ticket_id'),
 		);
 	}
@@ -61,11 +66,13 @@ abstract class BaseTicket extends GxActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id' => Yii::t('app', 'ID'),
-			'agent_id' => Yii::t('app', 'Agent'),
+			'agent_id' => null,
 			'title' => Yii::t('app', 'Title'),
 			'dt' => Yii::t('app', 'Dt'),
 			'whom' => Yii::t('app', 'Whom'),
 			'status' => Yii::t('app', 'Status'),
+			'prise' => Yii::t('app', 'Prise'),
+			'agent' => null,
 			'ticketMessages' => null,
 		);
 	}
@@ -79,9 +86,52 @@ abstract class BaseTicket extends GxActiveRecord {
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('whom', $this->whom);
 		$criteria->compare('status', $this->status, true);
+		$criteria->compare('prise', $this->prise);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
+
+    public function convertDateTimeFieldsToEDateTime() {
+        // rest of work will do setAttribute() routine
+        $this->setAttribute('dt',strval($this->dt));
+    }
+
+    public function convertDateTimeFieldsToString() {
+        if (is_object($this->dt) && get_class($this->dt)=='EDateTime') $this->dt=new EString($this->dt->format(self::$mySqlDateTimeFormat));
+    }
+
+    public function afterFind() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
+
+    private function convertStringToEDateTime($val,$type) {
+        if (!$val) return null;
+        try {
+            $val=new EDateTime($val,null,$type);
+        } catch (Exception $e) {
+        }
+        return $val;
+    }
+
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='dt') $value=$this->convertStringToEDateTime($value,'datetime');
+        }
+        return parent::setAttribute($name,$value);
+    }
+
+    public function beforeSave() {
+        $this->convertDateTimeFieldsToString();
+
+        return true;
+    }
+
+    public function afterSave() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
 }

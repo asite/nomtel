@@ -133,7 +133,11 @@ class AgentController extends BaseGxController
 
                 $this->save($model,$user,$referralRates);
 
-                $this->redirect(array('admin'));
+                if ($id==adminAgentId()) {
+                    $this->redirect(array('update','id'=>$id));
+                } else {
+                    $this->redirect(array('admin'));
+                }
             }
         }
 

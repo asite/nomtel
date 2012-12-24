@@ -18,16 +18,21 @@ $this->widget('bootstrap.widgets.TbGridView', array(
       'header'=>Yii::t('app','ID'),
     ),
     array(
+      'name'=>'agent_id',
+      'sortable'=>true,
+      'value'=>'$data->agent',
+      'htmlOptions' => array('style'=>'text-align:left;vertical-align:middle'),
+      'header'=>Yii::t('app','From'),
+    ),
+    array(
       'name'=>'dt',
       'sortable'=>true,
-      //'value'=>'new EDateTime($data["dt"])',
       'htmlOptions' => array('style'=>'text-align:center;vertical-align:middle'),
       'header'=>Yii::t('app','Date'),
     ),
     array(
       'name'=>'title',
       'sortable'=>true,
-
       'htmlOptions' => array('style'=>'text-align:left;vertical-align:middle'),
       'header'=>Yii::t('app','Message'),
     ),
@@ -42,6 +47,11 @@ $this->widget('bootstrap.widgets.TbGridView', array(
       'class' => 'bootstrap.widgets.TbButtonColumn',
       'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
       'template'=>'{view}',
+      'buttons'=>array(
+        'view'=>array(
+          'url'=>'Yii::app()->createUrl("message/view",array("id"=>$data->id, "type"=>"inbox"))',
+        ),
+      ),
     ),
   ),
 ));

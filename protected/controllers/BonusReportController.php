@@ -81,12 +81,21 @@ class BonusReportController extends BaseGxController
         ));
     }
 
-    private function errorInvalidFormat($msg) {
-        Yii::app()->user->setFlash('error',Yii::t('app','File has invalid format (%msg%)',array('%msg%'=>$msg)));
+    private function error($msg) {
+        Yii::app()->user->setFlash('error',$msg);
         $this->redirect(array());
     }
 
+    private function errorInvalidFormat($msg) {
+        $this->error(Yii::t('app','File has invalid format (%msg%)',array('%msg%'=>$msg)));
+    }
+
+    private function roundSum($sum) {
+        return floor($sum*100)/100;
+    }
+
     private function calculateBonuses($simBonus,$simAgent,$comment,$operator_id) {
+
         $db=Yii::app()->db;
 
         // get agents info
@@ -100,8 +109,7 @@ class BonusReportController extends BaseGxController
         foreach($agentsRaw as $row) {
             $agents[$row['id']]=array('rate'=>$row['rate']/100,'parent_id'=>$row['parent_id'] ? $row['parent_id']:0);
         }
-        $agents[adminAgentId()]['payments']=array(array('agent_id'=>adminAgentId(),'rate'=>1));
-        $agents[adminAgentId()]['rate']=1;
+        $agents[adminAgentId()]['payments']=array(array('agent_id'=>adminAgentId(),'rate'=>$agents[adminAgentId()]['rate']));
 
         unset($agentsRaw);
 
@@ -117,6 +125,14 @@ class BonusReportController extends BaseGxController
                         'rate'=>$v['rate']
                     );
 
+                    // check rate validity
+                    $idx=count($agents[$k]['payments'])-1;
+                    if ($agents[$k]['payments'][$idx]['rate']>$agents[$k]['payments'][$idx-1]['rate']) {
+                        $agent1=Agent::model()->findByPk($agents[$k]['payments'][$idx-1]['agent_id']);
+                        $agent2=Agent::model()->findByPk($agents[$k]['payments'][$idx]['agent_id']);
+                        $this->error(Yii::t('app',"Agent %agent1% has rate lower than subagent %agent2%",array('%agent1%'=>$agent1,'%agent2%'=>$agent2)));
+                    }
+
                     $modified=true;
                 }
         } while ($modified);
@@ -128,12 +144,12 @@ class BonusReportController extends BaseGxController
 
             $lastPaymentIndex=count($agents[$v['agent_id']])-1;
             foreach($agents[$v['agent_id']]['payments'] as $i=>$payment) {
-                $bonus*=$payment['rate'];
-                // for not last item we must substract provision of child agent
                 $agentsBonuses[$payment['agent_id']]['sim_count']++;
-                $agentsBonuses[$payment['agent_id']]['sum']+=$bonus;
+                $agentsBonuses[$payment['agent_id']]['sum']+=$this->roundSum($bonus*$payment['rate']);
+
+                // for not last item we must substract provision of child agent
                 $agentsBonuses[$payment['agent_id']]['sum_referrals']+= $i==$lastPaymentIndex ? 0:
-                    $bonus*$agents[$v['agent_id']]['payments'][$i+1]['rate'];
+                    $this->roundSum($bonus*$agents[$v['agent_id']]['payments'][$i+1]['rate']);
             }
         }
 
@@ -195,14 +211,14 @@ class BonusReportController extends BaseGxController
 
         if ($sheet->getCellByColumnAndRow(3, 14)->getValue()!='CTN')
             $this->errorInvalidFormat(__LINE__);
-        if ($sheet->getCellByColumnAndRow(20, 14)->getValue()!='Вознаграждение без НДС, руб.')
+        if ($sheet->getCellByColumnAndRow(7, 14)->getValue()!='Выручка без учета НДС, руб.')
             $this->errorInvalidFormat(__LINE__);
 
         $simBonus=array();
         $sum=0;
         for($row=15;$row<=$rows;$row++) {
             $ctn=$sheet->getCellByColumnAndRow(3, $row)->getValue();
-            $bonus=$sheet->getCellByColumnAndRow(20, $row)->getCalculatedValue();
+            $bonus=$sheet->getCellByColumnAndRow(7, $row)->getValue();
 
             $sum+=$bonus;
 

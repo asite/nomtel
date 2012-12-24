@@ -39,6 +39,16 @@ $this->widget('bootstrap.widgets.TbGridView', array(
     ),
     array(
       'class' => 'bootstrap.widgets.TbButtonColumn',
+      'template'=>'{view}',
+      'buttons'=>array(
+        'view'=>array(
+          'url'=>'Yii::app()->createUrl("message/view",array("id"=>$data->id, "type"=>"outbox"))',
+        ),
+      ),
+    ),
+
+    /*array(
+      'class' => 'bootstrap.widgets.TbButtonColumn',
       'template'=>'{view} {close}',
       'buttons'=>array(
         'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
@@ -50,7 +60,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
         ),
       ),
       'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
-    ),
+    ),*/
   ),
 ));
 

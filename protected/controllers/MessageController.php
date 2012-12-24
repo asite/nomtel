@@ -17,8 +17,9 @@ class MessageController extends Controller {
     );
     $criteria->order = "status IN ('NEW','VIEWED','CLOSED'), status ASC, dt DESC";
     $dataProvider = new CActiveDataProvider('Ticket', array('criteria' => $criteria));
+    $agents = Agent::model()->getFullComboList();
 
-    $this->render('inbox',array('dataProvider'=>$dataProvider));
+    $this->render('inbox',array('dataProvider'=>$dataProvider,'agents'=>$agents));
   }
 
   public function actionOutbox() {
@@ -27,7 +28,7 @@ class MessageController extends Controller {
     $criteria->params = array(
       ':agent_id' => loggedAgentId()
     );
-    $criteria->order = 'status DESC, dt DESC';
+    $criteria->order = "status IN ('NEW','VIEWED','CLOSED'), status ASC, dt DESC";
     $dataProvider = new CActiveDataProvider('Ticket', array('criteria' => $criteria));
 
     $this->render('outbox',array('dataProvider'=>$dataProvider));
@@ -38,7 +39,7 @@ class MessageController extends Controller {
     $model->ticketMessages = new TicketMessage;
 
     $agent = Agent::model()->getFullComboList();
-    $agent = array_merge(array(0=>Yii::t('app','Select Agent')),$agent);
+    $agent = array(0=>Yii::t('app','Select Agent')) + $agent;
 
     if (isset($_POST['Ticket'])) {
 
@@ -72,15 +73,24 @@ class MessageController extends Controller {
     $this->render('create', array('model'=>$model,'agent'=>$agent));
   }
 
-  public function actionView($id='') {
+  public function actionView($id='', $type='') {
+    $ticket = Ticket::model()->findByPk($id);
+
+    if ($ticket->agent_id!=loggedAgentId() && $ticket->whom!=loggedAgentId()) $this->redirect($this->createUrl('site/index'));
+
     $model = new TicketMessage;
     $messages = TicketMessage::model()->findAllByAttributes(array('ticket_id'=>$id),array('order'=>'dt DESC'));
     $agents = Agent::model()->getFullComboList(false);
 
-    $this->render('view',array('model'=>$model,'messages'=>$messages,'agents'=>$agents));
+    if ($ticket->status == 'CLOSED') $params['tiketClosed']=true;
+    if ($ticket->whom == loggedAgentId()) $params['closeMessage']=true;
+    $agent = Agent::model()->findByPk($ticket->agent_id);
+    if (loggedAgentId()==$agent->parent_id || loggedAgentId()==1) $params['priseMessage']=true;
+
+    $this->render('view',array('model'=>$model,'messages'=>$messages,'agents'=>$agents,'params'=>$params));
   }
 
-  public function actionAnswer($ticket) {
+  public function actionAnswer($ticket, $type) {
     if (isset($_POST['TicketMessage'])) {
       $model = new TicketMessage;
       $model->setAttributes($_POST['TicketMessage']);
@@ -88,7 +98,7 @@ class MessageController extends Controller {
 
       $model->agent_id = loggedAgentId();
       $model->ticket_id = $ticket;
-      $model->dt = time();
+      $model->dt = new EDateTime();
 
       $transaction=Yii::app()->db->beginTransaction();
       try{
@@ -105,17 +115,36 @@ class MessageController extends Controller {
       }
     }
 
-    $this->redirect($this->createUrl('view',array('id'=>$ticket)));
+    $this->redirect($this->createUrl('view',array('id'=>$ticket, 'type'=>$type)));
   }
 
-  public function actionClose($id='') {
+  public function actionClose($ticket='', $type='') {
+    $model = Ticket::model()->findByPk($ticket);
+
+    if (isset($_POST['PriseMessage']['prise'])) {
+      $DeliveryReport = new DeliveryReport;
+      $DeliveryReport->agent_id = $model->agent_id;
+      $DeliveryReport->dt = new EDateTime();
+      $DeliveryReport->sum = $_POST['PriseMessage']['prise'];
+
+      $transaction=Yii::app()->db->beginTransaction();
       try {
-        $model = Ticket::model()->findByPk($id);
+        $DeliveryReport->save(false);
+        $DeliveryReport->agent->recalcBalance();
+        $DeliveryReport->agent->save();
+        $transaction->commit();
+      } catch (CDbException $e) {
+        $transaction->rollback();
+      }
+
+    }
+    if ($model->whom == loggedAgentId()) {
+      try {
         $model->status = 'CLOSED';
         $model->update();
-        return true;
-      } catch (CDbException $e) {
-        $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
-      }
+      } catch (CDbException $e) {}
+    }
+    if ($type=="inbox") $url="inbox"; elseif ($type=="outbox") $url="outbox"; else $url="view";
+    $this->redirect($this->createUrl($url));
   }
 }

@@ -17,7 +17,7 @@
  *
  * @property Ticket $ticket
  */
-abstract class BaseTicketMessage extends GxActiveRecord {
+abstract class BaseTicketMessage extends BaseGxActiveRecord {
 
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
@@ -39,6 +39,7 @@ abstract class BaseTicketMessage extends GxActiveRecord {
 		return array(
 			array('ticket_id, agent_id, message, dt', 'required'),
 			array('ticket_id, agent_id', 'numerical', 'integerOnly'=>true),
+            array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, ticket_id, agent_id, message, dt', 'safe', 'on'=>'search'),
 		);
 	}
@@ -74,8 +75,50 @@ abstract class BaseTicketMessage extends GxActiveRecord {
 		$criteria->compare('message', $this->message, true);
 		$criteria->compare('dt', $this->dt, true);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
+
+    public function convertDateTimeFieldsToEDateTime() {
+        // rest of work will do setAttribute() routine
+        $this->setAttribute('dt',strval($this->dt));
+    }
+
+    public function convertDateTimeFieldsToString() {
+        if (is_object($this->dt) && get_class($this->dt)=='EDateTime') $this->dt=new EString($this->dt->format(self::$mySqlDateTimeFormat));
+    }
+
+    public function afterFind() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
+
+    private function convertStringToEDateTime($val,$type) {
+        if (!$val) return null;
+        try {
+            $val=new EDateTime($val,null,$type);
+        } catch (Exception $e) {
+        }
+        return $val;
+    }
+
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='dt') $value=$this->convertStringToEDateTime($value,'datetime');
+        }
+        return parent::setAttribute($name,$value);
+    }
+
+    public function beforeSave() {
+        $this->convertDateTimeFieldsToString();
+
+        return true;
+    }
+
+    public function afterSave() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
 }

@@ -14,6 +14,7 @@
                   $menuLeft = array(
                     array('label'=>Yii::app()->name, 'url'=>$this->createUrl('site/index'),'active'=>$this->route=='site/index'),
                     '',
+                    array('label'=>Yii::t('app','My Profile'), 'url'=>$this->createUrl('agent/update',array('id'=>loggedAgentId())),'active'=>Yii::app()->request->url==$this->createUrl('agent/update',array('id'=>loggedAgentId()))),
                     array('label'=>Yii::t('app','MenuSim'), 'itemOptions'=>array('class'=>'nav-header')),
                     array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery'),'active'=>$this->route=='sim/delivery'),
                     array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add'),'active'=>$this->route=='sim/add'),
