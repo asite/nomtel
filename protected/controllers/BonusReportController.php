@@ -1,7 +1,5 @@
 <?php
 
-define('OPERATOR_BEELINE_ID', 1);
-
 class BonusReportController extends BaseGxController
 {
 
@@ -91,7 +89,7 @@ class BonusReportController extends BaseGxController
     }
 
     private function roundSum($sum) {
-        return floor($sum*100)/100;
+        return floor($sum*100+1e-6)/100;
     }
 
     private function calculateBonuses($simBonus,$simAgent,$comment,$operator_id) {
@@ -241,10 +239,56 @@ class BonusReportController extends BaseGxController
         // get agents, to which bonused sims was sent
         $simAgent=$db->createCommand("select personal_account as sim_id,parent_agent_id as agent_id
             from sim
-            where operator_id=".OPERATOR_BEELINE_ID." and agent_id is null and personal_account in (".
+            where operator_id=".Operator::OPERATOR_BEELINE_ID." and agent_id is null and personal_account in (".
             implode(',',$personal_accounts).")")->queryAll();
 
-        $this->calculateBonuses($simBonus,$simAgent,$model->comment,OPERATOR_BEELINE_ID);
+        $this->calculateBonuses($simBonus,$simAgent,$model->comment,Operator::OPERATOR_BEELINE_ID);
+    }
+
+    private function processLoadMegafon($model,$reader,$file) {
+        $reader->setReadFilter(new MegafonBonusReportReadFilter);
+        $book = $reader->load($file->tempName);
+        $sheet = $book->getActiveSheet();
+
+        $rows=$sheet->getHighestRow();
+
+        if ($sheet->getCellByColumnAndRow(0, 11)->getValue()!='Лицевой счет')
+            $this->errorInvalidFormat(__LINE__);
+        if ($sheet->getCellByColumnAndRow(8, 11)->getValue()!='Руб. с НДС')
+            $this->errorInvalidFormat(__LINE__);
+
+        $simBonus=array();
+        $sum=0;
+        for($row=12;$row<=$rows;$row++) {
+            $ctn=$sheet->getCellByColumnAndRow(0, $row)->getValue();
+            $bonus=$sheet->getCellByColumnAndRow(8, $row)->getValue();
+
+            $sum+=$bonus;
+
+            if ($ctn=='') continue;
+            if ($ctn=='Итого:') break;
+            if (!preg_match('%^\d{8}$%',$ctn)) $this->errorInvalidFormat(__LINE__);
+
+            $simBonus[$ctn]=$bonus;
+        }
+
+        $book->disconnectWorksheets();
+        unset($book);
+
+        if ($sum==0) $this->errorInvalidFormat(__LINE__);
+
+        $db=Yii::app()->db;
+
+        $personal_accounts=array();
+        foreach($simBonus as $k=>$v) $personal_accounts[]=$db->quoteValue($k);
+
+        // get agents, to which bonused sims was sent
+        $simAgent=$db->createCommand("select personal_account as sim_id,parent_agent_id as agent_id
+            from sim
+            where operator_id=".Operator::OPERATOR_MEGAFON_ID." and agent_id is null and personal_account in (".
+            implode(',',$personal_accounts).")")->queryAll();
+
+        $this->calculateBonuses($simBonus,$simAgent,$model->comment,Operator::OPERATOR_MEGAFON_ID);
     }
 
     private function processLoad($model) {
@@ -262,8 +306,11 @@ class BonusReportController extends BaseGxController
         $reader->setReadDataOnly(true);
 
         switch ($model->operator) {
-            case OPERATOR_BEELINE_ID:
+            case Operator::OPERATOR_BEELINE_ID:
                 $this->processLoadBeeline($model,$reader,$file);
+                break;
+            case Operator::OPERATOR_MEGAFON_ID:
+                $this->processLoadMegafon($model,$reader,$file);
                 break;
             default:
                 Yii::app()->user->setFlash('error',Yii::t('app','Loading bonuses for this operator is not yet implemented'));
