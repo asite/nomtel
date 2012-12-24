@@ -4,6 +4,10 @@ Yii::import('application.models._base.BaseOperator');
 
 class Operator extends BaseOperator
 {
+    const OPERATOR_BEELINE_ID=1;
+    const OPERATOR_MEGAFON_ID=2;
+
+
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}

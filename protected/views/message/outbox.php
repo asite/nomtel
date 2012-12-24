@@ -19,6 +19,13 @@ $this->widget('bootstrap.widgets.TbGridView', array(
       'header'=>Yii::t('app','ID'),
     ),
     array(
+      'name'=>'whom',
+      'sortable'=>true,
+      'value'=>'$data->whom0',
+      'htmlOptions' => array('style'=>'text-align:left;vertical-align:middle'),
+      'header'=>Yii::t('app','To'),
+    ),
+    array(
       'name'=>'dt',
       'sortable'=>true,
       'htmlOptions' => array('style'=>'text-align:center;vertical-align:middle'),

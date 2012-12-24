@@ -79,7 +79,7 @@ class MessageController extends Controller {
     if ($ticket->agent_id!=loggedAgentId() && $ticket->whom!=loggedAgentId()) $this->redirect($this->createUrl('site/index'));
 
     $model = new TicketMessage;
-    $messages = TicketMessage::model()->findAllByAttributes(array('ticket_id'=>$id),array('order'=>'dt DESC'));
+    $messages = TicketMessage::model()->findAllByAttributes(array('ticket_id'=>$id),array('order'=>'dt ASC'));
     $agents = Agent::model()->getFullComboList(false);
 
     if ($ticket->status == 'CLOSED') $params['tiketClosed']=true;
@@ -120,27 +120,28 @@ class MessageController extends Controller {
 
   public function actionClose($ticket='', $type='') {
     $model = Ticket::model()->findByPk($ticket);
-
-    if (isset($_POST['PriseMessage']['prise'])) {
-      $DeliveryReport = new DeliveryReport;
-      $DeliveryReport->agent_id = $model->agent_id;
-      $DeliveryReport->dt = new EDateTime();
-      $DeliveryReport->sum = $_POST['PriseMessage']['prise'];
-
-      $transaction=Yii::app()->db->beginTransaction();
-      try {
-        $DeliveryReport->save(false);
-        $DeliveryReport->agent->recalcBalance();
-        $DeliveryReport->agent->save();
-        $transaction->commit();
-      } catch (CDbException $e) {
-        $transaction->rollback();
-      }
-
-    }
     if ($model->whom == loggedAgentId()) {
+      if (isset($_POST['PriseMessage']['prise'])) {
+        $prise = $_POST['PriseMessage']['prise'];
+        $DeliveryReport = new DeliveryReport;
+        $DeliveryReport->agent_id = $model->agent_id;
+        $DeliveryReport->dt = new EDateTime();
+        $DeliveryReport->sum = $prise;
+
+        $transaction=Yii::app()->db->beginTransaction();
+        try {
+          $DeliveryReport->save(false);
+          $DeliveryReport->agent->recalcBalance();
+          $DeliveryReport->agent->save();
+          $transaction->commit();
+        } catch (CDbException $e) {
+          $transaction->rollback();
+        }
+      } else $prise = 0;
+
       try {
         $model->status = 'CLOSED';
+        $model->prise = $prise;
         $model->update();
       } catch (CDbException $e) {}
     }

@@ -38,7 +38,7 @@ return array (
   'Problem sending email' => '',
   'SimDeliveryReport|SimDeliveryReports' => '',
   'Skype' => '',
-  'Ticket closed' => '',
+  'Ticket closed' => 'Тикет закрыт',
   'TicketMessage|TicketMessages' => '',
   'Ticket|Tickets' => '',
   'Type' => '',
