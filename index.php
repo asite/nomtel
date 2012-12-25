@@ -26,13 +26,13 @@ switch ($_SERVER['SERVER_NAME']) {
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
-        $config = 'local_asite.php';
+        $config = 'server_asite_development.php';
         break;
     case 'nomtel.asiteapp.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
-        $config = 'server_asite.php';
+        $config = 'server_asite_production.php';
         break;
     default:
         die('unknown domain name');
