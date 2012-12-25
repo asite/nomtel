@@ -10,7 +10,6 @@
  * followed by relations of table "agent_referral_rate" available as properties of the model.
  *
  * @property integer $id
- * @property integer $parent_agent_id
  * @property integer $agent_id
  * @property integer $operator_id
  * @property double $rate
@@ -39,10 +38,9 @@ abstract class BaseAgentReferralRate extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('agent_id, operator_id, rate', 'required'),
-			array('parent_agent_id, agent_id, operator_id', 'numerical', 'integerOnly'=>true),
+			array('agent_id, operator_id', 'numerical', 'integerOnly'=>true),
 			array('rate', 'numerical'),
-			array('parent_agent_id', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, parent_agent_id, agent_id, operator_id, rate', 'safe', 'on'=>'search'),
+			array('id, agent_id, operator_id, rate', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -61,7 +59,6 @@ abstract class BaseAgentReferralRate extends BaseGxActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id' => Yii::t('app', 'ID'),
-			'parent_agent_id' => Yii::t('app', 'Parent Agent'),
 			'agent_id' => null,
 			'operator_id' => null,
 			'rate' => Yii::t('app', 'Rate'),
@@ -74,7 +71,6 @@ abstract class BaseAgentReferralRate extends BaseGxActiveRecord {
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id);
-		$criteria->compare('parent_agent_id', $this->parent_agent_id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('operator_id', $this->operator_id);
 		$criteria->compare('rate', $this->rate);

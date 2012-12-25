@@ -127,6 +127,7 @@ class MessageController extends Controller {
         $DeliveryReport->agent_id = $model->agent_id;
         $DeliveryReport->dt = new EDateTime();
         $DeliveryReport->sum = $prise;
+        $DeliveryReport->type= DeliveryReport::TYPE_NORMAL;
 
         $transaction=Yii::app()->db->beginTransaction();
         try {

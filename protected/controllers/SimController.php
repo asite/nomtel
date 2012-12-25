@@ -275,6 +275,7 @@ class SimController extends BaseGxController {
       $model->agent_id = $_POST['Move']['agent_id'];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
       $model->sum = $totalNumberPrice + $totalSimPrice;
+      $model->type = DeliveryReport::TYPE_SIM;
       $model->save();
 
       $criteria = new CDbCriteria();

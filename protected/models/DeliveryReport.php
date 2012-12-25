@@ -4,6 +4,9 @@ Yii::import('application.models._base.BaseDeliveryReport');
 
 class DeliveryReport extends BaseDeliveryReport
 {
+    const TYPE_NORMAL='NORMAL';
+    const TYPE_SIM='SIM';
+
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}
