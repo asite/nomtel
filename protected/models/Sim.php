@@ -24,7 +24,7 @@ class Sim extends BaseSim
         $criteria = new CDbCriteria;
 
         $criteria->compare('id', $this->id, true);
-        $criteria->compare('delivery_report_id', $this->delivery_report_id);
+        $criteria->compare('act_id', $this->act_id);
         $criteria->compare('personal_account', $this->personal_account, true);
 
         if ($this->number!=Yii::t('app','WITHOUT NUMBER'))

@@ -61,7 +61,7 @@ $this->breadcrumbs = array(
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'deliveryReportsSum',
+        'actsSum',
     ),
 )); ?>
 </div>
@@ -136,7 +136,7 @@ $this->breadcrumbs = array(
             'buttons'=>array(
                 'view'=>array(
                     'visible'=>'$data["type"]==1',
-                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/view",array("id"=>$data["id"]))'
+                    'url'=>'Yii::app()->controller->createUrl("act/view",array("id"=>$data["id"]))'
                 )
             )
         ),

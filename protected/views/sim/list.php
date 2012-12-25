@@ -52,8 +52,8 @@ $('.search-form form').submit(function(){
     ),
     'columns' => array(
         array(
-            'name'=>'delivery_report_id',
-            'value'=>'$data->deliveryReport->dt ? $data->deliveryReport->dt->format("d.m.Y"):"";    ',
+            'name'=>'act_id',
+            'value'=>'$data->act->dt ? $data->act->dt->format("d.m.Y"):"";    ',
             'filter'=>false,
         ),
         array(
@@ -85,7 +85,7 @@ $('.search-form form').submit(function(){
                 'feedback'=>array(
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
-                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))',
+                    'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data->id))',
                     'visible'=>'!isAdmin()'
                 )
             )

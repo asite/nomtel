@@ -1,8 +1,8 @@
 <?php
 
 $this->breadcrumbs = array(
-    DeliveryReport::model()->label(2)=>array('list'),
-    $model->parentDeliveryReport->adminLabel($model->parentDeliveryReport->label(1)) => array('view','id'=>$model->id),
+    Act::model()->label(2)=>array('list'),
+    $model->parentAct->adminLabel($model->parentAct->label(1)) => array('view','id'=>$model->id),
     $model->adminLabel($model->label(1))
 );
 ?>
@@ -13,7 +13,7 @@ $this->breadcrumbs = array(
     'data'=>$model,
     'attributes'=>array(
         'agent',
-        'parentDeliveryReport',
+        'parentAct',
         'personal_account',
         'number',
         'number_price',

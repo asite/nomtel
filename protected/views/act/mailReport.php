@@ -1,6 +1,6 @@
 <?php echo $model->getAttributeLabel('agent')?>: <?php echo $model->agent ?>
 
-<?php echo $model->getAttributeLabel('parentDeliveryReport')?>: <?php echo $model->parentDeliveryReport ?>
+<?php echo $model->getAttributeLabel('parentAct')?>: <?php echo $model->parentAct ?>
 
 <?php echo $model->getAttributeLabel('personal_account')?>: <?php echo $model->personal_account ?>
 

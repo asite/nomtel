@@ -80,12 +80,12 @@ $this->breadcrumbs = array(
 
 <?php
 
-  if (isset($deliveryReportMany)) {
+  if (isset($actMany)) {
 
-    if (empty($deliveryReportMany)) $deliveryReportMany = array();
+    if (empty($actMany)) $actMany = array();
 
     $dataProvider = array();
-    foreach($deliveryReportMany as $k=>$v) {
+    foreach($actMany as $k=>$v) {
       $dataProvider[$k]['personal_account'] = $v->personal_account;
       $dataProvider[$k]['icc'] = $v->icc;
       $dataProvider[$k]['number'] = $v->number;
@@ -169,11 +169,11 @@ $this->breadcrumbs = array(
 <?php $this->endWidget(); ?>
 
 <?php
-if (isset($deliveryReportFew)) {
+if (isset($actFew)) {
 
     $dataProvider = array();
 
-    foreach($deliveryReportFew as $k=>$v) {
+    foreach($actFew as $k=>$v) {
       $dataProvider[$k]['personal_account'] = $v->personal_account;
       $dataProvider[$k]['icc'] = $v->icc;
       $dataProvider[$k]['number'] = $v->number;

@@ -83,7 +83,7 @@ class SimController extends BaseGxController {
         }
       }
       //$transaction->commit();
-      Yii::app()->user->setFlash('deliveryReport',serialize($sims));
+      Yii::app()->user->setFlash('act',serialize($sims));
       $this->refresh();
       exit;
     }
@@ -127,7 +127,7 @@ class SimController extends BaseGxController {
 
         if (isset($_POST['buttonProcessSim'])) {
           $activeTabs['tab1'] = true;
-          $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportMany'=>$result, 'activeTabs'=>$activeTabs));
+          $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'actMany'=>$result, 'activeTabs'=>$activeTabs));
           exit;
         } else {
           foreach($result as $v) {
@@ -141,7 +141,7 @@ class SimController extends BaseGxController {
           if (empty($result)) {
             Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления!');
             $activeTabs['tab1'] = true;
-            $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportMany'=>$result, 'activeTabs'=>$activeTabs));
+            $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'actMany'=>$result, 'activeTabs'=>$activeTabs));
             exit;
           }
 
@@ -197,7 +197,7 @@ class SimController extends BaseGxController {
           if (empty($ids)) {
             Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления(возможно данные уже есть в базе)!');
             $activeTabs['tab2'] = true;
-            $this->render('add', array('model'=>$old_model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'deliveryReportMany'=>$result, 'activeTabs'=>$activeTabs));
+            $this->render('add', array('model'=>$old_model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'actMany'=>$result, 'activeTabs'=>$activeTabs));
             exit;
           }
 
@@ -271,20 +271,20 @@ class SimController extends BaseGxController {
         $this->redirect(Yii::app()->createUrl('sim/add'));
         exit;
       }
-      $model = new DeliveryReport;
+      $model = new Act;
       $model->agent_id = $_POST['Move']['agent_id'];
       $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
       $model->sum = $totalNumberPrice + $totalSimPrice;
-      $model->type = DeliveryReport::TYPE_SIM;
+      $model->type = Act::TYPE_SIM;
       $model->save();
 
       $criteria = new CDbCriteria();
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
       $ids_string = implode(",", $_SESSION['moveSims'][$key]);
 
-      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'delivery_report_id'=>$model->id, 'sim_price'=>$_POST['Move']['PriceForSim']),$criteria);
+      Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'act_id'=>$model->id, 'sim_price'=>$_POST['Move']['PriceForSim']),$criteria);
 
-      $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_delivery_report_id, agent_id, delivery_report_id, operator_id, tariff_id)
+      $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id)
               SELECT ".Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']).", s.personal_account, s.number,s.number_price, s.icc, s.id ,s.agent_id, ".Yii::app()->db->quoteValue($model->id).", NULL, NULL, s.operator_id, s.tariff_id
               FROM sim as s
               WHERE id IN ($ids_string)";

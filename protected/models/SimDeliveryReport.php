@@ -1,8 +1,8 @@
 <?php
 
-Yii::import('application.models._base.BaseSimDeliveryReport');
+Yii::import('application.models._base.BaseSimAct');
 
-class SimDeliveryReport extends BaseSimDeliveryReport
+class SimAct extends BaseSimAct
 {
 	public static function model($className=__CLASS__) {
 		return parent::model($className);

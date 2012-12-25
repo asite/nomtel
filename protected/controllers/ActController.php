@@ -1,18 +1,18 @@
 <?php
 
-class DeliveryReportController extends BaseGxController
+class ActController extends BaseGxController
 {
     public function actionList()
     {
-        $model = new DeliveryReport('search');
+        $model = new Act('search');
         $model->unsetAttributes();
 
-        if (isset($_GET['DeliveryReport']))
-            $model->setAttributes($_GET['DeliveryReport']);
+        if (isset($_GET['Act']))
+            $model->setAttributes($_GET['Act']);
 
         $dataProvider=$model->search();
-        $dataProvider->criteria->alias='delivery_report';
-        $dataProvider->criteria->join="join agent on (agent.id=delivery_report.agent_id and agent.parent_id=".loggedAgentId().')';
+        $dataProvider->criteria->alias='act';
+        $dataProvider->criteria->join="join agent on (agent.id=act.agent_id and agent.parent_id=".loggedAgentId().')';
 
         $this->render('list', array(
             'model' => $model,
@@ -22,7 +22,7 @@ class DeliveryReportController extends BaseGxController
 
     public function actionView($id)
     {
-        $model = $this->loadModel($id, 'DeliveryReport');
+        $model = $this->loadModel($id, 'Act');
         if (loggedAgentId()!=$model->agent_id &&
             loggedAgentId()!=$model->agent->parent_id)
             throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
@@ -32,7 +32,7 @@ class DeliveryReportController extends BaseGxController
 
         if (isset($_GET['Sim']))
             $sim->setAttributes($_GET['Sim']);
-        $sim->delivery_report_id = $id;
+        $sim->act_id = $id;
 
         $this->render('view', array(
             'model' => $model,
@@ -69,7 +69,7 @@ class DeliveryReportController extends BaseGxController
 		else
             	    Yii::app()->user->setFlash('error',Yii::t('app','Problem sending email'));
 
-                $this->redirect(array('view','id'=>$model->parent_delivery_report_id));
+                $this->redirect(array('view','id'=>$model->parent_act_id));
             }
         }
 

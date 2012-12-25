@@ -123,17 +123,17 @@ class MessageController extends Controller {
     if ($model->whom == loggedAgentId()) {
       if (isset($_POST['PriseMessage']['prise'])) {
         $prise = $_POST['PriseMessage']['prise'];
-        $DeliveryReport = new DeliveryReport;
-        $DeliveryReport->agent_id = $model->agent_id;
-        $DeliveryReport->dt = new EDateTime();
-        $DeliveryReport->sum = $prise;
-        $DeliveryReport->type= DeliveryReport::TYPE_NORMAL;
+        $Act = new Act;
+        $Act->agent_id = $model->agent_id;
+        $Act->dt = new EDateTime();
+        $Act->sum = $prise;
+        $Act->type= Act::TYPE_NORMAL;
 
         $transaction=Yii::app()->db->beginTransaction();
         try {
-          $DeliveryReport->save(false);
-          $DeliveryReport->agent->recalcBalance();
-          $DeliveryReport->agent->save();
+          $Act->save(false);
+          $Act->agent->recalcBalance();
+          $Act->agent->save();
           $transaction->commit();
         } catch (CDbException $e) {
           $transaction->rollback();

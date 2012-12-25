@@ -1,7 +1,7 @@
 <?php
 
 $this->breadcrumbs = array(
-    DeliveryReport::model()->label(2)=>array('list'),
+    Act::model()->label(2)=>array('list'),
     $model->adminLabel($model->label(1)),
 );
 
@@ -81,7 +81,7 @@ $('.search-form form').submit(function(){
                 'feedback'=>array(
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
-                    'url'=>'Yii::app()->controller->createUrl("deliveryReport/report",array("id"=>$data->id))',
+                    'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data->id))',
                     'visible'=>'!isAdmin()'
                 )
             )

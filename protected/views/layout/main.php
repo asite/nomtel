@@ -16,7 +16,7 @@
                     '',
                     array('label'=>Yii::t('app','My Profile'), 'url'=>$this->createUrl('agent/update',array('id'=>loggedAgentId())),'active'=>Yii::app()->request->url==$this->createUrl('agent/update',array('id'=>loggedAgentId()))),
                     array('label'=>Yii::t('app','MenuSim'), 'itemOptions'=>array('class'=>'nav-header')),
-                    array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery'),'active'=>$this->route=='sim/delivery'),
+                    array('label'=>Yii::t('app','addAct'), 'url'=>$this->createUrl('sim/delivery'),'active'=>$this->route=='sim/delivery'),
                     array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add'),'active'=>$this->route=='sim/add'),
                     array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list'),'active'=>$this->route=='sim/list'),
                     array('label'=>Yii::t('app','Mass select'), 'url'=>$this->createUrl('sim/massselect'),'active'=>$this->route=='sim/massselect'),
@@ -24,7 +24,7 @@
                     array('label'=>Yii::t('app','Agents'), 'url'=>$this->createUrl('agent/admin'),'active'=>$this->route=='agent/admin'),
                     array('label'=>Yii::t('app','Load Bonuses'), 'url'=>$this->createUrl('bonusReport/load'),'active'=>$this->route=='bonusReport/load'),
                     array('label'=>BonusReport::model()->label(2), 'url'=>$this->createUrl('bonusReport/list'),'active'=>$this->route=='bonusReport/list'),
-                    array('label'=>DeliveryReport::model()->label(2), 'url'=>$this->createUrl('deliveryReport/list'),'active'=>$this->route=='deliveryReport/list'),
+                    array('label'=>Act::model()->label(2), 'url'=>$this->createUrl('act/list'),'active'=>$this->route=='act/list'),
                     array('label'=>Yii::t('app','Operators'), 'url'=>$this->createUrl('operator/admin'),'active'=>$this->route=='operator/admin'),
                     '',
                     array('label'=>Yii::t('app','messages'), 'itemOptions'=>array('class'=>'nav-header')),
@@ -41,7 +41,7 @@
                     array('label'=>Yii::t('app','Agents'), 'url'=>$this->createUrl('agent/admin'),'active'=>$this->route=='agent/admin'),
                     array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list'),'active'=>$this->route=='sim/list'),
                       array('label'=>BonusReport::model()->label(2), 'url'=>$this->createUrl('bonusReport/list'),'active'=>$this->route=='bonusReport/list'),
-                    array('label'=>DeliveryReport::model()->label(2), 'url'=>$this->createUrl('deliveryReport/list'),'active'=>$this->route=='deliveryReport/list'),
+                    array('label'=>Act::model()->label(2), 'url'=>$this->createUrl('act/list'),'active'=>$this->route=='act/list'),
                     '',
                     array('label'=>Yii::t('app','messages'), 'itemOptions'=>array('class'=>'nav-header')),
                     array('label'=>Yii::t('app','Inbox'), 'url'=>$this->createUrl('message/inbox'),'active'=>$this->route=='message/inbox'),
@@ -72,7 +72,7 @@ $menu=array(
                 'url'=>'#',
                 'items'=>
                 array(
-                    array('label'=>Yii::t('app','addDeliveryReport'), 'url'=>$this->createUrl('sim/delivery')),
+                    array('label'=>Yii::t('app','addAct'), 'url'=>$this->createUrl('sim/delivery')),
                     array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add')),
                     array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list')),
                     array('label'=>Yii::t('app','Mass select'), 'url'=>$this->createUrl('sim/massselect'))
@@ -102,8 +102,8 @@ $menu=array(
         'class'=>'bootstrap.widgets.TbMenu',
         'items'=>array(
             array(
-                'label'=>DeliveryReport::model()->label(2),
-                'url'=>$this->createUrl('deliveryReport/list')
+                'label'=>Act::model()->label(2),
+                'url'=>$this->createUrl('act/list')
             )
         )
     ),
@@ -159,8 +159,8 @@ $menu=array(
             'class'=>'bootstrap.widgets.TbMenu',
             'items'=>array(
                 array(
-                    'label'=>DeliveryReport::model()->label(2),
-                    'url'=>$this->createUrl('deliveryReport/list')
+                    'label'=>Act::model()->label(2),
+                    'url'=>$this->createUrl('act/list')
                 )
             )
         ),

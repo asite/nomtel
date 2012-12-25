@@ -1,8 +1,8 @@
 <?php
 
-Yii::import('application.models._base.BaseDeliveryReport');
+Yii::import('application.models._base.BaseAct');
 
-class DeliveryReport extends BaseDeliveryReport
+class Act extends BaseAct
 {
     const TYPE_NORMAL='NORMAL';
     const TYPE_SIM='SIM';
@@ -18,12 +18,11 @@ class DeliveryReport extends BaseDeliveryReport
     public function search() {
         $criteria = new CDbCriteria;
 
-        $criteria->alias='delivery_report';
-        $criteria->compare('delivery_report.id', $this->id);
-        $criteria->compare('delivery_report.agent_id', $this->agent_id);
-        $criteria->compare('delivery_report.bonus_report_id', $this->bonus_report_id);
-        $criteria->compare('delivery_report.dt', $this->dt, true);
-        $criteria->compare('delivery_report.sum', $this->sum);
+        $criteria->alias='act';
+        $criteria->compare('act.id', $this->id);
+        $criteria->compare('act.agent_id', $this->agent_id);
+        $criteria->compare('act.dt', $this->dt, true);
+        $criteria->compare('act.sum', $this->sum);
 
         $dataProvider=new CActiveDataProvider($this, array(
             'criteria' => $criteria,

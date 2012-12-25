@@ -1,7 +1,7 @@
 <?php
 
 $this->breadcrumbs = array(
-  Yii::t('app','addDeliveryReport'),
+  Yii::t('app','addAct'),
 );
 
 
@@ -24,7 +24,7 @@ $this->breadcrumbs = array(
   })
 </script>
 
-<h1><?php echo Yii::t('app','addDeliveryReport'); ?></h1>
+<h1><?php echo Yii::t('app','addAct'); ?></h1>
 
 <div class="control-group cfix" style="display: none;" id="delivery">
   <label class="control-label" for="Delivery_fileField_">Добавте файл</label>
@@ -73,13 +73,13 @@ $this->breadcrumbs = array(
 <br/>
 <?php
 
-  if (Yii::app()->user->hasFlash('deliveryReport')) {
-    $deliveryReport = unserialize(Yii::app()->user->getFlash('deliveryReport'));
+  if (Yii::app()->user->hasFlash('act')) {
+    $act = unserialize(Yii::app()->user->getFlash('act'));
 
     echo "<h2>Добавленые данные</h2>";
 
     $dataProvider = new CArrayDataProvider(
-      $deliveryReport,
+      $act,
       array(
         'pagination'=>false
       )

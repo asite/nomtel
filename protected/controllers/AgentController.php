@@ -178,7 +178,7 @@ class AgentController extends BaseGxController
         }
 
         $sql="(select id,dt,sum,comment,0 as type from payment where agent_id=:agent_id) union
-         (select id,dt,-sum as sum,'' as comment, 1 as type from delivery_report where agent_id=:agent_id)";
+         (select id,dt,-sum as sum,'' as comment, 1 as type from act where agent_id=:agent_id)";
         $params=array(':agent_id'=>$id,':agent_id'=>$id);
         $count=Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
         $logDataProvider=new CSqlDataProvider($sql,
