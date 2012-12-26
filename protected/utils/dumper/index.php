@@ -10,6 +10,8 @@
 |   http://sypex.net/bsd_license.txt                                        |
 \***************************************************************************/
 
+require_once('common.php');
+
 header("Expires: Wed, 19 Nov 2008 19:19:19 GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Content-Type: text/html; charset=utf-8");
@@ -78,7 +80,7 @@ class Sypex_Dumper
 		{
 			$_POST = sxd_antimagic( $_POST );
 		}
-		include( "cfg.php" );
+		include( CFG_FILE );
 		$this->loadLang( $CFG['lang'] );
 		if ( !ini_get( "safe_mode" ) && function_exists( "set_time_limit" ) && strpos( ini_get( "disable_functions" ), "set_time_limit" ) === false )
 		{
@@ -152,7 +154,7 @@ class Sypex_Dumper
 		else if ( !empty( $this->CFG['auth'] ) )
 		{
 			$auth = false;
-			$sfile = "ses.php";
+			$sfile = SES_FILE;
 			if ( !empty( $_COOKIE['sxd'] ) && preg_match( "/^[\da-f]{32}$/", $_COOKIE['sxd'] ) )
 			{
 				include( $sfile );
@@ -599,11 +601,11 @@ class Sypex_Dumper
 				"time" => time( ),
 				"lng" => $this->LNG['name']
 			);
-			$this->saveToFile( "ses.php", "<?php\n\$SES = ".var_export( $this->SES, true ).";\n"."?>" );
+			$this->saveToFile( SES_FILE, "<?php\n\$SES = ".var_export( $this->SES, true ).";\n"."?>" );
 		}
 		if ( !$this->virtualize )
 		{
-			$this->saveToFile( "cfg.php", "<?php\n\$CFG = ".var_export( $this->CFG, true ).";\n"."?>" );
+			$this->saveToFile( CFG_FILE, "<?php\n\$CFG = ".var_export( $this->CFG, true ).";\n"."?>" );
 		}
 	}
 

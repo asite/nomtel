@@ -1,18 +1,19 @@
 <?php
+require_once('common.php');
 // Sypex Dumper Lite 2
 header("Content-Type: text/html; charset=utf-8");
 set_error_handler("sxd_error");
 if(!empty($_POST['ajax']['job']) && preg_match("/^[\w-]+$/", $_POST['ajax']['job'])){
 	$d = date("'Y.m.d H:i:s'");
 	if(!empty($_COOKIE['sxd'])) {
-		include('ses.php');
+		include(SES_FILE);
 		if(!empty($SES[$_COOKIE['sxd']])) {
 			$CFG = &$SES[$_COOKIE['sxd']]['cfg'];
 			include(load_lang($SES[$_COOKIE['sxd']]['lng']));
 		}
 	}
 	if(empty($LNG)) {
-		include('cfg.php');
+		include(CFG_FILE);
 		include(load_lang($CFG['lang']));
 		if(!empty($CFG['auth'])) {echo "sxd.log.add({$d},[" . esc($LNG['stop_5']) . " (1)]);sxd.hideLoading();"; exit;}
 	} 

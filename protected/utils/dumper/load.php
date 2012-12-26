@@ -1,4 +1,5 @@
 <?php
+require_once('common.php');
 if(!empty($_SERVER['QUERY_STRING']) && preg_match("/^(\w+)(\.v\d+)?\.(lng\.js|js|css|gif|png|ico)$/", $_SERVER['QUERY_STRING'], $m)){
 	$compress = true;
 	$skin = '';
