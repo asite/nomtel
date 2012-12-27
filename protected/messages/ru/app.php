@@ -184,4 +184,8 @@ return array (
   'remove from transmit list' => 'Удалить из списка передачи',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
+  'Bilain' => 'Билайн',
+  'Megafon' => 'Мегафон',
+  'Company|Companies' => 'Компания',
+  'OperatorRegion|OperatorRegions' => 'Регион',
 );

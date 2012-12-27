@@ -192,9 +192,8 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
 */
 
 .delivery_help {
-  display: none;
-  padding-left: 160px;
-  font-size: 12px;
+  padding: 0 0 15px;
+  font-size: 14px;
   color: red;
 }
 

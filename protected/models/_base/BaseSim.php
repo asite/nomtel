@@ -22,12 +22,16 @@
  * @property integer $act_id
  * @property integer $operator_id
  * @property integer $tariff_id
+ * @property integer $operator_region_id
+ * @property integer $company_id
  *
- * @property Act $parentAct
- * @property Act $act
  * @property Agent $parentAgent
  * @property Sim $parent
  * @property Sim[] $sims
+ * @property Act $parentAct
+ * @property Act $act
+ * @property OperatorRegion $operatorRegion
+ * @property Company $company
  * @property Tariff $tariff
  * @property Operator $operator
  * @property Agent $agent
@@ -53,22 +57,24 @@ abstract class BaseSim extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('personal_account', 'required'),
-			array('parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id', 'numerical', 'integerOnly'=>true),
+			array('parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'numerical', 'integerOnly'=>true),
 			array('number_price, sim_price', 'numerical'),
 			array('personal_account, number, icc', 'length', 'max'=>50),
 			array('parent_id', 'length', 'max'=>20),
-			array('number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, personal_account, number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id', 'safe', 'on'=>'search'),
+			array('number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, personal_account, number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
-			'parentAct' => array(self::BELONGS_TO, 'Act', 'parent_act_id'),
-			'act' => array(self::BELONGS_TO, 'Act', 'act_id'),
 			'parentAgent' => array(self::BELONGS_TO, 'Agent', 'parent_agent_id'),
 			'parent' => array(self::BELONGS_TO, 'Sim', 'parent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'parent_id'),
+			'parentAct' => array(self::BELONGS_TO, 'Act', 'parent_act_id'),
+			'act' => array(self::BELONGS_TO, 'Act', 'act_id'),
+			'operatorRegion' => array(self::BELONGS_TO, 'OperatorRegion', 'operator_region_id'),
+			'company' => array(self::BELONGS_TO, 'Company', 'company_id'),
 			'tariff' => array(self::BELONGS_TO, 'Tariff', 'tariff_id'),
 			'operator' => array(self::BELONGS_TO, 'Operator', 'operator_id'),
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
@@ -95,11 +101,15 @@ abstract class BaseSim extends BaseGxActiveRecord {
 			'act_id' => null,
 			'operator_id' => null,
 			'tariff_id' => null,
-			'parentAct' => null,
-			'act' => null,
+			'operator_region_id' => null,
+			'company_id' => null,
 			'parentAgent' => null,
 			'parent' => null,
 			'sims' => null,
+			'parentAct' => null,
+			'act' => null,
+			'operatorRegion' => null,
+			'company' => null,
 			'tariff' => null,
 			'operator' => null,
 			'agent' => null,
@@ -122,6 +132,8 @@ abstract class BaseSim extends BaseGxActiveRecord {
 		$criteria->compare('act_id', $this->act_id);
 		$criteria->compare('operator_id', $this->operator_id);
 		$criteria->compare('tariff_id', $this->tariff_id);
+		$criteria->compare('operator_region_id', $this->operator_region_id);
+		$criteria->compare('company_id', $this->company_id);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

@@ -10,16 +10,43 @@ class SimController extends BaseGxController {
   }
 
   public function actionDelivery() {
-    if (isset($_POST['Delivery']['operator']) && $_POST['Delivery']['operator']==0) {Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Не выбран оператор!'); $this->refresh(); exit; }
+    $activeTabs = array('tab1'=>false,'tab2'=>false);
+    $model = new Sim;
+
+    $companyList = Company::model()->findAll();
+    $companyListArray = array(''=>'Выбор компании');
+    foreach($companyList as $v) {
+      $companyListArray[$v['id']]=$v['title'];
+    }
+
+    $regionList = OperatorRegion::model()->findAll();
+    $regionListArray = array('1'=>array(''=>'Выбор региона'),'2'=>array(''=>'Выбор региона'));
+    foreach($regionList as $v) {
+      $regionListArray[$v['operator_id']][$v['id']]=$v['title'];
+    }
+
+    $tariffList = Tariff::model()->findAll();
+    $tariffListArray = array('1'=>array(''=>'Выбор тарифа'),'2'=>array(''=>'Выбор тарифа'));
+    foreach($tariffList as $v) {
+      $tariffListArray[$v['operator_id']][$v['id']]=$v['title'];
+    }
+
+    if (isset($_POST['Sim'])) {
+      $model->setAttributes($_POST['Sim']);
+      $this->performAjaxValidation($model, $_POST['simAdd']['method']);
+      $data = $_POST['Sim'];
+    }
+
     if (isset($_FILES['Delivery']) && $_FILES['Delivery']) {
       $sims = array();
-      //$transaction = Yii::app()->db->beginTransaction();
-      $i=1;
+      $transaction = Yii::app()->db->beginTransaction();
+      $i=0;
       for($f=1;$f<=count($_FILES['Delivery']['tmp_name']['fileField']);$f++) {
         $file = $_FILES['Delivery']['tmp_name']['fileField'][$f];
         $file_name = $_FILES['Delivery']['name']['fileField'][$f];
         if ($file) {
-          if ($_POST['Delivery']['operator']==1) {
+          if ($_POST['Sim']['operator_id']==1) {
+            $activeTabs['tab1']=true;
             $f=fopen($file, 'r') or die("Невозможно открыть файл!");
             while(!feof($f)) {
               $text = fgets($f);
@@ -30,19 +57,24 @@ class SimController extends BaseGxController {
               if (!isset($sim[2])) $sim[2]='';
               if ($sim[0] && $sim[1]) {
                 $model = new Sim;
+                $model->setAttributes($data);
                 $model->number_price = 0;
                 $model->personal_account = $sim[0];
                 $model->icc = $sim[1];
                 $model->number = $sim[2];
-                try {
+                //try {
                   $model->save();
+                  $model->parent_id=$model->id;
+                  $model->save();
+                  $sims[$i]['id'] = $model->id;
                   $sims[$i]['personal_account'] = $sim[0];
                   $sims[$i]['icc'] = $sim[1];
                   $sims[$i++]['number'] = $sim[2];
-                 } catch(Exception $e) {}
+                //} catch(Exception $e) {}
               }
             }
-          } elseif ($_POST['Delivery']['operator']==2) {
+          } elseif ($_POST['Sim']['operator_id']==2) {
+            $activeTabs['tab2']=true;
             Yii::import('application.vendors.PHPExcel',true);
             if (preg_match('%\.xls$%',$file_name)) {
               $objReader = new PHPExcel_Reader_Excel5;
@@ -68,26 +100,32 @@ class SimController extends BaseGxController {
               }
               if ($sim[0] && $sim[1]) {
                 $model = new Sim;
+                $model->setAttributes($data);
                 $model->parent_agent_id=adminAgentId();
                 $model->number_price = 0;
                 $model->personal_account = $sim[0];
                 $model->number = $sim[1];
-                try {
+                //try {
                   $model->save();
+                  $model->parent_id=$model->id;
+                  $model->save();
+                  $sims[$i]['id'] = $model->id;
                   $sims[$i]['personal_account'] = $sim[0];
                   $sims[$i++]['number'] = $sim[1];
-                } catch(Exception $e) { }
+                //} catch(Exception $e) { }
               }
             }
           }
         }
       }
-      //$transaction->commit();
+      $transaction->commit();
       Yii::app()->user->setFlash('act',serialize($sims));
+      Yii::app()->user->setFlash('activeTabs',serialize($activeTabs));
       $this->refresh();
       exit;
     }
-    $this->render('delivery');
+    $activeTabs['tab1']=true;
+    $this->render('delivery',array('model'=>$model,'activeTabs'=>$activeTabs,'company'=>$companyListArray,'regionList'=>$regionListArray,'tariffList'=>$tariffListArray));
   }
 
   public function actionAdd() {
@@ -110,6 +148,8 @@ class SimController extends BaseGxController {
 
 
     if ($_POST['AddSim']) {
+      $transaction = Yii::app()->db->beginTransaction();
+
       $activeTabs = array('tab1'=>false,'tab2'=>false);
 
       $model->attributes = $_POST['AddSim'];
@@ -137,7 +177,6 @@ class SimController extends BaseGxController {
             $model->tariff_id = $_POST['AddSim']['tariff'];
             $model->save();
           }
-
           if (empty($result)) {
             Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления!');
             $activeTabs['tab1'] = true;
@@ -150,10 +189,11 @@ class SimController extends BaseGxController {
             foreach($result as $v) {
               $_SESSION['moveSims'][$key][$v->id]=$v->id;
             }
+            $transaction->commit();
             $this->redirect(array('move','key'=>$key));
-            exit;
           } else {
             Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+            $transaction->commit();
             $this->refresh();
             exit;
           }
@@ -171,11 +211,13 @@ class SimController extends BaseGxController {
           $model->personal_account = $_POST['AddSim']['ICCPersonalAccount'];
           $model->icc = $_POST['AddSim']['ICCBeginFew'].$_POST['AddSim']['ICCEndFew'];
           $model->number = $_POST['AddSim']['phone'];
-          try {
+          //try {
+            $model->save();
+            $model->parent_id = $model->id;
             $model->save();
             $ids = array();
             $ids[$model->id] = $model->id;
-          } catch(Exception $e) {}
+          //} catch(Exception $e) {}
 
           for($o=1;$o<=count($_POST['AddNewSim']['ICCPersonalAccount']);$o++) {
             $model = new Sim;
@@ -187,10 +229,12 @@ class SimController extends BaseGxController {
             $model->icc = $_POST['AddNewSim']['ICCBeginFew'][$o].$_POST['AddNewSim']['ICCEndFew'][$o];
             $model->number = $_POST['AddNewSim']['phone'][$o];
 
-            try {
+            //try {
+              $model->save();
+              $model->parent_id = $model->id;
               $model->save();
               $ids[$model->id] = $model->id;
-            } catch(Exception $e) {}
+            //} catch(Exception $e) {}
 
           }
 
@@ -204,11 +248,13 @@ class SimController extends BaseGxController {
           if ($_POST['AddSim']['where']) {
             $key = rand();
             $_SESSION['moveSims'][$key]=$ids;
+            $transaction->commit();
             $this->redirect(array('move','key'=>$key));
             exit;
           } else {
             Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
             Yii::app()->user->setFlash('tab2', true);
+            $transaction->commit();
             $this->refresh();
             exit;
           }
@@ -256,8 +302,6 @@ class SimController extends BaseGxController {
   }
 
   public function actionMove($key) {
-
-
     if ($_POST['Move']) {
       if (!$_POST['Move']['agent_id']) {
         Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не выбран агент.');
@@ -284,8 +328,8 @@ class SimController extends BaseGxController {
 
       Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'act_id'=>$model->id, 'sim_price'=>$_POST['Move']['PriceForSim']),$criteria);
 
-      $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id)
-              SELECT ".Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']).", s.personal_account, s.number,s.number_price, s.icc, s.id ,s.agent_id, ".Yii::app()->db->quoteValue($model->id).", NULL, NULL, s.operator_id, s.tariff_id
+      $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id)
+              SELECT ".Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']).", s.personal_account, s.number,s.number_price, s.icc, s.parent_id ,s.agent_id, ".Yii::app()->db->quoteValue($model->id).", NULL, NULL, s.operator_id, s.tariff_id, s.operator_region_id, s.company_id
               FROM sim as s
               WHERE id IN ($ids_string)";
 
