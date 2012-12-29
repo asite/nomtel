@@ -276,11 +276,11 @@ class SimController extends BaseGxController {
         {
             if($icc!='')
             {
-                if($sim = Sim::model()->find("icc = {trim($icc)} or number = {trim($icc)}"))
+                if($sim = Sim::model()->find('icc = "'.trim($icc).'" or number = "'.trim($icc).'"'))
                 {
                     $ids[] = $sim->id;
 
-                }
+                } 
             }
         }
 
