@@ -16,7 +16,6 @@ class AgentController extends BaseGxController
 
         foreach($referralRates as $rate) {
             $rate->agent_id=$model->id;
-            $rate->parent_agent_id=$model->parent_id;
             $rate->save();
         }
 
