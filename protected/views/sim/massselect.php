@@ -19,7 +19,7 @@ $(document).ready(function(){$('#ICCtoSelect').focus();});
   ));
 ?>
 
-<label>ICC номера:</label>
+<label>ICC номера / Номера телефона:</label>
 <textarea name="ICCtoSelect" id="ICCtoSelect" rows="20" style="width:100%"></textarea>
 
 
