@@ -41,9 +41,10 @@ abstract class BaseBonusReportAgent extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('bonus_report_id, agent_id, sim_count, sum, sum_referrals, payment_id', 'required'),
+			array('bonus_report_id, agent_id, sim_count, sum, sum_referrals', 'required'),
 			array('bonus_report_id, agent_id, sim_count, payment_id', 'numerical', 'integerOnly'=>true),
 			array('sum, sum_referrals', 'numerical'),
+			array('payment_id', 'default', 'setOnEmpty' => true, 'value' => null),
 			array('id, bonus_report_id, agent_id, sim_count, sum, sum_referrals, payment_id', 'safe', 'on'=>'search'),
 		);
 	}

@@ -134,8 +134,12 @@ class BonusReportController extends BaseGxController
                 }
         } while ($modified);
 
-        // calculate earned bonuses+statistics
+        $allAgentsIds=$db->createCommand("select id from agent")->queryColumn();
         $agentsBonuses=array();
+        foreach($allAgentsIds as $agentId)
+            $agentsBonuses[$agentId]=array('sim_count'=>0,'sum'=>0,'sum_referrals'=>0);
+
+        // calculate earned bonuses+statistics
         foreach($simAgent as $v) {
             $bonus=$simBonus[$v['sim_id']];
 
@@ -169,14 +173,19 @@ class BonusReportController extends BaseGxController
         $bonusReportAgent->payment_id=$payment->id;
 
         foreach($agentsBonuses as $agent_id=>$data) {
-            Agent::deltaBalance($agent_id,$data['sum']-$data['sum_referrals']);
+            $sum=$data['sum']-$data['sum_referrals'];
 
-            unset($payment->id);
-            $payment->isNewRecord=true;
+            if ($sum>1e-6) {
+                Agent::deltaBalance($agent_id,$sum);
 
-            $payment->agent_id=$agent_id;
-            $payment->sum=$data['sum']-$data['sum_referrals'];
-            $payment->save();
+                unset($payment->id);
+                $payment->isNewRecord=true;
+
+                $payment->agent_id=$agent_id;
+                $payment->sum=$sum;
+                $payment->save();
+                $bonusReportAgent->payment_id=$payment->id;
+            }
 
             unset($bonusReportAgent->id);
             $bonusReportAgent->isNewRecord=true;
@@ -184,7 +193,6 @@ class BonusReportController extends BaseGxController
             $bonusReportAgent->sim_count=$data['sim_count'];
             $bonusReportAgent->sum=$data['sum'];
             $bonusReportAgent->sum_referrals=$data['sum_referrals'];
-            $bonusReportAgent->payment_id=$payment->id;
             $bonusReportAgent->agent_id=$agent_id;
             $bonusReportAgent->save();
         }
