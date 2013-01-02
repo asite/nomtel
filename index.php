@@ -14,25 +14,25 @@ switch ($_SERVER['SERVER_NAME']) {
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
-        $config = 'server_development.php';
+        $config = 'server_web_development.php';
         break;
     case 'nomtel.gushchas.com':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
-        $config = 'server_staging.php';
+        $config = 'server_web_staging.php';
         break;
     case 'crm.nomtel':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
-        $config = 'server_asite_development.php';
+        $config = 'server_web_asite_development.php';
         break;
     case 'nomtel.asiteapp.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
-        $config = 'server_asite_production.php';
+        $config = 'server_web_asite_production.php';
         break;
     default:
         die('unknown domain name');

@@ -92,6 +92,7 @@ class SimController extends BaseGxController {
             $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
 
             $sim = array();
+            $sim_count=0;
             for ($row = 2; $row <= $highestRow; ++$row) {
               for ($col = 0; $col <= $highestColumnIndex; ++$col) {
                 $info = $objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
@@ -102,6 +103,7 @@ class SimController extends BaseGxController {
                 $model = new Sim;
                 $model->setAttributes($data);
                 $model->parent_agent_id=adminAgentId();
+                $sim_count++;
                 $model->number_price = 0;
                 $model->personal_account = $sim[0];
                 $model->number = $sim[1];
@@ -115,6 +117,7 @@ class SimController extends BaseGxController {
                 //} catch(Exception $e) { }
               }
             }
+            Agent::deltaSimCount(adminAgentId(),$sim_count);
           }
         }
       }
@@ -170,14 +173,18 @@ class SimController extends BaseGxController {
           $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'actMany'=>$result, 'activeTabs'=>$activeTabs));
           exit;
         } else {
+          $sim_count=0;
           foreach($result as $v) {
             $model = Sim::model()->findByAttributes(array('icc'=>$v->icc));
             $model->parent_agent_id=adminAgentId();
+            $sim_count++;
             $model->operator_id = $_POST['AddSim']['operator'];
             $model->tariff_id = $_POST['AddSim']['tariff'];
             $model->save();
           }
-          if (empty($result)) {
+          Agent::deltaSimCount(adminAgentId(),$sim_count);
+
+            if (empty($result)) {
             Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления!');
             $activeTabs['tab1'] = true;
             $this->render('add', array('model'=>$model,'tariffListArray'=>$tariffListArray, 'opListArray'=>$opListArray, 'whereListArray'=>$whereListArray, 'actMany'=>$result, 'activeTabs'=>$activeTabs));
@@ -203,6 +210,8 @@ class SimController extends BaseGxController {
       if ($_POST['simMethod'] == 'add-few-sim') {
           $old_model = $model;
 
+          $sim_count=1;
+
           $model = new Sim;
           $model->parent_agent_id=adminAgentId();
           $model->number_price = 0;
@@ -222,6 +231,7 @@ class SimController extends BaseGxController {
           for($o=1;$o<=count($_POST['AddNewSim']['ICCPersonalAccount']);$o++) {
             $model = new Sim;
             $model->parent_agent_id=adminAgentId();
+            $sim_count++;
             $model->number_price = 0;
             $model->operator_id = $_POST['AddSim']['operator'];
             $model->tariff_id = $_POST['AddSim']['tariff'];
@@ -237,6 +247,8 @@ class SimController extends BaseGxController {
             //} catch(Exception $e) {}
 
           }
+
+          Agent::deltaSimCount(adminAgentId(),$sim_count);
 
           if (empty($ids)) {
             Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления(возможно данные уже есть в базе)!');
@@ -325,6 +337,9 @@ class SimController extends BaseGxController {
       $criteria = new CDbCriteria();
       $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
       $ids_string = implode(",", $_SESSION['moveSims'][$key]);
+
+      // update Agent stats
+      Agent::deltaSimCount($_POST['Move']['agent_id'],count($_SESSION['moveSims'][$key]));
 
       Sim::model()->updateAll(array('agent_id'=>$_POST['Move']['agent_id'], 'act_id'=>$model->id, 'sim_price'=>$_POST['Move']['PriceForSim']),$criteria);
 

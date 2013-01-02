@@ -47,6 +47,7 @@ $('.search-form form').submit(function(){
         'registration_address',
         'balance',
         */
+        'balance',
 		array(
 			'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),

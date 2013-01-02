@@ -169,8 +169,8 @@ class AgentController extends BaseGxController
                 $paymentNew->setAttributes($_POST['Payment']);
                 if ($paymentNew->validate()) {
                     $paymentNew->save();
-                    $model->recalcBalance();
                     $model->save();
+                    Agent::deltaBalance($paymentNew->agent_id,$paymentNew->sum);
                     $this->redirect(array('view','id'=>$model->id));
                 }
             }

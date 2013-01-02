@@ -46,6 +46,7 @@ $this->breadcrumbs = array(
     'data'=>$model,
     'attributes'=>array(
         'balance',
+        'stat_sim_count',
     ),
 )); ?>
 </div>
@@ -53,7 +54,7 @@ $this->breadcrumbs = array(
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'paymentsSum',
+        'stat_payments_sum',
     ),
 )); ?>
 </div>
@@ -61,7 +62,7 @@ $this->breadcrumbs = array(
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'actsSum',
+        'stat_acts_sum',
     ),
 )); ?>
 </div>

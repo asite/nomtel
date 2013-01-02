@@ -29,12 +29,15 @@
  * @property string $birthday_place
  * @property string $registration_address
  * @property double $balance
+ * @property double $stat_acts_sum
+ * @property double $stat_payments_sum
+ * @property integer $stat_sim_count
  *
+ * @property Act[] $acts
  * @property User $user
  * @property User $parent
  * @property AgentReferralRate[] $agentReferralRates
  * @property BonusReportAgent[] $bonusReportAgents
- * @property Act[] $acts
  * @property Payment[] $payments
  * @property Sim[] $sims
  * @property Sim[] $sims1
@@ -62,27 +65,27 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
-			array('parent_id, user_id', 'numerical', 'integerOnly'=>true),
-			array('balance', 'numerical'),
+			array('parent_id, user_id, stat_sim_count', 'numerical', 'integerOnly'=>true),
+			array('balance, stat_acts_sum, stat_payments_sum', 'numerical'),
 			array('name, surname, middle_name, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
-			array('parent_id, user_id, phone_2, phone_3, email, skype, icq, balance', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('parent_id, user_id, phone_2, phone_3, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birthday_date','date','format'=>'dd.MM.yyyy'),
-			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance', 'safe', 'on'=>'search'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'acts' => array(self::HAS_MANY, 'Act', 'agent_id'),
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'parent' => array(self::BELONGS_TO, 'User', 'parent_id'),
 			'agentReferralRates' => array(self::HAS_MANY, 'AgentReferralRate', 'agent_id'),
 			'bonusReportAgents' => array(self::HAS_MANY, 'BonusReportAgent', 'agent_id'),
-			'acts' => array(self::HAS_MANY, 'Act', 'agent_id'),
 			'payments' => array(self::HAS_MANY, 'Payment', 'agent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'parent_agent_id'),
 			'sims1' => array(self::HAS_MANY, 'Sim', 'agent_id'),
@@ -118,11 +121,14 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'birthday_place' => Yii::t('app', 'Birthday Place'),
 			'registration_address' => Yii::t('app', 'Registration Address'),
 			'balance' => Yii::t('app', 'Balance'),
+			'stat_acts_sum' => Yii::t('app', 'Stat Acts Sum'),
+			'stat_payments_sum' => Yii::t('app', 'Stat Payments Sum'),
+			'stat_sim_count' => Yii::t('app', 'Stat Sim Count'),
+			'acts' => null,
 			'user' => null,
 			'parent' => null,
 			'agentReferralRates' => null,
 			'bonusReportAgents' => null,
-			'acts' => null,
 			'payments' => null,
 			'sims' => null,
 			'sims1' => null,
@@ -154,6 +160,9 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('birthday_place', $this->birthday_place, true);
 		$criteria->compare('registration_address', $this->registration_address, true);
 		$criteria->compare('balance', $this->balance);
+		$criteria->compare('stat_acts_sum', $this->stat_acts_sum);
+		$criteria->compare('stat_payments_sum', $this->stat_payments_sum);
+		$criteria->compare('stat_sim_count', $this->stat_sim_count);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

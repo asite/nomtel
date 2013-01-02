@@ -11,9 +11,8 @@ class BonusReportController extends BaseGxController
             $bonusReports = Yii::app()->db->createCommand("select agent_id,sum-sum_referrals from bonus_report_agent where bonus_report_id=:bonus_report_id")->
                 queryAll(true, array(':bonus_report_id' => $id));
 
-            $cmd = Yii::app()->db->createCommand("update agent set balance=balance-:sum where id=:id");
             foreach ($bonusReports as $report)
-                $cmd->execute(array(':id' => $report['agent_id'], ':sum' => $report['sum']));
+                Agent::deltaBalance($report['agent_id'],$report['sum']);
 
             // get payment ids for deletion
             $paymentIds=Yii::app()->db->createCommand(
@@ -160,8 +159,6 @@ class BonusReportController extends BaseGxController
         $bonusReport->comment=$comment;
         $bonusReport->save();
 
-        $cmdBalance=$db->createCommand('update agent set balance=balance+:sum where id=:agent_id');
-
         $payment=new Payment();
         $payment->type=Payment::TYPE_BONUS;
         $payment->dt=new EDateTime();
@@ -172,10 +169,7 @@ class BonusReportController extends BaseGxController
         $bonusReportAgent->payment_id=$payment->id;
 
         foreach($agentsBonuses as $agent_id=>$data) {
-            $cmdBalance->execute(array(
-                ':agent_id'=>$agent_id,
-                ':sum'=>$data['sum']-$data['sum_referrals']
-            ));
+            Agent::deltaBalance($agent_id,$data['sum']-$data['sum_referrals']);
 
             unset($payment->id);
             $payment->isNewRecord=true;

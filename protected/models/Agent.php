@@ -53,17 +53,71 @@ class Agent extends BaseAgent
     }
 
     public function recalcBalance() {
-        $this->balance=$this->getPaymentsSum()-$this->getActsSum();
+        $this->recalcStatPaymentsSum();
+        $this->recalcStatActsSum();
+        $this->balance=$this->stat_payments_sum-$this->stat_acts_sum;
     }
 
-    public function getPaymentsSum() {
-        return floatval(Yii::app()->db->createCommand('select sum(sum) from '.Payment::model()->tableName().
+    public function recalcStatPaymentsSum() {
+        $this->stat_payments_sum=floatval(Yii::app()->db->createCommand('select sum(sum) from '.Payment::model()->tableName().
             ' where agent_id=:agent_id')->queryScalar(array('agent_id'=>$this->id)));
     }
 
-    public function getActsSum() {
-        return floatval(Yii::app()->db->createCommand('select sum(sum) from '.Act::model()->tableName().
+    public function recalcStatActsSum() {
+        $this->stat_acts_sum=floatval(Yii::app()->db->createCommand('select sum(sum) from '.Act::model()->tableName().
             ' where agent_id=:agent_id')->queryScalar(array('agent_id'=>$this->id)));
+    }
+
+    public function recalcStatSimCount() {
+        $this->stat_sim_count=Sim::model()->countByAttributes(array('parent_agent_id'=>$this->id));
+    }
+
+    public function recalcAllStats() {
+        $this->recalcBalance();
+        $this->recalcStatSimCount();
+    }
+
+    /**
+     * Procedure updates balance and acts/payments statistic
+     * @param $agent_id
+     * @param $delta_balance
+     * @param bool $reverse = true, if doing deleting existing act/payment
+     */
+    public static function deltaBalance($agent_id,$delta_balance,$reverse=false) {
+        static $cmdBalance;
+
+        if (!$cmdBalance) $cmdBalance=Yii::app()->db->createCommand("update agent set
+            balance=balance+:delta_balance,
+            stat_acts_sum=stat_acts_sum+:delta_stat_acts_sum,
+            stat_payments_sum=stat_payments_sum+:delta_stat_payments_sum
+        where id=:agent_id");
+
+        $delta_stat_payments_sum=0;
+        $delta_stat_acts_sum=0;
+        if ($reverse) {
+            if ($delta_balance<0) {
+                $delta_stat_payments_sum=$delta_balance;
+            } else {
+                $delta_stat_acts_sum=-$delta_balance;
+            }
+        } else {
+            if ($delta_balance>0) {
+                $delta_stat_payments_sum=$delta_balance;
+            } else {
+                $delta_stat_acts_sum=-$delta_balance;
+            }
+        }
+
+        $cmdBalance->execute(array(
+            ':agent_id'=>$agent_id,
+            ':delta_balance'=>$delta_balance,
+            ':delta_stat_acts_sum'=>$delta_stat_acts_sum,
+            ':delta_stat_payments_sum'=>$delta_stat_payments_sum
+        ));
+    }
+
+    public static function deltaSimCount($agent_id,$delta_sim_count) {
+        Agent::model()->updateCounters(array('stat_sim_count'=>$delta_sim_count),'id=:id',array('id'=>$agent_id));
     }
 
     public function attributeLabels() {
