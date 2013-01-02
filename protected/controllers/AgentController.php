@@ -205,10 +205,13 @@ class AgentController extends BaseGxController
                 $model = $this->loadModel($id, 'Agent');
                 $this->checkAgentPermissions($model);
                 $user = $model->user;
+
+                AgentReferralRate::model()->deleteAllByAttributes(array('agent_id'=>$model->id));
+
                 $model->delete();
                 $user->delete();
             } catch (CDbException $e) {
-                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+                $this->ajaxError(Yii::t("app", "Can't delete this Agent because it is used in system"));
             }
 
             if (!Yii::app()->getRequest()->getIsAjaxRequest())
