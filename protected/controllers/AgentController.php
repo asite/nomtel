@@ -208,6 +208,7 @@ class AgentController extends BaseGxController
     {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
+                $trx=Yii::app()->db->beginTransaction();
                 $model = $this->loadModel($id, 'Agent');
                 $this->checkAgentPermissions($model);
                 $user = $model->user;
@@ -216,6 +217,8 @@ class AgentController extends BaseGxController
 
                 $model->delete();
                 $user->delete();
+
+                $trx->commit();
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Can't delete this Agent because it is used in system"));
             }
