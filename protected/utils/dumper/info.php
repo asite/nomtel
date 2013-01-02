@@ -123,7 +123,7 @@ function sxd_error($errno, $errmsg, $filename, $linenum, $vars){
 	$errortype = array(1 => 'Error', 2 => 'Warning', 4 => 'Parsing Error', 8 => 'Notice', 16 => 'Core Error', 32 => 'Core Warning', 64 => 'Compile Error', 
 					   128 => 'Compile Warning', 256 => 'User Error', 512 => 'User Warning', 1024 => 'User Notice');
 	$str = "{$errortype[$errno]}: {$errmsg} ({$filename}:{$linenum})";
-	//error_log("[info.php]\n{$str}\n", 3, "error.log"); 
+	//error_log("[info.php]\n{$str}\n", 3, ERRORLOG_FILE);
     if($errno == 8 || $errno == 1024) {
     	echo "sxd.log.add('" . date("Y.m.d H:i:s") . "',['" . mysql_escape_string($str) . "'], 4);sxd.hideLoading();";;
 	}

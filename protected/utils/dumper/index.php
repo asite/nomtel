@@ -1203,7 +1203,7 @@ class Sypex_Dumper
 				}
 				else
 				{
-					error_log( "----------\n{$q}\n", 3, "error.log" );
+					error_log( "----------\n{$q}\n", 3, ERRORLOG_FILE );
 					sxd_my_error( );
 				}
 				if ( $c )
@@ -1405,7 +1405,7 @@ class Sypex_Dumper
 				}
 				else
 				{
-					error_log( "-----------------\n{$q}\n", 3, "error.log" );
+					error_log( "-----------------\n{$q}\n", 3, ERRORLOG_FILE );
 					sxd_my_error( );
 				}
 				if ( $c )
@@ -2642,7 +2642,7 @@ function sxd_error_handler( $errno, $errmsg, $filename, $linenum, $vars )
 	$str = mysql_escape_string( "{$errortype[$errno]}: {$errmsg} ({$filename}:{$linenum})" );
 	if ( SXD_DEBUG )
 	{
-		error_log( "[index.php]\n{$str}\n", 3, "error.log" );
+		error_log( "[index.php]\n{$str}\n", 3, ERRORLOG_FILE );
 	}
 	if ( $errno == 8 || $errno == 1024 )
 	{
