@@ -2,6 +2,13 @@
 
 class SiteController extends Controller {
 
+    public function additionalAccessRules() {
+        return array(
+            array('allow','actions'=>array('error','login','logout'),'users'=>array('*')),
+            array('allow','actions'=>array('index'),'users'=>array('@')),
+        );
+    }
+
 	public function actionError() {
 		$error = Yii::app()->errorHandler->error;
 		$this->layout='/layout/simple';
@@ -32,7 +39,7 @@ class SiteController extends Controller {
 
     public function actionLogout() {
         Yii::app()->user->logout();
-        $this->redirect(array('admin/login'));
+        $this->redirect(array('site/login'));
     }
 
     public function actionIndex() {

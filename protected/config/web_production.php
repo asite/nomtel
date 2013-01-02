@@ -32,11 +32,16 @@ return array(
     ),
     // application components
     'components' => array(
+        'authManager'=>array(
+            'class'=>'PhpAuthManager',
+            'authFile'=>'protected/config/auth.php'
+        ),
         'request' => array(
             'enableCsrfValidation' => true,
             'enableCookieValidation' => true,
         ),
         'user' => array(
+            //'class'=>'WebUser',
             // enable cookie-based authentication
             'allowAutoLogin' => true,
         ),

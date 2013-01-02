@@ -2,6 +2,12 @@
 
 class AgentController extends BaseGxController
 {
+    public function additionalAccessRules() {
+        return array(
+            array('allow','roles'=>array('agent')),
+        );
+    }
+
     public function checkAgentPermissions($agent) {
         if (!isAdmin() && loggedAgentId()!=$agent->parent_id) $this->redirect(array('list'));
     }

@@ -6,9 +6,27 @@ class Controller extends CController {
 
     public $breadcrumbs;
 
-    public function filters() {
+    public function filters()
+    {
         return array(
-            array('AuthFilter -login'),
+            'accessControl'           // required to enable accessRules
+        );
+    }
+
+    public function additionalAccessRules() {
+        return array();
+    }
+
+    public function accessRules()
+    {
+        return array_merge(
+            array(
+                array('allow','roles'=>array('admin'))
+            ),
+            $this->additionalAccessRules(),
+            array(
+                array('deny','users' => array('*'))
+            )
         );
     }
 

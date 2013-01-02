@@ -2,6 +2,11 @@
 
 class BonusReportController extends BaseGxController
 {
+    public function additionalAccessRules() {
+        return array(
+            array('allow','actions'=>array('list','view'),'roles'=>array('agent')),
+        );
+    }
 
     public function actionDelete($id)
     {

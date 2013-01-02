@@ -2,6 +2,12 @@
 
 class ActController extends BaseGxController
 {
+    public function additionalAccessRules() {
+        return array(
+            array('allow','actions'=>array('list','view','report'),'roles'=>array('agent')),
+        );
+    }
+
     public function actionList()
     {
         $model = new Act('search');
