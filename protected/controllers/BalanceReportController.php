@@ -16,12 +16,92 @@ class BalanceReportController extends BaseGxController
             BalanceReportNumber::model()->deleteAllByAttributes(array('balance_report_id'=>$id));
             BalanceReport::model()->deleteByPk($id);
 
+            $this->recalcWarnings();
+
             $trx->commit();
 
             if (!Yii::app()->getRequest()->getIsAjaxRequest())
                 $this->redirect(array('list'));
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+
+    private function recalcOperatorWarnings($reportId1,$reportId2,$reportId3) {
+        $goodIds=array();
+        $warnedIds=array();
+
+        $reader=Yii::app()->db->createCommand("
+            select n.id,brn1.balance as b1,brn2.balance as b2,brn3.balance as b3
+            from number n
+            left outer join balance_report_number brn1 on (brn1.balance_report_id=:report_id1 and brn1.number_id=n.id)
+            left outer join balance_report_number brn2 on (brn2.balance_report_id=:report_id2 and brn2.number_id=n.id)
+            left outer join balance_report_number brn3 on (brn3.balance_report_id=:report_id3 and brn3.number_id=n.id)
+            where n.id in (
+              select distinct number_id
+              from balance_report_number
+              where balance_report_id in (:report_id1,:report_id2,:report_id3)
+            )
+        ")->query(array(
+            ':report_id1'=>$reportId1,
+            ':report_id2'=>$reportId2,
+            ':report_id3'=>$reportId3,
+        ));
+
+        foreach($reader as $row) {
+            $b=array($row['b1'],$row['b2'],$row['b3']);
+
+            $warned=false;
+
+            // if number not present in current or previous report
+            if ($b[1]=='' || $b[2]=='') $warned=true;
+
+            // if balance of last three reports is equal
+            if ($b[0]==$b[1] || $b[1]==$b[2]) $warned=true;
+
+            if ($warned) $warnedIds[]=$row['id']; else $goodIds[]=$row['id'];
+        }
+
+        //var_dump($goodIds);
+        //var_dump($warnedIds);
+        //exit;
+
+        if (!empty($goodIds)) {
+            Yii::app()->db->createCommand('update number set status=:status_normal, warning_dt=NULL where id in ('.
+                implode(',',$goodIds).') and status=:status_warning')->execute(array(
+                ':status_normal'=>Number::STATUS_NORMAL,
+                ':status_warning'=>Number::STATUS_WARNING,
+            ));
+        }
+
+        if (!empty($warnedIds)) {
+            Yii::app()->db->createCommand('update number set status=:status_warning, warning_dt=NOW() where id in ('.
+                implode(',',$warnedIds).') and status=:status_normal')->execute(array(
+                ':status_normal'=>Number::STATUS_NORMAL,
+                ':status_warning'=>Number::STATUS_WARNING,
+            ));
+        }
+    }
+
+    private function recalcWarnings() {
+        $operators=Operator::model()->findAll();
+
+        foreach($operators as $operator) {
+            $balanceReports=BalanceReport::model()->findAll(array(
+                'condition'=>'operator_id=:operator_id',
+                'params'=>array('operator_id'=>$operator->id),
+                'limit'=>3,
+                'order'=>'id desc'
+            ));
+
+            if (count($balanceReports)<3) continue;
+
+            $this->recalcOperatorWarnings(
+                $balanceReports[2]->id,
+                $balanceReports[1]->id,
+                $balanceReports[0]->id
+            );
+        }
     }
 
     public function actionView($id)
@@ -151,6 +231,8 @@ class BalanceReportController extends BaseGxController
         }
 
         $balanceReportNumberBulkInsert->finish();
+
+        $this->recalcWarnings();
 
         $trx->commit();
 
