@@ -332,6 +332,9 @@ class SimController extends BaseGxController {
                 $this->redirect(Yii::app()->createUrl('sim/add'));
                 exit;
             }
+
+            $trx=Yii::app()->db->beginTransaction();
+
             $model = new Act;
             $model->agent_id = $_POST['Move']['agent_id'];
             $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
@@ -359,6 +362,9 @@ class SimController extends BaseGxController {
 
             $model->agent->recalcBalance();
             $model->agent->save();
+
+            $trx->commit();
+
             Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
             unset($_SESSION['moveSims'][$key]);
             $this->redirect(Yii::app()->createUrl('site/index'));
