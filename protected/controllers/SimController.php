@@ -1,25 +1,21 @@
 <?php
 
-class SimController extends BaseGxController
-{
+class SimController extends BaseGxController {
 
-    public function additionalAccessRules()
-    {
+    public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array(), 'roles' => array('agent')),
         );
     }
 
-    protected function performAjaxValidation($model, $id = '')
-    {
+    protected function performAjaxValidation($model, $id = '') {
         if (isset($_POST['ajax']) && $_POST['ajax'] === $id) {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }
     }
 
-    public function actionDelivery()
-    {
+    public function actionDelivery() {
         $activeTabs = array('tab1' => false, 'tab2' => false);
         $model = new Sim;
 
@@ -139,8 +135,7 @@ class SimController extends BaseGxController
         $this->render('delivery', array('model' => $model, 'activeTabs' => $activeTabs, 'company' => $companyListArray, 'regionList' => $regionListArray, 'tariffList' => $tariffListArray));
     }
 
-    public function actionAdd()
-    {
+    public function actionAdd() {
         $model = new AddSim;
 
         $opList = Operator::model()->findAll();
@@ -184,12 +179,12 @@ class SimController extends BaseGxController
                 } else {
                     $sim_count = 0;
                     foreach ($result as $v) {
-                        $model = Sim::model()->findByAttributes(array('icc' => $v->icc));
-                        $model->parent_agent_id = adminAgentId();
+                        //$model = Sim::model()->findByAttributes(array('icc' => $v->icc));
+                        $v->parent_agent_id = adminAgentId();
                         $sim_count++;
-                        $model->operator_id = $_POST['AddSim']['operator'];
-                        $model->tariff_id = $_POST['AddSim']['tariff'];
-                        $model->save();
+                        $v->operator_id = $_POST['AddSim']['operator'];
+                        $v->tariff_id = $_POST['AddSim']['tariff'];
+                        $v->save();
                     }
                     Agent::deltaSimCount(adminAgentId(), $sim_count);
 

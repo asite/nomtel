@@ -24,7 +24,7 @@ $base_config_name=array();
 
 switch (gethostname()) {
     case 'primacomp':
-    case 'primawork':
+    case 'primaworkvirt':
         $base_config_name='server_console_development.php';
         break;
     default:

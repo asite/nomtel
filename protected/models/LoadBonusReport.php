@@ -1,6 +1,6 @@
 <?php
 
-class LoadBonus extends CFormModel
+class LoadBonusReport extends CFormModel
 {
     public $file;
     public $operator;

@@ -209,7 +209,13 @@ class BonusReportController extends BaseGxController
 
     private function processLoadBeeline($model,$reader,$file) {
         $reader->setReadFilter(new BeelineBonusReportReadFilter);
-        $book = $reader->load($file->tempName);
+
+        try {
+            $book = $reader->load($file->tempName);
+        } catch (Exception $e) {
+            $this->errorInvalidFormat($e->getMessage());
+        }
+
         $sheet = $book->getActiveSheet();
 
         $rows=$sheet->getHighestRow();
@@ -228,7 +234,7 @@ class BonusReportController extends BaseGxController
             $sum+=$bonus;
 
             if ($ctn=='') continue;
-            if (!preg_match('%^\d{10}$%',$ctn)) $this->errorInvalidFormat(__LINE__);
+            if (!preg_match('%^\d{10}$%',$ctn)) $this->errorInvalidFormat(__LINE__." $row '$ctn'");
 
             $simBonus[$ctn]=$bonus;
         }
@@ -254,7 +260,13 @@ class BonusReportController extends BaseGxController
 
     private function processLoadMegafon($model,$reader,$file) {
         $reader->setReadFilter(new MegafonBonusReportReadFilter);
-        $book = $reader->load($file->tempName);
+
+        try {
+            $book = $reader->load($file->tempName);
+        } catch (Exception $e) {
+            $this->errorInvalidFormat($e->getMessage());
+        }
+
         $sheet = $book->getActiveSheet();
 
         $rows=$sheet->getHighestRow();
@@ -274,7 +286,7 @@ class BonusReportController extends BaseGxController
 
             if ($ctn=='') continue;
             if ($ctn=='Итого:') break;
-            if (!preg_match('%^\d{8}$%',$ctn)) $this->errorInvalidFormat(__LINE__);
+            if (!preg_match('%^\d{8}$%',$ctn)) $this->errorInvalidFormat(__LINE__." $row '$ctn'");
 
             $simBonus[$ctn]=$bonus;
         }
@@ -307,10 +319,14 @@ class BonusReportController extends BaseGxController
 
         Yii::import('application.vendors.PHPExcel', true);
 
-        if ($file->extensionName=='xls') $reader=new PHPExcel_Reader_Excel5;
-        if ($file->extensionName=='xlsx') $reader=new PHPExcel_Reader_Excel2007;
+        try {
+            $reader=PHPExcel_IOFactory::createReader(PHPExcel_IOFactory::identify($file->tempName));
+        } catch (Exception $e) {
+            $this->errorInvalidFormat($e->getMessage());
+        }
 
-        $reader->setReadDataOnly(true);
+        // csv doesn't have setReadDataOnly method
+        if (method_exists( $reader,'setReadDataOnly')) $reader->setReadDataOnly(true);
 
         switch ($model->operator) {
             case Operator::OPERATOR_BEELINE_ID:
@@ -329,12 +345,12 @@ class BonusReportController extends BaseGxController
     }
 
     public function actionLoad() {
-        $model=new LoadBonus();
+        $model=new LoadBonusReport();
 
         $this->performAjaxValidation($model);
 
-        if (isset($_POST['LoadBonus'])) {
-            $model->setAttributes($_POST['LoadBonus']);
+        if (isset($_POST['LoadBonusReport'])) {
+            $model->setAttributes($_POST['LoadBonusReport']);
 
             if ($model->validate()) {
                 $this->processLoad($model);
