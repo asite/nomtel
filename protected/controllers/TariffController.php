@@ -3,11 +3,10 @@
 class TariffController extends BaseGxController
 {
 
-
     public function actionCreate()
     {
         $model = new Tariff;
-        $model->operator_id=$_REQUEST['parent_id'];
+        $model->operator_id = $_REQUEST['parent_id'];
 
         $this->performAjaxValidation($model, 'tariff-form');
 
@@ -19,7 +18,7 @@ class TariffController extends BaseGxController
                 if (Yii::app()->getRequest()->getIsAjaxRequest())
                     Yii::app()->end();
                 else
-                    $this->redirect(array('operator/update','id'=>$model->operator_id));
+                    $this->redirect(array('operator/update', 'id' => $model->operator_id));
             }
         }
 
@@ -37,7 +36,7 @@ class TariffController extends BaseGxController
 
             if ($model->validate()) {
                 $model->save();
-                $this->redirect(array('operator/update','id'=>$model->operator_id));
+                $this->redirect(array('operator/update', 'id' => $model->operator_id));
             }
         }
 

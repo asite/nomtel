@@ -4,11 +4,13 @@ Yii::import('application.models._base.BaseTariff');
 
 class Tariff extends BaseTariff
 {
-	public static function model($className=__CLASS__) {
-		return parent::model($className);
-	}
+    public static function model($className = __CLASS__)
+    {
+        return parent::model($className);
+    }
 
-    public function search() {
+    public function search()
+    {
         $data_provider = parent::search();
 
         $data_provider->setSort(array(
@@ -17,24 +19,26 @@ class Tariff extends BaseTariff
         return $data_provider;
     }
 
-    public static function getComboList($data=array()) {
-        $agents=Yii::app()->db->createCommand("select id,title from ".
-            self::model()->tableName()." order by title")->queryAll();
+    public static function getComboList($data = array())
+    {
+        $agents = Yii::app()->db->createCommand("select id,title from " .
+            self::model()->tableName() . " order by title")->queryAll();
 
-        foreach($agents as $v) {
-            $data[$v['id']]=$v['title'];
+        foreach ($agents as $v) {
+            $data[$v['id']] = $v['title'];
         }
 
         return $data;
     }
 
-    public static function getTextComboList() {
-        $agents=Yii::app()->db->createCommand("select title from ".
-            self::model()->tableName()." order by title")->queryAll();
+    public static function getTextComboList()
+    {
+        $agents = Yii::app()->db->createCommand("select title from " .
+            self::model()->tableName() . " order by title")->queryAll();
 
-        $data=array();
-        foreach($agents as $v) {
-            $data[$v['title']]=$v['title'];
+        $data = array();
+        foreach ($agents as $v) {
+            $data[$v['title']] = $v['title'];
         }
 
         return $data;

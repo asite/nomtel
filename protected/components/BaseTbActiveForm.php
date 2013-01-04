@@ -3,39 +3,44 @@
 Yii::import('bootstrap.widgets.TbActiveForm');
 
 
-class BaseTbActiveForm extends TbActiveForm {
-    public function PickerDateRow($model,$field,$htmlOptions=array(),$options=array()) {
-        $this->pickerRow('date',$model,$field,$htmlOptions,$options);
+class BaseTbActiveForm extends TbActiveForm
+{
+    public function PickerDateRow($model, $field, $htmlOptions = array(), $options = array())
+    {
+        $this->pickerRow('date', $model, $field, $htmlOptions, $options);
     }
 
-    public function PickerTimeRow($model,$field,$htmlOptions=array(),$options=array()) {
-        $this->pickerRow('time',$model,$field,$htmlOptions,$options);
+    public function PickerTimeRow($model, $field, $htmlOptions = array(), $options = array())
+    {
+        $this->pickerRow('time', $model, $field, $htmlOptions, $options);
     }
 
-    public function PickerDateTimeRow($model,$field,$htmlOptions=array(),$options=array()) {
-        $this->pickerRow('datetime',$model,$field,$htmlOptions,$options);
+    public function PickerDateTimeRow($model, $field, $htmlOptions = array(), $options = array())
+    {
+        $this->pickerRow('datetime', $model, $field, $htmlOptions, $options);
     }
 
-    protected function pickerRow($mode,$model,$field,$htmlOptions=array(),$options=array()) {
-        echo $this->textFieldRow($model,$field,$htmlOptions);
-        CHtml::resolveNameID($model, $field,$htmlOptions);
-        $id=$htmlOptions['id'];
-		$cs = Yii::app()->getClientScript();
+    protected function pickerRow($mode, $model, $field, $htmlOptions = array(), $options = array())
+    {
+        echo $this->textFieldRow($model, $field, $htmlOptions);
+        CHtml::resolveNameID($model, $field, $htmlOptions);
+        $id = $htmlOptions['id'];
+        $cs = Yii::app()->getClientScript();
 
         $cs->registerCoreScript('jquery');
-		$cs->registerCoreScript('jquery.ui');
-        $cs->registerScriptFile($cs->getCoreScriptUrl().'/jui/js/jquery-ui-i18n.min.js');
-        $cs->registerCssFile($cs->getCoreScriptUrl().'/jui/css/base/jquery-ui.css');
+        $cs->registerCoreScript('jquery.ui');
+        $cs->registerScriptFile($cs->getCoreScriptUrl() . '/jui/js/jquery-ui-i18n.min.js');
+        $cs->registerCssFile($cs->getCoreScriptUrl() . '/jui/css/base/jquery-ui.css');
 
-		$assets = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.extensions.datetimepicker.assets'));
-		$cs->registerCssFile($assets.'/jquery-ui-timepicker-addon.css');
-		$cs->registerScriptFile($assets.'/jquery-ui-timepicker-addon.js',CClientScript::POS_END);
+        $assets = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.extensions.datetimepicker.assets'));
+        $cs->registerCssFile($assets . '/jquery-ui-timepicker-addon.css');
+        $cs->registerScriptFile($assets . '/jquery-ui-timepicker-addon.js', CClientScript::POS_END);
 
-        $lang=Yii::app()->language;
-        if ($lang!='en') $cs->registerScriptFile($assets."/localization/jquery-ui-timepicker-$lang.js",CClientScript::POS_END);
-        $encodedOptions=CJavaScript::encode($options);
-   		$js = "jQuery('#{$id}').{$mode}picker(jQuery.extend(jQuery.datepicker.regional['$lang'],{changeMonth:true,changeYear:true,dateFormat:'dd.mm.yy',timeFormat:'hh:mm:ss'},  $encodedOptions));";
-		$cs->registerScript(__CLASS__.'#'.$id, $js);
+        $lang = Yii::app()->language;
+        if ($lang != 'en') $cs->registerScriptFile($assets . "/localization/jquery-ui-timepicker-$lang.js", CClientScript::POS_END);
+        $encodedOptions = CJavaScript::encode($options);
+        $js = "jQuery('#{$id}').{$mode}picker(jQuery.extend(jQuery.datepicker.regional['$lang'],{changeMonth:true,changeYear:true,dateFormat:'dd.mm.yy',timeFormat:'hh:mm:ss'},  $encodedOptions));";
+        $cs->registerScript(__CLASS__ . '#' . $id, $js);
     }
 
     /*
@@ -126,7 +131,8 @@ class BaseTbActiveForm extends TbActiveForm {
      * @param array $htmlOptions Addtional HTML options.
      * @return string The generated check box list.
      */
-    public function checkBoxList($model, $attribute, $data, $htmlOptions = array()) {
+    public function checkBoxList($model, $attribute, $data, $htmlOptions = array())
+    {
         $html = GxHtml::activeCheckBoxList($model, $attribute, $data, $htmlOptions);
         $html = preg_replace("%<input.*?</label>%", "<label class='checkbox'>$0</label>", $html);
         $html = str_replace("<br/>", "", $html);

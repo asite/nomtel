@@ -1,33 +1,37 @@
 <?php
 
-class SiteController extends Controller {
+class SiteController extends Controller
+{
 
-    public function additionalAccessRules() {
+    public function additionalAccessRules()
+    {
         return array(
-            array('allow','actions'=>array('error','login','logout'),'users'=>array('*')),
-            array('allow','actions'=>array('index'),'users'=>array('@')),
+            array('allow', 'actions' => array('error', 'login', 'logout'), 'users' => array('*')),
+            array('allow', 'actions' => array('index'), 'users' => array('@')),
         );
     }
 
-	public function actionError() {
-		$error = Yii::app()->errorHandler->error;
-		$this->layout='/layout/simple';
+    public function actionError()
+    {
+        $error = Yii::app()->errorHandler->error;
+        $this->layout = '/layout/simple';
 
-		$this->render('error', $error);
-	}
+        $this->render('error', $error);
+    }
 
-    public function actionLogin() {
+    public function actionLogin()
+    {
         $this->layout = '/layout/simple';
 
         if (isset($_REQUEST['loginForm'])) {
-            $identity=new UserIdentity($_REQUEST['loginForm']['username'],
+            $identity = new UserIdentity($_REQUEST['loginForm']['username'],
                 $_REQUEST['loginForm']['password']);
             if ($identity->authenticate()) {
                 Yii::app()->user->login($identity,
-                    $_REQUEST['loginForm']['remember']==1 ? 3600*24*7:0);
+                    $_REQUEST['loginForm']['remember'] == 1 ? 3600 * 24 * 7 : 0);
                 $this->redirect(array('index'));
             }
-            Yii::app()->user->setFlash('loginError',$identity->errorMessage);
+            Yii::app()->user->setFlash('loginError', $identity->errorMessage);
 
         }
 
@@ -37,12 +41,14 @@ class SiteController extends Controller {
         $this->render('login');
     }
 
-    public function actionLogout() {
+    public function actionLogout()
+    {
         Yii::app()->user->logout();
         $this->redirect(array('site/login'));
     }
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
         $this->render('index');
     }
 }

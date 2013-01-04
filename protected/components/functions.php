@@ -1,13 +1,16 @@
 <?php
 
-function isAdmin() {
+function isAdmin()
+{
     return Yii::app()->user->getState('isAdmin');
 }
 
-function loggedAgentId() {
+function loggedAgentId()
+{
     return Yii::app()->user->getState('agentId');
 }
 
-function adminAgentId() {
+function adminAgentId()
+{
     return 1;
 }

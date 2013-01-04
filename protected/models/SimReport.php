@@ -1,17 +1,20 @@
 <?php
 
-class SimReport extends CFormModel {
+class SimReport extends CFormModel
+{
     public $message;
 
-    public function rules() {
+    public function rules()
+    {
         return array(
-            array('message','required')
+            array('message', 'required')
         );
     }
 
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return array(
-            'message'=>Yii::t('app','Problem description')
+            'message' => Yii::t('app', 'Problem description')
         );
     }
 

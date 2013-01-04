@@ -2,8 +2,9 @@
 
 class BalanceReportController extends BaseGxController
 {
-    public function filters() {
-        return array_merge(parent::filters(),array(
+    public function filters()
+    {
+        return array_merge(parent::filters(), array(
             array('LoggingFilter +load')
         ));
     }
@@ -13,7 +14,7 @@ class BalanceReportController extends BaseGxController
         if (Yii::app()->getRequest()->getIsPostRequest() && isAdmin()) {
             $trx = Yii::app()->db->beginTransaction();
 
-            BalanceReportNumber::model()->deleteAllByAttributes(array('balance_report_id'=>$id));
+            BalanceReportNumber::model()->deleteAllByAttributes(array('balance_report_id' => $id));
             BalanceReport::model()->deleteByPk($id);
 
             $this->recalcWarnings();
@@ -27,11 +28,12 @@ class BalanceReportController extends BaseGxController
     }
 
 
-    private function recalcOperatorWarnings($reportId1,$reportId2,$reportId3) {
-        $goodIds=array();
-        $warnedIds=array();
+    private function recalcOperatorWarnings($reportId1, $reportId2, $reportId3)
+    {
+        $goodIds = array();
+        $warnedIds = array();
 
-        $reader=Yii::app()->db->createCommand("
+        $reader = Yii::app()->db->createCommand("
             select n.id,brn1.balance as b1,brn2.balance as b2,brn3.balance as b3
             from number n
             left outer join balance_report_number brn1 on (brn1.balance_report_id=:report_id1 and brn1.number_id=n.id)
@@ -43,58 +45,55 @@ class BalanceReportController extends BaseGxController
               where balance_report_id in (:report_id1,:report_id2,:report_id3)
             )
         ")->query(array(
-            ':report_id1'=>$reportId1,
-            ':report_id2'=>$reportId2,
-            ':report_id3'=>$reportId3,
+            ':report_id1' => $reportId1,
+            ':report_id2' => $reportId2,
+            ':report_id3' => $reportId3,
         ));
 
-        foreach($reader as $row) {
-            $b=array($row['b1'],$row['b2'],$row['b3']);
+        foreach ($reader as $row) {
+            $b = array($row['b1'], $row['b2'], $row['b3']);
 
-            $warned=false;
+            $warned = false;
 
             // if number not present in current or previous report
-            if ($b[1]=='' || $b[2]=='') $warned=true;
+            if ($b[1] == '' || $b[2] == '') $warned = true;
 
             // if balance of last three reports is equal
-            if ($b[0]==$b[1] || $b[1]==$b[2]) $warned=true;
+            if ($b[0] == $b[1] || $b[1] == $b[2]) $warned = true;
 
-            if ($warned) $warnedIds[]=$row['id']; else $goodIds[]=$row['id'];
+            if ($warned) $warnedIds[] = $row['id']; else $goodIds[] = $row['id'];
         }
 
-        //var_dump($goodIds);
-        //var_dump($warnedIds);
-        //exit;
-
         if (!empty($goodIds)) {
-            Yii::app()->db->createCommand('update number set status=:status_normal, warning_dt=NULL where id in ('.
-                implode(',',$goodIds).') and status=:status_warning')->execute(array(
-                ':status_normal'=>Number::STATUS_NORMAL,
-                ':status_warning'=>Number::STATUS_WARNING,
+            Yii::app()->db->createCommand('update number set status=:status_normal, warning_dt=NULL where id in (' .
+                implode(',', $goodIds) . ') and status=:status_warning')->execute(array(
+                ':status_normal' => Number::STATUS_NORMAL,
+                ':status_warning' => Number::STATUS_WARNING,
             ));
         }
 
         if (!empty($warnedIds)) {
-            Yii::app()->db->createCommand('update number set status=:status_warning, warning_dt=NOW() where id in ('.
-                implode(',',$warnedIds).') and status=:status_normal')->execute(array(
-                ':status_normal'=>Number::STATUS_NORMAL,
-                ':status_warning'=>Number::STATUS_WARNING,
+            Yii::app()->db->createCommand('update number set status=:status_warning, warning_dt=NOW() where id in (' .
+                implode(',', $warnedIds) . ') and status=:status_normal')->execute(array(
+                ':status_normal' => Number::STATUS_NORMAL,
+                ':status_warning' => Number::STATUS_WARNING,
             ));
         }
     }
 
-    private function recalcWarnings() {
-        $operators=Operator::model()->findAll();
+    private function recalcWarnings()
+    {
+        $operators = Operator::model()->findAll();
 
-        foreach($operators as $operator) {
-            $balanceReports=BalanceReport::model()->findAll(array(
-                'condition'=>'operator_id=:operator_id',
-                'params'=>array('operator_id'=>$operator->id),
-                'limit'=>3,
-                'order'=>'id desc'
+        foreach ($operators as $operator) {
+            $balanceReports = BalanceReport::model()->findAll(array(
+                'condition' => 'operator_id=:operator_id',
+                'params' => array('operator_id' => $operator->id),
+                'limit' => 3,
+                'order' => 'id desc'
             ));
 
-            if (count($balanceReports)<3) continue;
+            if (count($balanceReports) < 3) continue;
 
             $this->recalcOperatorWarnings(
                 $balanceReports[2]->id,
@@ -112,38 +111,38 @@ class BalanceReportController extends BaseGxController
         if (isset($_GET['BalanceReportNumberSearch']))
             $model->setAttributes($_GET['BalanceReportNumberSearch']);
 
-        $criteria=new CDbCriteria();
-        $criteria->compare('n.personal_account',$model->personal_account);
-        $criteria->compare('n.number',$model->number);
-        $criteria->compare('brn.balance',$model->balance);
-        $criteria->compare('brn.balance_report_id',$id);
+        $criteria = new CDbCriteria();
+        $criteria->compare('n.personal_account', $model->personal_account);
+        $criteria->compare('n.number', $model->number);
+        $criteria->compare('brn.balance', $model->balance);
+        $criteria->compare('brn.balance_report_id', $id);
 
-        $sql="from balance_report_number brn
+        $sql = "from balance_report_number brn
             join number n on (n.id=brn.number_id)
-            where ".$criteria->condition;
+            where " . $criteria->condition;
 
-        $totalItemCount=Yii::app()->db->createCommand('select count(*) '.$sql)->queryScalar($criteria->params);
+        $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider=new CSqlDataProvider('select * '.$sql,array(
-            'totalItemCount'=>$totalItemCount,
-            'params'=>$criteria->params,
-            'sort'=>array(
-                'attributes'=>array(
+        $dataProvider = new CSqlDataProvider('select * ' . $sql, array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $criteria->params,
+            'sort' => array(
+                'attributes' => array(
                     'personal_account',
                     'number',
                     'balance',
                 ),
             ),
-            'pagination'=>array(
-                'pageSize'=>BalanceReportNumber::ITEMS_PER_PAGE,
+            'pagination' => array(
+                'pageSize' => BalanceReportNumber::ITEMS_PER_PAGE,
             ),
         ));
 
         $this->render('view', array(
             'model' => $model,
             'balanceReport' => BalanceReport::model()->findByPk($id),
-            'balanceReportNumberSearch' =>$model,
-            'balanceReportNumberDataProvider'=>$dataProvider
+            'balanceReportNumberSearch' => $model,
+            'balanceReportNumberDataProvider' => $dataProvider
         ));
     }
 
@@ -161,72 +160,75 @@ class BalanceReportController extends BaseGxController
         ));
     }
 
-    private function error($msg) {
-        Yii::app()->user->setFlash('error',$msg);
+    private function error($msg)
+    {
+        Yii::app()->user->setFlash('error', $msg);
         $this->redirect(array());
     }
 
-    private function errorInvalidFormat($msg) {
-        $this->error(Yii::t('app','File has invalid format (%msg%)',array('%msg%'=>$msg)));
+    private function errorInvalidFormat($msg)
+    {
+        $this->error(Yii::t('app', 'File has invalid format (%msg%)', array('%msg%' => $msg)));
     }
 
-    private function loadBalances($numberBalances,$comment,$operator_id) {
-        $db=Yii::app()->db;
+    private function loadBalances($numberBalances, $comment, $operator_id)
+    {
+        $db = Yii::app()->db;
 
         // store all info in database
-        $trx=$db->beginTransaction();
+        $trx = $db->beginTransaction();
 
-        $balanceReport=new BalanceReport;
-        $balanceReport->dt=new EDateTime();
-        $balanceReport->operator_id=$operator_id;
-        $balanceReport->comment=$comment;
+        $balanceReport = new BalanceReport;
+        $balanceReport->dt = new EDateTime();
+        $balanceReport->operator_id = $operator_id;
+        $balanceReport->comment = $comment;
         $balanceReport->save();
 
-        $balanceReportNumberBulkInsert=new BulkInsert('balance_report_number',array('number_id','balance_report_id','balance'));
+        $balanceReportNumberBulkInsert = new BulkInsert('balance_report_number', array('number_id', 'balance_report_id', 'balance'));
 
-        $cmdFindNumberId=Yii::app()->db->createCommand("select id from number where personal_account=:personal_account and number=:number");
+        $cmdFindNumberId = Yii::app()->db->createCommand("select id from number where personal_account=:personal_account and number=:number");
 
-        foreach($numberBalances as $numberBalance) {
+        foreach ($numberBalances as $numberBalance) {
 
-            $numberId=$cmdFindNumberId->queryScalar(array(
-                ':personal_account'=>$numberBalance['personal_account'],
-                ':number'=>$numberBalance['number'],
+            $numberId = $cmdFindNumberId->queryScalar(array(
+                ':personal_account' => $numberBalance['personal_account'],
+                ':number' => $numberBalance['number'],
             ));
 
             // create number, if it was not found
             if (!$numberId) {
-                $number=new Number();
-                $number->number=$numberBalance['number'];
-                $number->personal_account=$numberBalance['personal_account'];
-                $number->status=Number::STATUS_NORMAL;
+                $number = new Number();
+                $number->number = $numberBalance['number'];
+                $number->personal_account = $numberBalance['personal_account'];
+                $number->status = Number::STATUS_NORMAL;
                 $number->save();
-                $numberId=$number->id;
+                $numberId = $number->id;
 
                 // search number in sim cards
-                $sim=Sim::model()->findByAttributes(array(
-                    'parent_agent_id'=>adminAgentId(),
-                    'personal_account'=>$numberBalance['personal_account'],
-                    'number'=>$numberBalance['number']
+                $sim = Sim::model()->findByAttributes(array(
+                    'parent_agent_id' => adminAgentId(),
+                    'personal_account' => $numberBalance['personal_account'],
+                    'number' => $numberBalance['number']
                 ));
 
                 // create sim, if it was not found
                 if (!$sim) {
-                    $sim=new Sim();
-                    $sim->parent_agent_id=adminAgentId();
-                    $sim->personal_account=$numberBalance['personal_account'];
-                    $sim->number=$numberBalance['number'];
-                    $sim->operator_id=$operator_id;
+                    $sim = new Sim();
+                    $sim->parent_agent_id = adminAgentId();
+                    $sim->personal_account = $numberBalance['personal_account'];
+                    $sim->number = $numberBalance['number'];
+                    $sim->operator_id = $operator_id;
                     $sim->save();
-                    $sim->parent_id=$sim->id;
+                    $sim->parent_id = $sim->id;
                     $sim->save();
 
                 }
             }
 
             $balanceReportNumberBulkInsert->insert(array(
-                'number_id'=>$numberId,
-                'balance_report_id'=>$balanceReport->id,
-                'balance'=>$numberBalance['balance']
+                'number_id' => $numberId,
+                'balance_report_id' => $balanceReport->id,
+                'balance' => $numberBalance['balance']
             ));
         }
 
@@ -236,10 +238,11 @@ class BalanceReportController extends BaseGxController
 
         $trx->commit();
 
-        $this->redirect(array('view','id'=>$balanceReport->id));
+        $this->redirect(array('view', 'id' => $balanceReport->id));
     }
 
-    private function processLoadMegafon($model,$reader,$file) {
+    private function processLoadMegafon($model, $reader, $file)
+    {
         $reader->setReadFilter(new MegafonBalanceReportReadFilter);
 
         try {
@@ -250,68 +253,72 @@ class BalanceReportController extends BaseGxController
 
         $sheet = $book->getActiveSheet();
 
-        $rows=$sheet->getHighestRow();
+        $rows = $sheet->getHighestRow();
 
-        $balances=array();
-        for($row=4;$row<=$rows;$row++) {
-            $personal_account=$sheet->getCellByColumnAndRow(0, $row)->getValue();
-            $number=$sheet->getCellByColumnAndRow(5, $row)->getValue();
-            $balance=$sheet->getCellByColumnAndRow(12, $row)->getValue();
+        $balances = array();
+        for ($row = 4; $row <= $rows; $row++) {
+            $personal_account = $sheet->getCellByColumnAndRow(0, $row)->getValue();
+            $number = $sheet->getCellByColumnAndRow(5, $row)->getValue();
+            $balance = $sheet->getCellByColumnAndRow(12, $row)->getValue();
 
-            if ($personal_account=='' || $number=='') continue;
-            if (!preg_match('/^\d{7,8}$/',$personal_account)) {$this->errorInvalidFormat(__LINE__)." $row '$personal_account'";}
-            if ($number!='') {
-                if (!preg_match('/^\d+[^0-9]*- (\d{10}),?\s*$/',$number,$m)) $this->errorInvalidFormat(__LINE__." $row '$number'");
-                $number=$m[1];
+            if ($personal_account == '' || $number == '') continue;
+            if (!preg_match('/^\d{7,8}$/', $personal_account)) {
+                $this->errorInvalidFormat(__LINE__) . " $row '$personal_account'";
             }
-            if ($balance==='') $this->errorInvalidFormat(__LINE__." $row");
+            if ($number != '') {
+                if (!preg_match('/^\d+[^0-9]*- (\d{10}),?\s*$/', $number, $m)) $this->errorInvalidFormat(__LINE__ . " $row '$number'");
+                $number = $m[1];
+            }
+            if ($balance === '') $this->errorInvalidFormat(__LINE__ . " $row");
 
-            $balances[]=array(
-                'personal_account'=>$personal_account,
-                'number'=>$number,
-                'balance'=>floatval($balance)
+            $balances[] = array(
+                'personal_account' => $personal_account,
+                'number' => $number,
+                'balance' => floatval($balance)
             );
         }
 
         $book->disconnectWorksheets();
         unset($book);
 
-        $this->loadBalances($balances,$model->comment,Operator::OPERATOR_MEGAFON_ID);
+        $this->loadBalances($balances, $model->comment, Operator::OPERATOR_MEGAFON_ID);
     }
 
-    private function processLoad($model) {
+    private function processLoad($model)
+    {
         $file = CUploadedFile::getInstance($model, 'file');
 
         if ($file === null) {
-            Yii::app()->user->setFlash('error',Yii::t('app','File uploaded with error'));
+            Yii::app()->user->setFlash('error', Yii::t('app', 'File uploaded with error'));
         }
 
         Yii::import('application.vendors.PHPExcel', true);
 
         try {
-            $reader=PHPExcel_IOFactory::createReader(PHPExcel_IOFactory::identify($file->tempName));
+            $reader = PHPExcel_IOFactory::createReader(PHPExcel_IOFactory::identify($file->tempName));
         } catch (Exception $e) {
             $this->errorInvalidFormat($e->getMessage());
         }
 
         // csv doesn't have setReadDataOnly method
-        if (method_exists( $reader,'setReadDataOnly')) $reader->setReadDataOnly(true);
+        if (method_exists($reader, 'setReadDataOnly')) $reader->setReadDataOnly(true);
 
         switch ($model->operator) {
             case Operator::OPERATOR_MEGAFON_ID:
-                $this->processLoadMegafon($model,$reader,$file);
+                $this->processLoadMegafon($model, $reader, $file);
                 break;
             default:
-                Yii::app()->user->setFlash('error',Yii::t('app','Loading balance for this operator is not yet implemented'));
+                Yii::app()->user->setFlash('error', Yii::t('app', 'Loading balance for this operator is not yet implemented'));
                 $this->redirect(array());
         }
 
-        Yii::app()->user->setFlash('success',Yii::t('app','Loading balance report completed successfully'));
+        Yii::app()->user->setFlash('success', Yii::t('app', 'Loading balance report completed successfully'));
         $this->redirect(array(''));
     }
 
-    public function actionLoad() {
-        $model=new LoadBalanceReport();
+    public function actionLoad()
+    {
+        $model = new LoadBalanceReport();
 
         $this->performAjaxValidation($model);
 
@@ -323,8 +330,8 @@ class BalanceReportController extends BaseGxController
             }
         }
 
-        $this->render('load',array(
-            'model'=>$model
+        $this->render('load', array(
+            'model' => $model
         ));
     }
 }

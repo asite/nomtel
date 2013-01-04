@@ -6,18 +6,20 @@ class LoadBonusReport extends CFormModel
     public $operator;
     public $comment;
 
-    public function rules() {
+    public function rules()
+    {
         return array(
-            array('operator,comment','required'),
-            array('file','file','types'=>'xls,xlsx')
+            array('operator,comment', 'required'),
+            array('file', 'file', 'types' => 'xls,xlsx')
         );
     }
 
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return array(
-            'file'=>Yii::t('app','File'),
-            'operator'=>Operator::model()->label(1),
-            'comment'=>Yii::t('app','Comment'),
+            'file' => Yii::t('app', 'File'),
+            'operator' => Operator::model()->label(1),
+            'comment' => Yii::t('app', 'Comment'),
         );
     }
 }

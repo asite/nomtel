@@ -2,77 +2,81 @@
 
 class AgentController extends BaseGxController
 {
-    public function additionalAccessRules() {
+    public function additionalAccessRules()
+    {
         return array(
-            array('allow','roles'=>array('agent')),
+            array('allow', 'roles' => array('agent')),
         );
     }
 
-    public function checkAgentPermissions($agent) {
-        if (!isAdmin() && loggedAgentId()!=$agent->parent_id) $this->redirect(array('list'));
+    public function checkAgentPermissions($agent)
+    {
+        if (!isAdmin() && loggedAgentId() != $agent->parent_id) $this->redirect(array('list'));
     }
 
-    private function save($model,$user,$referralRates) {
-        $trx=Yii::app()->db->beginTransaction();
+    private function save($model, $user, $referralRates)
+    {
+        $trx = Yii::app()->db->beginTransaction();
 
         $user->save();
 
-        $model->user_id=$user->id;
+        $model->user_id = $user->id;
         $model->save();
 
-        foreach($referralRates as $rate) {
-            $rate->agent_id=$model->id;
+        foreach ($referralRates as $rate) {
+            $rate->agent_id = $model->id;
             $rate->save();
         }
 
         $trx->commit();
     }
 
-    private function getReferralRates($model) {
-        $referralRates=array();
-        foreach(Operator::getComboList() as $k=>$v) {
-            $m=AgentReferralRate::model()->findByAttributes(array('agent_id'=>$model->id,'operator_id'=>$k));
+    private function getReferralRates($model)
+    {
+        $referralRates = array();
+        foreach (Operator::getComboList() as $k => $v) {
+            $m = AgentReferralRate::model()->findByAttributes(array('agent_id' => $model->id, 'operator_id' => $k));
 
             if (!$m) {
-                $m=new AgentReferralRate();
-                $m->operator_id=$k;
+                $m = new AgentReferralRate();
+                $m->operator_id = $k;
             }
 
-            $referralRates[$k]=$m;
+            $referralRates[$k] = $m;
         }
 
         return $referralRates;
     }
 
-    private function validate(&$model,&$user,&$referralRates) {
-        $result=array();
+    private function validate(&$model, &$user, &$referralRates)
+    {
+        $result = array();
 
         if (isset($_POST['Agent']))
             $model->setAttributes($_POST['Agent']);
 
         $model->validate();
 
-        foreach($model->getErrors() as $attribute=>$errors)
-            $result[CHtml::activeId($model,$attribute)]=$errors;
+        foreach ($model->getErrors() as $attribute => $errors)
+            $result[CHtml::activeId($model, $attribute)] = $errors;
 
         if (isset($_POST['User']))
             $user->setAttributes($_POST['User']);
 
         $user->validate();
 
-        foreach($user->getErrors() as $attribute=>$errors)
-            $result[CHtml::activeId($user,$attribute)]=$errors;
+        foreach ($user->getErrors() as $attribute => $errors)
+            $result[CHtml::activeId($user, $attribute)] = $errors;
 
-        foreach($referralRates as $rate)
-        {
+        foreach ($referralRates as $rate) {
             if (isset($_POST['AgentReferralRate'][$rate->operator_id]))
                 $rate->setAttributes($_POST['AgentReferralRate'][$rate->operator_id]);
 
-            if (!$model->id) $rate->agent_id=0;else $rate->agent_id=$model->id;
+            if (!$model->id) $rate->agent_id = 0; else $rate->agent_id = $model->id;
 
             $rate->validate();
-            foreach($rate->getErrors() as $attribute=>$errors)
-                $result[CHtml::activeId($rate,'['.$rate->operator_id.']'.$attribute)]=$errors;
+            foreach ($rate->getErrors() as $attribute => $errors)
+                $result[CHtml::activeId($rate, '[' . $rate->operator_id . ']' . $attribute)] = $errors;
         }
 
         return $result;
@@ -84,22 +88,22 @@ class AgentController extends BaseGxController
         $user = new User('create');
         $user->status = ModelLoggableBehavior::STATUS_ACTIVE;
 
-        $referralRates=$this->getReferralRates($model);
+        $referralRates = $this->getReferralRates($model);
 
         if (Yii::app()->getRequest()->getIsAjaxRequest()) {
-            $result=$this->validate($model,$user,$referralRates);
+            $result = $this->validate($model, $user, $referralRates);
             echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
             Yii::app()->end();
         }
 
         if (isset($_POST['Agent'])) {
-            $model->parent_id=loggedAgentId();
+            $model->parent_id = loggedAgentId();
 
-            $errors=$this->validate($model,$user,$referralRates);
+            $errors = $this->validate($model, $user, $referralRates);
 
             if (empty($errors)) {
                 $user->encryptPwd();
-                $this->save($model,$user,$referralRates);
+                $this->save($model, $user, $referralRates);
 
                 $this->redirect(array('admin'));
             }
@@ -108,7 +112,7 @@ class AgentController extends BaseGxController
         $this->render('create', array(
             'model' => $model,
             'user' => $user,
-            'referralRates'=>$referralRates));
+            'referralRates' => $referralRates));
     }
 
     public function actionUpdate($id)
@@ -118,16 +122,16 @@ class AgentController extends BaseGxController
         $user = $model->user;
         $password = $user->password;
 
-        $referralRates=$this->getReferralRates($model);
+        $referralRates = $this->getReferralRates($model);
 
         if (Yii::app()->getRequest()->getIsAjaxRequest()) {
-            $result=$this->validate($model,$user,$referralRates);
+            $result = $this->validate($model, $user, $referralRates);
             echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
             Yii::app()->end();
         }
 
         if (isset($_POST['Agent'])) {
-            $errors=$this->validate($model,$user,$referralRates);
+            $errors = $this->validate($model, $user, $referralRates);
 
             if (empty($errors)) {
                 if ($user->password != '') {
@@ -136,10 +140,10 @@ class AgentController extends BaseGxController
                     $user->password = $password;
                 }
 
-                $this->save($model,$user,$referralRates);
+                $this->save($model, $user, $referralRates);
 
-                if ($id==adminAgentId()) {
-                    $this->redirect(array('update','id'=>$id));
+                if ($id == adminAgentId()) {
+                    $this->redirect(array('update', 'id' => $id));
                 } else {
                     $this->redirect(array('admin'));
                 }
@@ -154,52 +158,53 @@ class AgentController extends BaseGxController
         ));
     }
 
-    public function addPaymentAllowed($model) {
-        return (loggedAgentId()==$model->parent_id);
+    public function addPaymentAllowed($model)
+    {
+        return (loggedAgentId() == $model->parent_id);
     }
 
     public function actionView($id)
     {
         $model = $this->loadModel($id, 'Agent');
-        if ($model->id!=loggedAgentId())
+        if ($model->id != loggedAgentId())
             $this->checkAgentPermissions($model);
 
         if ($this->addPaymentAllowed($model)) {
-            $paymentNew= new Payment();
-            $paymentNew->dt=new EDateTime();
-            $paymentNew->agent_id=$model->id;
-            $paymentNew->type=Payment::TYPE_NORMAL;
-            $this->performAjaxValidation($paymentNew,'payment-form');
+            $paymentNew = new Payment();
+            $paymentNew->dt = new EDateTime();
+            $paymentNew->agent_id = $model->id;
+            $paymentNew->type = Payment::TYPE_NORMAL;
+            $this->performAjaxValidation($paymentNew, 'payment-form');
 
             if (isset($_POST['Payment'])) {
                 $paymentNew->setAttributes($_POST['Payment']);
                 if ($paymentNew->validate()) {
                     $paymentNew->save();
                     $model->save();
-                    Agent::deltaBalance($paymentNew->agent_id,$paymentNew->sum);
-                    $this->redirect(array('view','id'=>$model->id));
+                    Agent::deltaBalance($paymentNew->agent_id, $paymentNew->sum);
+                    $this->redirect(array('view', 'id' => $model->id));
                 }
             }
         }
 
-        $sql="(select id,dt,sum,comment,0 as type from payment where agent_id=:agent_id) union
+        $sql = "(select id,dt,sum,comment,0 as type from payment where agent_id=:agent_id) union
          (select id,dt,-sum as sum,'' as comment, 1 as type from act where agent_id=:agent_id)";
-        $params=array(':agent_id'=>$id,':agent_id'=>$id);
-        $count=Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
-        $logDataProvider=new CSqlDataProvider($sql,
-        array(
-            'params'=>$params,
-            'totalItemCount'=>$count,
-            'sort'=>array(
-                'defaultOrder'=>'dt',
-                'attributes'=>array('id','dt','comment','sum')
-            ),
-            'pagination'=>array('pageSize'=>BaseGxActiveRecord::ITEMS_PER_PAGE)
-        ));
+        $params = array(':agent_id' => $id, ':agent_id' => $id);
+        $count = Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
+        $logDataProvider = new CSqlDataProvider($sql,
+            array(
+                'params' => $params,
+                'totalItemCount' => $count,
+                'sort' => array(
+                    'defaultOrder' => 'dt',
+                    'attributes' => array('id', 'dt', 'comment', 'sum')
+                ),
+                'pagination' => array('pageSize' => BaseGxActiveRecord::ITEMS_PER_PAGE)
+            ));
 
         $this->render('view', array(
             'model' => $model,
-            'logDataProvider'=>$logDataProvider,
+            'logDataProvider' => $logDataProvider,
             'paymentNew' => $paymentNew
         ));
     }
@@ -208,12 +213,12 @@ class AgentController extends BaseGxController
     {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
-                $trx=Yii::app()->db->beginTransaction();
+                $trx = Yii::app()->db->beginTransaction();
                 $model = $this->loadModel($id, 'Agent');
                 $this->checkAgentPermissions($model);
                 $user = $model->user;
 
-                AgentReferralRate::model()->deleteAllByAttributes(array('agent_id'=>$model->id));
+                AgentReferralRate::model()->deleteAllByAttributes(array('agent_id' => $model->id));
 
                 $model->delete();
                 $user->delete();
@@ -237,8 +242,8 @@ class AgentController extends BaseGxController
         if (isset($_GET['Agent']))
             $model->setAttributes($_GET['Agent']);
 
-        $dataProvider=$model->search();
-        $dataProvider->criteria->addColumnCondition(array('parent_id'=>loggedAgentId()));
+        $dataProvider = $model->search();
+        $dataProvider->criteria->addColumnCondition(array('parent_id' => loggedAgentId()));
 
         $this->render('admin', array(
             'model' => $model,

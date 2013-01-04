@@ -1,7 +1,7 @@
 <?php
 
-class ModelLoggableBehavior extends CModelBehavior {
-
+class ModelLoggableBehavior extends CModelBehavior
+{
     const STATUS_ACTIVE = 'ACTIVE';
     const STATUS_BLOCKED = 'BLOCKED';
 
@@ -10,19 +10,23 @@ class ModelLoggableBehavior extends CModelBehavior {
     private $authIdentityModelAttrs = 'user';
     private $authIdentityClass = 'ModelBasedIdentity';
 
-    public function setAuthComponentName($authComponentName) {
+    public function setAuthComponentName($authComponentName)
+    {
         $this->authComponentName = $authComponentName;
     }
 
-    public function getAuthComponentName() {
+    public function getAuthComponentName()
+    {
         return $this->authComponentName;
     }
 
-    public function setAuthIdentityClass($authIdentityClass) {
+    public function setAuthIdentityClass($authIdentityClass)
+    {
         $this->authIdentityClass = $authIdentityClass;
     }
 
-    public function getAuthIdentityClass() {
+    public function getAuthIdentityClass()
+    {
         return $this->authIdentityClass;
     }
 
@@ -37,20 +41,23 @@ class ModelLoggableBehavior extends CModelBehavior {
         }
         $rand[] = substr(microtime(), 2, 6);
         $rand = sha1(implode('', $rand), true);
-        $salt = '$2a$' . str_pad((int) $cost, 2, '0', STR_PAD_RIGHT) . '$';
+        $salt = '$2a$' . str_pad((int)$cost, 2, '0', STR_PAD_RIGHT) . '$';
         $salt .= strtr(substr(base64_encode($rand), 0, 22), array('+' => '.'));
         return $salt;
     }
 
-    private function _encryptPwd($salt, $password) {
-        return crypt($password,$salt);
+    private function _encryptPwd($salt, $password)
+    {
+        return crypt($password, $salt);
     }
 
-    public function encryptPwd() {
+    public function encryptPwd()
+    {
         $this->owner->password = $this->_encryptPwd($this->blowfishSalt(), $this->owner->password);
     }
 
-    public function login($username, $password) {
+    public function login($username, $password)
+    {
         $user = $this->owner->findByAttributes(array('username' => $username));
 
         if (!$user)
@@ -63,7 +70,7 @@ class ModelLoggableBehavior extends CModelBehavior {
             return Yii::t('app', 'Your account blocked for :m minutes due to invalid logins.', array(':m' => $this->blockTime));
 
         if ($this->_encryptPwd($user->password, $password) != $user->password) {
-            $user->failed_logins+=1;
+            $user->failed_logins += 1;
 
             if ($user->failed_logins >= $this->maxFailedLogins) {
                 $user->blocked_until = new EDateTime("+" . $this->blockTime . " min");
@@ -76,14 +83,15 @@ class ModelLoggableBehavior extends CModelBehavior {
 
         if ($user->failed_logins > 0) {
             $user->failed_logins = 0;
-            $user->blocked_until = null;//new CDbExpression("NULL");
+            $user->blocked_until = null; //new CDbExpression("NULL");
             $user->save();
         }
 
         return $user;
     }
 
-    public function logout() {
+    public function logout()
+    {
         $authComponentName = $this->authComponentName;
         Yii::app()->$authComponentName->logout(false);
     }

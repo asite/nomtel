@@ -1,21 +1,25 @@
 <?php
 
-class SimController extends BaseGxController {
+class SimController extends BaseGxController
+{
 
-    public function additionalAccessRules() {
+    public function additionalAccessRules()
+    {
         return array(
             array('allow', 'actions' => array(), 'roles' => array('agent')),
         );
     }
 
-    protected function performAjaxValidation($model, $id = '') {
+    protected function performAjaxValidation($model, $id = '')
+    {
         if (isset($_POST['ajax']) && $_POST['ajax'] === $id) {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }
     }
 
-    public function actionDelivery() {
+    public function actionDelivery()
+    {
         $activeTabs = array('tab1' => false, 'tab2' => false);
         $model = new Sim;
 
@@ -71,7 +75,7 @@ class SimController extends BaseGxController {
                                 $model->number = $sim[2];
                                 //print_r($model->countByAttributes(array('icc'=>$sim[1],'number'=>$sim[2]))); exit;
                                 //try {
-                                if ($model->countByAttributes(array('icc'=>$sim[1],'number'=>$sim[2]))==0) {
+                                if ($model->countByAttributes(array('icc' => $sim[1], 'number' => $sim[2])) == 0) {
                                     $model->save();
                                     $model->parent_id = $model->id;
                                     $model->save();
@@ -117,7 +121,7 @@ class SimController extends BaseGxController {
                                 $model->number = $sim[1];
                                 //try {
 
-                                if ($model->countByAttributes(array('number'=>$sim[1]))==0) {
+                                if ($model->countByAttributes(array('number' => $sim[1])) == 0) {
                                     $model->save();
                                     $model->parent_id = $model->id;
                                     $model->save();
@@ -142,7 +146,8 @@ class SimController extends BaseGxController {
         $this->render('delivery', array('model' => $model, 'activeTabs' => $activeTabs, 'company' => $companyListArray, 'regionList' => $regionListArray, 'tariffList' => $tariffListArray));
     }
 
-    public function actionAdd() {
+    public function actionAdd()
+    {
         $model = new AddSim;
 
         $opList = Operator::model()->findAll();
@@ -333,7 +338,7 @@ class SimController extends BaseGxController {
                 exit;
             }
 
-            $trx=Yii::app()->db->beginTransaction();
+            $trx = Yii::app()->db->beginTransaction();
 
             $model = new Act;
             $model->agent_id = $_POST['Move']['agent_id'];
@@ -344,7 +349,7 @@ class SimController extends BaseGxController {
 
             $criteria = new CDbCriteria();
             $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
-            $criteria->addColumnCondition(array('parent_agent_id'=>loggedAgentId()));
+            $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
             $criteria->addCondition('agent_id is null');
             $ids_string = implode(",", $_SESSION['moveSims'][$key]);
 
@@ -371,7 +376,7 @@ class SimController extends BaseGxController {
         } else {
             $criteria = new CDbCriteria();
             $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
-            $criteria->addColumnCondition(array('parent_agent_id'=>loggedAgentId()));
+            $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
             $criteria->addCondition('agent_id is null');
             $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
 

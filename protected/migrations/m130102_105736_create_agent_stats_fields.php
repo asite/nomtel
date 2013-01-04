@@ -24,15 +24,4 @@ class m130102_105736_create_agent_stats_fields extends CDbMigration
 		echo "m130102_105736_create_agent_stats_fields does not support migration down.\n";
 		return false;
 	}
-
-	/*
-	// Use safeUp/safeDown to do migration with transaction
-	public function safeUp()
-	{
-	}
-
-	public function safeDown()
-	{
-	}
-	*/
 }

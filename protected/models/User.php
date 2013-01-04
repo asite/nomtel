@@ -2,18 +2,22 @@
 
 Yii::import('application.models._base.BaseUser');
 
-class User extends BaseUser {
-	const TAG=__CLASS__;
+class User extends BaseUser
+{
+    const TAG = __CLASS__;
 
-    public static function model($className = __CLASS__) {
+    public static function model($className = __CLASS__)
+    {
         return parent::model($className);
     }
 
-    public static function representingColumn() {
+    public static function representingColumn()
+    {
         return 'username';
     }
 
-    public function behaviors() {
+    public function behaviors()
+    {
         return array(
             'loggable' => array(
                 'class' => 'ModelLoggableBehavior',
@@ -22,12 +26,14 @@ class User extends BaseUser {
         );
     }
 
-    static public function getStatusTitle($id) {
+    static public function getStatusTitle($id)
+    {
         $list = self::getStatusList();
         return $list[$id];
     }
 
-    static public function getStatusList() {
+    static public function getStatusList()
+    {
         static $list;
 
         if (!isset($list))
@@ -39,14 +45,16 @@ class User extends BaseUser {
         return $list;
     }
 
-    public function rules() {
+    public function rules()
+    {
         return array_merge(parent::rules(), array(
-                    array('username', 'unique', 'message' => Yii::t('app', 'User with this username already exists'), 'skipOnError' => true),
-                    array('password', 'required', 'on'=>'create')
-                ));
+            array('username', 'unique', 'message' => Yii::t('app', 'User with this username already exists'), 'skipOnError' => true),
+            array('password', 'required', 'on' => 'create')
+        ));
     }
 
-    public function search() {
+    public function search()
+    {
         $data_provider = parent::search();
         $data_provider->pagination->pageSize = self::ITEMS_PER_PAGE;
         $data_provider->setSort(array(

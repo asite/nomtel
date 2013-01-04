@@ -28,13 +28,12 @@ return array(
         'application.vendors.*',
         'application.extensions.yii-mail.YiiMailMessage',
     ),
-    'modules' => array(
-    ),
+    'modules' => array(),
     // application components
     'components' => array(
-        'authManager'=>array(
-            'class'=>'PhpAuthManager',
-            'authFile'=>'protected/config/auth.php'
+        'authManager' => array(
+            'class' => 'PhpAuthManager',
+            'authFile' => 'protected/config/auth.php'
         ),
         'request' => array(
             'enableCsrfValidation' => true,
@@ -56,8 +55,7 @@ return array(
         'assetManager' => array(
             'linkAssets' => true,
         ),
-        'clientScript' => array(
-        ),
+        'clientScript' => array(),
         'db' => array(
             'charset' => 'utf8',
             'enableProfiling' => ENABLE_PROFILING,
@@ -78,8 +76,8 @@ return array(
                 ),
             ),
         ),
-        'viewRenderer'=>array(
-            'class'=>'application.extensions.smarty.ESmartyViewRenderer',
+        'viewRenderer' => array(
+            'class' => 'application.extensions.smarty.ESmartyViewRenderer',
         ),
         'mail' => array(
             'class' => 'application.extensions.yii-mail.YiiMail',

@@ -30,7 +30,7 @@ class OperatorController extends BaseGxController
         $model = $this->loadModel($id, 'Operator');
         $model2 = new Tariff('search');
         $model2->unsetAttributes();
-        $model2->operator_id=$model->id;
+        $model2->operator_id = $model->id;
 
         $this->performAjaxValidation($model, 'operator-form');
 

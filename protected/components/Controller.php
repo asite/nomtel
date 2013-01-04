@@ -1,19 +1,21 @@
 <?php
 
-class Controller extends CController {
+class Controller extends CController
+{
 
-    public $layout='/layout/main';
+    public $layout = '/layout/main';
 
     public $breadcrumbs;
 
     public function filters()
     {
         return array(
-            'accessControl'           // required to enable accessRules
+            'accessControl' // required to enable accessRules
         );
     }
 
-    public function additionalAccessRules() {
+    public function additionalAccessRules()
+    {
         return array();
     }
 
@@ -21,16 +23,17 @@ class Controller extends CController {
     {
         return array_merge(
             array(
-                array('allow','roles'=>array('admin'))
+                array('allow', 'roles' => array('admin'))
             ),
             $this->additionalAccessRules(),
             array(
-                array('deny','users' => array('*'))
+                array('deny', 'users' => array('*'))
             )
         );
     }
 
-    public function setBreadcrumbs($breadcrumbs) {
+    public function setBreadcrumbs($breadcrumbs)
+    {
         $this->breadcrumbs = $breadcrumbs;
     }
 }
