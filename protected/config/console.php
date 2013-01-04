@@ -27,6 +27,9 @@ switch (gethostname()) {
     case 'primawork':
         $base_config_name='server_console_development.php';
         break;
+    case 'hawking.timeweb.ru':
+        $base_config_name='server_web_asite_production.php';
+        break;
     default:
         die('unknown hostname');
 }
