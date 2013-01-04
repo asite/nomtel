@@ -1,8 +1,8 @@
 <?php
 
 $this->breadcrumbs = array(
-    $bonusReport::model()->label(2) => array('list'),
-    $bonusReport->adminLabel($bonusReport->label(1)),
+    $balanceReport::model()->label(2) => array('list'),
+    $balanceReport->adminLabel($balanceReport->label(1)),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -19,35 +19,33 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1><?php echo $bonusReport->adminLabel($bonusReport->label(1)); ?></h1>
+<h1><?php echo $balanceReport->adminLabel($balanceReport->label(1)); ?></h1>
 
 <?php $this->widget('bootstrap.widgets.TbDetailView',array(
-    'data'=>$bonusReportAgent,
+    'data'=>$balanceReport,
     'attributes'=>array(
-        'sim_count',
-        'sum',
-        'sum_referrals',
+        'dt',
+        'comment',
     ),
 )); ?>
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
-    'id' => 'payment-grid',
-    'dataProvider' => $dataProvider,
+    'id' => 'balanceReportNumber-grid',
+    'dataProvider' => $balanceReportNumberDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    //'filter' => $model,
+    'filter' => $balanceReportNumberSearch,
     'columns' => array(
         array(
-            'name'=>'agent_id',
-            'value'=>'$data->agent',
-            'filter'=>Agent::getComboList()
+            'name'=>'personal_account',
+            'header'=>Yii::t('app','Personal Account')
         ),
         array(
-            'name'=>'sim_count',
-            'htmlOptions' => array('style'=>'text-align:center;'),
+            'name'=>'number',
+            'header'=>Yii::t('app','Number')
         ),
         array(
-            'name'=>'sum',
-            'htmlOptions' => array('style'=>'text-align:center;'),
+            'name'=>'balance',
+            'header'=>Yii::t('app','Balance')
         )
     ),
 )); ?>

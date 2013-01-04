@@ -2,6 +2,12 @@
 
 class BonusReportController extends BaseGxController
 {
+    public function filters() {
+        return array_merge(parent::filters(),array(
+            array('LoggingFilter +load')
+        ));
+    }
+
     public function additionalAccessRules() {
         return array(
             array('allow','actions'=>array('list','view'),'roles'=>array('agent')),

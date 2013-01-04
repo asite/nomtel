@@ -12,7 +12,7 @@
  * @property string $id
  * @property string $number
  * @property string $personal_account
- * @property integer $warning
+ * @property string $status
  * @property string $warning_dt
  *
  * @property BalanceReport[] $balanceReports
@@ -38,12 +38,12 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('number, personal_account', 'required'),
-			array('warning', 'numerical', 'integerOnly'=>true),
 			array('number, personal_account', 'length', 'max'=>50),
+			array('status', 'length', 'max'=>7),
 			array('warning_dt', 'safe'),
-			array('warning, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('status, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
             array('warning_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, number, personal_account, warning, warning_dt', 'safe', 'on'=>'search'),
+			array('id, number, personal_account, status, warning_dt', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -64,7 +64,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'id' => Yii::t('app', 'ID'),
 			'number' => Yii::t('app', 'Number'),
 			'personal_account' => Yii::t('app', 'Personal Account'),
-			'warning' => Yii::t('app', 'Warning'),
+			'status' => Yii::t('app', 'Status'),
 			'warning_dt' => Yii::t('app', 'Warning Dt'),
 			'balanceReports' => null,
 		);
@@ -76,7 +76,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('number', $this->number, true);
 		$criteria->compare('personal_account', $this->personal_account, true);
-		$criteria->compare('warning', $this->warning);
+		$criteria->compare('status', $this->status, true);
 		$criteria->compare('warning_dt', $this->warning_dt, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(

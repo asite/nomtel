@@ -2,12 +2,18 @@
 
 class BalanceReportController extends BaseGxController
 {
+    public function filters() {
+        return array_merge(parent::filters(),array(
+            array('LoggingFilter +load')
+        ));
+    }
+
     public function actionDelete($id)
     {
         if (Yii::app()->getRequest()->getIsPostRequest() && isAdmin()) {
             $trx = Yii::app()->db->beginTransaction();
 
-            BalanceReportAgent::model()->deleteAllByAttributes(array('balance_report_id'=>$id));
+            BalanceReportNumber::model()->deleteAllByAttributes(array('balance_report_id'=>$id));
             BalanceReport::model()->deleteByPk($id);
 
             $trx->commit();
@@ -20,18 +26,44 @@ class BalanceReportController extends BaseGxController
 
     public function actionView($id)
     {
-        $model = new BalanceReportNumber('list');
+        $model = new BalanceReportNumberSearch();
         $model->unsetAttributes();
 
-        if (isset($_GET['BalanceReportNumber']))
-            $model->setAttributes($_GET['BalanceReportNumber']);
+        if (isset($_GET['BalanceReportNumberSearch']))
+            $model->setAttributes($_GET['BalanceReportNumberSearch']);
 
-        $model->balance_report_id=$id;
+        $criteria=new CDbCriteria();
+        $criteria->compare('n.personal_account',$model->personal_account);
+        $criteria->compare('n.number',$model->number);
+        $criteria->compare('brn.balance',$model->balance);
+        $criteria->compare('brn.balance_report_id',$id);
+
+        $sql="from balance_report_number brn
+            join number n on (n.id=brn.number_id)
+            where ".$criteria->condition;
+
+        $totalItemCount=Yii::app()->db->createCommand('select count(*) '.$sql)->queryScalar($criteria->params);
+
+        $dataProvider=new CSqlDataProvider('select * '.$sql,array(
+            'totalItemCount'=>$totalItemCount,
+            'params'=>$criteria->params,
+            'sort'=>array(
+                'attributes'=>array(
+                    'personal_account',
+                    'number',
+                    'balance',
+                ),
+            ),
+            'pagination'=>array(
+                'pageSize'=>BalanceReportNumber::ITEMS_PER_PAGE,
+            ),
+        ));
 
         $this->render('view', array(
             'model' => $model,
             'balanceReport' => BalanceReport::model()->findByPk($id),
-            'balanceReportNumber' =>$model
+            'balanceReportNumberSearch' =>$model,
+            'balanceReportNumberDataProvider'=>$dataProvider
         ));
     }
 
@@ -45,7 +77,7 @@ class BalanceReportController extends BaseGxController
 
         $this->render('list', array(
             'model' => $model,
-            'dataProvider' => $model->search
+            'dataProvider' => $model->search()
         ));
     }
 
@@ -59,7 +91,6 @@ class BalanceReportController extends BaseGxController
     }
 
     private function loadBalances($numberBalances,$comment,$operator_id) {
-
         $db=Yii::app()->db;
 
         // store all info in database
@@ -75,34 +106,19 @@ class BalanceReportController extends BaseGxController
 
         $cmdFindNumberId=Yii::app()->db->createCommand("select id from number where personal_account=:personal_account and number=:number");
 
-        echo (memory_get_usage()/1024/1024).'<br/>';
-        echo microtime(true);echo "<br/>";
-        for ($i=0;$i<10000;$i++) {
-            //$cmdFindNumberId=Yii::app()->db->createCommand("select id from number where personal_account=:personal_account and number=:number");
-            $numberId=$cmdFindNumberId->queryScalar(array(
-                ':personal_account'=>$numberBalance['personal_account'],
-                ':number'=>$numberBalance['number'],
-            ));
-        }
-        echo microtime(true);
-        echo (memory_get_usage()/1024/1024).'<br/>';
-        exit;
-
         foreach($numberBalances as $numberBalance) {
-            echo (memory_get_usage()/1024/1024).'<br/>';
 
-            $cmdFindNumberId=Yii::app()->db->createCommand("select id from number where personal_account=:personal_account and number=:number");
             $numberId=$cmdFindNumberId->queryScalar(array(
                 ':personal_account'=>$numberBalance['personal_account'],
                 ':number'=>$numberBalance['number'],
             ));
 
-            /*
             // create number, if it was not found
             if (!$numberId) {
                 $number=new Number();
                 $number->number=$numberBalance['number'];
                 $number->personal_account=$numberBalance['personal_account'];
+                $number->status=Number::STATUS_NORMAL;
                 $number->save();
                 $numberId=$number->id;
 
@@ -121,9 +137,11 @@ class BalanceReportController extends BaseGxController
                     $sim->number=$numberBalance['number'];
                     $sim->operator_id=$operator_id;
                     $sim->save();
+                    $sim->parent_id=$sim->id;
+                    $sim->save();
 
                 }
-            }   */
+            }
 
             $balanceReportNumberBulkInsert->insert(array(
                 'number_id'=>$numberId,
@@ -173,13 +191,8 @@ class BalanceReportController extends BaseGxController
             );
         }
 
-        echo memory_get_usage()/1024/1024;
-
         $book->disconnectWorksheets();
         unset($book);
-
-        echo "<br/>";
-        echo memory_get_usage()/1024/1024;echo "<br/>";
 
         $this->loadBalances($balances,$model->comment,Operator::OPERATOR_MEGAFON_ID);
     }
