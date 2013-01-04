@@ -42,15 +42,9 @@ class Sim extends BaseSim
         $criteria->compare('operator_id', $this->operator_id);
         $criteria->compare('tariff_id', $this->tariff_id);
 
-        
         $dataProvider=new CActiveDataProvider($this, array(
-        	'pagination'=>array(
-				'pageSize'=>500,
-			),
             'criteria' => $criteria,
         ));
-        
-        
 
         $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
         return $dataProvider;
