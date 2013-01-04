@@ -61,6 +61,7 @@ class SimController extends BaseGxController {
                             $text = preg_replace('/(\s){2,}/', "$1", $text);
                             $sim = explode(" ", $text);
                             if (!isset($sim[2])) $sim[2] = '';
+
                             if ($sim[0] && $sim[1]) {
                                 $model = new Sim;
                                 $model->setAttributes($data);
@@ -68,14 +69,17 @@ class SimController extends BaseGxController {
                                 $model->personal_account = $sim[0];
                                 $model->icc = $sim[1];
                                 $model->number = $sim[2];
+                                //print_r($model->countByAttributes(array('icc'=>$sim[1],'number'=>$sim[2]))); exit;
                                 //try {
-                                $model->save();
-                                $model->parent_id = $model->id;
-                                $model->save();
-                                $sims[$i]['id'] = $model->id;
-                                $sims[$i]['personal_account'] = $sim[0];
-                                $sims[$i]['icc'] = $sim[1];
-                                $sims[$i++]['number'] = $sim[2];
+                                if ($model->countByAttributes(array('icc'=>$sim[1],'number'=>$sim[2]))==0) {
+                                    $model->save();
+                                    $model->parent_id = $model->id;
+                                    $model->save();
+                                    $sims[$i]['id'] = $model->id;
+                                    $sims[$i]['personal_account'] = $sim[0];
+                                    $sims[$i]['icc'] = $sim[1];
+                                    $sims[$i++]['number'] = $sim[2];
+                                }
                                 //} catch(Exception $e) {}
                             }
                         }
@@ -112,13 +116,16 @@ class SimController extends BaseGxController {
                                 $model->personal_account = $sim[0];
                                 $model->number = $sim[1];
                                 //try {
-                                $model->save();
-                                $model->parent_id = $model->id;
-                                $model->save();
-                                $sims[$i]['id'] = $model->id;
-                                $sims[$i]['personal_account'] = $sim[0];
-                                $sims[$i++]['number'] = $sim[1];
-                                //} catch(Exception $e) { }
+
+                                if ($model->countByAttributes(array('number'=>$sim[1]))==0) {
+                                    $model->save();
+                                    $model->parent_id = $model->id;
+                                    $model->save();
+                                    $sims[$i]['id'] = $model->id;
+                                    $sims[$i]['personal_account'] = $sim[0];
+                                    $sims[$i++]['number'] = $sim[1];
+                                    //} catch(Exception $e) { }
+                                }
                             }
                         }
                         Agent::deltaSimCount(adminAgentId(), $sim_count);
@@ -179,7 +186,6 @@ class SimController extends BaseGxController {
                 } else {
                     $sim_count = 0;
                     foreach ($result as $v) {
-                        //$model = Sim::model()->findByAttributes(array('icc' => $v->icc));
                         $v->parent_agent_id = adminAgentId();
                         $sim_count++;
                         $v->operator_id = $_POST['AddSim']['operator'];
@@ -335,6 +341,8 @@ class SimController extends BaseGxController {
 
             $criteria = new CDbCriteria();
             $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+            $criteria->addColumnCondition(array('parent_agent_id'=>loggedAgentId()));
+            $criteria->addCondition('agent_id is null');
             $ids_string = implode(",", $_SESSION['moveSims'][$key]);
 
             // update Agent stats
@@ -357,6 +365,8 @@ class SimController extends BaseGxController {
         } else {
             $criteria = new CDbCriteria();
             $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+            $criteria->addColumnCondition(array('parent_agent_id'=>loggedAgentId()));
+            $criteria->addCondition('agent_id is null');
             $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
 
             $total = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);

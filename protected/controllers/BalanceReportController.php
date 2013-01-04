@@ -207,7 +207,7 @@ class BalanceReportController extends BaseGxController
         Yii::import('application.vendors.PHPExcel', true);
 
         try {
-        $reader=PHPExcel_IOFactory::createReader(PHPExcel_IOFactory::identify($file->tempName));
+            $reader=PHPExcel_IOFactory::createReader(PHPExcel_IOFactory::identify($file->tempName));
         } catch (Exception $e) {
             $this->errorInvalidFormat($e->getMessage());
         }
