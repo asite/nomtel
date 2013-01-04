@@ -35,7 +35,6 @@ $('.search-form form').submit(function(){
 				'name'=>'agent_id',
 				'value'=>'GxHtml::valueEx($data->agent)',
 				'filter'=>Agent::getComboList(),
-                'visible'=>isAdmin(),
 		),
         array(
 		        'name'=>'dt',
@@ -51,6 +50,11 @@ $('.search-form form').submit(function(){
 			'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
 			'template'=>'{view}',
+            'buttons'=>array(
+                'view'=>array(
+                    'visible'=>'$data->type==Act::TYPE_SIM'
+                )
+            )
 		),
 	),
 )); ?>
