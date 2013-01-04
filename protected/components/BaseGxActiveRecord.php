@@ -2,7 +2,7 @@
 
 class BaseGxActiveRecord extends GxActiveRecord {
 
-    const ITEMS_PER_PAGE = 500;
+    const ITEMS_PER_PAGE = 100;
 
     protected static $mySqlDateFormat = 'Y-m-d';
     protected static $mySqlDateTimeFormat = 'Y-m-d H:i:s';
