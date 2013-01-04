@@ -11,7 +11,7 @@ $config = CMap::mergeArray(
             ),
             'params' => array(
                 'adminEmail'=>'gghz@bk.ru',
-		      'adminEmailFrom'=>'info@nomtel.com'
+		      'adminEmailFrom'=>'info@asiteapp.ru'
             )
         )
 );
