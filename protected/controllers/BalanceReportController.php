@@ -35,15 +35,14 @@ class BalanceReportController extends BaseGxController
 
         $reader = Yii::app()->db->createCommand("
             select n.id,brn1.balance as b1,brn2.balance as b2,brn3.balance as b3
-            from number n
+            from (
+              select distinct number_id as id
+              from balance_report_number
+              where balance_report_id in (:report_id1,:report_id2,:report_id3)
+            ) as n
             left outer join balance_report_number brn1 on (brn1.balance_report_id=:report_id1 and brn1.number_id=n.id)
             left outer join balance_report_number brn2 on (brn2.balance_report_id=:report_id2 and brn2.number_id=n.id)
             left outer join balance_report_number brn3 on (brn3.balance_report_id=:report_id3 and brn3.number_id=n.id)
-            where n.id in (
-              select distinct number_id
-              from balance_report_number
-              where balance_report_id in (:report_id1,:report_id2,:report_id3)
-            )
         ")->query(array(
             ':report_id1' => $reportId1,
             ':report_id2' => $reportId2,
@@ -56,7 +55,7 @@ class BalanceReportController extends BaseGxController
             $warned = false;
 
             // if number not present in current or previous report
-            if ($b[1] == '' || $b[2] == '') $warned = true;
+            if (($b[1] == '' && $b[2]!='') || $b[2] == '') $warned = true;
 
             // if balance of last three reports is equal
             if ($b[0] == $b[1] || $b[1] == $b[2]) $warned = true;
