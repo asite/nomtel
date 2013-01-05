@@ -157,7 +157,13 @@ class BonusReportController extends BaseGxController
             $agentsBonuses[$agentId] = array('sim_count' => 0, 'sum' => 0, 'sum_referrals' => 0);
 
         // calculate earned bonuses+statistics
+        // keep in mind, that two different cards can have same personal_account or number
+        // so, we must check for duplicates
+        $processedSims=array();
         foreach ($simAgent as $v) {
+            if ($processedSims[$v['sim_id']]) continue;
+            $processedSims[$v['sim_id']]=true;
+
             $bonus = $simBonus[$v['sim_id']];
 
             $lastPaymentIndex = count($agents[$v['agent_id']]) - 1;
@@ -241,7 +247,7 @@ class BonusReportController extends BaseGxController
         $simBonus = array();
         $sum = 0;
         for ($row = 15; $row <= $rows; $row++) {
-            $ctn = $sheet->getCellByColumnAndRow(3, $row)->getValue();
+            $ctn = trim($sheet->getCellByColumnAndRow(3, $row)->getValue());
             $bonus = $sheet->getCellByColumnAndRow(7, $row)->getValue();
 
             $sum += $bonus;
@@ -260,13 +266,13 @@ class BonusReportController extends BaseGxController
         $db = Yii::app()->db;
 
         $personal_accounts = array();
-        foreach ($simBonus as $k => $v) $personal_accounts[] = $db->quoteValue($k);
+        foreach ($simBonus as $k => $v) $numbers[] = $db->quoteValue($k);
 
         // get agents, to which bonused sims was sent
-        $simAgent = $db->createCommand("select personal_account as sim_id,parent_agent_id as agent_id
+        $simAgent = $db->createCommand("select number as sim_id,parent_agent_id as agent_id
             from sim
-            where operator_id=" . Operator::OPERATOR_BEELINE_ID . " and agent_id is null and personal_account in (" .
-            implode(',', $personal_accounts) . ")")->queryAll();
+            where operator_id=" . Operator::OPERATOR_BEELINE_ID . " and agent_id is null and number in (" .
+            implode(',', $numbers) . ") order by sim.id desc")->queryAll();
 
         $this->calculateBonuses($simBonus, $simAgent, $model->comment, Operator::OPERATOR_BEELINE_ID);
     }
@@ -293,7 +299,7 @@ class BonusReportController extends BaseGxController
         $simBonus = array();
         $sum = 0;
         for ($row = 12; $row <= $rows; $row++) {
-            $ctn = $sheet->getCellByColumnAndRow(0, $row)->getValue();
+            $ctn = trim($sheet->getCellByColumnAndRow(0, $row)->getValue());
             $bonus = $sheet->getCellByColumnAndRow(8, $row)->getValue();
 
             $sum += $bonus;
@@ -319,7 +325,7 @@ class BonusReportController extends BaseGxController
         $simAgent = $db->createCommand("select personal_account as sim_id,parent_agent_id as agent_id
             from sim
             where operator_id=" . Operator::OPERATOR_MEGAFON_ID . " and agent_id is null and personal_account in (" .
-            implode(',', $personal_accounts) . ")")->queryAll();
+            implode(',', $personal_accounts) . ") order by sim.id desc")->queryAll();
 
         $this->calculateBonuses($simBonus, $simAgent, $model->comment, Operator::OPERATOR_MEGAFON_ID);
     }

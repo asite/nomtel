@@ -256,8 +256,8 @@ class BalanceReportController extends BaseGxController
 
         $balances = array();
         for ($row = 4; $row <= $rows; $row++) {
-            $personal_account = $sheet->getCellByColumnAndRow(0, $row)->getValue();
-            $number = $sheet->getCellByColumnAndRow(5, $row)->getValue();
+            $personal_account = trim($sheet->getCellByColumnAndRow(0, $row)->getValue());
+            $number = trim($sheet->getCellByColumnAndRow(5, $row)->getValue());
             $balance = $sheet->getCellByColumnAndRow(12, $row)->getValue();
 
             if ($personal_account == '' || $number == '') continue;
