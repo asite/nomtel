@@ -87,6 +87,7 @@ class MessageController extends Controller
     public function actionView($id = '', $type = '')
     {
         $ticket = Ticket::model()->findByPk($id);
+        $act = new Act('ticket');
 
         if ($ticket->agent_id != loggedAgentId() && $ticket->whom != loggedAgentId()) $this->redirect($this->createUrl('site/index'));
 
@@ -97,9 +98,9 @@ class MessageController extends Controller
         if ($ticket->status == 'CLOSED') $params['tiketClosed'] = true;
         if ($ticket->whom == loggedAgentId()) $params['closeMessage'] = true;
         $agent = Agent::model()->findByPk($ticket->agent_id);
-        if (loggedAgentId() == $agent->parent_id || loggedAgentId() == 1) $params['priseMessage'] = true;
+        if (loggedAgentId() == $agent->parent_id) $params['priseMessage'] = true;
 
-        $this->render('view', array('model' => $model, 'messages' => $messages, 'agents' => $agents, 'params' => $params));
+        $this->render('view', array('model' => $model, 'act'=>$act, 'messages' => $messages, 'agents' => $agents, 'params' => $params));
     }
 
     public function actionAnswer($ticket, $type)
@@ -137,11 +138,13 @@ class MessageController extends Controller
         if ($model->whom == loggedAgentId()) {
             if (isset($_POST['PriseMessage']['prise'])) {
                 $prise = $_POST['PriseMessage']['prise'];
-                $Act = new Act;
+                $Act = new Act('ticket');
+                $Act->setAttributes($_POST['Act']);
                 $Act->agent_id = $model->agent_id;
                 $Act->dt = new EDateTime();
                 $Act->sum = $prise;
                 $Act->type = Act::TYPE_NORMAL;
+                $this->performAjaxValidation($Act, 'close-ticket');
 
                 $transaction = Yii::app()->db->beginTransaction();
                 try {

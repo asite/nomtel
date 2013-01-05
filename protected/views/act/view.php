@@ -31,6 +31,7 @@ $('.search-form form').submit(function(){
         ),
         'dt',
         'sum',
+        'comment',
     ),
 )); ?>
 

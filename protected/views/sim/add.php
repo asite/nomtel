@@ -11,13 +11,13 @@ $this->breadcrumbs = array(
 
 <script type="text/javascript">
 
-  function changeOperator(mode) {
+  function changeOperator(mode,tariff) {
     $.ajax({
       type: "POST",
       url: "<?php echo $this->createUrl('ajaxcombo') ?>",
       data: { YII_CSRF_TOKEN: $('[name="YII_CSRF_TOKEN"]').val(), operatorId: $(mode).val() }
     }).done(function( msg ) {
-      $(mode).siblings('[name="AddSim[tariff]"]').html(msg);
+      $(mode).siblings('select[name*="[tariff]"]').html(msg);
     });
   }
 
@@ -27,7 +27,8 @@ $this->breadcrumbs = array(
       index = $('#boxSims').children('div').length;
       clone.find('input').each(function(){
         //$(this).attr('id',$(this).attr('id')+index);
-        $(this).attr('name',$(this).attr('name')+'['+index+']');
+        //AddNewSim[index][ICCPersonalAccount]
+        $(this).attr('name',$(this).attr('name').replace(/index/,index));
       })
 
       clone.css({'display':'block'}).attr('id','').appendTo('#boxSims');
@@ -131,24 +132,24 @@ $this->breadcrumbs = array(
 <div id="boxSims">
   <div class="cfix" style="position: relative;">
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
+      <?php echo $form->textFieldRow($model,'[0]ICCPersonalAccount',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
     </div>
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'ICCBeginFew',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
+      <?php echo $form->textFieldRow($model,'[0]ICCBeginFew',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
     </div>
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'ICCEndFew',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span1')); ?>
+      <?php echo $form->textFieldRow($model,'[0]ICCEndFew',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span1')); ?>
     </div>
     <div style="float: left; margin-right: 5px;">
-      <?php echo $form->textFieldRow($model,'phone',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
+      <?php echo $form->textFieldRow($model,'[0]phone',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span2')); ?>
     </div>
     <?php if (!isset($_POST['AddNewSim']['ICCBeginFew'])): ?> <a href="#" class="iconplussim"><i class="icon-plus"></i></a><?php endif; ?>
   </div>
   <?php $count=count($_POST['AddNewSim']['ICCBeginFew']); for($k=1;$k<=$count;$k++): ?>
     <div class="cfix" style="position: relative;">
       <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCPersonalAccount]" type="text"></div>-->
-      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCBeginFew][<?php echo $k ?>]" type="text" maxlength="15" value="<?php echo $_POST['AddNewSim']['ICCBeginFew'][$k] ?>"></div>
-      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCEndFew][<?php echo $k ?>]" type="text" maxlength="3" value="<?php echo $_POST['AddNewSim']['ICCEndFew'][$k] ?>"></div>
+      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[<?php echo $k ?>][ICCBeginFew]" type="text" maxlength="15" value="<?php echo $_POST['AddNewSim'][$k]['ICCBeginFew'] ?>"></div>
+      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[<?php echo $k ?>][ICCEndFew]" type="text" maxlength="3" value="<?php echo $_POST['AddNewSim'][$k]['ICCEndFew'] ?>"></div>
       <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[phone]" type="text"></div>-->
       <?php if ($k==$count): ?><a href="#" class="iconplussim"><i class="icon-plus"></i></a><?php endif; ?>
     </div>
@@ -157,11 +158,11 @@ $this->breadcrumbs = array(
 
 <br/>
 <div class="cfix">
-  <?php echo $form->dropDownListRow($model, 'operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
+  <?php echo $form->dropDownListRow($model, '[0]operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
 
-  <?php echo $form->dropDownListRow($model, 'tariff', $tariffListArray); ?>
+  <?php echo $form->dropDownListRow($model, '[0]tariff', $tariffListArray); ?>
 
-  <?php echo $form->dropDownListRow($model, 'where', $whereListArray); ?>
+  <?php echo $form->dropDownListRow($model, '[0]where', $whereListArray); ?>
 </div>
 
 <?php echo CHtml::htmlButton(Yii::t('app', 'buttonAddSim'), array('class'=>'btn btn-primary', 'name'=>'buttonAddSim', 'type'=>'submit')); ?>
@@ -216,9 +217,9 @@ $this->widget('bootstrap.widgets.TbTabs', array(
 
 
 <div class="cfix" id="addFewSims" style="display: none; position: relative;">
-  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddNewSim[ICCPersonalAccount]" type="text"></div>
-  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddNewSim[ICCBeginFew]" type="text" maxlength="15"></div>
-  <div style="float: left; margin-right: 5px;"><input class="span1" name="AddNewSim[ICCEndFew]" type="text" maxlength="3"></div>
-  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddNewSim[phone]" type="text"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddSim[index][ICCPersonalAccount]" type="text"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddSim[index][ICCBeginFew]" type="text" maxlength="15"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span1" name="AddSim[index][ICCEndFew]" type="text" maxlength="3"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddSim[index][phone]" type="text"></div>
   <a href="#" class="iconplussim"><i class="icon-plus"></i></a>
 </div>

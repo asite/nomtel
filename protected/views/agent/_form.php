@@ -42,6 +42,8 @@
                 <?php echo $form->textFieldRow($model,'phone_3',array('class'=>'span2','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 </div>
 <div class="form-container-item form-label-width-80">
+                <?php echo $form->textFieldRow($model,'city',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+
                 <?php echo $form->textFieldRow($model,'email',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
                 <?php echo $form->textFieldRow($model,'skype',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>

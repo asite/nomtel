@@ -56,12 +56,11 @@ abstract class BaseSim extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('personal_account', 'required'),
 			array('parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'numerical', 'integerOnly'=>true),
 			array('number_price, sim_price', 'numerical'),
 			array('personal_account, number, icc', 'length', 'max'=>50),
 			array('parent_id', 'length', 'max'=>20),
-			array('number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('personal_account, number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'default', 'setOnEmpty' => true, 'value' => null),
 			array('id, personal_account, number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'safe', 'on'=>'search'),
 		);
 	}

@@ -40,7 +40,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
     array(
       'name'=>'status',
       'sortable'=>true,
-      'value'=>'Yii::t("app",$data->status)',
+      'value'=>'Ticket::getStatusLabel($data->status)',
       'htmlOptions' => array('style'=>'text-align:center;vertical-align:middle'),
       'header'=>Yii::t('app','Status'),
     ),

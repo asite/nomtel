@@ -20,6 +20,7 @@ class ActController extends BaseGxController
         $dataProvider = $model->search();
         $dataProvider->criteria->alias = 'act';
         $dataProvider->criteria->join = "join agent on (agent.id=act.agent_id and agent.parent_id=" . loggedAgentId() . ')';
+        $dataProvider->criteria->order = "dt DESC";
 
         $this->render('list', array(
             'model' => $model,

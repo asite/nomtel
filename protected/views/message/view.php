@@ -43,21 +43,25 @@
   <?php $this->endWidget(); ?>
 
   <?php if (isset($params['closeMessage'])) { ?>
+    <br/><br/>
+    <h1><?php echo Yii::t('app','Ticket close') ?></h1>
     <?php $form = $this->beginWidget('BaseTbActiveForm', array(
       'id' => 'close-ticket',
       'method'=>'post',
       'action'=>$this->createUrl('close',array('ticket'=>$_GET['id'], 'type'=>$_GET['type'])),
-      'enableAjaxValidation' => false,
-      'clientOptions'=>array('validateOnSubmit' => false, 'validateOnChange' => false)
+      'enableAjaxValidation' => true,
+      'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
     )); ?>
-    <br/><br/>
+    <?php echo $form->errorSummary($act); ?>
     <div class="cfix">
       <?php if (isset($params['priseMessage'])) { ?>
-        <label style="float: left; line-height: 30px;" for="PriseMessage_prise" class="required"><?php echo Yii::t('app','Enter prise'); ?>:</label>
-        <input style="float: left; margin: 0 20px 0 5px;" name="PriseMessage[prise]" id="PriseMessage_prise" type="text" value="0">
+        <label style="line-height: 30px;" for="PriseMessage_prise" class="required"><?php echo Yii::t('app','Enter prise'); ?>:</label>
+        <input style="" name="PriseMessage[prise]" id="PriseMessage_prise" type="text" value="0">
+        <?php echo $form->textAreaRow($act,'comment',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span4','rows'=>5)); ?>
       <?php } ?>
-      <?php echo CHtml::htmlButton(Yii::t('app', 'Close ticket'), array('class'=>'btn btn-primary', 'type'=>'submit', 'style'=>'float: left;')); ?>
     </div>
+    <?php echo CHtml::htmlButton(Yii::t('app', 'Close ticket'), array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
+
     <?php $this->endWidget(); ?>
 
   <?php } ?>

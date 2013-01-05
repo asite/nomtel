@@ -52,7 +52,7 @@ $('.search-form form').submit(function(){
 			'template'=>'{view}',
             'buttons'=>array(
                 'view'=>array(
-                    'visible'=>'$data->type==Act::TYPE_SIM'
+                    //'visible'=>'$data->type==Act::TYPE_SIM'
                 )
             )
 		),

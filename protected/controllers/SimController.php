@@ -1,51 +1,36 @@
 <?php
 
-class SimController extends BaseGxController
-{
+class SimController extends BaseGxController {
 
-    public function additionalAccessRules()
-    {
+    public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array(), 'roles' => array('agent')),
         );
     }
 
-    protected function performAjaxValidation($model, $id = '')
-    {
+    protected function performAjaxValidation($model, $id = '') {
         if (isset($_POST['ajax']) && $_POST['ajax'] === $id) {
             echo CActiveForm::validate($model);
             Yii::app()->end();
         }
     }
 
-    public function actionDelivery()
-    {
+    public function actionDelivery() {
         $activeTabs = array('tab1' => false, 'tab2' => false);
         $model = new Sim;
 
-        $companyList = Company::model()->findAll();
-        $companyListArray = array('' => 'Выбор компании');
-        foreach ($companyList as $v) {
-            $companyListArray[$v['id']] = $v['title'];
-        }
-
-        $regionList = OperatorRegion::model()->findAll();
-        $regionListArray = array('1' => array('' => 'Выбор региона'), '2' => array('' => 'Выбор региона'));
-        foreach ($regionList as $v) {
-            $regionListArray[$v['operator_id']][$v['id']] = $v['title'];
-        }
-
-        $tariffList = Tariff::model()->findAll();
-        $tariffListArray = array('1' => array('' => 'Выбор тарифа'), '2' => array('' => 'Выбор тарифа'));
-        foreach ($tariffList as $v) {
-            $tariffListArray[$v['operator_id']][$v['id']] = $v['title'];
-        }
+        // Выпадающие списки
+        $companyListArray = Company::getDropDownList();
+        $regionListArray = OperatorRegion::getDropDownList();
+        $tariffListArray = Tariff::getDropDownList();
+        // ------------------
 
         if (isset($_POST['Sim'])) {
             $model->setAttributes($_POST['Sim']);
             $this->performAjaxValidation($model, $_POST['simAdd']['method']);
             $data = $_POST['Sim'];
         }
+
 
         if (isset($_FILES['Delivery']) && $_FILES['Delivery']) {
             $sims = array();
@@ -55,7 +40,7 @@ class SimController extends BaseGxController
                 $file = $_FILES['Delivery']['tmp_name']['fileField'][$f];
                 $file_name = $_FILES['Delivery']['name']['fileField'][$f];
                 if ($file) {
-                    if ($_POST['Sim']['operator_id'] == 1) {
+                    if ($_POST['Sim']['operator_id'] == Operator::OPERATOR_BEELINE_ID) {
                         $activeTabs['tab1'] = true;
                         $f = fopen($file, 'r') or die("Невозможно открыть файл!");
                         while (!feof($f)) {
@@ -64,6 +49,8 @@ class SimController extends BaseGxController
                             $text = preg_replace('/\r\n|\r|\n/u', "", $text);
                             $text = preg_replace('/(\s){2,}/', "$1", $text);
                             $sim = explode(" ", $text);
+
+
                             if (!isset($sim[2])) $sim[2] = '';
 
                             if ($sim[0] && $sim[1]) {
@@ -87,7 +74,7 @@ class SimController extends BaseGxController
                                 //} catch(Exception $e) {}
                             }
                         }
-                    } elseif ($_POST['Sim']['operator_id'] == 2) {
+                    } elseif ($_POST['Sim']['operator_id'] == Operator::OPERATOR_MEGAFON_ID) {
                         $activeTabs['tab2'] = true;
                         Yii::import('application.vendors.PHPExcel', true);
                         if (preg_match('%\.xls$%', $file_name)) {
@@ -146,15 +133,31 @@ class SimController extends BaseGxController
         $this->render('delivery', array('model' => $model, 'activeTabs' => $activeTabs, 'company' => $companyListArray, 'regionList' => $regionListArray, 'tariffList' => $tariffListArray));
     }
 
-    public function actionAdd()
+    private function validate(&$model, $data)
     {
+
+        $result = array();
+        $i = 0;
+        unset($data['operator']);
+        unset($data['tariff']);
+        unset($data['where']);
+
+        foreach ($data as $d) {
+            $model->unsetAttributes();
+            $model->setAttributes($d);
+            $model->validate();
+            foreach ($model->getErrors() as $attribute => $errors)
+                $result[CHtml::activeId($model,'['.$i.']' . $attribute)] = $errors;
+            $i++;
+        }
+
+        return $result;
+    }
+
+    public function actionAdd() {
         $model = new AddSim;
 
-        $opList = Operator::model()->findAll();
-        $opListArray = array();
-        foreach ($opList as $v) {
-            $opListArray[$v['id']] = $v['title'];
-        }
+        $opListArray = Operator::getComboList();
 
         if (isset($_POST['AddSim']['operator'])) $operator_id = $_POST['AddSim']['operator']; else $operator_id = key($opListArray);
         $tariffList = Tariff::model()->findAllByAttributes(array('operator_id' => $operator_id));
@@ -165,16 +168,15 @@ class SimController extends BaseGxController
 
         $whereListArray = array(0 => 'БАЗА', 1 => 'АГЕНТ');
 
-
         if ($_POST['AddSim']) {
             $transaction = Yii::app()->db->beginTransaction();
 
             $activeTabs = array('tab1' => false, 'tab2' => false);
 
-            $model->attributes = $_POST['AddSim'];
-            $this->performAjaxValidation($model, $_POST['simMethod']);
-
             if ($_POST['simMethod'] == 'add-much-sim') {
+                $model->attributes = $_POST['AddSim'];
+                $this->performAjaxValidation($model, $_POST['simMethod']);
+
                 $result = Sim::model()->findAllByAttributes(
                     array(),
                     $condition = 'icc >= :iccBegin AND icc <= :iccEnd AND parent_agent_id is null',
@@ -223,44 +225,35 @@ class SimController extends BaseGxController
             }
 
             if ($_POST['simMethod'] == 'add-few-sim') {
+                if (Yii::app()->getRequest()->getIsAjaxRequest()) {
+                    $result = $this->validate($model, $_POST['AddSim']);
+                    echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
+                    Yii::app()->end();
+                }
                 $old_model = $model;
 
                 $sim_count = 1;
 
-                $model = new Sim;
-                $model->parent_agent_id = adminAgentId();
-                $model->number_price = 0;
-                $model->operator_id = $_POST['AddSim']['operator'];
-                $model->tariff_id = $_POST['AddSim']['tariff'];
-                $model->personal_account = $_POST['AddSim']['ICCPersonalAccount'];
-                $model->icc = $_POST['AddSim']['ICCBeginFew'] . $_POST['AddSim']['ICCEndFew'];
-                $model->number = $_POST['AddSim']['phone'];
-                //try {
-                $model->save();
-                $model->parent_id = $model->id;
-                $model->save();
-                $ids = array();
-                $ids[$model->id] = $model->id;
-                //} catch(Exception $e) {}
+                for ($o = 0; $o <= count($_POST['AddSim'])-1; $o++) {
+                    if (isset($_POST['AddSim'][$o]['phone']) && ($_POST['AddSim'][$o]['phone']))
+                    {
+                        $model = new Sim;
+                        $model->parent_agent_id = adminAgentId();
+                        $sim_count++;
+                        $model->number_price = 0;
+                        $model->operator_id = $_POST['AddSim'][0]['operator'];
+                        $model->tariff_id = $_POST['AddSim'][0]['tariff'];
+                        $model->personal_account = $_POST['AddSim'][$o]['ICCPersonalAccount'];
+                        $model->icc = $_POST['AddSim'][$o]['ICCBeginFew'] . $_POST['AddSim'][$o]['ICCEndFew'];
+                        $model->number = $_POST['AddSim'][$o]['phone'];
 
-                for ($o = 1; $o <= count($_POST['AddNewSim']['ICCPersonalAccount']); $o++) {
-                    $model = new Sim;
-                    $model->parent_agent_id = adminAgentId();
-                    $sim_count++;
-                    $model->number_price = 0;
-                    $model->operator_id = $_POST['AddSim']['operator'];
-                    $model->tariff_id = $_POST['AddSim']['tariff'];
-                    $model->personal_account = $_POST['AddNewSim']['ICCPersonalAccount'][$o];
-                    $model->icc = $_POST['AddNewSim']['ICCBeginFew'][$o] . $_POST['AddNewSim']['ICCEndFew'][$o];
-                    $model->number = $_POST['AddNewSim']['phone'][$o];
-
-                    //try {
-                    $model->save();
-                    $model->parent_id = $model->id;
-                    $model->save();
-                    $ids[$model->id] = $model->id;
-                    //} catch(Exception $e) {}
-
+                        //try {
+                        $model->save();
+                        $model->parent_id = $model->id;
+                        $model->save();
+                        $ids[$model->id] = $model->id;
+                        //} catch(Exception $e) {}
+                    }
                 }
 
                 Agent::deltaSimCount(adminAgentId(), $sim_count);
@@ -272,7 +265,7 @@ class SimController extends BaseGxController
                     exit;
                 }
 
-                if ($_POST['AddSim']['where']) {
+                if ($_POST['AddSim'][0]['where']) {
                     $key = rand();
                     $_SESSION['moveSims'][$key] = $ids;
                     $transaction->commit();
@@ -293,8 +286,7 @@ class SimController extends BaseGxController
     }
 
 
-    public function actionMassSelect()
-    {
+    public function actionMassSelect() {
 
         if ($_POST['ICCtoSelect'] != '') {
             $icc_arr = explode("\n", $_POST['ICCtoSelect']);
@@ -322,8 +314,7 @@ class SimController extends BaseGxController
         $this->render('massselect');
     }
 
-    public function actionMove($key)
-    {
+    public function actionMove($key) {
         if ($_POST['Move']) {
             if (!$_POST['Move']['agent_id']) {
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не выбран агент.');
@@ -387,8 +378,7 @@ class SimController extends BaseGxController
         }
     }
 
-    public function actionAjaxcombo()
-    {
+    public function actionAjaxcombo() {
         $tariffList = Tariff::model()->findAllByAttributes(array('operator_id' => $_POST['operatorId']));
         $tariffListArray = array();
         $res = '';

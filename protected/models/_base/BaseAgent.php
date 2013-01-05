@@ -18,6 +18,7 @@
  * @property string $phone_1
  * @property string $phone_2
  * @property string $phone_3
+ * @property string $city
  * @property string $email
  * @property string $skype
  * @property string $icq
@@ -67,15 +68,15 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
 			array('parent_id, user_id, stat_sim_count', 'numerical', 'integerOnly'=>true),
 			array('balance, stat_acts_sum, stat_payments_sum', 'numerical'),
-			array('name, surname, middle_name, email, skype', 'length', 'max'=>100),
+			array('name, surname, middle_name, city, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
-			array('parent_id, user_id, phone_2, phone_3, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birthday_date','date','format'=>'dd.MM.yyyy'),
-			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'safe', 'on'=>'search'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -89,8 +90,8 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'payments' => array(self::HAS_MANY, 'Payment', 'agent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'parent_agent_id'),
 			'sims1' => array(self::HAS_MANY, 'Sim', 'agent_id'),
-			'tickets' => array(self::HAS_MANY, 'Ticket', 'whom'),
-			'tickets1' => array(self::HAS_MANY, 'Ticket', 'agent_id'),
+			'tickets' => array(self::HAS_MANY, 'Ticket', 'agent_id'),
+			'tickets1' => array(self::HAS_MANY, 'Ticket', 'whom'),
 		);
 	}
 
@@ -110,6 +111,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'phone_1' => Yii::t('app', 'Phone 1'),
 			'phone_2' => Yii::t('app', 'Phone 2'),
 			'phone_3' => Yii::t('app', 'Phone 3'),
+			'city' => Yii::t('app', 'City'),
 			'email' => Yii::t('app', 'Email'),
 			'skype' => Yii::t('app', 'Skype'),
 			'icq' => Yii::t('app', 'Icq'),
@@ -149,6 +151,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('phone_1', $this->phone_1, true);
 		$criteria->compare('phone_2', $this->phone_2, true);
 		$criteria->compare('phone_3', $this->phone_3, true);
+		$criteria->compare('city', $this->city, true);
 		$criteria->compare('email', $this->email, true);
 		$criteria->compare('skype', $this->skype, true);
 		$criteria->compare('icq', $this->icq, true);

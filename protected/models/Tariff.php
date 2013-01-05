@@ -21,8 +21,7 @@ class Tariff extends BaseTariff
 
     public static function getComboList($data = array())
     {
-        $agents = Yii::app()->db->createCommand("select id,title from " .
-            self::model()->tableName() . " order by title")->queryAll();
+        $agents = Yii::app()->db->createCommand("select id,title from ".self::model()->tableName()." order by title")->queryAll();
 
         foreach ($agents as $v) {
             $data[$v['id']] = $v['title'];
@@ -44,4 +43,12 @@ class Tariff extends BaseTariff
         return $data;
     }
 
+    public static function getDropDownList() {
+      $data = Yii::app()->db->createCommand("select id,title,operator_id from " .self::model()->tableName() . " order by title")->queryAll();
+      $result = array(Operator::OPERATOR_BEELINE_ID => array('' => 'Выбор тарифа'), Operator::OPERATOR_MEGAFON_ID => array('' => 'Выбор тарифа'));
+      foreach ($data as $v) {
+        $result[$v['operator_id']][$v['id']] = $v['title'];
+      }
+      return $result;
+    }
 }

@@ -35,4 +35,11 @@ class Act extends BaseAct
         return $dataProvider;
     }
 
+    public function rules()
+    {
+        return array_merge(parent::rules(), array(
+            array('comment', 'required', 'on'=>'ticket'),
+        ));
+    }
+
 }
