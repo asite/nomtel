@@ -301,7 +301,7 @@ class SimController extends BaseGxController
 
             foreach ($icc_arr as $icc) {
                 if ($icc != '') {
-                    if ($sim = Sim::model()->find('icc = "' . trim($icc) . '" or number = "' . trim($icc) . '"')) {
+                    if ($sim = Sim::model()->find('icc = "' . trim($icc) . '" or number = "' . trim($icc) . '" and parent_agent_id="'.loggedAgentId() .'"')) {
                         $ids[] = $sim->id;
 
                     }
