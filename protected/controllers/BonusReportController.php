@@ -196,7 +196,7 @@ class BonusReportController extends BaseGxController
         $bonusReportAgent->payment_id = $payment->id;
 
         foreach ($agentsBonuses as $agent_id => $data) {
-            $sum = $data['sum'] - $data['sum_referrals'];
+            $sum = $this->roundSum($data['sum'] - $data['sum_referrals']);
 
             if ($sum > 1e-6) {
                 Agent::deltaBalance($agent_id, $sum);
@@ -214,8 +214,8 @@ class BonusReportController extends BaseGxController
             $bonusReportAgent->isNewRecord = true;
 
             $bonusReportAgent->sim_count = $data['sim_count'];
-            $bonusReportAgent->sum = $data['sum'];
-            $bonusReportAgent->sum_referrals = $data['sum_referrals'];
+            $bonusReportAgent->sum = $this->roundSum($data['sum']);
+            $bonusReportAgent->sum_referrals = $this->roundSum($data['sum_referrals']);
             $bonusReportAgent->agent_id = $agent_id;
             $bonusReportAgent->save();
         }
