@@ -203,12 +203,22 @@ class BalanceReportController extends BaseGxController
                 $number->save();
                 $numberId = $number->id;
 
-                // search number in sim cards
-                $sim = Sim::model()->findByAttributes(array(
-                    'parent_agent_id' => adminAgentId(),
-                    'personal_account' => $numberBalance['personal_account'],
-                    'number' => $numberBalance['number']
+                // search number in sim cards (attached to admin or not yet received)
+                $sim = Sim::model()->find(array(
+                    'condition'=>"(parent_agent_id is null or parent_agent_id=:admin_agent_id) and
+                        personal_account=:personal_account and number=:number",
+                    'params' => array(
+                        ':admin_agent_id'=>adminAgentId(),
+                        ':personal_account'=>$numberBalance['personal_account'],
+                        ':number'=>$numberBalance['number']
+                    )
                 ));
+
+                // attach not yet received sim to admin
+                if ($sim && $sim->parent_agent_id!=adminAgentId()) {
+                    $sim->parent_agent_id=adminAgentId();
+                    $sim->save();
+                }
 
                 // create sim, if it was not found
                 if (!$sim) {
