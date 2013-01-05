@@ -271,7 +271,8 @@ class BonusReportController extends BaseGxController
         // get agents, to which bonused sims was sent
         $simAgent = $db->createCommand("select number as sim_id,parent_agent_id as agent_id
             from sim
-            where operator_id=" . Operator::OPERATOR_BEELINE_ID . " and agent_id is null and number in (" .
+            where operator_id=" . Operator::OPERATOR_BEELINE_ID .
+            " and parent_agent_id is not null and agent_id is null and number in (" .
             implode(',', $numbers) . ") order by sim.id desc")->queryAll();
 
         $this->calculateBonuses($simBonus, $simAgent, $model->comment, Operator::OPERATOR_BEELINE_ID);
