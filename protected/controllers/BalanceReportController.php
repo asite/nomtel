@@ -69,19 +69,13 @@ class BalanceReportController extends BaseGxController
         }
 
         if (!empty($goodIds)) {
-            Yii::app()->db->createCommand('update number set status=:status_normal, warning_dt=NULL where id in (' .
-                implode(',', $goodIds) . ') and status=:status_warning')->execute(array(
-                ':status_normal' => Number::STATUS_NORMAL,
-                ':status_warning' => Number::STATUS_WARNING,
-            ));
+            Yii::app()->db->createCommand('update number set warning=0, warning_dt=NULL where id in (' .
+                implode(',', $goodIds) . ') and warning=1')->execute();
         }
 
         if (!empty($warnedIds)) {
-            Yii::app()->db->createCommand('update number set status=:status_warning, warning_dt=NOW() where id in (' .
-                implode(',', $warnedIds) . ') and status=:status_normal')->execute(array(
-                ':status_normal' => Number::STATUS_NORMAL,
-                ':status_warning' => Number::STATUS_WARNING,
-            ));
+            Yii::app()->db->createCommand('update number set status=1, warning_dt=NOW() where id in (' .
+                implode(',', $warnedIds) . ') and status=0')->execute();
         }
     }
 
@@ -204,7 +198,7 @@ class BalanceReportController extends BaseGxController
                 $number = new Number();
                 $number->number = $numberBalance['number'];
                 $number->personal_account = $numberBalance['personal_account'];
-                $number->status = Number::STATUS_NORMAL;
+                $number->status = Number::STATUS_CONNECTED;
                 $number->save();
                 $numberId = $number->id;
 

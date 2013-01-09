@@ -171,20 +171,35 @@ class AgentController extends BaseGxController
 
         if ($this->addPaymentAllowed($model)) {
             $paymentNew = new Payment();
-            $paymentNew->dt = new EDateTime();
-            $paymentNew->agent_id = $model->id;
-            $paymentNew->type = Payment::TYPE_NORMAL;
-            $this->performAjaxValidation($paymentNew, 'payment-form');
-
+            $paymentAct = new Act();
             if (isset($_POST['Payment'])) {
-                $paymentNew->setAttributes($_POST['Payment']);
-                if ($paymentNew->validate()) {
-                    $paymentNew->save();
-                    $model->save();
-                    Agent::deltaBalance($paymentNew->agent_id, $paymentNew->sum);
+                $paymentNew->dt = new EDateTime();
+                $paymentNew->agent_id = $model->id;
+                $paymentNew->type = Payment::TYPE_NORMAL;
+                $this->performAjaxValidation($paymentNew, 'payment-form');
+
+                if (isset($_POST['Payment'])) {
+                    $paymentNew->setAttributes($_POST['Payment']);
+                    if ($paymentNew->validate()) {
+                        $paymentNew->save();
+                        $model->save();
+                        Agent::deltaBalance($paymentNew->agent_id, $paymentNew->sum);
+                        $this->redirect(array('view', 'id' => $model->id));
+                    }
+                }
+            } else if (isset($_POST['Act'])) {
+                $Act = new Act;
+                $Act->setAttributes($_POST['Act']);
+                $Act->agent_id = $id;
+                $Act->dt = new EDateTime();
+                $Act->type = Act::TYPE_NORMAL;
+                $this->performAjaxValidation($Act, 'debit-form');
+                if ($Act->validate()) {
+                    $Act->save();
                     $this->redirect(array('view', 'id' => $model->id));
                 }
             }
+
         }
 
         $sql = "(select id,dt,sum,comment,0 as type from payment where agent_id=:agent_id) union
@@ -205,7 +220,8 @@ class AgentController extends BaseGxController
         $this->render('view', array(
             'model' => $model,
             'logDataProvider' => $logDataProvider,
-            'paymentNew' => $paymentNew
+            'paymentNew' => $paymentNew,
+            'paymentAct' => $paymentAct
         ));
     }
 

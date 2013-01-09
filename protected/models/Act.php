@@ -39,6 +39,7 @@ class Act extends BaseAct
     {
         return array_merge(parent::rules(), array(
             array('comment', 'required', 'on'=>'ticket'),
+            array('sum', 'numerical', 'integerOnly' => false, 'min' => 0),
         ));
     }
 

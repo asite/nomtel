@@ -10,7 +10,7 @@ class NumberController extends BaseGxController
         if (isset($_GET['Number']))
             $model->setAttributes($_GET['Number']);
 
-        $model->status = Number::STATUS_WARNING;
+        $model->warning = 1;
 
         $this->render('warnedList', array(
             'model' => $model,

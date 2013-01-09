@@ -10,12 +10,17 @@
  * followed by relations of table "number" available as properties of the model.
  *
  * @property string $id
+ * @property string $sim_id
  * @property string $number
  * @property string $personal_account
  * @property string $status
+ * @property integer $warning
  * @property string $warning_dt
  *
  * @property BalanceReport[] $balanceReports
+ * @property Sim $sim
+ * @property NumberHistory[] $numberHistories
+ * @property SubscriptionAgreement[] $subscriptionAgreements
  */
 abstract class BaseNumber extends BaseGxActiveRecord {
 
@@ -38,18 +43,23 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('number, status', 'required'),
+			array('warning', 'numerical', 'integerOnly'=>true),
+			array('sim_id', 'length', 'max'=>20),
 			array('number, personal_account', 'length', 'max'=>50),
-			array('status', 'length', 'max'=>7),
+			array('status', 'length', 'max'=>9),
 			array('warning_dt', 'safe'),
-			array('personal_account, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('sim_id, personal_account, warning, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
             array('warning_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, number, personal_account, status, warning_dt', 'safe', 'on'=>'search'),
+			array('id, sim_id, number, personal_account, status, warning, warning_dt', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
 			'balanceReports' => array(self::MANY_MANY, 'BalanceReport', 'balance_report_number(number_id, balance_report_id)'),
+			'sim' => array(self::BELONGS_TO, 'Sim', 'sim_id'),
+			'numberHistories' => array(self::HAS_MANY, 'NumberHistory', 'number_id'),
+			'subscriptionAgreements' => array(self::HAS_MANY, 'SubscriptionAgreement', 'number_id'),
 		);
 	}
 
@@ -62,11 +72,16 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id' => Yii::t('app', 'ID'),
+			'sim_id' => null,
 			'number' => Yii::t('app', 'Number'),
 			'personal_account' => Yii::t('app', 'Personal Account'),
 			'status' => Yii::t('app', 'Status'),
+			'warning' => Yii::t('app', 'Warning'),
 			'warning_dt' => Yii::t('app', 'Warning Dt'),
 			'balanceReports' => null,
+			'sim' => null,
+			'numberHistories' => null,
+			'subscriptionAgreements' => null,
 		);
 	}
 
@@ -74,9 +89,11 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);
+		$criteria->compare('sim_id', $this->sim_id);
 		$criteria->compare('number', $this->number, true);
 		$criteria->compare('personal_account', $this->personal_account, true);
 		$criteria->compare('status', $this->status, true);
+		$criteria->compare('warning', $this->warning);
 		$criteria->compare('warning_dt', $this->warning_dt, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
