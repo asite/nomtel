@@ -13,8 +13,8 @@
  * @property integer $bonus_report_id
  * @property integer $agent_id
  * @property integer $sim_count
- * @property double $sum
- * @property double $sum_referrals
+ * @property string $sum
+ * @property string $sum_referrals
  * @property integer $payment_id
  *
  * @property BonusReport $bonusReport
@@ -36,14 +36,14 @@ abstract class BaseBonusReportAgent extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'id';
+		return 'sum';
 	}
 
 	public function rules() {
 		return array(
 			array('bonus_report_id, agent_id, sim_count, sum, sum_referrals', 'required'),
 			array('bonus_report_id, agent_id, sim_count, payment_id', 'numerical', 'integerOnly'=>true),
-			array('sum, sum_referrals', 'numerical'),
+			array('sum, sum_referrals', 'length', 'max'=>14),
 			array('payment_id', 'default', 'setOnEmpty' => true, 'value' => null),
 			array('id, bonus_report_id, agent_id, sim_count, sum, sum_referrals, payment_id', 'safe', 'on'=>'search'),
 		);
@@ -84,8 +84,8 @@ abstract class BaseBonusReportAgent extends BaseGxActiveRecord {
 		$criteria->compare('bonus_report_id', $this->bonus_report_id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('sim_count', $this->sim_count);
-		$criteria->compare('sum', $this->sum);
-		$criteria->compare('sum_referrals', $this->sum_referrals);
+		$criteria->compare('sum', $this->sum, true);
+		$criteria->compare('sum_referrals', $this->sum_referrals, true);
 		$criteria->compare('payment_id', $this->payment_id);
 
 		$dataProvider=new CActiveDataProvider($this, array(

@@ -29,9 +29,9 @@
  * @property string $birthday_date
  * @property string $birthday_place
  * @property string $registration_address
- * @property double $balance
- * @property double $stat_acts_sum
- * @property double $stat_payments_sum
+ * @property string $balance
+ * @property string $stat_acts_sum
+ * @property string $stat_payments_sum
  * @property integer $stat_sim_count
  *
  * @property Act[] $acts
@@ -67,12 +67,12 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		return array(
 			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
 			array('parent_id, user_id, stat_sim_count', 'numerical', 'integerOnly'=>true),
-			array('balance, stat_acts_sum, stat_payments_sum', 'numerical'),
 			array('name, surname, middle_name, city, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
+			array('balance, stat_acts_sum, stat_payments_sum', 'length', 'max'=>14),
 			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birthday_date','date','format'=>'dd.MM.yyyy'),
@@ -162,9 +162,9 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('birthday_date', $this->birthday_date, true);
 		$criteria->compare('birthday_place', $this->birthday_place, true);
 		$criteria->compare('registration_address', $this->registration_address, true);
-		$criteria->compare('balance', $this->balance);
-		$criteria->compare('stat_acts_sum', $this->stat_acts_sum);
-		$criteria->compare('stat_payments_sum', $this->stat_payments_sum);
+		$criteria->compare('balance', $this->balance, true);
+		$criteria->compare('stat_acts_sum', $this->stat_acts_sum, true);
+		$criteria->compare('stat_payments_sum', $this->stat_payments_sum, true);
 		$criteria->compare('stat_sim_count', $this->stat_sim_count);
 
 		$dataProvider=new CActiveDataProvider($this, array(

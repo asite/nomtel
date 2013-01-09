@@ -14,7 +14,7 @@
  * @property string $type
  * @property string $comment
  * @property string $dt
- * @property double $sum
+ * @property string $sum
  *
  * @property BonusReportAgent[] $bonusReportAgents
  * @property Agent $agent
@@ -41,9 +41,9 @@ abstract class BasePayment extends BaseGxActiveRecord {
 		return array(
 			array('agent_id, type, dt, sum', 'required'),
 			array('agent_id', 'numerical', 'integerOnly'=>true),
-			array('sum', 'numerical'),
 			array('type', 'length', 'max'=>6),
 			array('comment', 'length', 'max'=>200),
+			array('sum', 'length', 'max'=>14),
 			array('comment', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, agent_id, type, comment, dt, sum', 'safe', 'on'=>'search'),
@@ -83,7 +83,7 @@ abstract class BasePayment extends BaseGxActiveRecord {
 		$criteria->compare('type', $this->type, true);
 		$criteria->compare('comment', $this->comment, true);
 		$criteria->compare('dt', $this->dt, true);
-		$criteria->compare('sum', $this->sum);
+		$criteria->compare('sum', $this->sum, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

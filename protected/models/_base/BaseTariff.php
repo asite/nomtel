@@ -12,8 +12,8 @@
  * @property integer $id
  * @property integer $operator_id
  * @property string $title
- * @property double $price_agent_sim
- * @property double $price_license_fee
+ * @property string $price_agent_sim
+ * @property string $price_license_fee
  *
  * @property Sim[] $sims
  * @property Operator $operator
@@ -40,8 +40,8 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 		return array(
 			array('operator_id, title, price_agent_sim, price_license_fee', 'required'),
 			array('operator_id', 'numerical', 'integerOnly'=>true),
-			array('price_agent_sim, price_license_fee', 'numerical'),
 			array('title', 'length', 'max'=>50),
+			array('price_agent_sim, price_license_fee', 'length', 'max'=>14),
 			array('id, operator_id, title, price_agent_sim, price_license_fee', 'safe', 'on'=>'search'),
 		);
 	}
@@ -76,8 +76,8 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id);
 		$criteria->compare('operator_id', $this->operator_id);
 		$criteria->compare('title', $this->title, true);
-		$criteria->compare('price_agent_sim', $this->price_agent_sim);
-		$criteria->compare('price_license_fee', $this->price_license_fee);
+		$criteria->compare('price_agent_sim', $this->price_agent_sim, true);
+		$criteria->compare('price_license_fee', $this->price_license_fee, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

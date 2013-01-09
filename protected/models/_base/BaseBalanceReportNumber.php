@@ -40,7 +40,7 @@ abstract class BaseBalanceReportNumber extends BaseGxActiveRecord {
 			array('balance_report_id, number_id, balance', 'required'),
 			array('balance_report_id', 'numerical', 'integerOnly'=>true),
 			array('number_id', 'length', 'max'=>20),
-			array('balance', 'length', 'max'=>18),
+			array('balance', 'length', 'max'=>14),
 			array('balance_report_id, number_id, balance', 'safe', 'on'=>'search'),
 		);
 	}

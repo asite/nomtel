@@ -12,8 +12,8 @@
  * @property string $id
  * @property string $personal_account
  * @property string $number
- * @property double $number_price
- * @property double $sim_price
+ * @property string $number_price
+ * @property string $sim_price
  * @property string $icc
  * @property string $parent_id
  * @property integer $parent_agent_id
@@ -51,14 +51,14 @@ abstract class BaseSim extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'personal_account';
+		return 'number_price';
 	}
 
 	public function rules() {
 		return array(
 			array('parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'numerical', 'integerOnly'=>true),
-			array('number_price, sim_price', 'numerical'),
 			array('personal_account, number, icc', 'length', 'max'=>50),
+			array('number_price, sim_price', 'length', 'max'=>14),
 			array('parent_id', 'length', 'max'=>20),
 			array('personal_account, number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'default', 'setOnEmpty' => true, 'value' => null),
 			array('id, personal_account, number, number_price, sim_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id', 'safe', 'on'=>'search'),
@@ -121,8 +121,8 @@ abstract class BaseSim extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('personal_account', $this->personal_account, true);
 		$criteria->compare('number', $this->number, true);
-		$criteria->compare('number_price', $this->number_price);
-		$criteria->compare('sim_price', $this->sim_price);
+		$criteria->compare('number_price', $this->number_price, true);
+		$criteria->compare('sim_price', $this->sim_price, true);
 		$criteria->compare('icc', $this->icc, true);
 		$criteria->compare('parent_id', $this->parent_id);
 		$criteria->compare('parent_agent_id', $this->parent_agent_id);

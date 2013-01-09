@@ -15,10 +15,10 @@
  * @property string $dt
  * @property integer $whom
  * @property string $status
- * @property double $prise
+ * @property string $prise
  *
- * @property Agent $whom0
  * @property Agent $agent
+ * @property Agent $whom0
  * @property TicketMessage[] $ticketMessages
  */
 abstract class BaseTicket extends BaseGxActiveRecord {
@@ -43,9 +43,9 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 		return array(
 			array('agent_id, dt, whom', 'required'),
 			array('agent_id, whom', 'numerical', 'integerOnly'=>true),
-			array('prise', 'numerical'),
 			array('title', 'length', 'max'=>256),
 			array('status', 'length', 'max'=>6),
+			array('prise', 'length', 'max'=>14),
 			array('title, status, prise', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, agent_id, title, dt, whom, status, prise', 'safe', 'on'=>'search'),
@@ -54,8 +54,8 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
-			'whom0' => array(self::BELONGS_TO, 'Agent', 'whom'),
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
+			'whom0' => array(self::BELONGS_TO, 'Agent', 'whom'),
 			'ticketMessages' => array(self::HAS_MANY, 'TicketMessage', 'ticket_id'),
 		);
 	}
@@ -74,8 +74,8 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 			'whom' => null,
 			'status' => Yii::t('app', 'Status'),
 			'prise' => Yii::t('app', 'Prise'),
-			'whom0' => null,
 			'agent' => null,
+			'whom0' => null,
 			'ticketMessages' => null,
 		);
 	}
@@ -89,7 +89,7 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('whom', $this->whom);
 		$criteria->compare('status', $this->status, true);
-		$criteria->compare('prise', $this->prise);
+		$criteria->compare('prise', $this->prise, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

@@ -13,7 +13,7 @@
  * @property integer $agent_id
  * @property string $type
  * @property string $dt
- * @property double $sum
+ * @property string $sum
  * @property string $comment
  *
  * @property Agent $agent
@@ -42,8 +42,8 @@ abstract class BaseAct extends BaseGxActiveRecord {
 		return array(
 			array('agent_id, type, dt, sum', 'required'),
 			array('agent_id', 'numerical', 'integerOnly'=>true),
-			array('sum', 'numerical'),
 			array('type', 'length', 'max'=>6),
+			array('sum', 'length', 'max'=>14),
 			array('comment', 'safe'),
 			array('comment', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
@@ -85,7 +85,7 @@ abstract class BaseAct extends BaseGxActiveRecord {
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('type', $this->type, true);
 		$criteria->compare('dt', $this->dt, true);
-		$criteria->compare('sum', $this->sum);
+		$criteria->compare('sum', $this->sum, true);
 		$criteria->compare('comment', $this->comment, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
