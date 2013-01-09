@@ -28,7 +28,7 @@ class BalanceReportController extends BaseGxController
     }
 
 
-    private function recalcOperatorWarnings($reportId1, $reportId2, $reportId3)
+    private function recalcOperatorWarnings($reportId1, $reportId2, $reportId3, $warnOnEqualValues=true)
     {
         $goodIds = array();
         $warnedIds = array();
@@ -57,8 +57,13 @@ class BalanceReportController extends BaseGxController
             // if number not present in current or previous report
             if (($b[1] == '' && $b[2]!='') || $b[2] == '') $warned = true;
 
-            // if balance of last three reports is equal
-            if ($b[0] == $b[1] || $b[1] == $b[2]) $warned = true;
+            if ($warnOnEqualValues) {
+                // if balance of last three reports is equal
+                if ($b[0] == $b[1] && $b[1] == $b[2]) $warned = true;
+            }
+
+            // if balance of last three reports is zero or below zero
+            if ($b[0]<1e-6 && $b[1]<1e-6 && $b[2]<1e-6) $warned = true;
 
             if ($warned) $warnedIds[] = $row['id']; else $goodIds[] = $row['id'];
         }
@@ -97,7 +102,8 @@ class BalanceReportController extends BaseGxController
             $this->recalcOperatorWarnings(
                 $balanceReports[2]->id,
                 $balanceReports[1]->id,
-                $balanceReports[0]->id
+                $balanceReports[0]->id,
+                $operator->id=Operator::OPERATOR_MEGAFON_ID
             );
         }
     }
@@ -185,12 +191,11 @@ class BalanceReportController extends BaseGxController
 
         $balanceReportNumberBulkInsert = new BulkInsert('balance_report_number', array('number_id', 'balance_report_id', 'balance'));
 
-        $cmdFindNumberId = Yii::app()->db->createCommand("select id from number where personal_account=:personal_account and number=:number");
+        $cmdFindNumberId = Yii::app()->db->createCommand("select id from number where number=:number");
 
         foreach ($numberBalances as $numberBalance) {
 
             $numberId = $cmdFindNumberId->queryScalar(array(
-                ':personal_account' => $numberBalance['personal_account'],
                 ':number' => $numberBalance['number'],
             ));
 
@@ -248,6 +253,58 @@ class BalanceReportController extends BaseGxController
         $trx->commit();
 
         $this->redirect(array('view', 'id' => $balanceReport->id));
+    }
+
+    private function processLoadBeeline($model, $reader, $file)
+    {
+        $reader->setReadFilter(new BeelineBalanceReportReadFilter);
+
+        try {
+            $book = $reader->load($file->tempName);
+        } catch (Exception $e) {
+            $this->errorInvalidFormat($e->getMessage());
+        }
+
+        $sheet = $book->getActiveSheet();
+
+        $rows = $sheet->getHighestRow();
+
+        if ($sheet->getCellByColumnAndRow(3, 14)->getValue() != 'CTN')
+            $this->errorInvalidFormat(__LINE__);
+        if ($sheet->getCellByColumnAndRow(7, 14)->getValue() != 'Выручка без учета НДС, руб.')
+            $this->errorInvalidFormat(__LINE__);
+
+        $balances = array();
+        for ($row = 15; $row <= $rows; $row++) {
+            $number = trim($sheet->getCellByColumnAndRow(3, $row)->getValue());
+            $balance = $sheet->getCellByColumnAndRow(7, $row)->getValue();
+
+            if ($number == '') continue;
+
+            if (isset($numbers[$number])) {
+                echo $number;
+                exit;
+            }
+
+            if (!preg_match('/^\d{10}$/', $number)) $this->errorInvalidFormat(__LINE__ . " $row '$number'");
+            if ($balance === '') $this->errorInvalidFormat(__LINE__ . " $row");
+
+            // in beeline report one number can have many rows, don't know why...
+            if (!$balances[$number]) {
+                $balances[$number] = array(
+                    'personal_account' => '',
+                    'number' => $number,
+                    'balance' => floatval($balance)
+                );
+            } else {
+                $balances[$number]['balance']+=floatval($balance);
+            }
+        }
+
+        $book->disconnectWorksheets();
+        unset($book);
+
+        $this->loadBalances($balances, $model->comment, Operator::OPERATOR_BEELINE_ID);
     }
 
     private function processLoadMegafon($model, $reader, $file)
@@ -313,6 +370,9 @@ class BalanceReportController extends BaseGxController
         if (method_exists($reader, 'setReadDataOnly')) $reader->setReadDataOnly(true);
 
         switch ($model->operator) {
+            case Operator::OPERATOR_BEELINE_ID:
+                $this->processLoadBeeline($model, $reader, $file);
+                break;
             case Operator::OPERATOR_MEGAFON_ID:
                 $this->processLoadMegafon($model, $reader, $file);
                 break;

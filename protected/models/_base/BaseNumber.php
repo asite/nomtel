@@ -37,11 +37,11 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('number, personal_account', 'required'),
+			array('number, status', 'required'),
 			array('number, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>7),
 			array('warning_dt', 'safe'),
-			array('status, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('personal_account, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
             array('warning_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, number, personal_account, status, warning_dt', 'safe', 'on'=>'search'),
 		);

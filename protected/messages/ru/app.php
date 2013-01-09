@@ -68,6 +68,7 @@ return array (
   'Are you sure to delete this Tariff?' => 'Вы действительно хотите удалить этот тариф?',
   'Authorization data' => 'Авторизационные данные',
   'Balance' => 'Баланс',
+  'Balance/Earnings' => 'Баланс/Выручка',
   'BalanceReport|BalanceReports' => 'Отчет по балансам|Отчеты по балансам',
   'Bilain' => 'Билайн',
   'Birthday Date' => 'Дата рождения',

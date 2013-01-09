@@ -45,7 +45,7 @@ $('.search-form form').submit(function(){
         ),
         array(
             'name'=>'balance',
-            'header'=>Yii::t('app','Balance')
+            'header'=>Yii::t('app','Balance/Earnings')
         )
     ),
 )); ?>
