@@ -26,8 +26,8 @@
  * @property string $passport_number
  * @property string $passport_issue_date
  * @property string $passport_issuer
- * @property string $birthday_date
- * @property string $birthday_place
+ * @property string $birth_date
+ * @property string $birth_place
  * @property string $registration_address
  * @property string $balance
  * @property string $stat_acts_sum
@@ -65,18 +65,18 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address', 'required'),
+			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
 			array('parent_id, user_id, stat_sim_count', 'numerical', 'integerOnly'=>true),
 			array('name, surname, middle_name, city, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
-			array('passport_issuer, birthday_place, registration_address', 'length', 'max'=>200),
+			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>200),
 			array('balance, stat_acts_sum, stat_payments_sum', 'length', 'max'=>14),
 			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
-            array('birthday_date','date','format'=>'dd.MM.yyyy'),
-			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birthday_date, birthday_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'safe', 'on'=>'search'),
+            array('birth_date','date','format'=>'dd.MM.yyyy'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -119,8 +119,8 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'passport_number' => Yii::t('app', 'Passport Number'),
 			'passport_issue_date' => Yii::t('app', 'Passport Issue Date'),
 			'passport_issuer' => Yii::t('app', 'Passport Issuer'),
-			'birthday_date' => Yii::t('app', 'Birthday Date'),
-			'birthday_place' => Yii::t('app', 'Birthday Place'),
+			'birth_date' => Yii::t('app', 'Birth Date'),
+			'birth_place' => Yii::t('app', 'Birth Place'),
 			'registration_address' => Yii::t('app', 'Registration Address'),
 			'balance' => Yii::t('app', 'Balance'),
 			'stat_acts_sum' => Yii::t('app', 'Stat Acts Sum'),
@@ -159,8 +159,8 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('passport_number', $this->passport_number, true);
 		$criteria->compare('passport_issue_date', $this->passport_issue_date, true);
 		$criteria->compare('passport_issuer', $this->passport_issuer, true);
-		$criteria->compare('birthday_date', $this->birthday_date, true);
-		$criteria->compare('birthday_place', $this->birthday_place, true);
+		$criteria->compare('birth_date', $this->birth_date, true);
+		$criteria->compare('birth_place', $this->birth_place, true);
 		$criteria->compare('registration_address', $this->registration_address, true);
 		$criteria->compare('balance', $this->balance, true);
 		$criteria->compare('stat_acts_sum', $this->stat_acts_sum, true);
@@ -178,12 +178,12 @@ abstract class BaseAgent extends BaseGxActiveRecord {
     public function convertDateTimeFieldsToEDateTime() {
         // rest of work will do setAttribute() routine
         $this->setAttribute('passport_issue_date',strval($this->passport_issue_date));
-        $this->setAttribute('birthday_date',strval($this->birthday_date));
+        $this->setAttribute('birth_date',strval($this->birth_date));
     }
 
     public function convertDateTimeFieldsToString() {
         if (is_object($this->passport_issue_date) && get_class($this->passport_issue_date)=='EDateTime') $this->passport_issue_date=new EString($this->passport_issue_date->format(self::$mySqlDateFormat));
-        if (is_object($this->birthday_date) && get_class($this->birthday_date)=='EDateTime') $this->birthday_date=new EString($this->birthday_date->format(self::$mySqlDateFormat));
+        if (is_object($this->birth_date) && get_class($this->birth_date)=='EDateTime') $this->birth_date=new EString($this->birth_date->format(self::$mySqlDateFormat));
     }
 
     public function afterFind() {
@@ -202,7 +202,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
     public function setAttribute($name,$value) {
         if (is_string($value)) {
             if ($name=='passport_issue_date') $value=$this->convertStringToEDateTime($value,'date');
-            if ($name=='birthday_date') $value=$this->convertStringToEDateTime($value,'date');
+            if ($name=='birth_date') $value=$this->convertStringToEDateTime($value,'date');
         }
         return parent::setAttribute($name,$value);
     }

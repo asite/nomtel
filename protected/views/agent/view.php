@@ -97,8 +97,35 @@ $this->breadcrumbs = array(
         $this->endWidget();
         ?>
     </div>
-<?php } ?>
 
+
+   <h2><?php echo Yii::t('app', 'Debit');?></h2>
+
+
+    <div class="form">
+
+        <?php $form = $this->beginWidget('BaseTbActiveForm', array(
+        'id' => 'debit-form',
+        'type' => 'horizontal',
+        'enableAjaxValidation' => true,
+        'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false),
+        //'htmlOptions'=>array('enctype'=>'multipart/form-data')
+    ));
+        ?>
+
+        <?php echo $form->textFieldRow($paymentAct,'sum',array('class'=>'span1')); ?>
+
+        <?php echo $form->textAreaRow($paymentAct,'comment',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span4','rows'=>5)); ?>
+
+        <?php
+        echo '<div class="form-actions">';
+        echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'To charge'), array('class'=>'btn btn-primary', 'type'=>'submit'));
+        echo '</div>';
+        $this->endWidget();
+        ?>
+    </div>
+
+<?php } ?>
 <h2><?php echo Yii::t('app','Account history'); ?></h2>
 
 <h3 class="h3-balance">Баланс: <?php echo $model->balance; ?></h3>

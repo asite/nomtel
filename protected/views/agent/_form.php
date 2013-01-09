@@ -73,10 +73,10 @@
 
         <div class="form-container-horizontal">
             <div class="form-container-item form-label-width-140">
-                <?php echo $form->pickerDateRow($model,'birthday_date',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->pickerDateRow($model,'birth_date',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
             </div>
             <div class="form-container-item form-label-width-140">
-                <?php echo $form->textFieldRow($model,'birthday_place',array('class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <?php echo $form->textFieldRow($model,'birth_place',array('class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
             </div>
         </div>
 
