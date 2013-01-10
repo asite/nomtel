@@ -98,9 +98,9 @@ class MessageController extends Controller
         if ($ticket->status == 'CLOSED') $params['tiketClosed'] = true;
         if ($ticket->whom == loggedAgentId()) $params['closeMessage'] = true;
         $agent = Agent::model()->findByPk($ticket->agent_id);
-        if (loggedAgentId() == $agent->parent_id) $params['priseMessage'] = true;
+        if (loggedAgentId() == $agent->parent_id) $params['priceMessage'] = true;
 
-        $this->render('view', array('model' => $model, 'act'=>$act, 'messages' => $messages, 'agents' => $agents, 'params' => $params));
+        $this->render('view', array('model' => $model, 'act'=>$act, 'ticket'=>$ticket, 'messages' => $messages, 'agents' => $agents, 'params' => $params));
     }
 
     public function actionAnswer($ticket, $type)
@@ -136,15 +136,15 @@ class MessageController extends Controller
     {
         $model = Ticket::model()->findByPk($ticket);
         if ($model->whom == loggedAgentId()) {
-            if (isset($_POST['PriseMessage']['prise'])) {
-                $prise = $_POST['PriseMessage']['prise'];
+            if (isset($_POST['Ticket']['price'])) {
+                $price = $_POST['Ticket']['price'];
                 $Act = new Act('ticket');
                 $Act->setAttributes($_POST['Act']);
                 $Act->agent_id = $model->agent_id;
                 $Act->dt = new EDateTime();
-                $Act->sum = $prise;
+                $Act->sum = $price;
                 $Act->type = Act::TYPE_NORMAL;
-                $this->performAjaxValidation($Act, 'close-ticket');
+                $this->performAjaxValidation(array($Act,$model), 'close-ticket');
 
                 $transaction = Yii::app()->db->beginTransaction();
                 try {
@@ -155,11 +155,11 @@ class MessageController extends Controller
                 } catch (CDbException $e) {
                     $transaction->rollback();
                 }
-            } else $prise = 0;
+            } else $price = 0;
 
             try {
                 $model->status = 'CLOSED';
-                $model->prise = $prise;
+                $model->price = $price;
                 $model->update();
             } catch (CDbException $e) {
             }

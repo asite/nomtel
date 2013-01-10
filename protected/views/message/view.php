@@ -54,9 +54,8 @@
     )); ?>
     <?php echo $form->errorSummary($act); ?>
     <div class="cfix">
-      <?php if (isset($params['priseMessage'])) { ?>
-        <label style="line-height: 30px;" for="PriseMessage_prise" class="required"><?php echo Yii::t('app','Enter prise'); ?>:</label>
-        <input style="" name="PriseMessage[prise]" id="PriseMessage_prise" type="text" value="0">
+      <?php if (isset($params['priceMessage'])) { ?>
+        <?php echo $form->textFieldRow($ticket,'price',array('class'=>'span4','errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php echo $form->textAreaRow($act,'comment',array('errorOptions'=>array('hideErrorMessage'=>true),'class'=>'span4','rows'=>5)); ?>
       <?php } ?>
     </div>

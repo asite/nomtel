@@ -114,7 +114,7 @@ return array (
   'Delivery Reports Sum' => 'Всего списано',
   'Dt' => 'Дата',
   'Enter' => 'Войти',
-  'Enter prise' => 'Стоимость',
+  'Enter price' => 'Стоимость',
   'Fields with' => 'Поля, отмеченные',
   'File' => 'Файл',
   'File has invalid format (%msg%)' => 'Файл имеет неправильный формат (%msg%)',

@@ -19,11 +19,9 @@ class SimController extends BaseGxController {
         $activeTabs = array('tab1' => false, 'tab2' => false);
         $model = new Sim;
 
-        // Выпадающие списки
         $companyListArray = Company::getDropDownList();
         $regionListArray = OperatorRegion::getDropDownList();
         $tariffListArray = Tariff::getDropDownList();
-        // ------------------
 
         if (isset($_POST['Sim'])) {
             $model->setAttributes($_POST['Sim']);
@@ -40,6 +38,8 @@ class SimController extends BaseGxController {
                 $file = $_FILES['Delivery']['tmp_name']['fileField'][$f];
                 $file_name = $_FILES['Delivery']['name']['fileField'][$f];
                 if ($file) {
+
+                    // add bilain sim
                     if ($_POST['Sim']['operator_id'] == Operator::OPERATOR_BEELINE_ID) {
                         $activeTabs['tab1'] = true;
                         $f = fopen($file, 'r') or die("Невозможно открыть файл!");
@@ -74,6 +74,8 @@ class SimController extends BaseGxController {
                                 //} catch(Exception $e) {}
                             }
                         }
+
+                    // add megafon sim in base
                     } elseif ($_POST['Sim']['operator_id'] == Operator::OPERATOR_MEGAFON_ID) {
                         $activeTabs['tab2'] = true;
                         Yii::import('application.vendors.PHPExcel', true);
@@ -112,6 +114,9 @@ class SimController extends BaseGxController {
                                     $model->save();
                                     $model->parent_id = $model->id;
                                     $model->save();
+
+                                    Number::addNumber($model);
+
                                     $sims[$i]['id'] = $model->id;
                                     $sims[$i]['personal_account'] = $sim[0];
                                     $sims[$i++]['number'] = $sim[1];
@@ -173,6 +178,7 @@ class SimController extends BaseGxController {
 
             $activeTabs = array('tab1' => false, 'tab2' => false);
 
+            //add sim in base or in base and to agent
             if ($_POST['simMethod'] == 'add-much-sim') {
                 $model->attributes = $_POST['AddSim'];
                 $this->performAjaxValidation($model, $_POST['simMethod']);
@@ -198,6 +204,8 @@ class SimController extends BaseGxController {
                         $v->operator_id = $_POST['AddSim']['operator'];
                         $v->tariff_id = $_POST['AddSim']['tariff'];
                         $v->save();
+
+                        Number::addNumber($v);
                     }
                     Agent::deltaSimCount(adminAgentId(), $sim_count);
 
@@ -223,6 +231,7 @@ class SimController extends BaseGxController {
                     }
                 }
             }
+
 
             if ($_POST['simMethod'] == 'add-few-sim') {
                 if (Yii::app()->getRequest()->getIsAjaxRequest()) {
@@ -251,6 +260,9 @@ class SimController extends BaseGxController {
                         $model->save();
                         $model->parent_id = $model->id;
                         $model->save();
+
+                        Number::addNumber($model);
+
                         $ids[$model->id] = $model->id;
                         //} catch(Exception $e) {}
                     }
@@ -358,6 +370,17 @@ class SimController extends BaseGxController {
 
             $model->agent->recalcBalance();
             $model->agent->save();
+
+            //add NumberHistory
+            $criteria = new CDbCriteria();
+            $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+            $simsId = Sim::model()->findAll($criteria);
+            foreach($simsId as $s) {
+                $number = Number::model()->findByAttributes(array('number'=>$s->number));
+                if (!empty($number)) {
+                    NumberHistory::addHistoryNumber($number->id,'Агент '.loggedAgentId(),'Передача Агенту '.$_POST['Move']['agent_id']);
+                }
+            }
 
             $trx->commit();
 

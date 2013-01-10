@@ -21,4 +21,11 @@ class Ticket extends BaseTicket
       );
       return $statuses[$type];
     }
+
+    public function rules()
+    {
+        return array_merge(parent::rules(), array(
+            array('price', 'numerical', 'integerOnly' => false, 'min' => 0),
+        ));
+    }
 }
