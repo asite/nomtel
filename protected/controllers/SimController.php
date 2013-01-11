@@ -473,6 +473,7 @@ class SimController extends BaseGxController {
 
         $dataProvider = $model->search();
         $dataProvider->criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
+        $dataProvider->criteria->with=array('tariff','operator','act','agent');
 
         $this->render('list', array(
             'model' => $model,
