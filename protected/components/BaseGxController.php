@@ -12,6 +12,11 @@ class BaseGxController extends GxController
         Yii::app()->end();
     }
 
+    public function checkPermissions($operation,$params,$allowCaching=true) {
+        if (!Yii::app()->user->checkAccess($operation,$params,$allowCaching))
+            throw CHttpException(403,Yii::t('app','You are not authorized to perform this action.'));
+    }
+
     /*
         public function preProcessUploadedFile($file, &$model, $field, $force_name = '') {
             if (!isset($file['error'][$field]))

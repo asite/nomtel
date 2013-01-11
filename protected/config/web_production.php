@@ -33,14 +33,15 @@ return array(
     'components' => array(
         'authManager' => array(
             'class' => 'PhpAuthManager',
-            'authFile' => 'protected/config/auth.php'
+            'authFile' => 'protected/config/auth.php',
+            'defaultRoles' => array('guest'),
         ),
         'request' => array(
             'enableCsrfValidation' => true,
             'enableCookieValidation' => true,
         ),
         'user' => array(
-            //'class'=>'WebUser',
+            'class'=>'WebUser',
             // enable cookie-based authentication
             'allowAutoLogin' => true,
         ),

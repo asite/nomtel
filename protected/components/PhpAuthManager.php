@@ -6,6 +6,8 @@ class PhpAuthManager extends CPhpAuthManager
     {
         parent::init();
 
-        $this->assign(loggedAgentId() == adminAgentId() ? 'admin' : 'agent', loggedAgentId());
+        if(!Yii::app()->user->isGuest) {
+            $this->assign(Yii::app()->user->role, Yii::app()->user->id);
+        }
     }
 }

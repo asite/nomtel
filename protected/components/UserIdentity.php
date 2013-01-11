@@ -14,7 +14,6 @@ class UserIdentity extends CUserIdentity
             if ($agent) {
                 $this->setState('agentId', $agent->id);
             }
-            $this->setState('isAdmin', $agent->id == adminAgentId());
             return true;
         } else {
             $this->errorMessage = $result;

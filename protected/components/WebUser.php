@@ -1,12 +1,21 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: pavel
- * Date: 11.01.13
- * Time: 10:12
- * To change this template use File | Settings | File Templates.
- */
-class WebUser
-{
 
+class WebUser extends CWebUser
+{
+    private $role = null;
+
+    function getRole() {
+        if ($this->role===null) {
+            $agent=Agent::model()->findByAttributes(array('user_id'=>$this->id));
+            if ($agent) {
+                $this->role=$agent->id==adminAgentId() ? 'admin':'agent';
+            } else {
+                $supportOperator=SupportOperator::model()->findByAttributes(array('user_id'=>$this->id));
+                if ($supportOperator) {
+                    $this->role='support';
+                }
+            }
+        }
+        return $this->role;
+    }
 }

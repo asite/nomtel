@@ -29,7 +29,7 @@ $('.search-form form').submit(function(){
 <h1><?php echo '<?php'; ?> echo GxHtml::encode($model->label(2)); ?></h1>
 
 <a class="btn" style="margin-bottom:10px;" href="<?php echo '<?php echo $this->createUrl(\'create\') ?>' ?>"><?php echo '<?php echo Yii::t(\'app\', \'Create\') ?>' ?></a>
-<?php echo '<?php'; ?> $this->widget('bootstrap.widgets.TbGridView', array(
+<?php echo '<?php'; ?> $this->widget('bootstrap.widgets.TbExtendedGridView', array(
 	'id' => '<?php echo $this->class2id($this->modelClass); ?>-grid',
 	'dataProvider' => $model->search(),
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

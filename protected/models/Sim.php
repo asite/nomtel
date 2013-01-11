@@ -27,24 +27,24 @@ class Sim extends BaseSim
     {
         $criteria = new CDbCriteria;
 
-        $criteria->compare('id', $this->id, true);
-        $criteria->compare('act_id', $this->act_id);
-        $criteria->compare('personal_account', $this->personal_account, true);
+        $criteria->compare('t.id', $this->id, true);
+        $criteria->compare('t.act_id', $this->act_id);
+        $criteria->compare('t.personal_account', $this->personal_account, true);
 
         if ($this->number != Yii::t('app', 'WITHOUT NUMBER'))
-            $criteria->compare('number', $this->number, true);
+            $criteria->compare('t.number', $this->number, true);
         else
-            $criteria->addCondition("(number='' or number is null)");
+            $criteria->addCondition("(t.number='' or t.number is null)");
 
         if ($this->agent_id !== '0')
-            $criteria->compare('agent_id', $this->agent_id);
+            $criteria->compare('t.agent_id', $this->agent_id);
         else
-            $criteria->addCondition("agent_id is null");
+            $criteria->addCondition("t.agent_id is null");
 
-        $criteria->compare('number_price', $this->number_price);
-        $criteria->compare('icc', $this->icc, true);
-        $criteria->compare('operator_id', $this->operator_id);
-        $criteria->compare('tariff_id', $this->tariff_id);
+        $criteria->compare('t.number_price', $this->number_price);
+        $criteria->compare('t.icc', $this->icc, true);
+        $criteria->compare('t.operator_id', $this->operator_id);
+        $criteria->compare('t.tariff_id', $this->tariff_id);
 
         $dataProvider = new CActiveDataProvider($this, array(
             'criteria' => $criteria,

@@ -2,7 +2,7 @@
 
 function isAdmin()
 {
-    return Yii::app()->user->getState('isAdmin');
+    return Yii::app()->user->role=='admin';
 }
 
 function loggedAgentId()

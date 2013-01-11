@@ -1,8 +1,17 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: pavel
- * Date: 11.01.13
- * Time: 9:34
- * To change this template use File | Settings | File Templates.
- */
+
+class SubscriptionAgreementController extends BaseGxController {
+
+    public function actionCreate($sim_id) {
+
+        $sim=$this->loadModel($sim_id,'Sim');
+        $this->checkPermissions('createSubscriptionAgreement',array('sim'=>$sim));
+
+        $agreement=new SubscriptionAgreement();
+
+        $this->render('create',array(
+            'sim'=>$sim,
+            'agreement'=>$agreement
+        ));
+    }
+}

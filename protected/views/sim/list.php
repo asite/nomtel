@@ -53,7 +53,7 @@ $('.search-form form').submit(function(){
     'columns' => array(
         array(
             'name'=>'act_id',
-            'value'=>'$data->act->dt ? $data->act->dt->format("d.m.Y"):"";    ',
+            'value'=>'$data->act->dt ? $data->act->dt->format("d.m.Y"):"";',
             'filter'=>false,
         ),
         array(
@@ -80,14 +80,20 @@ $('.search-form form').submit(function(){
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:40px;text-align:center;vertical-align:middle'),
-            'template'=>'{feedback}',
+            'template'=>'{feedback} {agreement}',
             'buttons'=>array(
                 'feedback'=>array(
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
                     'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data->id))',
                     'visible'=>'!isAdmin()'
-                )
+                ),
+                'agreement'=>array(
+                    'label'=>Yii::t('app','Create subscription agreement'),
+                    'icon'=>'file',
+                    'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/create",array("sim_id"=>$data->id))',
+                    'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("sim"=>$data))'
+                ),
             )
         ),
     ),

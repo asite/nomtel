@@ -17,5 +17,5 @@
  * NOTE, this file must be saved in UTF-8 encoding.
  */
 return array (
-  'Your request is invalid.' => '',
+  'Your request is invalid.' => 'Ваш запрос неверен',
 );
