@@ -9,9 +9,12 @@ class SubscriptionAgreementController extends BaseGxController {
 
         $agreement=new SubscriptionAgreement();
 
+        $person=new Person();
+
         $this->render('create',array(
             'sim'=>$sim,
-            'agreement'=>$agreement
+            'agreement'=>$agreement,
+            'person'=>$person
         ));
     }
 }

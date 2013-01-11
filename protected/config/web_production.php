@@ -51,6 +51,7 @@ return array(
             // 'useStrictParsing' => true,
             'rules' => array(
                 '/' => 'site/login',
+                'var/thumbs/<url:.*>' => 'thumb/generateThumbnail',
             ),
         ),
         'assetManager' => array(
@@ -94,6 +95,32 @@ return array(
         'varUrl' => '/var/',
         'varDir' => dirname(__FILE__) . '/../../var/',
         'simPrice' => 100,
+        'thumbs'=>array(
+            'file' => array(
+                'width' => 300,
+                'height' => 300,
+                'resizeMode' => 'max',
+                'outputFormat' => 'jpg',
+                'qualityJPG' => 80,
+            ),
+            'uploader' => array(
+                'width' => 100,
+                'height' => 100,
+                // available modes:
+                // max - make image not larger, than width*height
+                // resizeAndCrop - make image size width*height, crop parts of image if needed
+                'resizeMode' => 'max',
+                // available formats
+                // jpg - force jpg
+                // png - force png32
+                // auto - if source is png/gif use png, in other cases - jpg
+                'outputFormat' => 'jpg',
+                // output quality for jpg images (0-100)
+                'qualityJPG' => 90,
+                // output quality (compression level) for png images (0-9)
+                'qualityPNG' => 9,
+            )
+        )
     ),
 );
 

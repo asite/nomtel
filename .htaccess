@@ -12,7 +12,10 @@ AddDefaultCharset UTF-8
 
 RewriteEngine on
 
-RewriteRule ^(assets|static|protected/utils/(adminer|dumper|gitLog|gitPull)|var/(dumper)) - [L]
+RewriteRule ^(assets|static|protected/utils/(adminer|dumper|gitLog|gitPull)|var/(dumper|files)) - [L]
 RewriteRule ^(favicon.ico|robots.txt|index\.php)$ - [L]
+
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^var/thumbs - [L]
 
 RewriteRule ^.*$ index.php [L]
