@@ -21,7 +21,7 @@ return array(
 
     'createSubscriptionAgreementForOwnSim' => array (
         'type' => CAuthItem::TYPE_TASK,
-        'bizRule' => 'return $params["sim"]->parent_id==loggedAgentId();',
+        'bizRule' => 'return $params["sim"]->parent_agent_id==loggedAgentId();',
         'children' => array(
             'createSubscriptionAgreement'
         )
