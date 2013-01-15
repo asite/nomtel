@@ -2,6 +2,11 @@
 
 class Thumb {
 
+    public static function getSubfolder($url) {
+        $code=sha1($url);
+        return '/'.substr($code,0,2).'/'.substr($code,2,2);
+    }
+
 	public static function createUrl($url, $thumbType) {
 		if ($url=='') return $url;
 
@@ -18,7 +23,9 @@ class Thumb {
 
 		$filetime = @filemtime(Yii::getPathOfAlias('webroot') . rawurldecode($url));
 
-		return Yii::app()->params['varUrl'] . 'thumbs/' . $m[1] . '.' . $m[2] . '_' . $thumbType . '_' . $filetime . ".$ext";
+        $subfolder=self::getSubfolder($url);
+
+		return Yii::app()->params['varUrl'] . 'thumbs' . $subfolder. '/' . $m[1] . '.' . $m[2] . '_' . $thumbType . '_' . $filetime . ".$ext";
 	}
 
 	public static function flush() {
@@ -148,6 +155,10 @@ class Thumb {
     }
 
 	public static function generate($url) {
+        if (preg_match('%^(.*)/%',$url,$m));
+        $url=substr($url,strlen($m[1])+1);
+        $subfolder='/'.$m[1];
+
 		if (!preg_match($f = '%^((.*)\.(jpe?g|gif|png)_([^_]+)_(\d+)\.(jpg|png))$%i', $url, $m))
 			throw new CHttpException(404);
 
@@ -155,7 +166,11 @@ class Thumb {
 		if (!$thumb)
 			throw new CHttpException(404);
 
-		$source_filename = Yii::getPathOfAlias('webroot') . rawurldecode(rawurldecode($m[2])) . '.' . $m[3];
+        $source_url=rawurldecode(rawurldecode($m[2])) . '.' . $m[3];
+
+        if ($subfolder!=self::getSubfolder($source_url)) throw new CHttpException(404);
+
+		$source_filename = Yii::getPathOfAlias('webroot') . $source_url;
 
         $sim=self::loadImage($source_filename);
 		if (!$sim) throw new CHttpException(404);
@@ -163,12 +178,17 @@ class Thumb {
         $im=self::resizeImage($sim,$thumb);
         if (!$im) throw new CHttpException(500);
 
-        $saved=self::saveImage($im,Yii::app()->params['varDir'] . 'thumbs/' . $m[1],$thumb);
+        $dest_folder=Yii::app()->params['varDir'] . 'thumbs'.$subfolder;
+
+        if (!file_exists($dest_folder))
+            if (!mkdir($dest_folder,0755,true)) throw new CHttpException(500);
+
+        $saved=self::saveImage($im,$dest_folder.'/' . $m[1],$thumb);
         if (!$saved)  throw new CHttpException(500);
 
 		header("Cache-Control: no-cache, must-revalidate");
 		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
-		header("Location: /var/thumbs/" . rawurlencode($url));
+		header("Location: /var/thumbs" . $subfolder.'/'.rawurlencode($url));
 		Yii::app()->end();
 	}
 
