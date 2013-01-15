@@ -19,6 +19,13 @@ $this->breadcrumbs = array(
     }).done(function( msg ) {
       $(mode).siblings('select[name*="[tariff]"]').html(msg);
     });
+      $.ajax({
+          type: "POST",
+          url: "<?php echo $this->createUrl('ajaxcombo2') ?>",
+          data: { YII_CSRF_TOKEN: $('[name="YII_CSRF_TOKEN"]').val(), operatorId: $(mode).val() }
+      }).done(function( msg ) {
+                  $(mode).siblings('select[name*="[region]"]').html(msg);
+              });
   }
 
   jQuery(document).ready(function(){
@@ -204,12 +211,59 @@ if (isset($actFew)) {
 
 <?php $tab2 = ob_get_contents(); ob_end_clean(); ?>
 
+
+
+
+
+<?php ob_start(); ?>
+
+<?php
+$form = $this->beginWidget('BaseTbActiveForm', array(
+    'id' => 'add-few-sim2',
+    'enableAjaxValidation' => true,
+    'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
+));
+?>
+<input type="hidden" name="simMethod" value="add-few-sim2"/>
+
+<?php echo $form->errorSummary($addSimByNumbers); ?>
+
+<br/>
+<div class="cfix">
+    <?php echo $form->textAreaRow($addSimByNumbers, 'numbers', array('rows'=>20)); ?>
+
+    <?php echo $form->dropDownListRow($addSimByNumbers, 'company', Company::getDropDownList()); ?>
+
+    <?php echo $form->dropDownListRow($addSimByNumbers, 'operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
+
+<?php $regions=OperatorRegion::getDropDownList();$regions=$addSimByNumbers->operator ? $regions[$addSimByNumbers->operator]:$regions[key($regions)]; ?>
+
+
+    <?php echo $form->dropDownListRow($addSimByNumbers, 'region', $regions); ?>
+
+    <?php echo $form->dropDownListRow($addSimByNumbers, 'tariff', $tariffListArray); ?>
+
+    <?php echo $form->dropDownListRow($addSimByNumbers, 'where', $whereListArray); ?>
+</div>
+
+<?php echo CHtml::htmlButton(Yii::t('app', 'buttonAddSim'), array('class'=>'btn btn-primary', 'name'=>'buttonAddSim', 'type'=>'submit')); ?>
+
+<?php $this->endWidget(); ?>
+
+<?php $tab3 = ob_get_contents(); ob_end_clean(); ?>
+
+
+
+
+
+
 <?php
 $this->widget('bootstrap.widgets.TbTabs', array(
   'type'=>'tabs', // 'tabs' or 'pills'
   'tabs'=>array(
     array('label'=>Yii::t('app', 'manySims'), 'content'=>$tab1, 'active'=>$activeTabs['tab1']),
     array('label'=>Yii::t('app', 'fewSims'), 'content'=>$tab2, 'active'=>$activeTabs['tab2']),
+    array('label'=>Yii::t('app', 'fewSims2'), 'content'=>$tab3, 'active'=>$activeTabs['tab3']),
    )
 ));
 

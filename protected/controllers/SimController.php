@@ -16,7 +16,7 @@ class SimController extends BaseGxController {
     }
 
     public function actionDelivery() {
-        $activeTabs = array('tab1' => false, 'tab2' => false);
+        $activeTabs = array('tab1' => false, 'tab2' => false,'tab3' => false);
         $model = new Sim;
 
         $companyListArray = Company::getDropDownList();
@@ -161,6 +161,7 @@ class SimController extends BaseGxController {
 
     public function actionAdd() {
         $model = new AddSim;
+        $addSimByNumbers=new AddSimByNumbers();
 
         $opListArray = Operator::getComboList();
 
@@ -173,10 +174,10 @@ class SimController extends BaseGxController {
 
         $whereListArray = array(0 => 'БАЗА', 1 => 'АГЕНТ');
 
-        if ($_POST['AddSim']) {
+        if ($_POST['AddSim'] || $_POST['AddSimByNumbers']) {
             $transaction = Yii::app()->db->beginTransaction();
 
-            $activeTabs = array('tab1' => false, 'tab2' => false);
+            $activeTabs = array('tab1' => false, 'tab2' => false, 'tab3' => false);
 
             //add sim in base or in base and to agent
             if ($_POST['simMethod'] == 'add-much-sim') {
@@ -291,10 +292,79 @@ class SimController extends BaseGxController {
                     exit;
                 }
             }
+
+            if ($_POST['simMethod'] == 'add-few-sim2') {
+                $this->performAjaxValidation($addSimByNumbers,'add-few-sim2');
+
+                if (isset($_POST['AddSimByNumbers']))
+                    $addSimByNumbers->setAttributes($_POST['AddSimByNumbers']);
+
+                if ($addSimByNumbers->validate()) {
+                    $sim_count = 1;
+
+                    $numbers=preg_split('%[\r\n]%',$addSimByNumbers->numbers,-1,PREG_SPLIT_NO_EMPTY);
+
+                    foreach($numbers as $number) {
+                        $number=trim($number);
+                        if (!preg_match('%^\d+$%',$number)) continue;
+                        if (Sim::model()->countByAttributes(array('number'=>$number))>0) continue;
+
+                        $sim = new Sim;
+                        $sim->parent_agent_id = adminAgentId();
+                        $sim_count++;
+                        $sim->number_price = 0;
+                        $sim->operator_id = $addSimByNumbers->operator;
+                        $sim->tariff_id = $addSimByNumbers->tariff;
+                        $sim->company_id = $addSimByNumbers->company;
+                        $sim->operator_region_id = $addSimByNumbers->region;
+
+                        $sim->number = $number;
+
+                        $sim->save();
+                        $sim->parent_id = $sim->id;
+                        $sim->save();
+
+                        Number::addNumber($sim);
+
+                        $ids[$sim->id] = $sim->id;
+                    }
+
+                    Agent::deltaSimCount(adminAgentId(), $sim_count);
+
+                    $transaction->commit();
+
+                    if (empty($ids)) {
+                        Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления(возможно данные уже есть в базе)!');
+                        $activeTabs['tab3'] = true;
+                        $this->render('add', array('model' => $model, 'addSimByNumbers'=>$addSimByNumbers,'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'actMany' => $result, 'activeTabs' => $activeTabs));
+                        exit;
+                    }
+
+                    if ($addSimByNumbers->where==1) {
+                        $key = rand();
+                        $_SESSION['moveSims'][$key] = $ids;
+                        $this->redirect(array('move', 'key' => $key));
+                    } else {
+                        Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+                        Yii::app()->user->setFlash('tab3', true);
+                        $this->refresh();
+                    }
+                }
+            }
+
+
         }
 
-        if (Yii::app()->user->hasFlash('tab2')) $activeTabs['tab2'] = true; else $activeTabs['tab1'] = true;
-        $this->render('add', array('model' => $model, 'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'activeTabs' => $activeTabs));
+        if (Yii::app()->user->hasFlash('tab2')) {
+            $activeTabs['tab2'] = true;
+        } else {
+            if (Yii::app()->user->hasFlash('tab3')) {
+                $activeTabs['tab3'] = true;
+            } else {
+                $activeTabs['tab1'] = true;
+            }
+        }
+        $this->render('add', array('model' => $model, 'addSimByNumbers'=>$addSimByNumbers,'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'activeTabs' => $activeTabs));
     }
 
 
@@ -403,10 +473,18 @@ class SimController extends BaseGxController {
 
     public function actionAjaxcombo() {
         $tariffList = Tariff::model()->findAllByAttributes(array('operator_id' => $_POST['operatorId']));
-        $tariffListArray = array();
         $res = '';
         foreach ($tariffList as $v) {
             $res .= '<option value="' . $v['id'] . '">' . $v['title'] . '</option>';
+        }
+        echo $res;
+    }
+
+    public function actionAjaxcombo2() {
+        $regionList = OperatorRegion::getDropDownList();
+        $res = '';
+        foreach ($regionList[$_POST['operatorId']] as $k=>$v) {
+            $res .= '<option value="' . $k . '">' . $v . '</option>';
         }
         echo $res;
     }
