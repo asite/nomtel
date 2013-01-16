@@ -58,4 +58,17 @@ class Sim extends BaseSim
     {
         return $this->shortIcc;
     }
+
+    public function rules()
+    {
+        $rules=parent::rules();
+        $this->addRules($rules,array(
+            array('number_price, sim_price', 'numerical', 'integerOnly' => false, 'min' => 0),
+        ));
+        $this->delRules($rules,array(
+            array('number_price, sim_price', 'length'),
+        ));
+
+        return $rules;
+    }
 }

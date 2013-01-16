@@ -1,6 +1,6 @@
 <?php
 
-class BeelineBalanceReportReadFilter implements PHPExcel_Reader_IReadFilter
+class BeelineBonusReportReadFilter implements PHPExcel_Reader_IReadFilter
 {
     public function readCell($column, $row, $worksheetName = '')
     {

@@ -14,9 +14,15 @@ class Payment extends BasePayment
 
     public function rules()
     {
-        return array_merge(parent::rules(), array(
+        $rules=parent::rules();
+        $this->addRules($rules,array(
             array('sum', 'numerical', 'integerOnly' => false, 'min' => 0),
         ));
+        $this->delRules($rules,array(
+            array('sum', 'length'),
+        ));
+
+        return $rules;
     }
 
 }

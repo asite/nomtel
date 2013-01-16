@@ -51,4 +51,17 @@ class Tariff extends BaseTariff
       }
       return $result;
     }
+
+    public function rules()
+    {
+        $rules=parent::rules();
+        $this->addRules($rules,array(
+            array('price_agent_sim, price_license_fee', 'numerical', 'integerOnly' => false, 'min' => 0),
+        ));
+        $this->delRules($rules,array(
+            array('price_agent_sim, price_license_fee', 'length'),
+        ));
+
+        return $rules;
+    }
 }

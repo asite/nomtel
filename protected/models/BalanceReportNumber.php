@@ -8,4 +8,18 @@ class BalanceReportNumber extends BaseBalanceReportNumber
     {
         return parent::model($className);
     }
+
+    public function rules()
+    {
+        $rules=parent::rules();
+        $this->addRules($rules,array(
+            array('balance', 'numerical', 'integerOnly' => false),
+        ));
+        $this->delRules($rules,array(
+            array('balance', 'length'),
+        ));
+
+        return $rules;
+    }
+
 }

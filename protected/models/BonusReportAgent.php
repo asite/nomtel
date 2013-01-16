@@ -8,4 +8,18 @@ class BonusReportAgent extends BaseBonusReportAgent
     {
         return parent::model($className);
     }
+
+    public function rules()
+    {
+        $rules=parent::rules();
+        $this->addRules($rules,array(
+            array('sum, sum_referrals', 'numerical', 'integerOnly' => false, 'min' => 0),
+        ));
+        $this->delRules($rules,array(
+            array('sum, sum_referrals', 'length'),
+        ));
+
+        return $rules;
+    }
+
 }

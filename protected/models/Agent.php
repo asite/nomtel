@@ -53,9 +53,19 @@ class Agent extends BaseAgent
 
     public function rules()
     {
-        return array_merge(parent::rules(), array(
-            array('parent_id', 'unsafe')
+        $rules=parent::rules();
+        $this->addRules($rules,array(
+            array('balance', 'numerical', 'integerOnly' => false),
+            array('stat_acts_sum', 'numerical', 'integerOnly' => false),
+            array('stat_payments_sum', 'numerical', 'integerOnly' => false),
         ));
+        $this->delRules($rules,array(
+            array('balance', 'length'),
+            array('stat_acts_sum', 'length'),
+            array('stat_payments_sum', 'length'),
+        ));
+
+        return $rules;
     }
 
     public function recalcBalance()

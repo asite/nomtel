@@ -37,10 +37,15 @@ class Act extends BaseAct
 
     public function rules()
     {
-        return array_merge(parent::rules(), array(
-            array('comment', 'required', 'on'=>'ticket'),
+        $rules=parent::rules();
+        $this->addRules($rules,array(
             array('sum', 'numerical', 'integerOnly' => false, 'min' => 0),
+            array('comment', 'required', 'on'=>'ticket'),
         ));
-    }
+        $this->delRules($rules,array(
+            array('sum', 'length'),
+        ));
 
+        return $rules;
+    }
 }

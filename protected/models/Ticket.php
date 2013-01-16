@@ -24,8 +24,14 @@ class Ticket extends BaseTicket
 
     public function rules()
     {
-        return array_merge(parent::rules(), array(
+        $rules=parent::rules();
+        $this->addRules($rules,array(
             array('price', 'numerical', 'integerOnly' => false, 'min' => 0),
         ));
+        $this->delRules($rules,array(
+            array('price', 'length'),
+        ));
+
+        return $rules;
     }
 }
