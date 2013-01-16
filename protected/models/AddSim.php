@@ -13,6 +13,8 @@ class AddSim extends CFormModel
     public $ICCPersonalAccount;
     public $ICCBeginFew;
     public $ICCEndFew;
+    public $region;
+    public $company;
 
 
     public function rules()
@@ -24,6 +26,7 @@ class AddSim extends CFormModel
             array('ICCBegin, ICCEnd', 'length'),
             array('ICCBeginFew', 'length', 'max' => 15),
             array('ICCEndFew', 'length', 'max' => 3),
+            array('region,company','safe')
         );
     }
 
@@ -40,6 +43,8 @@ class AddSim extends CFormModel
             'operator' => 'Выбор оператора',
             'tariff' => 'Тарифный план',
             'where' => 'Куда передать карты?',
+            'region' => OperatorRegion::label(1),
+            'company' => Company::label(1),
         );
     }
 }

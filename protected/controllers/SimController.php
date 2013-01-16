@@ -256,6 +256,8 @@ class SimController extends BaseGxController {
                         $model->personal_account = $_POST['AddSim'][$o]['ICCPersonalAccount'];
                         $model->icc = $_POST['AddSim'][$o]['ICCBeginFew'] . $_POST['AddSim'][$o]['ICCEndFew'];
                         $model->number = $_POST['AddSim'][$o]['phone'];
+                        $model->operator_region_id=$_POST['AddSim'][0]['region'];
+                        $model->company_id=$_POST['AddSim'][0]['company'];
 
                         //try {
                         $model->save();
@@ -483,6 +485,9 @@ class SimController extends BaseGxController {
     public function actionAjaxcombo2() {
         $regionList = OperatorRegion::getDropDownList();
         $res = '';
+        if (!isset($regionList[$_POST['operatorId']])) {
+            $regionList[$_POST['operatorId']]=array('' => 'Выбор региона');
+        }
         foreach ($regionList[$_POST['operatorId']] as $k=>$v) {
             $res .= '<option value="' . $k . '">' . $v . '</option>';
         }

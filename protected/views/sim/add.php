@@ -165,7 +165,16 @@ $this->breadcrumbs = array(
 
 <br/>
 <div class="cfix">
+  <?php echo $form->dropDownListRow($model, '[0]company', Company::getDropDownList()); ?>
+
   <?php echo $form->dropDownListRow($model, '[0]operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
+
+    <?php $regions=OperatorRegion::getDropDownList();
+          $key=$model->operator ? $model->operator:key($opListArray);
+          if (!isset($regions[$key])) $regions[$key]=array('' => 'Выбор региона');
+    ?>
+
+    <?php echo $form->dropDownListRow($model, '[0]region', $regions[$key]); ?>
 
   <?php echo $form->dropDownListRow($model, '[0]tariff', $tariffListArray); ?>
 
@@ -236,10 +245,12 @@ $form = $this->beginWidget('BaseTbActiveForm', array(
 
     <?php echo $form->dropDownListRow($addSimByNumbers, 'operator', $opListArray, array('onchange'=>'changeOperator(this);')); ?>
 
-<?php $regions=OperatorRegion::getDropDownList();$regions=$addSimByNumbers->operator ? $regions[$addSimByNumbers->operator]:$regions[key($regions)]; ?>
+    <?php $regions=OperatorRegion::getDropDownList();
+    $key=$addSimByNumbers->operator ? $addSimByNumbers->operator:key($opListArray);
+    if (!isset($regions[$key])) $regions[$key]=array('' => 'Выбор региона');
+    ?>
 
-
-    <?php echo $form->dropDownListRow($addSimByNumbers, 'region', $regions); ?>
+    <?php echo $form->dropDownListRow($addSimByNumbers, 'region', $regions[$key]); ?>
 
     <?php echo $form->dropDownListRow($addSimByNumbers, 'tariff', $tariffListArray); ?>
 
