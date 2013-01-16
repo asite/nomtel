@@ -1,23 +1,17 @@
 <?php
 class FileController extends BaseGxController
 {
-    private function getProtectionCode($id) {
-        return substr(sha1($id.rand().'BWQUwXsywDnak5H8'),0,16);
+
+    private function returnError($msg)
+    {
+        $data = array(array('error' => $msg));
+        $this->returnData($data);
     }
 
-    private function getSubfolder($id) {
-        $padded_id = $id;
-        while (strlen($padded_id) % 2 != 0)
-            $padded_id = '0' . $padded_id;
-
-        $folder_parts = str_split($padded_id, 2);
-        array_pop($folder_parts);
-
-        $res = '/';
-        foreach ($folder_parts as $fp)
-            $res.=$fp . '/';
-
-        return $res;
+    private function returnData($data)
+    {
+        echo function_exists('json_encode') ? json_encode($data) : CJSON::encode($data);
+        Yii::app()->end();
     }
 
     public function actionUpload()
@@ -30,56 +24,53 @@ class FileController extends BaseGxController
         } else {
             header('Content-type: text/plain');
         }
+
         $data = array();
 
         $model = new File('upload');
         $file = CUploadedFile::getInstance($model, 'url');
         $model->url = $file;
+
         if ($model->url !== null && $model->validate(array('url'))) {
             $model->save();
 
-            $url_part=$this->getSubfolder($model->id) . $model->id . '_'.$this->getProtectionCode($model->id).'.jpg';
+            $dir = $model->calculateDir();
+            if (!file_exists($dir))
+                if (!mkdir($dir, 0755, true)) $this->returnError(Yii::t('app', "Can't create dir %dir%", array('%dir%' => $dir)));
 
-            $folder=Yii::getPathOfAlias('webroot.var.files').$this->getSubfolder($model->id);
+            $fn = $model->id . '_' . $model->getProtectionCode() . '.jpg';
 
-            $res=true;
+            $fullFn = $dir . $fn;
 
-            if (!file_exists($folder)) $res=mkdir($folder,0755,true);
+            if (!Thumb::process($file->tempName, $fullFn, 'file'))
+                $this->returnError(Yii::t('app', "Can't resize and/or save file"));
 
-            $filename= Yii::getPathOfAlias('webroot.var.files') . $url_part;
+            $model->url = $model->calculateUrlDir() . $fn;
+            $model->save();
 
-            if ($res) $res = Thumb::process($file->tempName,$filename, 'file');
-
-            if ($res) {
-                $model->url = '/var/files'.$url_part;
-                $model->save();
-
-                // return data to the fileuploader
-                $data[] = array(
-                    'name' => $file->name,
-                    'type' => $file->type,
-                    'size' => filesize($filename),
-                    // we need to return the place where our image has been saved
-                    'url' => $model->url, // Should we add a helper method?
-                    // we need to provide a thumbnail url to display on the list
-                    // after upload. Again, the helper method now getting thumbnail.
-                    'thumbnail_url' => Thumb::createUrl($model->url, 'uploader'),
-                    // we need to include the action that is going to delete the url
-                    // if we want to after loading 
-                    'delete_url' => $this->createUrl('delete', array('id' => $model->id, 'method' => 'uploader')),
-                    'delete_type' => 'POST');
-            } else {
-                $data[] = array('error' => Yii::t('app', 'Unable to convert and save file'));
-            }
+            // return data to the fileuploader
+            $data[] = array(
+                'name' => $file->name,
+                'type' => $file->type,
+                'size' => filesize($fullFn),
+                // we need to return the place where our image has been saved
+                'url' => $model->url, // Should we add a helper method?
+                // we need to provide a thumbnail url to display on the list
+                // after upload. Again, the helper method now getting thumbnail.
+                'thumbnail_url' => Thumb::createUrl($model->url, 'uploader'),
+                // we need to include the action that is going to delete the url
+                // if we want to after loading
+                'delete_url' => $this->createUrl('delete', array('id' => $model->id, 'method' => 'uploader')),
+                'delete_type' => 'POST'
+            );
+            $this->returnData($data);
         } else {
             if ($model->hasErrors('url')) {
-                $data[] = array('error', $model->getErrors('url'));
+                $this->returnError($model->getErrors('url'));
             } else {
                 throw new CHttpException(500, "Could not upload file " . CHtml::errorSummary($model));
             }
         }
-        // JQuery File Upload expects JSON data
-        echo json_encode($data);
     }
 
     public function actionDelete($id)
