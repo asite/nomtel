@@ -91,7 +91,7 @@ $('.search-form form').submit(function(){
                 'agreement'=>array(
                     'label'=>Yii::t('app','Create subscription agreement'),
                     'icon'=>'file',
-                    'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/create",array("sim_id"=>$data->id))',
+                    'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$data->id))',
                     'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("sim"=>$data))'
                 ),
             )

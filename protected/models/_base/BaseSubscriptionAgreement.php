@@ -38,9 +38,9 @@ abstract class BaseSubscriptionAgreement extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('defined_id, number_id, person_id', 'required'),
 			array('defined_id', 'length', 'max'=>50),
 			array('number_id, person_id', 'length', 'max'=>20),
+			array('defined_id, number_id, person_id', 'default', 'setOnEmpty' => true, 'value' => null),
 			array('id, defined_id, number_id, person_id', 'safe', 'on'=>'search'),
 		);
 	}

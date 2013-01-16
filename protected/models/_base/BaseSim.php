@@ -25,6 +25,7 @@
  * @property integer $operator_region_id
  * @property integer $company_id
  *
+ * @property Number[] $numbers
  * @property Agent $parentAgent
  * @property Sim $parent
  * @property Sim[] $sims
@@ -67,6 +68,7 @@ abstract class BaseSim extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
+			'numbers' => array(self::HAS_MANY, 'Number', 'sim_id'),
 			'parentAgent' => array(self::BELONGS_TO, 'Agent', 'parent_agent_id'),
 			'parent' => array(self::BELONGS_TO, 'Sim', 'parent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'parent_id'),
@@ -102,6 +104,7 @@ abstract class BaseSim extends BaseGxActiveRecord {
 			'tariff_id' => null,
 			'operator_region_id' => null,
 			'company_id' => null,
+			'numbers' => null,
 			'parentAgent' => null,
 			'parent' => null,
 			'sims' => null,

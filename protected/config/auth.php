@@ -29,6 +29,6 @@ return array(
 
     'createSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
-        'bizRule' => 'return !$params["sim"]->agent_id;'
+        'bizRule' => 'if ($params["sim"]->agent_id) return false;$numbers=$params["sim"]->numbers;if (empty($numbers) || $numbers[0]->status!=Number::STATUS_FREE) return false;return true;'
     )
 );
