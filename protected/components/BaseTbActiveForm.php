@@ -39,7 +39,8 @@ class BaseTbActiveForm extends TbActiveForm
         $lang = Yii::app()->language;
         if ($lang != 'en') $cs->registerScriptFile($assets . "/localization/jquery-ui-timepicker-$lang.js", CClientScript::POS_END);
         $encodedOptions = CJavaScript::encode($options);
-        $js = "jQuery('#{$id}').{$mode}picker(jQuery.extend(jQuery.datepicker.regional['$lang'],{changeMonth:true,changeYear:true,dateFormat:'dd.mm.yy',timeFormat:'hh:mm:ss'},  $encodedOptions));";
+        $yearRange=date('Y',time()-365*24*3600*100).':'.date('Y',time()+365*24*3600*20);
+        $js = "jQuery('#{$id}').{$mode}picker(jQuery.extend(jQuery.datepicker.regional['$lang'],{changeMonth:true,changeYear:true,dateFormat:'dd.mm.yy',timeFormat:'hh:mm:ss',yearRange:'$yearRange'},  $encodedOptions));";
         $cs->registerScript(__CLASS__ . '#' . $id, $js);
     }
 
