@@ -40,17 +40,19 @@ class SubscriptionAgreementController extends BaseGxController {
 
 
     public function actionSaveFormInfo() {
-        $_SESSION['doc'][$_REQUEST['id']]=$_POST;
+        $sessionData=new SessionData(__CLASS__);
+        $key=$sessionData->add($_POST);
 
-        $data=array('url'=>$this->createUrl('downloadDocument',array("id"=>$_REQUEST['id'])));
+        $data=array('url'=>$this->createUrl('downloadDocument',array("key"=>$key)));
 
         echo function_exists('json_encode') ? json_encode($data) : CJSON::encode($data);
         Yii::app()->end();
     }
 
-    public function actionDownloadDocument($id) {
-        $data=$_SESSION['doc'][$id];
-        //unset($_SESSION['doc'][$id]);
+    public function actionDownloadDocument($key) {
+        $sessionData=new SessionData(__CLASS__);
+        $data=$sessionData->get($key);
+        $sessionData->delete($key);
 
         $agreement=$this->loadModel($data['id'],'SubscriptionAgreement');
         $sim=$this->loadModel($data['sim_id'],'Sim');
