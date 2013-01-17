@@ -10,6 +10,7 @@ class SubscriptionAgreementController extends BaseGxController {
         // reserve id
         $agreement=new SubscriptionAgreement();
         $agreement->save();
+        $agreement->dt=new EDateTime();
         $agreement->fillDefinedId();
         $agreement->save();
 
@@ -37,44 +38,6 @@ class SubscriptionAgreementController extends BaseGxController {
         Yii::app()->end();
     }
 
-    private function generateDocument($template,$filename,$data) {
-        // disable web logging
-        foreach (Yii::app()->log->routes as $route) {
-            if ($route instanceof CWebLogRoute || $route instanceof CProfileLogRoute) {
-                $route->enabled = false;
-            }
-        }
-        Yii::app()->db->enableProfiling = false;
-
-        $PHPWord = new PHPWord();
-
-        $tempFileName=tempnam(Yii::getPathOfAlias('webroot.var.temp'),'phpword_');
-
-        // open file in temp directory, phpword is creating temporary file in document folder
-        copy(Yii::getPathOfAlias('application.data').'/'.$template,$tempFileName);
-        $document = $PHPWord->loadTemplate($tempFileName);
-
-        // assign variable values
-        foreach($data as $key=>$val)
-            $document->setValue($key,$val);
-
-        // delete unitialized variables
-        foreach($document->getVariables() as $key)
-            $document->setValue($key,'');
-
-        $document->save($tempFileName);
-
-        $file=file_get_contents($tempFileName);
-
-        unlink($tempFileName);
-
-        header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        header('Pragma: private');
-        header('Content-Disposition: attachment; filename="'.$filename.'"');
-
-        echo $file;
-        Yii::app()->end();
-    }
 
     public function actionSaveFormInfo() {
         $_SESSION['doc'][$_REQUEST['id']]=$_POST;
@@ -90,14 +53,25 @@ class SubscriptionAgreementController extends BaseGxController {
         //unset($_SESSION['doc'][$id]);
 
         $agreement=$this->loadModel($data['id'],'SubscriptionAgreement');
+        $sim=$this->loadModel($data['sim_id'],'Sim');
+        $number=Number::model()->findByAttributes(array('number'=>$sim->number));
+        $person=new Person;
+        $person->setAttributes($data['Person']);
 
-        $this->generateDocument('subscription_agreement.docx','agreement_'.$agreement->defined_id.'.docx',array(
-            'defined_id'=>$agreement->defined_id
+        DocumentGenerator::generate('subscription_agreement.docx','agreement_'.$agreement->defined_id.'.docx',array(
+            'a'=>$agreement,
+            's'=>$sim,
+            'n'=>$number,
+            'p'=>$person,
+            'o'=>$sim->operator,
+            'or'=>$sim->operatorRegion,
+            't'=>$sim->tariff,
+            'dt'=>$agreement->dt->format('d.m.Y')
         ));
     }
 
     public function actionGetBlank() {
-        $this->generateDocument('subscription_agreement.docx','subscription_agreement.docx',array(
+        DocumentGenerator::generate('subscription_agreement.docx','subscription_agreement.docx',array(
         ));
     }
 
@@ -133,18 +107,6 @@ class SubscriptionAgreementController extends BaseGxController {
 
         if (isset($_POST['Person'])) {
             $errors=$this->validate($agreement,$sim,$person);
-
-            if ($_POST['doctype']=='blank') {
-                $this->generateDocument('subscription_agreement.docx','subscription_agreement.docx',array(
-                ));
-            }
-
-            if ($_POST['doctype']=='doc') {
-                $this->generateDocument('subscription_agreement.docx','subscription_agreement.docx',array(
-                    'defined_id'=>$agreement->defined_id
-                ));
-            }
-
 
             if (empty($errors)) {
                 $trx=Yii::app()->db->beginTransaction();

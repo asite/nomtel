@@ -129,7 +129,7 @@ $personUpload=ob_get_clean();
                 sim_id:<?=$sim->id?>
             };
             $('#subscriptionagreement-form input').each(function(){
-                   data[$(this).name]=$(this).val();
+                   data[$(this).attr('name')]=$(this).val();
             });
             $.post(
                     '<?=$this->createUrl('saveFormInfo')?>',
@@ -142,9 +142,9 @@ $personUpload=ob_get_clean();
         }
     </script>
 
-    <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'link', 'url'=>$this->createUrl('getBlank',array('id'=>$agreement->id)),'label'=>'Blank')); ?>
+    <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'link', 'url'=>$this->createUrl('getBlank',array('id'=>$agreement->id)),'label'=>Yii::t('app','Download agreement blank'))); ?>
 
-    <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'button', 'htmlOptions'=>array('onclick'=>'download()'),'label'=>'Document')); ?>
+    <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'button', 'htmlOptions'=>array('onclick'=>'download()'),'label'=>Yii::t('app','Download agreement'))); ?>
 
     <?php
     echo '<div class="form-actions">';

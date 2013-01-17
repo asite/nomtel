@@ -11,6 +11,7 @@
  *
  * @property string $id
  * @property string $defined_id
+ * @property string $dt
  * @property string $number_id
  * @property string $person_id
  *
@@ -40,8 +41,10 @@ abstract class BaseSubscriptionAgreement extends BaseGxActiveRecord {
 		return array(
 			array('defined_id', 'length', 'max'=>50),
 			array('number_id, person_id', 'length', 'max'=>20),
-			array('defined_id, number_id, person_id', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, defined_id, number_id, person_id', 'safe', 'on'=>'search'),
+			array('dt', 'safe'),
+			array('defined_id, dt, number_id, person_id', 'default', 'setOnEmpty' => true, 'value' => null),
+            array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+			array('id, defined_id, dt, number_id, person_id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -63,6 +66,7 @@ abstract class BaseSubscriptionAgreement extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'defined_id' => Yii::t('app', 'Defined'),
+			'dt' => Yii::t('app', 'Dt'),
 			'number_id' => null,
 			'person_id' => null,
 			'number' => null,
@@ -76,6 +80,7 @@ abstract class BaseSubscriptionAgreement extends BaseGxActiveRecord {
 
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('defined_id', $this->defined_id, true);
+		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('number_id', $this->number_id);
 		$criteria->compare('person_id', $this->person_id);
 
@@ -87,4 +92,42 @@ abstract class BaseSubscriptionAgreement extends BaseGxActiveRecord {
         return $dataProvider;
 	}
 
+    public function convertDateTimeFieldsToEDateTime() {
+        // rest of work will do setAttribute() routine
+        $this->setAttribute('dt',strval($this->dt));
+    }
+
+    public function convertDateTimeFieldsToString() {
+        if (is_object($this->dt) && get_class($this->dt)=='EDateTime') $this->dt=new EString($this->dt->format(self::$mySqlDateTimeFormat));
+    }
+
+    public function afterFind() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
+
+    private function convertStringToEDateTime($val,$type) {
+        if (!$val) return null;
+        try {
+            $val=new EDateTime($val,null,$type);
+        } catch (Exception $e) {
+        }
+        return $val;
+    }
+
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='dt') $value=$this->convertStringToEDateTime($value,'datetime');
+        }
+        return parent::setAttribute($name,$value);
+    }
+
+    public function beforeSave() {
+        $this->convertDateTimeFieldsToString();
+
+        return true;
+    }
+
+    public function afterSave() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
 }

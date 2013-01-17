@@ -5,7 +5,7 @@ Yii::import('application.models._base.BaseSubscriptionAgreement');
 class SubscriptionAgreement extends BaseSubscriptionAgreement
 {
     public function fillDefinedId() {
-        $this->defined_id=$this->id.date('dmy');
+        $this->defined_id=$this->id.$this->dt->format('dmy');
     }
 
 	public static function model($className=__CLASS__) {
