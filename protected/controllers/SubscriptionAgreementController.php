@@ -37,6 +37,70 @@ class SubscriptionAgreementController extends BaseGxController {
         Yii::app()->end();
     }
 
+    private function generateDocument($template,$filename,$data) {
+        // disable web logging
+        foreach (Yii::app()->log->routes as $route) {
+            if ($route instanceof CWebLogRoute || $route instanceof CProfileLogRoute) {
+                $route->enabled = false;
+            }
+        }
+        Yii::app()->db->enableProfiling = false;
+
+        $PHPWord = new PHPWord();
+
+        $tempFileName=tempnam(Yii::getPathOfAlias('webroot.var.temp'),'phpword_');
+
+        // open file in temp directory, phpword is creating temporary file in document folder
+        copy(Yii::getPathOfAlias('application.data').'/'.$template,$tempFileName);
+        $document = $PHPWord->loadTemplate($tempFileName);
+
+        // assign variable values
+        foreach($data as $key=>$val)
+            $document->setValue($key,$val);
+
+        // delete unitialized variables
+        foreach($document->getVariables() as $key)
+            $document->setValue($key,'');
+
+        $document->save($tempFileName);
+
+        $file=file_get_contents($tempFileName);
+
+        unlink($tempFileName);
+
+        header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Pragma: private');
+        header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+        echo $file;
+        Yii::app()->end();
+    }
+
+    public function actionSaveFormInfo() {
+        $_SESSION['doc'][$_REQUEST['id']]=$_POST;
+
+        $data=array('url'=>$this->createUrl('downloadDocument',array("id"=>$_REQUEST['id'])));
+
+        echo function_exists('json_encode') ? json_encode($data) : CJSON::encode($data);
+        Yii::app()->end();
+    }
+
+    public function actionDownloadDocument($id) {
+        $data=$_SESSION['doc'][$id];
+        //unset($_SESSION['doc'][$id]);
+
+        $agreement=$this->loadModel($data['id'],'SubscriptionAgreement');
+
+        $this->generateDocument('subscription_agreement.docx','agreement_'.$agreement->defined_id.'.docx',array(
+            'defined_id'=>$agreement->defined_id
+        ));
+    }
+
+    public function actionGetBlank() {
+        $this->generateDocument('subscription_agreement.docx','subscription_agreement.docx',array(
+        ));
+    }
+
     private function validate($agreement,$sim,$person)
     {
         $errors=array();
@@ -69,6 +133,19 @@ class SubscriptionAgreementController extends BaseGxController {
 
         if (isset($_POST['Person'])) {
             $errors=$this->validate($agreement,$sim,$person);
+
+            if ($_POST['doctype']=='blank') {
+                $this->generateDocument('subscription_agreement.docx','subscription_agreement.docx',array(
+                ));
+            }
+
+            if ($_POST['doctype']=='doc') {
+                $this->generateDocument('subscription_agreement.docx','subscription_agreement.docx',array(
+                    'defined_id'=>$agreement->defined_id
+                ));
+            }
+
+
             if (empty($errors)) {
                 $trx=Yii::app()->db->beginTransaction();
 

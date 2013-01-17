@@ -1,3 +1,8 @@
 yii 1.1.13-RC
 SwiftMailer 4.2.2
 Smarty 3.1.12
+PHPExcel 1.7.4
+    PHPExcel.php fixed (see spl_autoload_unregister(array('YiiBase','autoload')) and spl_autoload_register(array('YiiBase','autoload')) in file begin
+PHPWord fetched from https://github.com/PHPOffice/PHPWord 17.01.2013
+    PHPWord.php fixed (see spl_autoload_unregister(array('YiiBase','autoload')) and spl_autoload_register(array('YiiBase','autoload')) in file begin
+    Template.php fixed (commented line "$replace = utf8_encode($replace);")

@@ -121,6 +121,31 @@ $personUpload=ob_get_clean();
 
     <h3><?=Yii::t('app','Subscription Agreement Number')?> <?=CHtml::encode($agreement->defined_id)?></h3>
 
+    <script>
+        function download() {
+            var data={
+                YII_CSRF_TOKEN:'<?=Yii::app()->request->csrfToken?>',
+                id:<?=$agreement->id?>,
+                sim_id:<?=$sim->id?>
+            };
+            $('#subscriptionagreement-form input').each(function(){
+                   data[$(this).name]=$(this).val();
+            });
+            $.post(
+                    '<?=$this->createUrl('saveFormInfo')?>',
+                    data,
+                    function(data) {
+                        window.location.href=data.url;
+                    },
+                    'json'
+            );
+        }
+    </script>
+
+    <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'link', 'url'=>$this->createUrl('getBlank',array('id'=>$agreement->id)),'label'=>'Blank')); ?>
+
+    <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'button', 'htmlOptions'=>array('onclick'=>'download()'),'label'=>'Document')); ?>
+
     <?php
     echo '<div class="form-actions">';
     echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Save'), array('class'=>'btn btn-primary', 'type'=>'submit'));
