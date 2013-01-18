@@ -2,7 +2,13 @@
 
 class NumberController extends BaseGxController
 {
-    public function actionWarnedList()
+    public function additionalAccessRules() {
+        return array(
+            array('allow', 'actions' => array('list','view'), 'roles' => array('agent','support')),
+        );
+    }
+
+    public function actionList()
     {
         $model = new Number('list');
         $model->unsetAttributes();
@@ -10,9 +16,7 @@ class NumberController extends BaseGxController
         if (isset($_GET['Number']))
             $model->setAttributes($_GET['Number']);
 
-        $model->warning = 1;
-
-        $this->render('warnedList', array(
+        $this->render('list', array(
             'model' => $model,
             'dataProvider' => $model->search()
         ));

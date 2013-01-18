@@ -1,7 +1,7 @@
 <?php
 
 $this->breadcrumbs = array(
-    Yii::t('app', 'Warned numbers list'),
+    Number::label(2),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -18,7 +18,7 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1><?php echo Yii::t('app','Warned numbers list') ?></h1>
+<h1><?=Number::label(2)?></h1>
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'number-grid',
@@ -28,6 +28,20 @@ $('.search-form form').submit(function(){
     'columns' => array(
         'personal_account',
         'number',
-        'warning_dt'
+        array(
+            'name'=>'status',
+            'filter'=>Number::getStatusDropDownList(),
+            'value'=>'Number::getStatusLabel($data->status)',
+            'htmlOptions'=>array('style'=>'width:120px;'),
+        ),
+        array(
+            'name'=>'warning',
+            'filter'=>Number::getWarningDropDownList(),
+            'value'=>'Number::getWarningLabel($data->warning)',
+        ),
+        array(
+            'name'=>'warning_dt',
+            'filter'=>false
+        )
     ),
 )); ?>

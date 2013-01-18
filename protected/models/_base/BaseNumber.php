@@ -42,13 +42,13 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('number, status', 'required'),
+			array('number', 'required'),
 			array('warning', 'numerical', 'integerOnly'=>true),
 			array('sim_id', 'length', 'max'=>20),
 			array('number, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>9),
 			array('warning_dt', 'safe'),
-			array('sim_id, personal_account, warning, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('sim_id, personal_account, status, warning, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
             array('warning_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, sim_id, number, personal_account, status, warning, warning_dt', 'safe', 'on'=>'search'),
 		);

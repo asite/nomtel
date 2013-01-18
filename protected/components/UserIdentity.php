@@ -14,6 +14,11 @@ class UserIdentity extends CUserIdentity
             if ($agent) {
                 $this->setState('agentId', $agent->id);
             }
+            $supportOperator = SupportOperator::model()->findByAttributes(array('user_id' => $this->_id));
+            if ($agent) {
+                $this->setState('supportOperatorId', $supportOperator->id);
+            }
+
             return true;
         } else {
             $this->errorMessage = $result;

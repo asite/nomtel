@@ -10,6 +10,11 @@ function loggedAgentId()
     return Yii::app()->user->getState('agentId');
 }
 
+function loggedSupportOperatorId()
+{
+    return Yii::app()->user->getState('supportOperatorId');
+}
+
 function adminAgentId()
 {
     return 1;
