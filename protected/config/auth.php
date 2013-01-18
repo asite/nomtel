@@ -12,6 +12,12 @@ return array(
         )
     ),
 
+    'support' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+        )
+    ),
+
     'agent' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(

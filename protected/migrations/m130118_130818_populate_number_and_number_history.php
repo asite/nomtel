@@ -20,7 +20,7 @@ class m130118_130818_populate_number_and_number_history extends CDbMigration
             $m->personal_account=$number['personal_account'];
             $m->sim_id=$number['id'];
             $m->save();
-            NumberHistory::addHistoryNumber($m->id,'База','SIM {Sim:'.$number['id'].'} добавлена в базу');
+            NumberHistory::addHistoryNumber($m->id,'SIM {Sim:'.$number['id'].'} добавлена в базу','База');
         }
 	}
 

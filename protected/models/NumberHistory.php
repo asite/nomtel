@@ -8,7 +8,19 @@ class NumberHistory extends BaseNumberHistory
 		return parent::model($className);
 	}
 
-    public function addHistoryNumber($number_id,$who,$comment) {
+    public function addHistoryNumber($number_id,$comment,$who=null) {
+        if (!isset($who)) {
+            switch (Yii::app()->user->role) {
+                case 'admin':
+                    $who='База';
+                    break;
+                case 'agent':
+                    $who='Агент {Agent:'.loggedAgentId().'}';
+                    break;
+                case 'support':
+                    $who='Техподдержка {SupportOperator:'.loggedSupportOperatorId().'}';
+            }
+        }
         $model = new NumberHistory;
         $model->number_id = $number_id;
         $model->dt = new EDateTime();
