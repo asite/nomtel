@@ -172,9 +172,11 @@ function checkPassport() {
             'downloadView'=>'application.views.fileupload.download',
             'options' => array(
                 'maxFileSize' => 1024*1024*10,
-                'acceptFileTypes' => 'js:/(\.|\/)(jpe?g)$/i',
+                'acceptFileTypes' => 'js:/(\.|\/)(jpe?g|png)$/i',
                 'autoUpload' => true,
                 'previewSourceMaxFileSize' => 1024*1024*10,
+                'previewMaxWidth' => Yii::app()->params['thumbs']['uploader']['width'],
+                'previewMaxHeight' => Yii::app()->params['thumbs']['uploader']['height'],
                 'limitConcurrentUploads' => 2,
         )));
     ?>
@@ -191,9 +193,11 @@ function checkPassport() {
             'downloadView'=>'application.views.fileupload.download',
             'options' => array(
                 'maxFileSize' => 1024*1024*10,
-                'acceptFileTypes' => 'js:/(\.|\/)(jpe?g)$/i',
+                'acceptFileTypes' => 'js:/(\.|\/)(jpe?g|png)$/i',
                 'autoUpload' => true,
                 'previewSourceMaxFileSize' => 1024*1024*10,
+                'previewMaxWidth' => Yii::app()->params['thumbs']['uploader']['width'],
+                'previewMaxHeight' => Yii::app()->params['thumbs']['uploader']['height'],
                 'limitConcurrentUploads' => 2,
             )));
         ?>

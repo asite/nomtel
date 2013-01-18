@@ -97,15 +97,15 @@ return array(
         'simPrice' => 100,
         'thumbs'=>array(
             'file' => array(
-                'width' => 300,
-                'height' => 300,
+                'width' => 1500,
+                'height' => 1500,
                 'resizeMode' => 'max',
                 'outputFormat' => 'jpg',
                 'qualityJPG' => 80,
             ),
             'uploader' => array(
-                'width' => 100,
-                'height' => 100,
+                'width' => 200,
+                'height' => 200,
                 // available modes:
                 // max - make image not larger, than width*height
                 // resizeAndCrop - make image size width*height, crop parts of image if needed
