@@ -27,11 +27,15 @@ class FileController extends BaseGxController
 
         $data = array();
 
-        $model = new File('upload');
+        $name=$_GET['name'];
+        $model=new $name('upload');
+
         $file = CUploadedFile::getInstance($model, 'url');
         $model->url = $file;
 
         if ($model->url !== null && $model->validate(array('url'))) {
+            $model->url=new CDbExpression('NULL');
+            $model->dt=new EDateTime();
             $model->save();
 
             $dir = $model->calculateDir();
@@ -49,20 +53,12 @@ class FileController extends BaseGxController
             $model->save();
 
             // return data to the fileuploader
-            $data[] = array(
-                'name' => $file->name,
-                'type' => $file->type,
-                'size' => filesize($fullFn),
-                // we need to return the place where our image has been saved
-                'url' => $model->url, // Should we add a helper method?
-                // we need to provide a thumbnail url to display on the list
-                // after upload. Again, the helper method now getting thumbnail.
-                'thumbnail_url' => Thumb::createUrl($model->url, 'uploader'),
-                // we need to include the action that is going to delete the url
-                // if we want to after loading
-                'delete_url' => $this->createUrl('delete', array('id' => $model->id, 'method' => 'uploader')),
-                'delete_type' => 'POST'
-            );
+            $fileInfo=$model->getUploaderInfo();
+            $data[]=$fileInfo;
+
+            //    'delete_url' => $this->createUrl('delete', array('id' => $model->id, 'method' => 'uploader')),
+            //    'delete_type' => 'POST'
+
             $this->returnData($data);
         } else {
             if ($model->hasErrors('url')) {

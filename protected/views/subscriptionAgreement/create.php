@@ -32,31 +32,39 @@ function checkPassport() {
     );
 }
 </script>
-<?php
-ob_start();
-$this->widget('bootstrap.widgets.TbFileUpload', array(
-    'url' => $this->createUrl("file/upload"),
-    'model' => new File(),
-    'attribute' => 'url',
-    'multiple' => true,
-    'options' => array(
-        'maxFileSize' => 1024*1024*10,
-        'acceptFileTypes' => 'js:/(\.|\/)(gif|jpe?g|png)$/i',
-        'autoUpload' => true,
-        'previewSourceMaxFileSize' => 1024*1024*10,
-        'limitConcurrentUploads' => 2
-    )));
-$personUpload=ob_get_clean();
-?>
 
 <div class="form">
+
+<script>
+    function checkForm(form) {
+        // check if there any active upload
+        var uploadIsActive=false;
+        $('form').each(function(){
+            if ($(this).data('fileupload')) {
+                if ($(this).data('fileupload')._active) uploadIsActive=true;
+                var ids='';
+                $(this).find('input[name="file_id"]').each(function(){
+                    if (ids!='') ids+=',';
+                    ids+=$(this).val();
+                });
+                $("#"+$(this).attr('id')+'-field').val(ids);
+            }
+        });
+
+        if (uploadIsActive) {
+            alert('Загрузка файлов на сервер еще не закончена');
+            return false;
+        }
+        return true;
+    }
+</script>
 
     <?php $form = $this->beginWidget('BaseTbActiveForm', array(
     'id' => 'subscriptionagreement-form',
     'type' => 'horizontal',
     'enableAjaxValidation' => true,
     'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false),
-    //'htmlOptions'=>array('enctype'=>'multipart/form-data')
+    'htmlOptions'=>array('onsubmit'=>'return checkForm(this);')
 ));
     ?>
 
@@ -146,14 +154,54 @@ $personUpload=ob_get_clean();
 
     <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'button', 'htmlOptions'=>array('onclick'=>'download()'),'label'=>Yii::t('app','Download agreement'))); ?>
 
+    <input type="hidden" name="person_files" id="File-form-field" value=""/>
+    <input type="hidden" name="agreement_files" id="File2-form-field" value=""/>
     <?php
-    echo '<div class="form-actions">';
-    echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Save'), array('class'=>'btn btn-primary', 'type'=>'submit'));
-    echo '&nbsp;&nbsp;&nbsp;'.CHtml::htmlButton('<i class="icon-remove"></i> '.Yii::t('app', 'Cancel'), array('class'=>'btn', 'type'=>'button', 'onclick'=>'window.location.href="'.$this->createUrl('admin').'"'));
-    echo '</div>';
     $this->endWidget();
     ?>
 
-    <?=$personUpload?>
+        <h3>Сканы паспорта</h3>
+    <?php
+        $this->widget('bootstrap.widgets.TbFileUpload', array(
+            'url' => $this->createUrl("file/upload",array('name'=>'File')),
+            'model' => new File(),
+            'attribute' => 'url',
+            'multiple' => true,
+            'formView'=>'application.views.fileupload.form',
+            'uploadView'=>'application.views.fileupload.upload',
+            'downloadView'=>'application.views.fileupload.download',
+            'options' => array(
+                'maxFileSize' => 1024*1024*10,
+                'acceptFileTypes' => 'js:/(\.|\/)(jpe?g)$/i',
+                'autoUpload' => true,
+                'previewSourceMaxFileSize' => 1024*1024*10,
+                'limitConcurrentUploads' => 2,
+        )));
+    ?>
+        <h3>Сканы договора</h3>
+        <?php
+        $this->widget('bootstrap.widgets.TbFileUpload', array(
+            'url' => $this->createUrl("file/upload",array('name'=>'File2')),
+            'htmlOptions'=>array('data-id'=>'File2-form'),
+            'model' => new File2(),
+            'attribute' => 'url',
+            'multiple' => true,
+            'formView'=>'application.views.fileupload.form',
+            'uploadView'=>'application.views.fileupload.upload',
+            'downloadView'=>'application.views.fileupload.download',
+            'options' => array(
+                'maxFileSize' => 1024*1024*10,
+                'acceptFileTypes' => 'js:/(\.|\/)(jpe?g)$/i',
+                'autoUpload' => true,
+                'previewSourceMaxFileSize' => 1024*1024*10,
+                'limitConcurrentUploads' => 2,
+            )));
+        ?>
 
+<?php
+    echo '<div class="form-actions">';
+    echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Save'), array('class'=>'btn btn-primary', 'type'=>'button','onclick'=>'$("#subscriptionagreement-form").submit()'));
+    echo '&nbsp;&nbsp;&nbsp;'.CHtml::htmlButton('<i class="icon-remove"></i> '.Yii::t('app', 'Cancel'), array('class'=>'btn', 'type'=>'button', 'onclick'=>'window.location.href="'.$this->createUrl('admin').'"'));
+    echo '</div>';
+?>
 </div>

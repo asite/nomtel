@@ -110,6 +110,14 @@ class SubscriptionAgreementController extends BaseGxController {
         if (isset($_POST['Person'])) {
             $errors=$this->validate($agreement,$sim,$person);
 
+            $person_files=array();
+            foreach(explode(',',$_POST['person_files']) as $file_id)
+                if ($file_id) $person_files[]=$file_id;
+
+            $agreement_files=array();
+            foreach(explode(',',$_POST['agreement_files']) as $file_id)
+                if ($file_id) $agreement_files[]=$file_id;
+
             if (empty($errors)) {
                 $trx=Yii::app()->db->beginTransaction();
 
@@ -122,6 +130,22 @@ class SubscriptionAgreementController extends BaseGxController {
                 $agreement->person_id=$person->id;
                 $agreement->number_id=$number->id;
                 $agreement->save();
+
+                // save person files
+                foreach($person_files as $file_id) {
+                    $personFile=new PersonFile();
+                    $personFile->person_id=$person->id;
+                    $personFile->file_id=$file_id;
+                    $personFile->save();
+                }
+
+                // save agreement files
+                foreach($agreement_files as $file_id) {
+                    $agreementFile=new SubscriptionAgreementFile();
+                    $agreementFile->subscription_agreement_id=$agreement->id;
+                    $agreementFile->file_id=$file_id;
+                    $agreementFile->save();
+                }
 
                 $trx->commit();
                 $this->redirect(array('sim/list'));
