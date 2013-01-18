@@ -23,7 +23,7 @@ class Number extends BaseNumber
                 $model->personal_account = $sim->personal_account;
                 $model->status = self::STATUS_FREE;
                 $model->save();
-                NumberHistory::addHistoryNumber($model->id,'База','Добавление в базу');
+                NumberHistory::addHistoryNumber($model->id,'База','SIM {Sim:'.$sim->id.'} добавлена в базу');
             }
         }
     }
