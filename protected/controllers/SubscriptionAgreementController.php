@@ -31,8 +31,11 @@ class SubscriptionAgreementController extends BaseGxController {
 
         if ($person)
             foreach($person->attributes as $attr=>$val) {
-                $data[CHtml::activeId($person,$attr)]=strval($val);
+                $data['fields'][CHtml::activeId($person,$attr)]=strval($val);
             }
+
+        foreach($person->files as $file)
+            $data['person_files'][]=$file->getUploaderInfo();
 
         echo function_exists('json_encode') ? json_encode($data) : CJSON::encode($data);
         Yii::app()->end();

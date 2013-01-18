@@ -23,14 +23,27 @@ function checkPassport() {
             YII_CSRF_TOKEN:'<?=Yii::app()->request->csrfToken?>'
         },
         function(data) {
-            for(i in data) {
+            for(i in data.fields) {
                 var field=$("#"+i);
-                if (field.val()=='') field.val(data[i]);
+                if (field.val()=='') field.val(data.fields[i]);
             }
+            UploaderAddFiles("File-form",data.person_files);
         },
         'json'
     );
 }
+
+function UploaderAddFiles(id,files) {
+    var form=$("#"+id);
+    var uploader=form.data('fileupload');
+
+    var download=uploader._renderDownload(files);
+
+    download.appendTo(uploader.options.filesContainer);
+    uploader._forceReflow(download);
+    uploader._transition(download);
+}
+
 </script>
 
 <div class="form">
