@@ -27,7 +27,7 @@ switch (gethostname()) {
     case 'primaworkvirt':
         $base_config_name = 'server_console_development.php';
         break;
-    case 'h2068869':
+    case 'h2068869.stratoserver.net':
         $base_config_name = 'server_console_staging.php';
         break;
     case 'hawking.timeweb.ru':
