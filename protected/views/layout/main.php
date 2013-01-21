@@ -61,6 +61,8 @@
     if (Yii::app()->user->role == 'support') {
         $menuLeft = array(
             array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
+            '',
+            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
     }
 

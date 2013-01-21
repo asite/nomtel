@@ -450,7 +450,7 @@ class SimController extends BaseGxController {
             foreach($simsId as $s) {
                 $number = Number::model()->findByAttributes(array('number'=>$s->number));
                 if (!empty($number)) {
-                    NumberHistory::addHistoryNumber($number->id,'SIM передана агенту {Agent:'.$_POST['Move']['agent_id'].'}');
+                    NumberHistory::addHistoryNumber($number->id,'SIM передана агенту {Agent:'.$_POST['Move']['agent_id'].'} по акту {Act:'.$model->id.'}');
                 }
             }
 

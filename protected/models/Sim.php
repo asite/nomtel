@@ -54,6 +54,12 @@ class Sim extends BaseSim
         return $dataProvider;
     }
 
+    public function relations() {
+        return array_merge(parent::relations(),array(
+            'numberObject' => array(self::HAS_ONE, 'Number', 'sim_id'),
+        ));
+    }
+
     public function __toString()
     {
         return $this->shortIcc;
