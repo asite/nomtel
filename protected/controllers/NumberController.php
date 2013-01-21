@@ -21,4 +21,12 @@ class NumberController extends BaseGxController
             'dataProvider' => $model->search()
         ));
     }
+
+    public function actionView($id)
+    {
+        $number=$this->loadModel($id,'Number');
+        $this->render('view',array(
+            'number'=>$number
+        ));
+    }
 }

@@ -193,10 +193,12 @@ class SimController extends BaseGxController {
                     )
                 );
 
+                //if press button PROCESS
                 if (isset($_POST['buttonProcessSim'])) {
                     $activeTabs['tab1'] = true;
-                    $this->render('add', array('model' => $model, 'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'actMany' => $result, 'activeTabs' => $activeTabs));
+                    $this->render('add', array('model' => $model, 'addSimByNumbers'=>$addSimByNumbers, 'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'actMany' => $result, 'activeTabs' => $activeTabs));
                     exit;
+                //if press button add simcard
                 } else {
                     $sim_count = 0;
                     foreach ($result as $v) {
@@ -207,6 +209,8 @@ class SimController extends BaseGxController {
                         $v->save();
 
                         Number::addNumber($v);
+
+                        $ids[$v->id] = $v->id;
                     }
                     Agent::deltaSimCount(adminAgentId(), $sim_count);
 
@@ -217,13 +221,16 @@ class SimController extends BaseGxController {
                         exit;
                     }
 
+                    //if simcard move to agent
                     if ($_POST['AddSim']['where']) {
-                        $key = rand();
-                        foreach ($result as $v) {
-                            $_SESSION['moveSims'][$key][$v->id] = $v->id;
-                        }
+
+                        $sessionData=new SessionData(__CLASS__);
+                        $key=$sessionData->add($ids);
+
                         $transaction->commit();
+
                         $this->redirect(array('move', 'key' => $key));
+                    //if simcard move to base
                     } else {
                         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
                         $transaction->commit();
@@ -233,7 +240,7 @@ class SimController extends BaseGxController {
                 }
             }
 
-
+            //add few simcard in base or in base and to agent
             if ($_POST['simMethod'] == 'add-few-sim') {
                 if (Yii::app()->getRequest()->getIsAjaxRequest()) {
                     $result = $this->validate($model, $_POST['AddSim']);
@@ -280,12 +287,15 @@ class SimController extends BaseGxController {
                     exit;
                 }
 
+                //if simcard move to agent
                 if ($_POST['AddSim'][0]['where']) {
-                    $key = rand();
-                    $_SESSION['moveSims'][$key] = $ids;
+                    $sessionData=new SessionData(__CLASS__);
+                    $key=$sessionData->add($ids);
+
                     $transaction->commit();
                     $this->redirect(array('move', 'key' => $key));
                     exit;
+                 //if simcard move to base
                 } else {
                     Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
                     Yii::app()->user->setFlash('tab2', true);
@@ -343,8 +353,9 @@ class SimController extends BaseGxController {
                     }
 
                     if ($addSimByNumbers->where==1) {
-                        $key = rand();
-                        $_SESSION['moveSims'][$key] = $ids;
+                        $sessionData=new SessionData(__CLASS__);
+                        $key=$sessionData->add($ids);
+
                         $this->redirect(array('move', 'key' => $key));
                     } else {
                         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
@@ -384,10 +395,9 @@ class SimController extends BaseGxController {
                 }
             }
 
-
             if (count($ids) > 0) {
-                $key = rand();
-                $_SESSION['moveSims'][$key] = $ids;
+                $sessionData=new SessionData(__CLASS__);
+                $key=$sessionData->add(explode($ids));
 
                 $this->redirect(array('sim/move', 'key' => $key));
             } else
@@ -399,15 +409,19 @@ class SimController extends BaseGxController {
     }
 
     public function actionMove($key) {
+        $sessionData=new SessionData(__CLASS__);
+        $moveSimCards=$sessionData->get($key);
+        $countMoveSimCards=count($moveSimCards);
+
         if ($_POST['Move']) {
-            if (!$_POST['Move']['agent_id']) {
-                Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не выбран агент.');
-                $this->refresh();
-                exit;
-            }
-            $totalNumberPrice = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
-            $totalSimPrice = count($_SESSION['moveSims'][$key]) * $_POST['Move']['PriceForSim'];
-            if (count($_SESSION['moveSims'][$key]) == 0) {
+            $agent_id = $_POST['Act']['agent_id'];
+            if ($agent_id == 0) $_POST['Act']['agent_id']='';
+            $model = new Act;
+            $this->performAjaxValidation($model, 'move-sim');
+
+            $totalNumberPrice = Sim::model()->getTotalNumberPrice($moveSimCards);
+            $totalSimPrice = $countMoveSimCards * $_POST['Move']['PriceForSim'];
+            if ($countMoveSimCards == 0) {
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
                 $this->redirect(Yii::app()->createUrl('sim/add'));
                 exit;
@@ -416,22 +430,22 @@ class SimController extends BaseGxController {
             $trx = Yii::app()->db->beginTransaction();
 
             $model = new Act;
-            $model->agent_id = $_POST['Move']['agent_id'];
+            $model->agent_id = $agent_id;
             $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
             $model->sum = $totalNumberPrice + $totalSimPrice;
             $model->type = Act::TYPE_SIM;
             $model->save();
 
             $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+            $criteria->addInCondition('id', $moveSimCards);
             $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
             $criteria->addCondition('agent_id is null');
-            $ids_string = implode(",", $_SESSION['moveSims'][$key]);
+            $ids_string = implode(",", $moveSimCards);
 
             // update Agent stats
-            Agent::deltaSimCount($_POST['Move']['agent_id'], count($_SESSION['moveSims'][$key]));
+            Agent::deltaSimCount($agent_id, $countMoveSimCards);
 
-            Sim::model()->updateAll(array('agent_id' => $_POST['Move']['agent_id'], 'act_id' => $model->id, 'sim_price' => $_POST['Move']['PriceForSim']), $criteria);
+            Sim::model()->updateAll(array('agent_id' => $agent_id, 'act_id' => $model->id, 'sim_price' => $_POST['Move']['PriceForSim']), $criteria);
 
             $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id)
               SELECT " . Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']) . ", s.personal_account, s.number,s.number_price, s.icc, s.parent_id ,s.agent_id, " . Yii::app()->db->quoteValue($model->id) . ", NULL, NULL, s.operator_id, s.tariff_id, s.operator_region_id, s.company_id
@@ -445,31 +459,32 @@ class SimController extends BaseGxController {
 
             //add NumberHistory
             $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+            $criteria->addInCondition('id', $moveSimCards);
             $simsId = Sim::model()->findAll($criteria);
             foreach($simsId as $s) {
                 $number = Number::model()->findByAttributes(array('number'=>$s->number));
                 if (!empty($number)) {
-                    NumberHistory::addHistoryNumber($number->id,'SIM передана агенту {Agent:'.$_POST['Move']['agent_id'].'} по акту {Act:'.$model->id.'}');
+                    NumberHistory::addHistoryNumber($number->id,'SIM передана агенту {Agent:'.$agent_id.'} по акту {Act:'.$model->id.'}');
                 }
             }
 
             $trx->commit();
 
             Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
-            unset($_SESSION['moveSims'][$key]);
+            $sessionData->delete($key);
             $this->redirect(Yii::app()->createUrl('site/index'));
         } else {
             $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $_SESSION['moveSims'][$key]);
+            $criteria->addInCondition('id', $moveSimCards);
             $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
             $criteria->addCondition('agent_id is null');
             $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
 
-            $total = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
+            $act = new Act;
+            $total = Sim::model()->getTotalNumberPrice($moveSimCards);
             $agent = Agent::model()->getComboList();
-            $agent = array(0 => Yii::t('app', 'Select Agent')) + $agent;
-            $this->render('move', array('model' => $model, 'dataProvider' => $dataProvider, 'agent' => $agent, 'totalNumberPrice' => $total));
+            $agent = array('0'=>Yii::t('app', 'Select Agent')) + $agent;
+            $this->render('move', array('model' => $model, 'dataProvider' => $dataProvider, 'agent' => $agent, 'totalNumberPrice' => $total, 'act'=>$act));
         }
     }
 
@@ -498,10 +513,13 @@ class SimController extends BaseGxController {
     {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
+                $sessionData=new SessionData(__CLASS__);
+                $data=$sessionData->get($key);
+
                 Yii::import('bootstrap.widgets.TbEditableSaver'); //or you can add import 'ext.editable.*' to config
                 $model = new TbEditableSaver('Sim'); // 'User' is classname of model to be updated
                 $model->update();
-                $price = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
+                $price = Sim::model()->getTotalNumberPrice($data);
                 echo CJSON::encode(array('price' => $price));
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Can't edit this object because it is used by another object(s)"));
@@ -514,9 +532,13 @@ class SimController extends BaseGxController {
     {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
-                unset($_SESSION['moveSims'][$key][$id]);
-                $price = Sim::model()->getTotalNumberPrice($_SESSION['moveSims'][$key]);
-                echo CJSON::encode(array('count' => count($_SESSION['moveSims'][$key]), 'price' => $price));
+                $sessionData=new SessionData(__CLASS__);
+                $data=$sessionData->get($key);
+                unset($data[$id]);
+                $sessionData->set($key,$data);
+
+                $price = Sim::model()->getTotalNumberPrice($data);
+                echo CJSON::encode(array('count' => count($data), 'price' => $price));
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
             }
@@ -542,8 +564,8 @@ class SimController extends BaseGxController {
     public function actionList()
     {
         if (isset($_REQUEST['passSIM'])) {
-            $key = rand();
-            $_SESSION['moveSims'][$key] = explode(',', $_POST['ids']);
+            $sessionData=new SessionData(__CLASS__);
+            $key=$sessionData->add(explode(',', $_POST['ids']));
 
             $this->redirect(array('sim/move', 'key' => $key));
         }

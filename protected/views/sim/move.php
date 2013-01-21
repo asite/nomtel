@@ -46,8 +46,8 @@
 <?php
   $form = $this->beginWidget('BaseTbActiveForm', array(
     'id' => 'move-sim',
-    'enableAjaxValidation' => false,
-    'clientOptions'=>array('validateOnSubmit' => false, 'validateOnChange' => false)
+    'enableAjaxValidation' => true,
+    'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
   ));
 ?>
 
@@ -134,15 +134,17 @@ $this->widget('bootstrap.widgets.TbGridView', array(
   <label class="control-label" for="Move_PriceForSim"><?php echo Yii::t('app','price for one sim'); ?></label>
   <div class="controls"><input class="width70" name="Move[PriceForSim]" id="Move_PriceForSim" type="text" value="<?php echo Yii::app()->params->simPrice; ?>"></div>
 </div>
+<?php echo $form->errorSummary($act); ?>
+<div style="display: none;"><?php echo $form->error($act,'agent_id'); ?></div>
 <div class="control-group left-label cfix">
-  <label class="control-label" for="Move_agent_id"><?php echo Yii::t('app','to Agent'); ?></label>
+  <label for="Act_agent_id" class="required"><?php echo Yii::t('app','to Agent'); ?> <span class="required">*</span></label>
   <div class="controls">
     <?php
       $this->widget('bootstrap.widgets.TbSelect2', array(
-        'name' => 'Move[agent_id]',
+        'name' => 'Act[agent_id]',
+        'id' => 'Act_agent_id',
         'data' => $agent,
         'options' => array(
-          'placeholder' => 'better',
           'width' => '400px',
         )
       ));

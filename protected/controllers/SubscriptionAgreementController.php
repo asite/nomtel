@@ -150,6 +150,7 @@ class SubscriptionAgreementController extends BaseGxController {
                     $agreementFile->save();
                 }
 
+                NumberHistory::addHistoryNumber($number->id,'Оформлен договор {SubscriptionAgreement:'.$agreement->id.'}');
                 $trx->commit();
                 $this->redirect(array('sim/list'));
             }

@@ -85,7 +85,7 @@ class SessionData
      * @param bool $check_existence throw exception, if key has no assigned data yet
      * @throws Exception
      */
-    public function set($key,$data,$lifetime=self::DEFAULT_LIFETIME,$check_existence=true) {
+    public function set($key,$data,$lifetime=self::DEFAULT_EXPIRATION,$check_existence=true) {
         if ($check_existence && !$this->exists($key)) throw new Exception('unknown key');
 
         $_SESSION['SessionData'][$this->section][$key]=array(
