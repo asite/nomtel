@@ -199,7 +199,6 @@ class BalanceReportController extends BaseGxController
                 $number->number = $numberBalance['number'];
                 $number->personal_account = $numberBalance['personal_account'];
                 $number->status = Number::STATUS_CONNECTED;
-                $number->save();
                 $numberId = $number->id;
 
                 // search number in sim cards (attached to admin or not yet received)
@@ -229,8 +228,10 @@ class BalanceReportController extends BaseGxController
                     $sim->save();
                     $sim->parent_id = $sim->id;
                     $sim->save();
-
                 }
+
+                $number->sim_id=$sim->id;
+                $number->save();
             }
 
             $balanceReportNumberBulkInsert->insert(array(
