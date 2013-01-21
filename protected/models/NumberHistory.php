@@ -28,4 +28,14 @@ class NumberHistory extends BaseNumberHistory
         $model->comment = $comment;
         $model->save();
     }
+
+    public function search()
+    {
+        $data_provider = parent::search();
+
+        $data_provider->setSort(array(
+            'defaultOrder' => 'dt DESC'
+        ));
+        return $data_provider;
+    }
 }
