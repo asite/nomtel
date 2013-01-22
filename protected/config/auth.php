@@ -37,7 +37,7 @@ return array(
 
     'createSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
-        'bizRule' => 'if ($params["sim"]->agent_id) return false;if (!$params["sim"]->numberObject || $params["sim"]->numberObject->status!=Number::STATUS_FREE) return false;return true;'
+        'bizRule' => 'if ($params["sim"]->agent_id) return false;$number=$params["sim"]->numberObjectBySimId;if (!$number || $number->status!=Number::STATUS_FREE) return false;return true;'
     ),
 
     'deleteAct'=>array(

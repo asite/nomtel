@@ -57,7 +57,7 @@ class Sim extends BaseSim
 
     public function relations() {
         return array_merge(parent::relations(),array(
-            'numberObject' => array(self::HAS_ONE, 'Number', 'sim_id'),
+            'numberObjectBySimId' => array(self::HAS_ONE, 'Number', array('sim_id'=>'parent_id')),
         ));
     }
 
