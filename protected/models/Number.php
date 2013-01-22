@@ -6,7 +6,8 @@ class Number extends BaseNumber
 {
     const STATUS_UNKNOWN = 'UNKNOWN';
     const STATUS_FREE = 'FREE';
-    const STATUS_CONNECTED = 'CONNECTED';
+    const STATUS_ACTIVE = 'ACTIVE';
+    const STATUS_BLOCKED = 'BLOCKED';
 
     public static function model($className = __CLASS__)
     {
@@ -25,7 +26,8 @@ class Number extends BaseNumber
             $labels=array(
                 self::STATUS_UNKNOWN=>Yii::t('app','UNKNOWN'),
                 self::STATUS_FREE=>Yii::t('app','FREE'),
-                self::STATUS_CONNECTED=>Yii::t('app','CONNECTED')
+                self::STATUS_ACTIVE=>Yii::t('app','ACTIVE'),
+                self::STATUS_BLOCKED=>Yii::t('app','BLOCKED')
             );
         }
 

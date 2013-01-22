@@ -126,7 +126,7 @@ class SubscriptionAgreementController extends BaseGxController {
 
                 $person->save();
 
-                $number->status=Number::STATUS_CONNECTED;
+                $number->status=Number::STATUS_ACTIVE;
                 $number->save();
 
                 $agreement->setScenario('create');

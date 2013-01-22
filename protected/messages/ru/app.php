@@ -17,9 +17,11 @@
  * NOTE, this file must be saved in UTF-8 encoding.
  */
 return array (
+  'ACTIVE' => 'Активен',
   'AgentReferralRate|AgentReferralRates' => '',
   'Are you sure to delete this Balance Report?' => '',
   'Are you sure to delete this Technical Support User?' => '',
+  'BLOCKED' => 'Заблокирован',
   'BalanceReportNumber|BalanceReportNumbers' => '',
   'BonusReportAgent|BonusReportAgents' => '',
   'Can\'t create dir %dir%' => '',
@@ -46,7 +48,6 @@ return array (
   'Person|People' => '',
   'Price' => '',
   'Problem sending email' => '',
-  'Revert Act' => 'Откатить акт',
   'Size should be less then 2MB !!!' => '',
   'Skype' => '',
   'SubscriptionAgreementFile|SubscriptionAgreementFiles' => '',
@@ -58,6 +59,7 @@ return array (
   'Url' => '',
   'message to agent down' => '',
   'message to agent up' => '',
+  'CONNECTED' => '@@Подключен@@',
   'Account history' => 'История счета',
   'Act sims move' => 'Акт - Передачи сим карт',
   'Active' => 'Активен',
@@ -86,7 +88,6 @@ return array (
   'BonusReport|BonusReports' => 'Отчет по бонусам|Отчеты по бонусам',
   'Bonuses' => 'Бонусы',
   'CLOSED' => 'Закрыт',
-  'CONNECTED' => 'Подключен',
   'Can\'t delete this Agent because it is used in system' => 'Не могу удалить данного агента, т.к. он используется в системе',
   'Can\'t delete this object because it is used by another object(s)' => 'Не могу удалить данный объект, т.к. он используется',
   'Can\'t revert this act: Some of numbers are non free' => 'Не могу откатить акт: номера некоторых SIM имеют статус, отличающийся от "свободен"',
@@ -174,6 +175,7 @@ return array (
   'Registration Address' => 'Адрес регистрации',
   'Remember me' => 'Запомнить меня',
   'Report problem' => 'Сообщить о проблеме',
+  'Revert Act' => 'Откатить акт',
   'Save' => 'Сохранение',
   'Saved data not found' => 'Сохраненные данные не найдены',
   'Select Agent' => 'Выбор агента',

@@ -198,7 +198,7 @@ class BalanceReportController extends BaseGxController
                 $number = new Number();
                 $number->number = $numberBalance['number'];
                 $number->personal_account = $numberBalance['personal_account'];
-                $number->status = Number::STATUS_CONNECTED;
+                $number->status = Number::STATUS_ACTIVE;
                 $numberId = $number->id;
 
                 // search number in sim cards (attached to admin or not yet received)
