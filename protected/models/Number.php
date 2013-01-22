@@ -64,14 +64,18 @@ class Number extends BaseNumber
         if ($sim->number) {
             $number = self::model()->findByAttributes(array('number'=>$sim->number));
             if (empty($number)) {
-                $model = new Number;
-                $model->sim_id = $sim->id;
-                $model->number = $sim->number;
-                $model->personal_account = $sim->personal_account;
-                $model->status = self::STATUS_FREE;
-                $model->save();
-                NumberHistory::addHistoryNumber($model->id,'SIM {Sim:'.$sim->id.'} добавлена в базу');
+                $number = new Number;
+                $number->sim_id = $sim->id;
+                $number->number = $sim->number;
+                $number->personal_account = $sim->personal_account;
+                $number->status = self::STATUS_FREE;
+                $number->save();
             }
+            if ($number->status!=self::STATUS_FREE) {
+                $number->status=self::STATUS_FREE;
+                $number->save();
+            }
+            NumberHistory::addHistoryNumber($number->id,'SIM {Sim:'.$sim->id.'} добавлена в базу');
         }
     }
 }
