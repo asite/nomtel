@@ -97,8 +97,10 @@ class ActController extends BaseGxController
                 $agent->recalcAllStats();
                 $agent->save();
 
+                NumberHistory::deleteByApproximateDtAndSubstringOrModel($act->dt,$act);
                 $trx->commit();
             } catch (CDbException $e) {
+                $this->ajaxError($e);
                 $this->ajaxError(Yii::t("app", "Can't delete this Act because it is used in system"));
             }
 

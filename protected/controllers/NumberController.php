@@ -31,24 +31,25 @@ class NumberController extends BaseGxController
 
 
         $criteria = new CDbCriteria();
-        $criteria->select = "t.*";
-        $criteria->join = "JOIN ".Number::model()->tableName()." ON t.parent_id=number.sim_id";
-        $criteria->condition = "t.number=:number";
-        $criteria->params= array(":number" => $number->number);
-        $criteria->order = "t.id DESC";
+        $criteria->condition = "parent_id=:sim_id";
+        $criteria->params= array(":sim_id" => $number->sim_id);
+        $criteria->order = "id DESC";
         $criteria->limit = 1;
-
         $sim = Sim::model()->find($criteria);
 
         $criteria = new CDbCriteria();
-        $criteria->select = "t.*";
-        $criteria->join = "JOIN ".Number::model()->tableName()." ON t.number_id=number.id";
-        $criteria->condition = "number.id=:id";
+        $criteria->condition = "number_id=:id";
         $criteria->params= array(":id" => $number->id);
-        $criteria->order = "number.id DESC";
+        $criteria->order = "id DESC";
         $criteria->limit = 1;
-
         $SubscriptionAgreement = SubscriptionAgreement::model()->find($criteria);
+
+        $criteria = new CDbCriteria();
+        $criteria->condition = "number_id=:id";
+        $criteria->params= array(":id" => $number->id);
+        $criteria->order = "id DESC";
+        $criteria->limit = 1;
+        $BalanceReportNumber = BalanceReportNumber::model()->find($criteria);
 
         $numberHistory = new NumberHistory('search');
         $numberHistory->number_id = $number->id;
@@ -57,7 +58,20 @@ class NumberController extends BaseGxController
             'number'=>$number,
             'sim'=>$sim,
             'SubscriptionAgreement'=>$SubscriptionAgreement,
+            'BalanceReportNumber'=>$BalanceReportNumber,
             'numberHistory'=>$numberHistory
         ));
     }
+
+
+
+    public function parseStr($str='') {
+        return preg_replace_callback("%{([a-zA-Z0-9]+):(\d+)}%",'parseStrCallback',$str);
+        //print_r($matches);
+        //return $str;
+    }
 }
+
+    function parseStrCallback() {
+      return 'asd';
+    }

@@ -243,3 +243,15 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
   right: 10px;
   top: 12px;
 }
+
+.number_info {}
+.number_info table tr th {
+  width: 140px;
+}
+.number_info .w80 table {}
+.number_info .w80 table tr th {
+  width: 80px;
+}
+.number_info .table_margin0 table {
+  margin: 0;
+}

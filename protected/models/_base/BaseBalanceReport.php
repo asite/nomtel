@@ -15,7 +15,7 @@
  * @property string $comment
  *
  * @property Operator $operator
- * @property Number[] $numbers
+ * @property BalanceReportNumber[] $balanceReportNumbers
  */
 abstract class BaseBalanceReport extends BaseGxActiveRecord {
 
@@ -48,13 +48,12 @@ abstract class BaseBalanceReport extends BaseGxActiveRecord {
 	public function relations() {
 		return array(
 			'operator' => array(self::BELONGS_TO, 'Operator', 'operator_id'),
-			'numbers' => array(self::MANY_MANY, 'Number', 'balance_report_number(balance_report_id, number_id)'),
+			'balanceReportNumbers' => array(self::HAS_MANY, 'BalanceReportNumber', 'balance_report_id'),
 		);
 	}
 
 	public function pivotModels() {
 		return array(
-			'numbers' => 'BalanceReportNumber',
 		);
 	}
 
@@ -65,7 +64,7 @@ abstract class BaseBalanceReport extends BaseGxActiveRecord {
 			'operator_id' => null,
 			'comment' => Yii::t('app', 'Comment'),
 			'operator' => null,
-			'numbers' => null,
+			'balanceReportNumbers' => null,
 		);
 	}
 

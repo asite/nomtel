@@ -7,12 +7,15 @@
  * property or method in class "BalanceReportNumber".
  *
  * Columns in table "balance_report_number" available as properties of the model,
- * and there are no model relations.
+ * followed by relations of table "balance_report_number" available as properties of the model.
  *
+ * @property string $id
  * @property integer $balance_report_id
  * @property string $number_id
  * @property string $balance
  *
+ * @property BalanceReport $balanceReport
+ * @property Number $number
  */
 abstract class BaseBalanceReportNumber extends BaseGxActiveRecord {
 
@@ -29,10 +32,7 @@ abstract class BaseBalanceReportNumber extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return array(
-			'balance_report_id',
-			'number_id',
-		);
+		return 'balance';
 	}
 
 	public function rules() {
@@ -41,12 +41,14 @@ abstract class BaseBalanceReportNumber extends BaseGxActiveRecord {
 			array('balance_report_id', 'numerical', 'integerOnly'=>true),
 			array('number_id', 'length', 'max'=>20),
 			array('balance', 'length', 'max'=>14),
-			array('balance_report_id, number_id, balance', 'safe', 'on'=>'search'),
+			array('id, balance_report_id, number_id, balance', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'balanceReport' => array(self::BELONGS_TO, 'BalanceReport', 'balance_report_id'),
+			'number' => array(self::BELONGS_TO, 'Number', 'number_id'),
 		);
 	}
 
@@ -57,15 +59,19 @@ abstract class BaseBalanceReportNumber extends BaseGxActiveRecord {
 
 	public function attributeLabels() {
 		return array(
+			'id' => Yii::t('app', 'ID'),
 			'balance_report_id' => null,
 			'number_id' => null,
 			'balance' => Yii::t('app', 'Balance'),
+			'balanceReport' => null,
+			'number' => null,
 		);
 	}
 
 	public function search() {
 		$criteria = new CDbCriteria;
 
+		$criteria->compare('id', $this->id, true);
 		$criteria->compare('balance_report_id', $this->balance_report_id);
 		$criteria->compare('number_id', $this->number_id);
 		$criteria->compare('balance', $this->balance, true);

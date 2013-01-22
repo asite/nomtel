@@ -11,6 +11,7 @@ class Sim extends BaseSim
 
     public function getShortIcc()
     {
+        if ($this->icc=='') return '';
         return '...' . substr($this->icc, -6);
     }
 

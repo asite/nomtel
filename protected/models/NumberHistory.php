@@ -29,6 +29,25 @@ class NumberHistory extends BaseNumberHistory
         $model->save();
     }
 
+    public static function getModelShortcut($model) {
+        return '{'.get_class($model).':'.$model->id.'}';
+    }
+
+    public static function deleteByApproximateDtAndSubstringOrModel($dt,$subStringOrModel) {
+        if ($subStringOrModel instanceof CActiveRecord) $substringOrModel=self::getModelShortcut($subStringOrModel);
+        if (!$dt instanceof EDateTime) $dt=new EDateTime($dt);
+
+        Yii::app()->db->createCommand("
+            delete from number_history
+            where (who like(:pattern) or comment like(:pattern)) and
+                dt>=:dt_from and dt<=:dt_to
+        ")->execute(array(
+            ':pattern'=>'%'.$substringOrModel.'%',
+            ':dt_from'=>$dt->modifiedCopy("-1 hour")->toMysqlDateTime(),
+            ':dt_to'=>$dt->modifiedCopy("+1 hour")->toMysqlDateTime()
+        ));
+    }
+
     public function search()
     {
         $data_provider = parent::search();

@@ -17,7 +17,7 @@
  * @property integer $warning
  * @property string $warning_dt
  *
- * @property BalanceReport[] $balanceReports
+ * @property BalanceReportNumber[] $balanceReportNumbers
  * @property Sim $sim
  * @property NumberHistory[] $numberHistories
  * @property SubscriptionAgreement[] $subscriptionAgreements
@@ -56,7 +56,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 
 	public function relations() {
 		return array(
-			'balanceReports' => array(self::MANY_MANY, 'BalanceReport', 'balance_report_number(number_id, balance_report_id)'),
+			'balanceReportNumbers' => array(self::HAS_MANY, 'BalanceReportNumber', 'number_id'),
 			'sim' => array(self::BELONGS_TO, 'Sim', 'sim_id'),
 			'numberHistories' => array(self::HAS_MANY, 'NumberHistory', 'number_id'),
 			'subscriptionAgreements' => array(self::HAS_MANY, 'SubscriptionAgreement', 'number_id'),
@@ -65,7 +65,6 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 
 	public function pivotModels() {
 		return array(
-			'balanceReports' => 'BalanceReportNumber',
 		);
 	}
 
@@ -78,7 +77,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'status' => Yii::t('app', 'Status'),
 			'warning' => Yii::t('app', 'Warning'),
 			'warning_dt' => Yii::t('app', 'Warning Dt'),
-			'balanceReports' => null,
+			'balanceReportNumbers' => null,
 			'sim' => null,
 			'numberHistories' => null,
 			'subscriptionAgreements' => null,

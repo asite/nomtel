@@ -47,4 +47,16 @@ class EDateTime extends DateTime
         return (string)parent::format($this->type == 'date' ? self::$formatDate : self::$formatDateTime);
     }
 
+    public function modifiedCopy($modify) {
+        $datetime=clone $this;
+        return $datetime->modify($modify);
+    }
+
+    public function toMysqlDateTime() {
+        return $this->format(BaseGxActiveRecord::$mySqlDateTimeFormat);
+    }
+
+    public function toMysqlDate() {
+        return $this->format(BaseGxActiveRecord::$mySqlDateFormat);
+    }
 }
