@@ -4,7 +4,7 @@ class m130122_093917_add_number_history_dt_index extends CDbMigration
 {
 	public function up()
 	{
-        $this->db->execute("
+        $this->execute("
             ALTER TABLE `number_history`
             ADD INDEX `dt` (`dt`);
         ");
