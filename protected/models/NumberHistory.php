@@ -4,7 +4,10 @@ Yii::import('application.models._base.BaseNumberHistory');
 
 class NumberHistory extends BaseNumberHistory
 {
-
+    static $linksForShortcuts = array(
+        'Agent'=>true,
+        'Act'=>true,
+    );
 
 
 	public static function model($className=__CLASS__) {
@@ -61,10 +64,13 @@ class NumberHistory extends BaseNumberHistory
         return $data_provider;
     }
 
-    private function parseStr($string) {
+    private static function parseStr($string) {
         $class=$string[1];
         $model=$class::model()->findByPk($string[2]);
-        return '"'.CHtml::link($model,Yii::app()->createUrl(strtolower($string[1]).'/view',array('id'=>$string[2]))).'"';
+        if (isset(self::$linksForShortcuts[$class]))
+            return '"'.CHtml::link($model,Yii::app()->createUrl(lcfirst($string[1]).'/view',array('id'=>$string[2]))).'"';
+        else
+            return '"'.CHtml::encode($model).'"';
     }
 
     public function replaceShortcutsByLinks($str='') {
