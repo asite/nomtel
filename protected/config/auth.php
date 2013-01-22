@@ -8,7 +8,8 @@ return array(
     'admin' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
-            'createSubscriptionAgreementForOwnSim'
+            'createSubscriptionAgreementForOwnSim',
+            'deleteAct'
         )
     ),
 
@@ -21,7 +22,8 @@ return array(
     'agent' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
-            'createSubscriptionAgreementForOwnSim'
+            'createSubscriptionAgreementForOwnSim',
+            'deleteAct'
         )
     ),
 
@@ -36,5 +38,10 @@ return array(
     'createSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
         'bizRule' => 'if ($params["sim"]->agent_id) return false;if (!$params["sim"]->numberObject || $params["sim"]->numberObject->status!=Number::STATUS_FREE) return false;return true;'
+    ),
+
+    'deleteAct'=>array(
+        'type' => CAuthItem::TYPE_OPERATION,
+        'bizRule' => 'return $params["act"]->agent->parent_id==loggedAgentId();'
     )
 );

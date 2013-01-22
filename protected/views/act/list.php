@@ -20,7 +20,6 @@ $('.search-form form').submit(function(){
 ?>
 
 <h1><?php echo GxHtml::encode($model->label(2)); ?></h1>
-
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
 	'id' => 'delivery-report-grid',
 	'dataProvider' => $dataProvider,
@@ -49,12 +48,9 @@ $('.search-form form').submit(function(){
 		array(
 			'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
-			'template'=>'{view}',
-            'buttons'=>array(
-                'view'=>array(
-                    //'visible'=>'$data->type==Act::TYPE_SIM'
-                )
-            )
+			'template'=>'{view} {delete}',
+            'deleteButtonLabel'=> Yii::t('app','Revert Act'),
+            'deleteConfirmation' => Yii::t('app','Are you sure to revert this Act?'),
 		),
 	),
 )); ?>

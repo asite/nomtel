@@ -49,6 +49,65 @@ class ActController extends BaseGxController
         ));
     }
 
+    public function actionDelete($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $trx = Yii::app()->db->beginTransaction();
+                $act = $this->loadModel($id, 'Act');
+
+                if (!Yii::app()->user->checkAccess('deleteAct',array('act'=>$act)))
+                    $this->ajaxError(Yii::t('app','You are not authorized to perform this action.'));
+
+                if ($act->type==Act::TYPE_SIM) {
+                    $passedSims=Sim::model()->count(array(
+                        'condition'=>'parent_act_id=:act_id and agent_id is not null',
+                        'params'=>array(
+                            ':act_id'=>$act->id
+                        )
+                    ));
+
+                    if ($passedSims>0) $this->ajaxError(Yii::t("app", "Can't revert this act: Some of sim agent passed to subagents"));
+
+                    $connectedSims=Yii::app()->db->createCommand("
+                        select count(*) from sim
+                        join number on (number.number=sim.number and number.status!=:STATUS_FREE)
+                        where sim.act_id=:act_id
+                        ")->queryScalar(array(':act_id'=>$act->id,'STATUS_FREE'=>Number::STATUS_FREE));
+
+                    if ($connectedSims>0) $this->ajaxError(Yii::t("app", "Can't revert this act: Some of numbers are non free"));
+
+                    // modify agent sim records
+                    Sim::model()->updateAll(array(
+                            'agent_id'=>new CDbExpression('NULL'),
+                            'act_id'=>new CDbExpression('NULL')
+                        ),
+                        'act_id=:act_id',
+                        array(
+                            ':act_id'=>$act->id
+                        ));
+
+                    // delete subagent sim records
+                    Sim::model()->deleteAll('parent_act_id=:parent_act_id',array(':parent_act_id'=>$act->id));
+                }
+
+                $act->delete();
+
+                // recalc agent statistics
+                $agent=$act->agent;
+                $agent->recalcAllStats();
+                $agent->save();
+
+                $trx->commit();
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this Act because it is used in system"));
+            }
+
+            if (!Yii::app()->getRequest()->getIsAjaxRequest())
+                $this->redirect(array('admin'));
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
     public function actionReport($id)
     {
         $model = $this->loadModel($id, 'Sim');
