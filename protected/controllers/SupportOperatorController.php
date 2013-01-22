@@ -1,6 +1,6 @@
 <?php
 
-class SupportController extends BaseGxController
+class SupportOperatorController extends BaseGxController
 {
     public function additionalAccessRules()
     {

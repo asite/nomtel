@@ -21,7 +21,7 @@
             array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
             array('label' => Yii::t('app', 'Mass select'), 'url' => $this->createUrl('sim/massselect'), 'active' => $this->route == 'sim/massselect'),
             '',
-            array('label' => SupportOperator::label(2), 'url' => $this->createUrl('support/admin'), 'active' => $this->id == 'support'),
+            array('label' => SupportOperator::label(2), 'url' => $this->createUrl('supportOperator/admin'), 'active' => $this->id == 'supportOperator'),
             array('label' => Yii::t('app', 'Agents'), 'url' => $this->createUrl('agent/admin'), 'active' => ($this->id == 'agent' && $this->route != 'agent/update')),
             array('label' => Yii::t('app', 'Load Bonuses'), 'url' => $this->createUrl('bonusReport/load'), 'active' => $this->route == 'bonusReport/load'),
             array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list'),
