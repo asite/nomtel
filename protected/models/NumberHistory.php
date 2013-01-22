@@ -57,4 +57,14 @@ class NumberHistory extends BaseNumberHistory
         ));
         return $data_provider;
     }
+
+    private function parseStr($string) {
+        $class=$string[1];
+        $model=$class::model()->findByPk($string[2]);
+        return '"'.CHtml::link($model,Yii::app()->createUrl(strtolower($string[1]).'/view',array('id'=>$string[2]))).'"';
+    }
+
+    public function replaceShortcutsByLinks($str='') {
+        return preg_replace_callback("%{([a-zA-Z0-9]+):(\d+)}%",'NumberHistory::parseStr',$str);
+    }
 }

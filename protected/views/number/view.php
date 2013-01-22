@@ -54,6 +54,7 @@ $this->breadcrumbs = array(
         )); ?>
         </div>
     </div>
+    <?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support'): ?>
     <br/>
     <div class="cfix">
         <div style="float:left;width:50%;">
@@ -85,6 +86,8 @@ $this->breadcrumbs = array(
         )); ?>
         </div>
     </div>
+    <?php endif; ?>
+    <?php if (Yii::app()->user->role=='admin'): ?>
     <br/>
     <div class="table_margin0 cfix">
         <div style="float:left;width:40%;">
@@ -146,8 +149,10 @@ $this->breadcrumbs = array(
             ),
         )); ?>
     </div>
-
+    <?php endif; ?>
 </div>
+
+<?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support'): ?>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'number-grid',
     'dataProvider' => $numberHistory->search(),
@@ -157,7 +162,9 @@ $this->breadcrumbs = array(
         'who',
         array(
             'name'=>'comment',
-            'value'=>'Yii::app()->controller->parseStr($data->comment)',
+            'type'=>'html',
+            'value'=>'NumberHistory::replaceShortcutsByLinks($data->comment)',
         ),
     ),
 )); ?>
+<?php endif; ?>

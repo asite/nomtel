@@ -62,16 +62,5 @@ class NumberController extends BaseGxController
             'numberHistory'=>$numberHistory
         ));
     }
-
-
-
-    public function parseStr($str='') {
-        return preg_replace_callback("%{([a-zA-Z0-9]+):(\d+)}%",'parseStrCallback',$str);
-        //print_r($matches);
-        //return $str;
-    }
 }
 
-    function parseStrCallback() {
-      return 'asd';
-    }
