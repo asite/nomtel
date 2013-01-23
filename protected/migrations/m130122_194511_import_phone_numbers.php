@@ -16,10 +16,38 @@ class m130122_194511_import_phone_numbers extends CDbMigration
 
 	public function safeUp()
 	{
-        return false;
-
         $csv=$this->readCSV(dirname(__FILE__).'/m130122_194511_import_phone_numbers.csv');
         array_shift($csv);
+
+        $tariffs=array();
+        foreach(Tariff::model()->findAllByAttributes(array('operator_id'=>Operator::OPERATOR_BEELINE_ID)) as $tariff)
+            $tariffs[$tariff->title]=$tariff->id;
+
+        $tariffMap=array(
+            '08INTERN'=>'Интернациональный 2012',
+            '08STAND'=>'Неактивированный тариф',
+            '08WELN'=>'Урал Добро пожаловать 2008',
+            '72_VSE_L'=>'Всё включено L 2012',
+            '72_VSE_XL'=>'Всё включено XL 2012',
+            '72ALLRUS'=>'ТЮМ Вся Россия',
+            '72ALLRUSN'=>'Вся Россия +',
+            '72FLAME'=>'Зажигай',
+            '72GO'=>'Go! 2012',
+            '72INCL'=>'ТЮМ Все включено Л 2011',
+            '72INCUNL'=>'ТЮМ Все включено Безлимит 2011',
+            '72INCUNLN'=>'ТЮМ Все включено Безлимит 2011',
+            '72INCXL'=>'ТЮМ Все включено ХЛ 2011',
+            '72LIDER'=>'Лидер Общения',
+            '72MONSTER'=>'ТЮМ Монстр общения 2011',
+            '72MONSTR'=>'ТЮМ Монстр общения',
+            '72NODOUBT'=>'ТЮМ Ноль сомнений',
+            '72URAL'=>'ТЮМ Уральский',
+            '72VSE_XXL'=>'Все включено XXL 2012',
+            '72WORLD'=>'ТЮМ Мир Билайн + ф',
+            '72WORLDN'=>'ТЮМ Мир Билайн + ф',
+            '72VISISNG'=>'Содружество СНГ',
+            '72BIZPART'=>'Бизнес-партнеры',
+        );
 
         $stat=array(
             'new_numbers'=>0,
@@ -32,6 +60,13 @@ class m130122_194511_import_phone_numbers extends CDbMigration
             $csv_dt=new EDateTime($row[1]);
             $csv_tariff=trim($row[2]);
             $csv_status=trim($row[3]);
+
+            $tariff=$tariffs[$tariffMap[$csv_tariff]];
+            if (!$tariff) {
+                var_dump($row);
+                echo __LINE__."\n";
+                die;
+            }
 
             $number=Number::model()->findByAttributes(array('number'=>$csv_number));
             if (!$number) {
@@ -73,6 +108,9 @@ class m130122_194511_import_phone_numbers extends CDbMigration
                     $sim->save();
                     $sim->parent_id=$sim->id;
                     $sim->operator_id=Operator::OPERATOR_BEELINE_ID;
+
+                    $sim->tariff_id=$tariff;
+                    $sim->company_id=2; // Инпэй
                     $stat['new_sims']++;
                 } else {
                     $stat['sims_from_reports']++;
@@ -94,7 +132,7 @@ class m130122_194511_import_phone_numbers extends CDbMigration
             $agreement->save();
 
             $stat['cnt']++;
-            if ($stat['cnt']%100==0) {
+            if ($stat['cnt']%1000==0) {
                 echo "processed {$stat['cnt']} of ".count($csv)."\n";
             }
         }

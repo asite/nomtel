@@ -15,10 +15,10 @@ class m130122_211800_import_phone_numbers_megafon extends CDbMigration
 
     public function safeUp()
     {
-        return false;
-
         $csv=$this->readCSV(dirname(__FILE__).'/m130122_211800_import_phone_numbers_megafon.csv');
         array_shift($csv);
+
+        $now=new EDateTime();
 
         $stat=array(
             'new_numbers'=>0,
@@ -28,6 +28,7 @@ class m130122_211800_import_phone_numbers_megafon extends CDbMigration
         );
         foreach($csv as $row) {
             $csv_number=trim($row[0]);
+            $csv_personal_account=trim($row[1]);
 
             $number=Number::model()->findByAttributes(array('number'=>$csv_number));
             if (!$number) {
@@ -58,6 +59,7 @@ class m130122_211800_import_phone_numbers_megafon extends CDbMigration
                     $sim->save();
                     $sim->parent_id=$sim->id;
                     $sim->operator_id=Operator::OPERATOR_MEGAFON_ID;
+                    $sim->personal_account=$csv_personal_account;
                     $stat['new_sims']++;
                 } else {
                     $stat['sims_from_reports']++;
@@ -71,8 +73,15 @@ class m130122_211800_import_phone_numbers_megafon extends CDbMigration
             }
             $number->save();
 
+            $agreement=new SubscriptionAgreement();
+            $agreement->dt=$now;
+            $agreement->save();
+            $agreement->fillDefinedId();
+            $agreement->number_id=$number->id;
+            $agreement->save();
+
             $stat['cnt']++;
-            if ($stat['cnt']%100==0) {
+            if ($stat['cnt']%1000==0) {
                 echo "processed {$stat['cnt']} of ".count($csv)."\n";
             }
         }
