@@ -30,8 +30,9 @@ class BulkInsert
         if ($this->sqlData == '') return;
 
         if ($force || strlen($this->sqlData) > $this->sqlMaxDataSize) {
-            Yii::app()->db->createCommand($this->sqlHeader . $this->sqlData)->execute();
+            $sql=$this->sqlHeader . $this->sqlData;
             $this->sqlData = '';
+            Yii::app()->db->createCommand($sql)->execute();
         }
     }
 

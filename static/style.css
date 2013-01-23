@@ -255,3 +255,7 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
 .number_info .table_margin0 table {
   margin: 0;
 }
+
+table.margin_b0 {
+  margin: 0;
+}

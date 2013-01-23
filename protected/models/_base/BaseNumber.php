@@ -14,8 +14,8 @@
  * @property string $number
  * @property string $personal_account
  * @property string $status
- * @property integer $warning
- * @property string $warning_dt
+ * @property string $balance_status
+ * @property string $balance_status_changed_dt
  *
  * @property BalanceReportNumber[] $balanceReportNumbers
  * @property Sim $sim
@@ -43,14 +43,14 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('number', 'required'),
-			array('warning', 'numerical', 'integerOnly'=>true),
 			array('sim_id', 'length', 'max'=>20),
 			array('number, personal_account', 'length', 'max'=>50),
-			array('status', 'length', 'max'=>9),
-			array('warning_dt', 'safe'),
-			array('sim_id, personal_account, status, warning, warning_dt', 'default', 'setOnEmpty' => true, 'value' => null),
-            array('warning_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, personal_account, status, warning, warning_dt', 'safe', 'on'=>'search'),
+			array('status', 'length', 'max'=>7),
+			array('balance_status', 'length', 'max'=>16),
+			array('balance_status_changed_dt', 'safe'),
+			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt', 'default', 'setOnEmpty' => true, 'value' => null),
+            array('balance_status_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -75,8 +75,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'number' => Yii::t('app', 'Number'),
 			'personal_account' => Yii::t('app', 'Personal Account'),
 			'status' => Yii::t('app', 'Status'),
-			'warning' => Yii::t('app', 'Warning'),
-			'warning_dt' => Yii::t('app', 'Warning Dt'),
+			'balance_status' => Yii::t('app', 'Balance Status'),
+			'balance_status_changed_dt' => Yii::t('app', 'Balance Status Changed Dt'),
 			'balanceReportNumbers' => null,
 			'sim' => null,
 			'numberHistories' => null,
@@ -92,8 +92,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('number', $this->number, true);
 		$criteria->compare('personal_account', $this->personal_account, true);
 		$criteria->compare('status', $this->status, true);
-		$criteria->compare('warning', $this->warning);
-		$criteria->compare('warning_dt', $this->warning_dt, true);
+		$criteria->compare('balance_status', $this->balance_status, true);
+		$criteria->compare('balance_status_changed_dt', $this->balance_status_changed_dt, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
@@ -105,11 +105,11 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 
     public function convertDateTimeFieldsToEDateTime() {
         // rest of work will do setAttribute() routine
-        $this->setAttribute('warning_dt',strval($this->warning_dt));
+        $this->setAttribute('balance_status_changed_dt',strval($this->balance_status_changed_dt));
     }
 
     public function convertDateTimeFieldsToString() {
-        if (is_object($this->warning_dt) && get_class($this->warning_dt)=='EDateTime') $this->warning_dt=new EString($this->warning_dt->format(self::$mySqlDateTimeFormat));
+        if (is_object($this->balance_status_changed_dt) && get_class($this->balance_status_changed_dt)=='EDateTime') $this->balance_status_changed_dt=new EString($this->balance_status_changed_dt->format(self::$mySqlDateTimeFormat));
     }
 
     public function afterFind() {
@@ -127,7 +127,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 
     public function setAttribute($name,$value) {
         if (is_string($value)) {
-            if ($name=='warning_dt') $value=$this->convertStringToEDateTime($value,'datetime');
+            if ($name=='balance_status_changed_dt') $value=$this->convertStringToEDateTime($value,'datetime');
         }
         return parent::setAttribute($name,$value);
     }

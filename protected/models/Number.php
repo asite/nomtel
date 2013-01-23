@@ -9,6 +9,14 @@ class Number extends BaseNumber
     const STATUS_ACTIVE = 'ACTIVE';
     const STATUS_BLOCKED = 'BLOCKED';
 
+    const BALANCE_STATUS_NORMAL = 'NORMAL';
+    const BALANCE_STATUS_POSITIVE_STATIC = 'POSITIVE_STATIC';
+    const BALANCE_STATUS_NEGATIVE_STATIC = 'NEGATIVE_STATIC';
+    const BALANCE_STATUS_POSITIVE_DYNAMIC = 'POSITIVE_DYNAMIC';
+    const BALANCE_STATUS_NEGATIVE_DYNAMIC = 'NEGATIVE_DYNAMIC';
+    const BALANCE_STATUS_NEW = 'NEW';
+    const BALANCE_STATUS_MISSING = 'MISSING';
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
@@ -39,26 +47,31 @@ class Number extends BaseNumber
         return $labels[$status];
     }
 
-    public static function getWarningDropDownList($items=array()) {
-        $labels=self::getWarningLabels();
+    public static function getBalanceStatusDropDownList($items=array()) {
+        $labels=self::getBalanceStatusLabels();
         return array_merge($items,$labels);
     }
 
-    public static function getWarningLabels() {
+    public static function getBalanceStatusLabels() {
         static $labels;
 
         if (!$labels) {
             $labels=array(
-                '0'=>Yii::t('app','No'),
-                '1'=>Yii::t('app','Yes'),
+                self::BALANCE_STATUS_NORMAL => Yii::t('app','BALANCE_STATUS_NORMAL'),
+                self::BALANCE_STATUS_POSITIVE_STATIC => Yii::t('app','BALANCE_STATUS_POSITIVE_STATIC'),
+                self::BALANCE_STATUS_NEGATIVE_STATIC => Yii::t('app','BALANCE_STATUS_NEGATIVE_STATIC'),
+                self::BALANCE_STATUS_POSITIVE_DYNAMIC => Yii::t('app','BALANCE_STATUS_POSITIVE_DYNAMIC'),
+                self::BALANCE_STATUS_NEGATIVE_DYNAMIC => Yii::t('app','BALANCE_STATUS_NEGATIVE_DYNAMIC'),
+                self::BALANCE_STATUS_NEW => Yii::t('app','BALANCE_STATUS_NEW'),
+                self::BALANCE_STATUS_MISSING => Yii::t('app','BALANCE_STATUS_MISSING')
             );
         }
 
         return $labels;
     }
 
-    public function getWarningLabel($status) {
-        $labels=self::getWarningLabels();
+    public function getBalanceStatusLabel($status) {
+        $labels=self::getBalanceStatusLabels();
         return $labels[$status];
     }
     

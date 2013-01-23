@@ -5,7 +5,7 @@ class BalanceReportController extends BaseGxController
     public function filters()
     {
         return array_merge(parent::filters(), array(
-            array('LoggingFilter +load')
+            array('LoggingFilter +load,delete,recalcBalancesStatuses')
         ));
     }
 
@@ -17,7 +17,7 @@ class BalanceReportController extends BaseGxController
             BalanceReportNumber::model()->deleteAllByAttributes(array('balance_report_id' => $id));
             BalanceReport::model()->deleteByPk($id);
 
-            $this->recalcWarnings();
+            $this->recalcBalancesStatuses();
 
             $trx->commit();
 
@@ -28,10 +28,9 @@ class BalanceReportController extends BaseGxController
     }
 
 
-    private function recalcOperatorWarnings($reportId1, $reportId2, $reportId3, $warnOnEqualValues=true)
+    private function recalcOperatorBalancesStatuses($reportId1, $reportId2, $reportId3, $analyzeBalances)
     {
-        $goodIds = array();
-        $warnedIds = array();
+        $statuses = array();
 
         $reader = Yii::app()->db->createCommand("
             select n.id,brn1.balance as b1,brn2.balance as b2,brn3.balance as b3
@@ -52,34 +51,57 @@ class BalanceReportController extends BaseGxController
         foreach ($reader as $row) {
             $b = array($row['b1'], $row['b2'], $row['b3']);
 
-            $warned = false;
+            $status = Number::BALANCE_STATUS_NORMAL;
 
-            // if number not present in current or previous report
-            if (($b[1] == '' && $b[2]!='') || $b[2] == '') $warned = true;
+            if ($analyzeBalances) {
+                $b[0]=floatval($b[0]);
+                $b[1]=floatval($b[1]);
+                $b[2]=floatval($b[2]);
 
-            if ($warnOnEqualValues) {
-                // if balance of last three reports is equal
-                if ($b[0] == $b[1] && $b[1] == $b[2]) $warned = true;
+                // if all balances equal
+                if (abs($b[0]-$b[1])+abs($b[0]-$b[2])<1e-4) {
+                    $status=$b[0]<0 ? Number::BALANCE_STATUS_NEGATIVE_STATIC:Number::BALANCE_STATUS_POSITIVE_STATIC;
+                } else {
+                    if ($b[0]>0 || $b[1]>0 || $b[2]>0)
+                        $status=Number::BALANCE_STATUS_POSITIVE_DYNAMIC;
+                    else
+                        $status=Number::BALANCE_STATUS_NEGATIVE_DYNAMIC;
+                }
             }
 
-            // if balance of last three reports is zero or below zero
-            if ($b[0]<1e-6 && $b[1]<1e-6 && $b[2]<1e-6) $warned = true;
+            if (($b[1]=='' && $b[2]!='') || $b[2] == '') $status = Number::BALANCE_STATUS_MISSING;
 
-            if ($warned) $warnedIds[] = $row['id']; else $goodIds[] = $row['id'];
+            if ($b[0]=='' && $b[1]=='' && $b[2] != '') $status = Number::BALANCE_STATUS_NEW;
+
+            $statuses[$row['id']]=$status;
         }
 
-        if (!empty($goodIds)) {
-            Yii::app()->db->createCommand('update number set warning=0, warning_dt=NULL where id in (' .
-                implode(',', $goodIds) . ') and warning=1')->execute();
-        }
+        // get statuses from database
+        $ids=array();
+        foreach($statuses as $id=>$status) $ids[]=Yii::app()->db->quoteValue($id);
 
-        if (!empty($warnedIds)) {
-            Yii::app()->db->createCommand('update number set status=1, warning_dt=NOW() where id in (' .
-                implode(',', $warnedIds) . ') and status=0')->execute();
+        $lastReport=BalanceReport::model()->findByPk($reportId3);
+        $dt=$lastReport->dt->toMysqlDateTime();
+
+        $changeStatusCommand=Yii::app()->db->createCommand("
+            update number
+            set balance_status=:balance_status,balance_status_changed_dt=:balance_status_changed_dt
+            where id=:id");
+
+        if (!empty($ids)) {
+            $oldStatuses=Yii::app()->db->createCommand('select id,balance_status from number where id in('.implode(',',$ids).')')->queryAll();
+
+            foreach($oldStatuses as $oldStatus)
+                if ($oldStatus['balance_status']!=$statuses[$oldStatus['id']])
+                    $changeStatusCommand->execute(array(
+                        ':id'=>$oldStatus['id'],
+                        ':balance_status'=>$statuses[$oldStatus['id']],
+                        ':balance_status_changed_dt'=>$dt
+                    ));
         }
     }
 
-    private function recalcWarnings()
+    private function recalcBalancesStatuses()
     {
         $operators = Operator::model()->findAll();
 
@@ -93,13 +115,19 @@ class BalanceReportController extends BaseGxController
 
             if (count($balanceReports) < 3) continue;
 
-            $this->recalcOperatorWarnings(
+            $this->recalcOperatorBalancesStatuses(
                 $balanceReports[2]->id,
                 $balanceReports[1]->id,
                 $balanceReports[0]->id,
                 $operator->id=Operator::OPERATOR_MEGAFON_ID
             );
         }
+    }
+
+    public function actionRecalcBalancesStatuses() {
+        $trx=Yii::app()->db->beginTransaction();
+        $this->recalcBalancesStatuses();
+        $trx->commit();
     }
 
     public function actionView($id)
@@ -199,7 +227,6 @@ class BalanceReportController extends BaseGxController
                 $number->number = $numberBalance['number'];
                 $number->personal_account = $numberBalance['personal_account'];
                 $number->status = Number::STATUS_ACTIVE;
-                $numberId = $number->id;
 
                 // search number in sim cards (attached to admin or not yet received)
                 $sim = Sim::model()->find(array(
@@ -232,6 +259,7 @@ class BalanceReportController extends BaseGxController
 
                 $number->sim_id=$sim->id;
                 $number->save();
+                $numberId = $number->id;
             }
 
             $balanceReportNumberBulkInsert->insert(array(
@@ -243,7 +271,7 @@ class BalanceReportController extends BaseGxController
 
         $balanceReportNumberBulkInsert->finish();
 
-        $this->recalcWarnings();
+        $this->recalcBalancesStatuses();
 
         $trx->commit();
 
