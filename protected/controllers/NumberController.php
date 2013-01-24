@@ -90,17 +90,86 @@ class NumberController extends BaseGxController
     public function actionSaveTariff($id) {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
+                $number = Number::model()->findByPk($id);
+                $tariff_id = Sim::model()->findByAttributes(array('parent_id' => $number->sim_id));
                 $criteria = new CDbCriteria();
                 $criteria->addCondition('parent_id=:id');
                 $criteria->params = array(
-                    ':id' => $id
+                    ':id' => $number->sim_id
                 );
                 Sim::model()->updateAll(array('tariff_id' => $_POST['value']), $criteria);
+                NumberHistory::addHistoryNumber($number->id,'Тариф сменен с {Tariff:'.$tariff_id->tariff_id.'} на {Tariff:'.$_POST['value'].'}');
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
             }
-            if (!Yii::app()->getRequest()->getIsAjaxRequest())
-                $this->redirect(array('move', 'key' => $key));
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+    public function actionSaveOperatorRegion($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $region_id = Sim::model()->findByAttributes(array('parent_id' => $number->sim_id));
+                $criteria = new CDbCriteria();
+                $criteria->addCondition('parent_id=:id');
+                $criteria->params = array(
+                    ':id' => $number->sim_id
+                );
+                Sim::model()->updateAll(array('operator_region_id' => $_POST['value']), $criteria);
+                NumberHistory::addHistoryNumber($number->id,'Регион сменен с {OperatorRegion:'.$region_id->operator_region_id.'} на {OperatorRegion:'.$_POST['value'].'}');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+    public function actionSaveCompany($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $company_id = Sim::model()->findByAttributes(array('parent_id' => $number->sim_id));
+                $criteria = new CDbCriteria();
+                $criteria->addCondition('parent_id=:id');
+                $criteria->params = array(
+                    ':id' => $number->sim_id
+                );
+                Sim::model()->updateAll(array('company_id' => $_POST['value']), $criteria);
+                NumberHistory::addHistoryNumber($number->id,'Компания сменена с {Company:'.$company_id->company_id.'} на {Company:'.$_POST['value'].'}');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+    public function actionSaveCodeword($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $codeword = $number->codeword;
+                $number->codeword = $_POST['value'];
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Кодовое слово сменено с "'.$codeword.'"" на "'.$_POST['value'].'"');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+    public function actionSaveServicePassword($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $service_password = $number->service_password;
+                $number->service_password = $_POST['value'];
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Кодовое слово сменено с "'.$service_password.'" на "'.$_POST['value'].'"');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+            }
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }

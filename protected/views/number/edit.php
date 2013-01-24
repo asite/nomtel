@@ -31,11 +31,15 @@ $this->breadcrumbs = array(
                     'value' => Chtml::value($tariff, 'title'),
                     'editable' => array(
                         'type'   => 'select',
-                        'url' => $this->createUrl('number/saveTariff',array('id'=>$number->sim_id)),
+                        'url' => $this->createUrl('number/saveTariff',array('id'=>$number->id)),
                         'options' => array(
                             'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
                         ),
                         'source' => CHtml::listData(Tariff::model()->findAllByAttributes(array('operator_id'=>$number->sim->operator_id)), 'id', 'title'),
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
+
                     )
                 )
             ),
@@ -62,7 +66,6 @@ $this->breadcrumbs = array(
         <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-condensed'),
             'data'=>$operatorRegion,
-            'url' => $this->createUrl('number/saveOperatorRegion'),
             'attributes'=>array(
                 array(
                     'label'=>Yii::t('app','OperatorRegion'),
@@ -70,7 +73,14 @@ $this->breadcrumbs = array(
                     'value' => Chtml::value($operatorRegion, 'title'),
                     'editable' => array(
                         'type'   => 'select',
+                        'url' => $this->createUrl('number/saveOperatorRegion',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
                         'source' => CHtml::listData(OperatorRegion::model()->findAllByAttributes(array('operator_id'=>$number->sim->operator_id)), 'id', 'title'),
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
                     )
                 )
             ),
@@ -107,11 +117,10 @@ $this->breadcrumbs = array(
 
     <br/>
     <div class="cfix">
-        <div style="float:left;width:50%;">
+        <div style="float:left;width:40%;">
         <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-striped table-condensed'),
             'data'=>$company,
-            'url' => $this->createUrl('number/saveCompany'),
             'attributes'=>array(
                 array(
                     'label'=>Yii::t('app','Company'),
@@ -119,13 +128,20 @@ $this->breadcrumbs = array(
                     'value' => Chtml::value($company, 'title'),
                     'editable' => array(
                         'type'   => 'select',
+                        'url' => $this->createUrl('number/saveCompany',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
                         'source' => CHtml::listData(Company::model()->findAll(),'id', 'title'),
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
                     )
                 )
             ),
         )); ?>
-        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
-            'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
+        <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
+            'htmlOptions' => array('class'=>'table margin_b0 table-condensed'),
             'data'=>$number,
             'attributes'=>array(
                 array(
@@ -136,8 +152,8 @@ $this->breadcrumbs = array(
             ),
         )); ?>
         </div>
-        <div style="float:left;width:50%;">
-        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+        <div style="float:left;width:30%;">
+        <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
             'data'=>$number,
             'attributes'=>array(
@@ -146,9 +162,49 @@ $this->breadcrumbs = array(
                     'value'=>''
                     ),
                 array(
-                    'label'=>Yii::t('app','Codeword'),
+                    //'label'=>Yii::t('app','Company'),
+                    'name' => 'codeword',
+                    'value' => $number->codeword,
+                    'editable' => array(
+                        'type'   => 'text',
+                        'url' => $this->createUrl('number/saveCodeword',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
+                        'source' => $number->codeword,
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
+                    )
+                )
+            ),
+        )); ?>
+        </div>
+        <div style="float:left;width:30%;">
+        <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
+            'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
+            'data'=>$number,
+            'attributes'=>array(
+                array(
+                    //'label'=>Yii::t('app','Company'),
+                    'name' => 'service_password',
+                    'value' => $number->service_password,
+                    'editable' => array(
+                        'type'   => 'text',
+                        'url' => $this->createUrl('number/saveServicePassword',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
+                        'source' => $number->service_password,
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
+                    )
+                ),
+                array(
+                    'label'=>'&nbsp;',
                     'value'=>''
-                    ),
+                ),
             ),
         )); ?>
         </div>

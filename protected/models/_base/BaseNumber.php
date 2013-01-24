@@ -16,6 +16,8 @@
  * @property string $status
  * @property string $balance_status
  * @property string $balance_status_changed_dt
+ * @property string $codeword
+ * @property string $service_password
  *
  * @property BalanceReportNumber[] $balanceReportNumbers
  * @property Sim $sim
@@ -43,14 +45,14 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('number', 'required'),
-			array('sim_id', 'length', 'max'=>20),
+			array('sim_id, codeword, service_password', 'length', 'max'=>20),
 			array('number, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>7),
 			array('balance_status', 'length', 'max'=>16),
 			array('balance_status_changed_dt', 'safe'),
-			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password', 'default', 'setOnEmpty' => true, 'value' => null),
             array('balance_status_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt', 'safe', 'on'=>'search'),
+			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -77,6 +79,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'status' => Yii::t('app', 'Status'),
 			'balance_status' => Yii::t('app', 'Balance Status'),
 			'balance_status_changed_dt' => Yii::t('app', 'Balance Status Changed Dt'),
+			'codeword' => Yii::t('app', 'Codeword'),
+			'service_password' => Yii::t('app', 'Service Password'),
 			'balanceReportNumbers' => null,
 			'sim' => null,
 			'numberHistories' => null,
@@ -94,6 +98,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('status', $this->status, true);
 		$criteria->compare('balance_status', $this->balance_status, true);
 		$criteria->compare('balance_status_changed_dt', $this->balance_status_changed_dt, true);
+		$criteria->compare('codeword', $this->codeword, true);
+		$criteria->compare('service_password', $this->service_password, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
