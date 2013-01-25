@@ -397,7 +397,7 @@ class SimController extends BaseGxController {
 
             if (count($ids) > 0) {
                 $sessionData=new SessionData(__CLASS__);
-                $key=$sessionData->add(explode($ids));
+                $key=$sessionData->add($ids);
 
                 $this->redirect(array('sim/move', 'key' => $key));
             } else
