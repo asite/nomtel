@@ -5,7 +5,7 @@ class ActController extends BaseGxController
     public function additionalAccessRules()
     {
         return array(
-            array('allow', 'actions' => array('list', 'view', 'report'), 'roles' => array('agent')),
+            array('allow', 'actions' => array('list', 'view', 'report','delete'), 'roles' => array('agent')),
         );
     }
 
