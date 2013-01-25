@@ -135,6 +135,7 @@ return array (
   'Download agreement blank' => 'Скачать бланк договора',
   'Dt' => 'Дата',
   'Enter' => 'Войти',
+  'Enter number price'=>'Введите стоимость номера',
   'FREE' => 'Свободен',
   'Fields with' => 'Поля, отмеченные',
   'File' => 'Файл',

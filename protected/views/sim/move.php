@@ -80,9 +80,10 @@ $this->widget('bootstrap.widgets.TbGridView', array(
       'name' => 'number_price',
       'sortable'=>false,
       'editable' => array(
-        'url' => $this->createUrl("updatePrice", array("id"=>$data->id,'key' => $_GET['key'])),
+        'url' => Yii::app()->createUrl("sim/updatePrice", array("id"=>$data->id,"key"=>$_GET["key"])),
         'placement' => 'right',
-        'inputclass' => 'span3',
+        'inputclass' => 'span2',
+        'title'=>Yii::t('app','Enter number price'),
         'options' => array(
           'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
         ),

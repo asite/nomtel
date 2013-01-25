@@ -352,7 +352,7 @@ class BalanceReportController extends BaseGxController
 
             if ($personal_account == '' || $number == '') continue;
             if (!preg_match('/^\d{7,8}$/', $personal_account)) {
-                $this->errorInvalidFormat(__LINE__) . " $row '$personal_account'";
+                $this->errorInvalidFormat(__LINE__ . " $row '$personal_account'");
             }
             if ($number != '') {
                 if (!preg_match('/^\d+[^0-9]*- (\d{10}),?\s*$/', $number, $m)) $this->errorInvalidFormat(__LINE__ . " $row '$number'");
