@@ -530,6 +530,7 @@ class SimController extends BaseGxController {
 
     public function actionRemove($id, $key)
     {
+
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
                 $sessionData=new SessionData(__CLASS__);
@@ -565,7 +566,10 @@ class SimController extends BaseGxController {
     {
         if (isset($_REQUEST['passSIM'])) {
             $sessionData=new SessionData(__CLASS__);
-            $key=$sessionData->add(explode(',', $_POST['ids']));
+            $data=array();
+            foreach(explode(',', $_POST['ids']) as $v)
+                if ($v!='') $data[$v]=$v;
+            $key=$sessionData->add($data);
 
             $this->redirect(array('sim/move', 'key' => $key));
         }
