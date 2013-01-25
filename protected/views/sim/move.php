@@ -80,7 +80,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
       'name' => 'number_price',
       'sortable'=>false,
       'editable' => array(
-        'url' => Yii::app()->createUrl("sim/updatePrice", array("id"=>$data->id,"key"=>$_GET["key"])),
+        'url' => Yii::app()->createUrl("sim/updatePrice", array("key"=>$_GET["key"])),
         'placement' => 'right',
         'inputclass' => 'span2',
         'title'=>Yii::t('app','Enter number price'),

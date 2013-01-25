@@ -509,16 +509,24 @@ class SimController extends BaseGxController {
         echo $res;
     }
 
-    public function actionUpdatePrice($id, $key)
+    public function actionUpdatePrice($key)
     {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
                 $sessionData=new SessionData(__CLASS__);
                 $data=$sessionData->get($key);
 
-                Yii::import('bootstrap.widgets.TbEditableSaver'); //or you can add import 'ext.editable.*' to config
-                $model = new TbEditableSaver('Sim'); // 'User' is classname of model to be updated
-                $model->update();
+                $sim = Sim::model()->findByPk($_REQUEST['pk']);
+
+                $criteria = new CDbCriteria();
+                $criteria->addCondition('parent_id=:id');
+                $criteria->params = array(":id" => $sim->id);
+                Sim::model()->updateAll(array('number_price' => $_REQUEST['value']), $criteria);
+
+                //Yii::import('bootstrap.widgets.TbEditableSaver'); //or you can add import 'ext.editable.*' to config
+                //$model = new TbEditableSaver('Sim'); // 'User' is classname of model to be updated
+                //$model->update();
+
                 $price = Sim::model()->getTotalNumberPrice($data);
                 echo CJSON::encode(array('price' => $price));
             } catch (CDbException $e) {
