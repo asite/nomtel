@@ -15,6 +15,9 @@ $('.search-form form').submit(function(){
 	});
 	return false;
 });
+$('#SimSearch_operator_id').live('change',function(){
+  $('[data-id='+$(this).val()+']').addClass('active').siblings().removeClass('active');
+})
 ");
 ?>
 
@@ -30,6 +33,37 @@ $('.search-form form').submit(function(){
         'style'=>"margin-bottom:10px;"
     )
 )) ?>
+
+
+<?php $this->widget('bootstrap.widgets.TbButtonGroup', array(
+    'toggle' => 'radio',
+    'buttons' => array(
+        array(
+            'label'=>Yii::t('app','All'),
+            'htmlOptions'=>array(
+                'onclick'=>"jQuery('#SimSearch_operator_id').val('').trigger(jQuery.Event('keydown', {keyCode: 13}))",
+                'data-id'=>'',
+                'style'=>"margin-bottom:10px;"
+            )
+        ),
+        array(
+            'label'=>Yii::t('app','Bilain'),
+            'htmlOptions'=>array(
+                'onclick'=>"jQuery('#SimSearch_operator_id').val(".Operator::OPERATOR_BEELINE_ID.").trigger(jQuery.Event('keydown', {keyCode: 13}))",
+                'data-id'=>Operator::OPERATOR_BEELINE_ID,
+                'style'=>"margin-bottom:10px;"
+            )
+        ),
+        array(
+            'label'=>Yii::t('app','Megafon'),
+            'htmlOptions'=>array(
+                'onclick'=>"jQuery('#SimSearch_operator_id').val(".Operator::OPERATOR_MEGAFON_ID.").trigger(jQuery.Event('keydown', {keyCode: 13}))",
+                'data-id'=>Operator::OPERATOR_MEGAFON_ID,
+                'style'=>"margin-bottom:10px;"
+            )
+            ),
+    ),
+)); ?>
 
 <style>
     #sim-grid tfoot {
@@ -70,6 +104,9 @@ $('.search-form form').submit(function(){
             'value'=>'$data["operator"]',
             'filter'=>Operator::getComboList(),
             'header'=>Operator::label(1),
+            'htmlOptions'=>array(
+                'onchange'=>'alert("ok")',
+            )
         ),
         array(
             'name'=>'tariff_id',
