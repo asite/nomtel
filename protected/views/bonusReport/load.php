@@ -1,7 +1,7 @@
 <?php
 
 $this->breadcrumbs = array(
-    Yii::t('app', 'Load Bonuses'),
+    Yii::t('app', 'Load Bonuses Report'),
 );
 
 ?>
@@ -31,7 +31,7 @@ $this->breadcrumbs = array(
 
 <?php
 echo '<div class="form-actions">';
-echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Load Bonuses'), array('class'=>'btn btn-primary', 'type'=>'submit'));
+echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Load Bonuses Report'), array('class'=>'btn btn-primary', 'type'=>'submit'));
 echo '</div>';
 $this->endWidget();
 ?>

@@ -48,3 +48,8 @@ $('.search-form form').submit(function(){
         ),
     ),
 )); ?>
+
+<?php $this->widget('bootstrap.widgets.TbButton',array(
+    'label' => Yii::t('app', 'Load report'),
+    'url' => $this->createUrl('bonusReport/load')
+)); ?>
