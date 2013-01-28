@@ -621,6 +621,7 @@ class SimController extends BaseGxController {
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
+                    'agent_id','number','icc','operator_id','tariff_id','status','balance_status'
                 ),
             ),
             'pagination' => array(
