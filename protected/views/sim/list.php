@@ -18,7 +18,7 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1><?php echo GxHtml::encode($model->label(2)); ?></h1>
+<h1><?php echo GxHtml::encode(Sim::label(2)); ?></h1>
 
 <a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#Sim_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('keydown', {keyCode: 13}));"><?php echo Yii::t('app', 'Without number') ?></a>
 
@@ -46,53 +46,69 @@ $('.search-form form').submit(function(){
         'actionButtons' => array(
         ),
         'checkBoxColumnConfig' => array(
-            'name' => 'id',
-            'disabled' => '$data->agent_id ? true:false'
+            'name' => 'sim_id',
+            'disabled' => '$data["agent_id"] ? true:false'
         ),
     ),
     'columns' => array(
         array(
-            'name'=>'act_id',
-            'value'=>'$data->act->dt ? $data->act->dt->format("d.m.Y"):"";',
-            'filter'=>false,
-        ),
-        array(
             'name'=>'agent_id',
-            'value'=>'GxHtml::valueEx($data->agent)',
+            'value'=>'CHtml::encode($data["surname"]." ".$data["name"])',
             'filter'=>Agent::getComboList(array(0=>Yii::t('app','WITHOUT AGENT'))),
+            'header'=>Agent::label(1)
         ),
         array(
             'name'=>'number',
+            'header'=>Yii::t('app','Number'),
         ),
         array(
             'name'=>'icc',
+            'header'=>Yii::t('app','Icc'),
         ),
         array(
             'name'=>'operator_id',
-            'value'=>'$data->operator',
+            'value'=>'$data["operator"]',
             'filter'=>Operator::getComboList(),
+            'header'=>Operator::label(1),
         ),
         array(
             'name'=>'tariff_id',
-            'value'=>'$data->tariff',
+            'value'=>'$data["tariff"]',
             'filter'=>Tariff::getComboList(),
+            'header'=>Tariff::label(1),
+        ),
+        array(
+            'name'=>'status',
+            'value'=>'Number::getStatusLabel($data["status"])',
+            'filter'=>Number::getStatusDropDownList(),
+            'header'=>Yii::t('app','Status'),
+        ),
+        array(
+            'name'=>'balance_status',
+            'value'=>'Number::getBalanceStatusLabel($data["balance_status"])',
+            'filter'=>Number::getBalanceStatusDropDownList(),
+            'header'=>Yii::t('app','Balance Status'),
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:40px;text-align:center;vertical-align:middle'),
-            'template'=>'{feedback} {agreement}',
+            'template'=>'{view} {feedback} {agreement}',
             'buttons'=>array(
+                'view'=>array(
+                    'url'=>'Yii::app()->createUrl("number/".((Yii::app()->user->role=="admin")?"edit":"view"),array("id"=>$data["number_id"]))',
+                ),
+
                 'feedback'=>array(
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
-                    'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data->id))',
+                    'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data["sim_id"]))',
                     'visible'=>'!isAdmin()'
                 ),
                 'agreement'=>array(
                     'label'=>Yii::t('app','Create subscription agreement'),
                     'icon'=>'file',
-                    'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$data->id))',
-                    'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("sim"=>$data))'
+                    'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$data["sim_id"]))',
+                    'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("sim"=>Sim::model()->findByPk($data["sim_id"])))'
                 ),
             )
         ),

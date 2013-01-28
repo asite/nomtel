@@ -27,7 +27,7 @@
             array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list'),
             array('label' => Yii::t('app', 'Load Balance Report'), 'url' => $this->createUrl('balanceReport/load'), 'active' => $this->route == 'balanceReport/load'),
             array('label' => BalanceReport::model()->label(2), 'url' => $this->createUrl('balanceReport/list'), 'active' => $this->route == 'balanceReport/list'),
-            array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
+            //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
             array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
             array('label' => Yii::t('app', 'Operators'), 'url' => $this->createUrl('operator/admin'), 'active' => $this->id == 'operator'),
             '',
@@ -62,7 +62,8 @@
 
     if (Yii::app()->user->role == 'support') {
         $menuLeft = array(
-            array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
+            array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
+            //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );

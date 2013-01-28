@@ -3,7 +3,7 @@
 <?php
 
 $this->breadcrumbs = array(
-    Number::label(2)=>$this->createUrl('list'),
+    Sim::label(2)=>$this->createUrl('sim/list'),
     $number->adminLabel(Number::label(1))
 );
 

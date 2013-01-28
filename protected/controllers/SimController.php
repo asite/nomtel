@@ -582,15 +582,45 @@ class SimController extends BaseGxController {
             $this->redirect(array('sim/move', 'key' => $key));
         }
 
-        $model = new Sim('search');
+        $model = new SimSearch();
         $model->unsetAttributes();
 
-        if (isset($_GET['Sim']))
-            $model->setAttributes($_GET['Sim']);
+        if (isset($_GET['SimSearch']))
+            $model->setAttributes($_GET['SimSearch']);
 
-        $dataProvider = $model->search();
-        $dataProvider->criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
-        $dataProvider->criteria->with=array('tariff','operator','act','agent');
+        $criteria = new CDbCriteria();
+        $criteria->compare('s.parent_agent_id',loggedAgentId());
+        if ($model->agent_id !== '0')
+            $criteria->compare('s.agent_id', $model->agent_id);
+        else
+            $criteria->addCondition("s.agent_id is null");
+        $criteria->compare('s.number',$model->number);
+        $criteria->compare('s.icc',$model->icc);
+        $criteria->compare('s.operator_id',$model->operator_id);
+        $criteria->compare('s.tariff_id',$model->tariff_id);
+        $criteria->compare('n.status',$model->status);
+        $criteria->compare('n.balance_status',$model->balance_status);
+
+        $sql = "from sim s
+            left outer join number n on (s.parent_id=n.sim_id)
+            left outer join agent a on (a.id=s.agent_id)
+            left outer join operator o on (o.id=s.operator_id)
+            left outer join tariff t on (t.id=s.tariff_id)
+            where " . $criteria->condition;
+
+        $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
+
+        $dataProvider = new CSqlDataProvider('select s.*,n.*,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id ' . $sql, array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $criteria->params,
+            'sort' => array(
+                'attributes' => array(
+                ),
+            ),
+            'pagination' => array(
+                'pageSize' => Sim::ITEMS_PER_PAGE,
+            ),
+        ));
 
         $this->render('list', array(
             'model' => $model,
