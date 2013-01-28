@@ -590,11 +590,17 @@ class SimController extends BaseGxController {
 
         $criteria = new CDbCriteria();
         $criteria->compare('s.parent_agent_id',loggedAgentId());
+
         if ($model->agent_id !== '0')
             $criteria->compare('s.agent_id', $model->agent_id);
         else
             $criteria->addCondition("s.agent_id is null");
-        $criteria->compare('s.number',$model->number);
+
+        if ($model->number != Yii::t('app', 'WITHOUT NUMBER'))
+            $criteria->compare('s.number', $model->number, true);
+        else
+            $criteria->addCondition("(s.number='' or s.number is null)");
+
         $criteria->compare('s.icc',$model->icc);
         $criteria->compare('s.operator_id',$model->operator_id);
         $criteria->compare('s.tariff_id',$model->tariff_id);
@@ -610,7 +616,7 @@ class SimController extends BaseGxController {
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider = new CSqlDataProvider('select s.*,n.*,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id ' . $sql, array(
+        $dataProvider = new CSqlDataProvider('select s.*,n.*,s.number,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(

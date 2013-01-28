@@ -23,7 +23,7 @@ $('#SimSearch_operator_id').live('change',function(){
 
 <h1><?php echo GxHtml::encode(Sim::label(2)); ?></h1>
 
-<a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#Sim_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('keydown', {keyCode: 13}));"><?php echo Yii::t('app', 'Without number') ?></a>
+<a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#SimSearch_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('keydown', {keyCode: 13}));"><?php echo Yii::t('app', 'Without number') ?></a>
 
 <?php $this->widget('bootstrap.widgets.TbButton', array(
     'type'=>'button',
