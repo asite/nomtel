@@ -616,7 +616,7 @@ class SimController extends BaseGxController {
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider = new CSqlDataProvider('select s.*,n.*,s.number,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id ' . $sql, array(
+        $dataProvider = new CSqlDataProvider('select s.*,n.*,s.number,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id,n.status as number_status ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(

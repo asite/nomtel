@@ -145,7 +145,7 @@ $('#SimSearch_operator_id').live('change',function(){
                     'label'=>Yii::t('app','Create subscription agreement'),
                     'icon'=>'file',
                     'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$data["sim_id"]))',
-                    'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("sim"=>Sim::model()->findByPk($data["sim_id"])))'
+                    'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))'
                 ),
             )
         ),

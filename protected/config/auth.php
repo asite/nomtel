@@ -29,7 +29,7 @@ return array(
 
     'createSubscriptionAgreementForOwnSim' => array (
         'type' => CAuthItem::TYPE_TASK,
-        'bizRule' => 'return $params["sim"]->parent_agent_id==loggedAgentId();',
+        'bizRule' => 'return $params["parent_agent_id"]==loggedAgentId();',
         'children' => array(
             'createSubscriptionAgreement'
         )
@@ -37,7 +37,7 @@ return array(
 
     'createSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
-        'bizRule' => 'if ($params["sim"]->agent_id) return false;$number=$params["sim"]->numberObjectBySimId;if (!$number || $number->status!=Number::STATUS_FREE) return false;return true;'
+        'bizRule' => 'return $params["number_status"]==Number::STATUS_FREE;'
     ),
 
     'deleteAct'=>array(
