@@ -71,9 +71,15 @@ class NumberController extends BaseGxController
     {
         $params = $this->getNumberInfo($id);
         $numberInfoEdit = new NumberInfoEdit;
-        $tariff = Tariff::model()->findByPk($params['number']->sim->tariff_id);
-        $operatorRegion = OperatorRegion::model()->findByPk($params['number']->sim->operator_region_id);
-        $company = Company::model()->findByPk($params['number']->sim->company_id);
+
+        $tariff = $params['sim']->tariff;
+        if (!$tariff) $tariff=new Tariff;
+
+        $operatorRegion = $params['sim']->operatorRegion;
+        if (!$operatorRegion) $operatorRegion=new operatorRegion;
+
+        $company = $params['sim']->company;
+        if (!$company) $company=new Company;
 
         $this->render('edit',array(
             'number'=>$params['number'],
