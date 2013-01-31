@@ -3,7 +3,6 @@
 class OperatorController extends BaseGxController
 {
 
-
     public function actionCreate()
     {
         $model = new Operator;
