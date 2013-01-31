@@ -68,6 +68,7 @@ class m130122_211800_import_phone_numbers_megafon extends CDbMigration
                 $sim->parent_agent_id=1;
                 $sim->number_price=0;
                 $sim->sim_price=100;
+                $sim->company=4; // Интрастпей
                 $sim->save();
                 $number->sim_id=$sim->id;
             }

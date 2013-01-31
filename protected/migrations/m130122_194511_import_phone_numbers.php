@@ -110,7 +110,7 @@ class m130122_194511_import_phone_numbers extends CDbMigration
                     $sim->operator_id=Operator::OPERATOR_BEELINE_ID;
 
                     $sim->tariff_id=$tariff;
-                    $sim->company_id=4; // Интрастпэй
+                    $sim->company_id=1; // Матави
                     $stat['new_sims']++;
                 } else {
                     $stat['sims_from_reports']++;
