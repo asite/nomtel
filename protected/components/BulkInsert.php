@@ -41,7 +41,7 @@ class BulkInsert
         $rowSql = '';
         foreach ($this->attributes as $attribute) {
             if ($rowSql != '') $rowSql .= ',';
-            $rowSql .= Yii::app()->db->quoteValue($row[$attribute]);
+            $rowSql .= is_null($row[$attribute]) ? 'NULL':Yii::app()->db->quoteValue($row[$attribute]);
         }
 
         if ($this->sqlData != '') $this->sqlData .= ',';

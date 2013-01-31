@@ -47,27 +47,74 @@ class BonusReportController extends BaseGxController
 
     public function actionView($id)
     {
-        $model = new BonusReportAgent('list');
-        $model->unsetAttributes();
+        $bonusReportAgent = new BonusReportAgent('list');
+        $bonusReportAgent->unsetAttributes();
 
         if (isset($_GET['BonusReportAgent']))
-            $model->setAttributes($_GET['BonusReportAgent']);
+            $bonusReportAgent->setAttributes($_GET['BonusReportAgent']);
 
-        $dataProvider = $model->search();
+        $dataProvider = $bonusReportAgent->search();
         $dataProvider->criteria->alias = 'bra';
         $dataProvider->criteria->join = 'join bonus_report br on (br.id=bra.bonus_report_id) ' .
             'join agent a on (a.id=bra.agent_id)';
         $dataProvider->criteria->addColumnCondition(array('bonus_report_id' => $id, 'a.parent_id' => loggedAgentId()));
 
+
+        $bonusReportNumberSearch = new BonusReportNumberSearch();
+        $bonusReportNumberSearch->unsetAttributes();
+
+        if (isset($_GET['BonusReportNumberSearch']))
+            $bonusReportNumberSearch->setAttributes($_GET['BonusReportNumberSearch']);
+
+        $criteria = new CDbCriteria();
+
+        $criteria->compare('brn.bonus_report_id',$id);
+        $criteria->compare('n.number', $bonusReportNumberSearch->number, true);
+        $criteria->compare('n.personal_account', $bonusReportNumberSearch->personal_account, true);
+        $criteria->compare('brn.turnover', $bonusReportNumberSearch->turnover, true);
+        $criteria->compare('brn.rate', $bonusReportNumberSearch->rate, true);
+        $criteria->compare('brn.sum', $bonusReportNumberSearch->sum, true);
+        $criteria->compare('brn.status', $bonusReportNumberSearch->status, true);
+
+        $criteria->compare('brn.parent_agent_id',loggedAgentId());
+
+        if ($bonusReportNumberSearch->agent_id !== '0')
+            $criteria->compare('brn.agent_id', $bonusReportNumberSearch->agent_id);
+        else
+            $criteria->addCondition("brn.agent_id is null");
+
+        $sql = "from bonus_report_number brn
+            left outer join number n on (brn.number_id=n.id)
+            left outer join agent a on (a.id=brn.agent_id)
+            where " . $criteria->condition;
+
+        $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
+
+        $dataProvider2 = new CSqlDataProvider('select a.*,n.*,brn.* ' . $sql, array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $criteria->params,
+            'sort' => array(
+                'attributes' => array(
+                    'number','personal_account','turnover','rate','sum','agent_id','status'
+                ),
+            ),
+            'pagination' => array(
+                'pageSize' => BonusReportNumber::ITEMS_PER_PAGE,
+            ),
+        ));
+
         $this->render('view', array(
-            'model' => $model,
+            'model' => $bonusReportAgent,
             'dataProvider' => $dataProvider,
+            'dataProvider2' => $dataProvider2,
+            'bonusReportNumberSearch' => $bonusReportNumberSearch,
             'bonusReport' => BonusReport::model()->findByPk($id),
             'bonusReportAgent' => BonusReportAgent::model()->findByAttributes(array(
                 'bonus_report_id' => $id,
                 'agent_id' => loggedAgentId()
             ))
         ));
+
 
     }
 
@@ -107,7 +154,7 @@ class BonusReportController extends BaseGxController
         return floor($sum * 100 + 1e-6) / 100;
     }
 
-    private function calculateBonuses($simBonus, $simAgent, $comment, $operator_id)
+    private function calculateBonuses($simBonus, $simAgent, $simIdNumberId, $comment, $operator_id)
     {
 
         $db = Yii::app()->db;
@@ -156,27 +203,6 @@ class BonusReportController extends BaseGxController
         foreach ($allAgentsIds as $agentId)
             $agentsBonuses[$agentId] = array('sim_count' => 0, 'sum' => 0, 'sum_referrals' => 0);
 
-        // calculate earned bonuses+statistics
-        // keep in mind, that two different cards can have same personal_account or number
-        // so, we must check for duplicates
-        $processedSims=array();
-        foreach ($simAgent as $v) {
-            if ($processedSims[$v['sim_id']]) continue;
-            $processedSims[$v['sim_id']]=true;
-
-            $bonus = $simBonus[$v['sim_id']];
-
-            $lastPaymentIndex = count($agents[$v['agent_id']]) - 1;
-            foreach ($agents[$v['agent_id']]['payments'] as $i => $payment) {
-                $agentsBonuses[$payment['agent_id']]['sim_count']++;
-                $agentsBonuses[$payment['agent_id']]['sum'] += $this->roundSum($bonus * $payment['rate']);
-
-                // for not last item we must substract provision of child agent
-                $agentsBonuses[$payment['agent_id']]['sum_referrals'] += $i == $lastPaymentIndex ? 0 :
-                    $this->roundSum($bonus * $agents[$v['agent_id']]['payments'][$i + 1]['rate']);
-            }
-        }
-
         // store all info in database
         $trx = $db->beginTransaction();
 
@@ -185,6 +211,46 @@ class BonusReportController extends BaseGxController
         $bonusReport->operator_id = $operator_id;
         $bonusReport->comment = $comment;
         $bonusReport->save();
+
+        $bonusReportNumber=new BulkInsert('bonus_report_number',array('bonus_report_id','number_id','parent_agent_id','agent_id','turnover','rate','sum','status'));
+
+        // calculate earned bonuses+statistics
+        // keep in mind, that two different cards can have same personal_account or number
+        // so, we must check for duplicates
+        $processedSims=array();
+        foreach ($simAgent as $v) {
+            if ($processedSims[$v['sim_id']]) continue;
+            $processedSims[$v['sim_id']]=true;
+
+            $bonus = $this->roundSum($simBonus[$v['sim_id']]);
+
+            $lastPaymentIndex = count($agents[$v['agent_id']]) - 1;
+            foreach ($agents[$v['agent_id']]['payments'] as $i => $payment) {
+                $agentsBonuses[$payment['agent_id']]['sim_count']++;
+                $sum=$this->roundSum($bonus * $payment['rate']);
+                $agentsBonuses[$payment['agent_id']]['sum'] += $sum;
+
+                // if number_is is not null
+                if ($simIdNumberId[$v['sim_id']]) {
+                    $bonusReportNumber->insert(array(
+                        'bonus_report_id'=>$bonusReport->id,
+                        'number_id'=>$simIdNumberId[$v['sim_id']],
+                        'parent_agent_id'=>$payment['agent_id'],
+                        'agent_id'=>$i == $lastPaymentIndex ? null:$agents[$v['agent_id']]['payments'][$i + 1]['agent_id'],
+                        'turnover'=>$bonus,
+                        'rate'=>$payment['rate']*100,
+                        'sum'=>$sum,
+                        'status'=>$sum>1e-6? BonusReportNumber::STATUS_OK:BonusReportNumber::STATUS_TURNOVER_ZERO
+                    ));
+                } else {
+                    $this->errorInvalidFormat(__LINE__." '{$v['sim_id']}'");
+                }
+
+                // for not last item we must substract provision of child agent
+                $agentsBonuses[$payment['agent_id']]['sum_referrals'] += $i == $lastPaymentIndex ? 0 :
+                    $this->roundSum($bonus * $agents[$v['agent_id']]['payments'][$i + 1]['rate']);
+            }
+        }
 
         $payment = new Payment();
         $payment->type = Payment::TYPE_BONUS;
@@ -219,6 +285,22 @@ class BonusReportController extends BaseGxController
             $bonusReportAgent->agent_id = $agent_id;
             $bonusReportAgent->save();
         }
+
+        $bonusReportNumber->finish();
+
+        // insert numbers, that missing in report
+        $db->createCommand("
+            insert into bonus_report_number (parent_agent_id,agent_id,number_id,bonus_report_id,turnover,sum,rate,status) (
+                select s.parent_agent_id,s.agent_id,n.id as number_id,:bonus_report_id as bonus_report_id,NULL as turnover,NULL as sum,NULL as rate,'NUMBER_MISSING' as status
+                from sim s
+                join number n on (n.sim_id=s.parent_id)
+                left outer join bonus_report_number brn on (brn.bonus_report_id=:bonus_report_id and brn.parent_agent_id=s.parent_agent_id and brn.number_id=n.id)
+                where s.parent_agent_id is not null and s.operator_id=:operator_id and brn.id is null
+            )
+            ")->execute(array(
+                ':operator_id'=>$operator_id,
+                ':bonus_report_id'=>$bonusReport->id
+            ));
 
         $trx->commit();
 
@@ -275,7 +357,19 @@ class BonusReportController extends BaseGxController
             " and parent_agent_id is not null and agent_id is null and number in (" .
             implode(',', $numbers) . ") order by sim.id desc")->queryAll();
 
-        $this->calculateBonuses($simBonus, $simAgent, $model->comment, Operator::OPERATOR_BEELINE_ID);
+        // get number->number_id mapping
+        $rawNumbers=Yii::app()->db->createCommand("
+            select n.id,n.number
+            from number n
+            join sim s on (s.id=n.sim_id and s.operator_id=:operator_id)
+        ")->queryAll(true,array(':operator_id'=>Operator::OPERATOR_BEELINE_ID));
+
+        $simIdNumberId=array();
+        foreach($rawNumbers as $row)
+            $simIdNumberId[$row['number']]=$row['id'];
+        unset($rawNumbers);
+
+        $this->calculateBonuses($simBonus, $simAgent, $simIdNumberId, $model->comment, Operator::OPERATOR_BEELINE_ID);
     }
 
     private function processLoadMegafon($model, $reader, $file)
@@ -328,7 +422,18 @@ class BonusReportController extends BaseGxController
             where operator_id=" . Operator::OPERATOR_MEGAFON_ID . " and agent_id is null and personal_account in (" .
             implode(',', $personal_accounts) . ") order by sim.id desc")->queryAll();
 
-        $this->calculateBonuses($simBonus, $simAgent, $model->comment, Operator::OPERATOR_MEGAFON_ID);
+        // get personal_id->number_id mapping
+        $rawNumbers=Yii::app()->db->createCommand("
+            select n.id,n.personal_account
+            from number n
+            join sim s on (s.id=n.sim_id and s.operator_id=:operator_id)
+        ")->queryAll(true,array(':operator_id'=>Operator::OPERATOR_MEGAFON_ID));
+        $simIdNumberId=array();
+        foreach($rawNumbers as $row)
+            $simIdNumberId[$row['personal_account']]=$row['id'];
+        unset($rawNumbers);
+
+        $this->calculateBonuses($simBonus, $simAgent, $simIdNumberId, $model->comment, Operator::OPERATOR_MEGAFON_ID);
     }
 
     private function processLoad($model)
