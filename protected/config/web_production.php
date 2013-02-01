@@ -55,7 +55,7 @@ return array(
             ),
         ),
         'assetManager' => array(
-            'linkAssets' => true,
+            //'linkAssets' => true,
         ),
         'clientScript' => array(),
         'db' => array(
