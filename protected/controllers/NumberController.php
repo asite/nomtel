@@ -72,15 +72,6 @@ class NumberController extends BaseGxController
         $params = $this->getNumberInfo($id);
         $numberInfoEdit = new NumberInfoEdit;
 
-        $tariff = $params['sim']->tariff;
-        if (!$tariff) $tariff=new Tariff;
-
-        $operatorRegion = $params['sim']->operatorRegion;
-        if (!$operatorRegion) $operatorRegion=new operatorRegion;
-
-        $company = $params['sim']->company;
-        if (!$company) $company=new Company;
-
         $this->render('edit',array(
             'number'=>$params['number'],
             'sim'=>$params['sim'],
@@ -104,7 +95,10 @@ class NumberController extends BaseGxController
                     ':id' => $number->sim_id
                 );
                 Sim::model()->updateAll(array('tariff_id' => $_POST['value']), $criteria);
-                NumberHistory::addHistoryNumber($number->id,'Тариф сменен с {Tariff:'.$tariff_id->tariff_id.'} на {Tariff:'.$_POST['value'].'}');
+                if ($tariff_id->tariff_id)
+                    NumberHistory::addHistoryNumber($number->id,'Тариф сменен с {Tariff:'.$tariff_id->tariff_id.'} на {Tariff:'.$_POST['value'].'}');
+                else
+                    NumberHistory::addHistoryNumber($number->id,'Установлен тариф {Tariff:'.$_POST['value'].'}');
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
             }
@@ -123,7 +117,10 @@ class NumberController extends BaseGxController
                     ':id' => $number->sim_id
                 );
                 Sim::model()->updateAll(array('operator_region_id' => $_POST['value']), $criteria);
-                NumberHistory::addHistoryNumber($number->id,'Регион сменен с {OperatorRegion:'.$region_id->operator_region_id.'} на {OperatorRegion:'.$_POST['value'].'}');
+                if ($region_id->operator_region_id)
+                  NumberHistory::addHistoryNumber($number->id,'Регион сменен с {OperatorRegion:'.$region_id->operator_region_id.'} на {OperatorRegion:'.$_POST['value'].'}');
+                else
+                  NumberHistory::addHistoryNumber($number->id,'Установлен регион {OperatorRegion:'.$_POST['value'].'}');
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
             }
@@ -142,7 +139,10 @@ class NumberController extends BaseGxController
                     ':id' => $number->sim_id
                 );
                 Sim::model()->updateAll(array('company_id' => $_POST['value']), $criteria);
-                NumberHistory::addHistoryNumber($number->id,'Компания сменена с {Company:'.$company_id->company_id.'} на {Company:'.$_POST['value'].'}');
+                if ($company_id->company_id)
+                    NumberHistory::addHistoryNumber($number->id,'Компания сменена с {Company:'.$company_id->company_id.'} на {Company:'.$_POST['value'].'}');
+                else
+                    NumberHistory::addHistoryNumber($number->id,'Установлена компания {Company:'.$_POST['value'].'}');
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
             }

@@ -23,12 +23,12 @@ $this->breadcrumbs = array(
         )); ?>
         <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-condensed'),
-            'data'=>$tariff,
+            'data'=>$sim,
             'attributes'=>array(
                 array(
                     'label'=>Yii::t('app','Tariff'),
-                    'name' => 'title',
-                    'value' => Chtml::value($tariff, 'title'),
+                    'name' => 'tariff_id',
+                    'value' => $sim->tariff,
                     'editable' => array(
                         'type'   => 'select',
                         'url' => $this->createUrl('number/saveTariff',array('id'=>$number->id)),
@@ -65,12 +65,12 @@ $this->breadcrumbs = array(
         )); ?>
         <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-condensed'),
-            'data'=>$operatorRegion,
+            'data'=>$sim,
             'attributes'=>array(
                 array(
                     'label'=>Yii::t('app','OperatorRegion'),
-                    'name' => 'title',
-                    'value' => Chtml::value($operatorRegion, 'title'),
+                    'name' => 'operator_region_id',
+                    'value' => $sim->operatorRegion,
                     'editable' => array(
                         'type'   => 'select',
                         'url' => $this->createUrl('number/saveOperatorRegion',array('id'=>$number->id)),
@@ -120,12 +120,12 @@ $this->breadcrumbs = array(
         <div style="float:left;width:40%;">
         <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-striped table-condensed'),
-            'data'=>$company,
+            'data'=>$sim,
             'attributes'=>array(
                 array(
                     'label'=>Yii::t('app','Company'),
-                    'name' => 'title',
-                    'value' => Chtml::value($company, 'title'),
+                    'name' => 'company_id',
+                    'value' => $sim->company,
                     'editable' => array(
                         'type'   => 'select',
                         'url' => $this->createUrl('number/saveCompany',array('id'=>$number->id)),
