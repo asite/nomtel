@@ -22,7 +22,7 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', true);
         $config = 'server_web_staging.php';
         break;
-    case 'crm.nomtel':
+    case 'nomtel.asiteplace.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
