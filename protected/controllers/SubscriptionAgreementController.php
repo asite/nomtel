@@ -2,6 +2,13 @@
 
 class SubscriptionAgreementController extends BaseGxController {
 
+    public function additionalAccessRules()
+    {
+        return array(
+            array('allow', 'roles' => array('agent')),
+        );
+    }
+
     public function actionStartCreate($sim_id)
     {
         $sim=$this->loadModel($sim_id,'Sim');
