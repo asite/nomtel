@@ -5,7 +5,8 @@ class SubscriptionAgreementController extends BaseGxController {
     public function actionStartCreate($sim_id)
     {
         $sim=$this->loadModel($sim_id,'Sim');
-        $this->checkPermissions('createSubscriptionAgreement',array('sim'=>$sim));
+        $number=$sim->numberObjectBySimId;
+        $this->checkPermissions('createSubscriptionAgreement',array('parent_agent_id'=>$sim->parent_agent_id,'number_status'=>$number->status));
 
         // reserve id
         $agreement=new SubscriptionAgreement();
@@ -100,7 +101,7 @@ class SubscriptionAgreementController extends BaseGxController {
         $sim=$this->loadModel($sim_id,'Sim');
         $number=Number::model()->findByAttributes(array('number'=>$sim->number));
 
-        $this->checkPermissions('createSubscriptionAgreement',array('sim'=>$sim));
+        $this->checkPermissions('createSubscriptionAgreement',array('parent_agent_id'=>$sim->parent_agent_id,'number_status'=>$number->status));
 
         $person=new Person();
 

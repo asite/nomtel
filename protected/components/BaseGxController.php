@@ -14,7 +14,7 @@ class BaseGxController extends GxController
 
     public function checkPermissions($operation,$params,$allowCaching=true) {
         if (!Yii::app()->user->checkAccess($operation,$params,$allowCaching))
-            throw CHttpException(403,Yii::t('app','You are not authorized to perform this action.'));
+            throw new CHttpException(403,Yii::t('app','You are not authorized to perform this action.'));
     }
 
     /*
