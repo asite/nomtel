@@ -5,6 +5,7 @@ class NumberController extends BaseGxController
     public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array('list','view'), 'roles' => array('agent','support')),
+            array('allow', 'roles' => array('support')),
         );
     }
 
@@ -78,9 +79,9 @@ class NumberController extends BaseGxController
             'SubscriptionAgreement'=>$params['SubscriptionAgreement'],
             'BalanceReportNumber'=>$params['BalanceReportNumber'],
             'numberHistory'=>$params['numberHistory'],
-            'tariff'=>$tariff,
-            'operatorRegion'=>$operatorRegion,
-            'company'=>$company
+            //'tariff'=>$tariff,
+            //'operatorRegion'=>$operatorRegion,
+            //'company'=>$company
         ));
     }
 

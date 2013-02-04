@@ -1,11 +1,16 @@
-<?php if (Yii::app()->user->role=='admin'): ?>
-
 <?php
 
-$this->breadcrumbs = array(
-    Sim::label(2)=>$this->createUrl('sim/list'),
-    $number->adminLabel(Number::label(1))
-);
+if (isSupport()) {
+    $this->breadcrumbs = array(
+        Number::label(2)=>$this->createUrl('support/numberStatus'),
+        $number->adminLabel(Number::label(1))
+    );
+} else {
+    $this->breadcrumbs = array(
+        Sim::label(2)=>$this->createUrl('sim/list'),
+        $number->adminLabel(Number::label(1))
+    );
+}
 
 ?>
 
@@ -291,4 +296,3 @@ $this->breadcrumbs = array(
         ),
     ),
 )); ?>
-<?php endif; ?>

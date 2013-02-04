@@ -1,8 +1,15 @@
 <?php
 
-$this->breadcrumbs = array(
-    Yii::t('app','Creating subscription agreement')
-);
+if (isSupport()) {
+    $this->breadcrumbs = array(
+        Number::label(2)=>$this->createUrl('support/numberStatus'),
+        Yii::t('app','Creating subscription agreement')
+    );
+} else {
+    $this->breadcrumbs = array(
+        Yii::t('app','Creating subscription agreement')
+    );
+}
 
 ?>
 
@@ -218,7 +225,6 @@ function UploaderAddFiles(id,files) {
 <?php
     echo '<div class="form-actions">';
     echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Save'), array('class'=>'btn btn-primary', 'type'=>'button','onclick'=>'$("#subscriptionagreement-form").submit()'));
-    echo '&nbsp;&nbsp;&nbsp;'.CHtml::htmlButton('<i class="icon-remove"></i> '.Yii::t('app', 'Cancel'), array('class'=>'btn', 'type'=>'button', 'onclick'=>'window.location.href="'.$this->createUrl('admin').'"'));
     echo '</div>';
 ?>
 </div>

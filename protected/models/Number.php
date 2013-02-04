@@ -17,6 +17,12 @@ class Number extends BaseNumber
     const BALANCE_STATUS_NEW = 'NEW';
     const BALANCE_STATUS_MISSING = 'MISSING';
 
+    const SUPPORT_STATUS_UNAVAILABLE='UNAVAILABLE';
+    const SUPPORT_STATUS_CALLBACK='CALLBACK';
+    const SUPPORT_STATUS_REJECT='REJECT';
+    const SUPPORT_STATUS_ACTIVE='ACTIVE';
+    const SUPPORT_STATUS_SERVICE_INFO='SERVICE_INFO';
+    
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
@@ -47,6 +53,32 @@ class Number extends BaseNumber
         return $labels[$status];
     }
 
+    public static function getSupportStatusDropDownList($items=array()) {
+        $labels=self::getSupportStatusLabels();
+        return array_merge($items,$labels);
+    }
+
+    public static function getSupportStatusLabels() {
+        static $labels;
+
+        if (!$labels) {
+            $labels=array(
+                self::SUPPORT_STATUS_UNAVAILABLE=>'Недоступен',
+                self::SUPPORT_STATUS_CALLBACK=>'Перезвонить',
+                self::SUPPORT_STATUS_REJECT=>'Отказ по телефону',
+                self::SUPPORT_STATUS_ACTIVE=>'Данные по договору',
+                self::SUPPORT_STATUS_SERVICE_INFO=>'Сервисная информация'
+            );
+        }
+
+        return $labels;
+    }
+
+    public function getSupportStatusLabel($status) {
+        $labels=self::getSupportStatusLabels();
+        return $labels[$status];
+    }
+    
     public static function getBalanceStatusDropDownList($items=array()) {
         $labels=self::getBalanceStatusLabels();
         return array_merge($items,$labels);

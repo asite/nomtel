@@ -18,8 +18,15 @@
  * @property string $balance_status_changed_dt
  * @property string $codeword
  * @property string $service_password
+ * @property integer $support_operator_id
+ * @property string $support_dt
+ * @property string $support_status
+ * @property string $support_callback_dt
+ * @property string $support_callback_name
  *
  * @property BalanceReportNumber[] $balanceReportNumbers
+ * @property BonusReportNumber[] $bonusReportNumbers
+ * @property SupportOperator $supportOperator
  * @property Sim $sim
  * @property NumberHistory[] $numberHistories
  * @property SubscriptionAgreement[] $subscriptionAgreements
@@ -45,20 +52,27 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('number', 'required'),
+			array('support_operator_id', 'numerical', 'integerOnly'=>true),
 			array('sim_id, codeword, service_password', 'length', 'max'=>20),
 			array('number, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>7),
 			array('balance_status', 'length', 'max'=>16),
-			array('balance_status_changed_dt', 'safe'),
-			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('support_status', 'length', 'max'=>12),
+			array('support_callback_name', 'length', 'max'=>200),
+			array('balance_status_changed_dt, support_dt, support_callback_dt', 'safe'),
+			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name', 'default', 'setOnEmpty' => true, 'value' => null),
             array('balance_status_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password', 'safe', 'on'=>'search'),
+            array('support_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+            array('support_callback_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
 			'balanceReportNumbers' => array(self::HAS_MANY, 'BalanceReportNumber', 'number_id'),
+			'bonusReportNumbers' => array(self::HAS_MANY, 'BonusReportNumber', 'number_id'),
+			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
 			'sim' => array(self::BELONGS_TO, 'Sim', 'sim_id'),
 			'numberHistories' => array(self::HAS_MANY, 'NumberHistory', 'number_id'),
 			'subscriptionAgreements' => array(self::HAS_MANY, 'SubscriptionAgreement', 'number_id'),
@@ -81,7 +95,14 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'balance_status_changed_dt' => Yii::t('app', 'Balance Status Changed Dt'),
 			'codeword' => Yii::t('app', 'Codeword'),
 			'service_password' => Yii::t('app', 'Service Password'),
+			'support_operator_id' => null,
+			'support_dt' => Yii::t('app', 'Support Dt'),
+			'support_status' => Yii::t('app', 'Support Status'),
+			'support_callback_dt' => Yii::t('app', 'Support Callback Dt'),
+			'support_callback_name' => Yii::t('app', 'Support Callback Name'),
 			'balanceReportNumbers' => null,
+			'bonusReportNumbers' => null,
+			'supportOperator' => null,
 			'sim' => null,
 			'numberHistories' => null,
 			'subscriptionAgreements' => null,
@@ -100,6 +121,11 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('balance_status_changed_dt', $this->balance_status_changed_dt, true);
 		$criteria->compare('codeword', $this->codeword, true);
 		$criteria->compare('service_password', $this->service_password, true);
+		$criteria->compare('support_operator_id', $this->support_operator_id);
+		$criteria->compare('support_dt', $this->support_dt, true);
+		$criteria->compare('support_status', $this->support_status, true);
+		$criteria->compare('support_callback_dt', $this->support_callback_dt, true);
+		$criteria->compare('support_callback_name', $this->support_callback_name, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
@@ -112,10 +138,14 @@ abstract class BaseNumber extends BaseGxActiveRecord {
     public function convertDateTimeFieldsToEDateTime() {
         // rest of work will do setAttribute() routine
         $this->setAttribute('balance_status_changed_dt',strval($this->balance_status_changed_dt));
+        $this->setAttribute('support_dt',strval($this->support_dt));
+        $this->setAttribute('support_callback_dt',strval($this->support_callback_dt));
     }
 
     public function convertDateTimeFieldsToString() {
         if (is_object($this->balance_status_changed_dt) && get_class($this->balance_status_changed_dt)=='EDateTime') $this->balance_status_changed_dt=new EString($this->balance_status_changed_dt->format(self::$mySqlDateTimeFormat));
+        if (is_object($this->support_dt) && get_class($this->support_dt)=='EDateTime') $this->support_dt=new EString($this->support_dt->format(self::$mySqlDateTimeFormat));
+        if (is_object($this->support_callback_dt) && get_class($this->support_callback_dt)=='EDateTime') $this->support_callback_dt=new EString($this->support_callback_dt->format(self::$mySqlDateTimeFormat));
     }
 
     public function afterFind() {
@@ -134,6 +164,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
     public function setAttribute($name,$value) {
         if (is_string($value)) {
             if ($name=='balance_status_changed_dt') $value=$this->convertStringToEDateTime($value,'datetime');
+            if ($name=='support_dt') $value=$this->convertStringToEDateTime($value,'datetime');
+            if ($name=='support_callback_dt') $value=$this->convertStringToEDateTime($value,'datetime');
         }
         return parent::setAttribute($name,$value);
     }
