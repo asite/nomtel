@@ -5,7 +5,7 @@ class SupportController extends BaseGxController
 
     public function additionalAccessRules() {
         return array(
-            //array('allow', 'actions' => array('number'), 'roles' => array('agent')),
+            array('allow', 'actions' => array('number'), 'roles' => array('agent')),
             array('allow', 'actions' => array('numberStatus'), 'roles' => array('support')),
         );
     }
