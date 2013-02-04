@@ -16,7 +16,10 @@ $this->breadcrumbs = array(
             'data'=>$number,
             'attributes'=>array(
                 'number',
-                'sim.tariff',
+                array(
+                    'label'=>Yii::t('app','Tariff')."<br/><br/>",
+                    'value'=>$sim->tariff
+                    ),
                 array(
                     'label'=>Yii::t('app','the Agent'),
                     'value'=>$sim->parentAgent
@@ -29,7 +32,10 @@ $this->breadcrumbs = array(
             'data'=>$number,
             'attributes'=>array(
                 'sim.operator',
-                'sim.operatorRegion',
+                array(
+                    'label'=>Yii::t('app','OperatorRegion')."<br/><br/>",
+                    'value'=>$sim->operatorRegion
+                    ),
                 'sim.icc'
             ),
         )); ?>
@@ -43,12 +49,12 @@ $this->breadcrumbs = array(
                     'value'=>Yii::t('app',$number->status),
                     ),
                 array(
-                    'label'=>'&nbsp;',
+                    'label'=>Yii::t('app','Balance Status'),
                     'value'=>''
                     ),
                 array(
-                    'label'=>'&nbsp;',
-                    'value'=>''
+                    'label'=>Yii::t('app','Abonent'),
+                    'value'=>$SubscriptionAgreement->person
                     )
             ),
         )); ?>
@@ -111,8 +117,8 @@ $this->breadcrumbs = array(
                     'value'=>$sim->sim_price
                     ),
                 array(
-                    'label'=>'&nbsp;',
-                    'value'=>''
+                    'label'=>Yii::t('app','Balance'),
+                    'value'=>Number::getBalanceStatusLabel($number->balance_status)
                     )
             ),
         )); ?>
@@ -136,8 +142,8 @@ $this->breadcrumbs = array(
     <div class="cfix">
         <?php
 
-        if ($BalanceReportNumber->balanceReport->dt) $turnover = '('.$BalanceReportNumber->balanceReport->dt.'): ';
-        if ($BalanceReportNumber->balance) $turnover = $BalanceReportNumber->balance.$turnover;
+        if ($BonusReportNumber->bonusReport->dt) $turnover = '('.$BonusReportNumber->bonusReport->dt.'): ';
+        if ($BonusReportNumber->turnover) $turnover = $BonusReportNumber->turnover.$turnover;
 
         $this->widget('bootstrap.widgets.TbDetailView',array(
             'data'=>$number,

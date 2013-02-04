@@ -19,6 +19,7 @@
 return array (
   'AgentReferralRate|AgentReferralRates' => '',
   'All' => '',
+  'Abonent' => 'Абонент',
   'Are you sure to delete this Balance Report?' => '',
   'Are you sure to delete this Technical Support User?' => '',
   'BalanceReportNumber|BalanceReportNumbers' => '',

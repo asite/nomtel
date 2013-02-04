@@ -46,7 +46,7 @@ class NumberController extends BaseGxController
         $criteria->params= array(":id" => $params['number']->id);
         $criteria->order = "id DESC";
         $criteria->limit = 1;
-        $params['BalanceReportNumber'] = BalanceReportNumber::model()->find($criteria);
+        $params['BonusReportNumber'] = BonusReportNumber::model()->find($criteria);
 
         $params['numberHistory'] = new NumberHistory('search');
         $params['numberHistory']->number_id = $params['number']->id;
@@ -62,7 +62,7 @@ class NumberController extends BaseGxController
             'number'=>$params['number'],
             'sim'=>$params['sim'],
             'SubscriptionAgreement'=>$params['SubscriptionAgreement'],
-            'BalanceReportNumber'=>$params['BalanceReportNumber'],
+            'BonusReportNumber'=>$params['BonusReportNumber'],
             'numberHistory'=>$params['numberHistory']
         ));
     }
