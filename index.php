@@ -29,9 +29,18 @@ switch ($_SERVER['SERVER_NAME']) {
         $config = 'server_web_asite_development.php';
         break;
     case 'nomtel.asiteapp.ru':
+   
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
+        $config = 'server_web_asite_production.php';
+        break;
+        
+ 
+    case 'dnomtel.asiteapp.ru':
+        define('LANGUAGE', 'ru');
+        define('TIMEZONE', 'Europe/Minsk');
+        define('YII_DEBUG', false);
         $config = 'server_web_asite_production.php';
         break;
     default:
