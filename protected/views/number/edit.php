@@ -1,11 +1,16 @@
-<?php if (Yii::app()->user->role=='admin'): ?>
-
 <?php
 
-$this->breadcrumbs = array(
-    Sim::label(2)=>$this->createUrl('sim/list'),
-    $number->adminLabel(Number::label(1))
-);
+if (isSupport()) {
+    $this->breadcrumbs = array(
+        Number::label(2)=>$this->createUrl('support/numberStatus'),
+        $number->adminLabel(Number::label(1))
+    );
+} else {
+    $this->breadcrumbs = array(
+        Sim::label(2)=>$this->createUrl('sim/list'),
+        $number->adminLabel(Number::label(1))
+    );
+}
 
 ?>
 
@@ -13,7 +18,7 @@ $this->breadcrumbs = array(
 
 <div class="number_info">
     <div class="w80 cfix">
-        <div style="float:left;width:40%;">
+        <div style="float:left;width:33%;">
         <?php $this->widget('bootstrap.widgets.TbDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-striped table-condensed'),
             'data'=>$number,
@@ -26,7 +31,7 @@ $this->breadcrumbs = array(
             'data'=>$sim,
             'attributes'=>array(
                 array(
-                    'label'=>Yii::t('app','Tariff'),
+                    'label'=>Yii::t('app','Tariff')."<br/><br/>",
                     'name' => 'tariff_id',
                     'value' => $sim->tariff,
                     'editable' => array(
@@ -55,7 +60,7 @@ $this->breadcrumbs = array(
             ),
         )); ?>
         </div>
-        <div style="float:left;width:40%;">
+        <div style="float:left;width:34%;">
         <?php $this->widget('bootstrap.widgets.TbDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-striped table-condensed'),
             'data'=>$number,
@@ -68,7 +73,7 @@ $this->breadcrumbs = array(
             'data'=>$sim,
             'attributes'=>array(
                 array(
-                    'label'=>Yii::t('app','OperatorRegion'),
+                    'label'=>Yii::t('app','OperatorRegion')."<br/><br/>",
                     'name' => 'operator_region_id',
                     'value' => $sim->operatorRegion,
                     'editable' => array(
@@ -93,7 +98,7 @@ $this->breadcrumbs = array(
             ),
         )); ?>
         </div>
-        <div style="float:left;width:20%;">
+        <div style="float:left;width:33%;">
         <?php $this->widget('bootstrap.widgets.TbDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
             'data'=>$number,
@@ -103,12 +108,12 @@ $this->breadcrumbs = array(
                     'value'=>Yii::t('app',$number->status),
                     ),
                 array(
-                    'label'=>'&nbsp;',
+                    'label'=>Yii::t('app','Balance Status'),
                     'value'=>''
                     ),
                 array(
-                    'label'=>'&nbsp;',
-                    'value'=>''
+                    'label'=>Yii::t('app','Abonent'),
+                    'value'=>$SubscriptionAgreement->person
                     )
             ),
         )); ?>
@@ -235,8 +240,8 @@ $this->breadcrumbs = array(
                     'value'=>$sim->sim_price
                     ),
                 array(
-                    'label'=>'&nbsp;',
-                    'value'=>''
+                    'label'=>Yii::t('app','Balance'),
+                    'value'=>Number::getBalanceStatusLabel($number->balance_status)
                     )
             ),
         )); ?>
@@ -261,8 +266,8 @@ $this->breadcrumbs = array(
     <div class="cfix">
         <?php
 
-        if ($BalanceReportNumber->balanceReport->dt) $turnover = '('.$BalanceReportNumber->balanceReport->dt.'): ';
-        if ($BalanceReportNumber->balance) $turnover = $BalanceReportNumber->balance.$turnover;
+        if ($BonusReportNumber->bonusReport->dt) $turnover = '('.$BonusReportNumber->bonusReport->dt.'): ';
+        if ($BonusReportNumber->turnover) $turnover = $BonusReportNumber->turnover.$turnover;
 
         $this->widget('bootstrap.widgets.TbDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
@@ -291,4 +296,3 @@ $this->breadcrumbs = array(
         ),
     ),
 )); ?>
-<?php endif; ?>

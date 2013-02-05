@@ -5,6 +5,11 @@ function isAdmin()
     return Yii::app()->user->role=='admin';
 }
 
+function isSupport()
+{
+    return Yii::app()->user->role=='support';
+}
+
 function loggedAgentId()
 {
     return Yii::app()->user->getState('agentId');

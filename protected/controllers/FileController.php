@@ -1,6 +1,12 @@
 <?php
 class FileController extends BaseGxController
 {
+    public function additionalAccessRules()
+    {
+        return array(
+            array('allow', 'users' => array('*')),
+        );
+    }
 
     private function returnError($msg)
     {

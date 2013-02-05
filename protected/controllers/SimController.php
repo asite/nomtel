@@ -104,7 +104,6 @@ class SimController extends BaseGxController {
                                 $model = new Sim;
                                 $model->setAttributes($data);
                                 $model->parent_agent_id = adminAgentId();
-                                $sim_count++;
                                 $model->number_price = 0;
                                 $model->personal_account = $sim[0];
                                 $model->number = $sim[1];
@@ -114,6 +113,7 @@ class SimController extends BaseGxController {
                                     $model->save();
                                     $model->parent_id = $model->id;
                                     $model->save();
+                                    $sim_count++;
 
                                     Number::addNumber($model);
 
@@ -249,14 +249,13 @@ class SimController extends BaseGxController {
                 }
                 $old_model = $model;
 
-                $sim_count = 1;
+                $sim_count = 0;
 
                 for ($o = 0; $o <= count($_POST['AddSim'])-1; $o++) {
                     if (isset($_POST['AddSim'][$o]['phone']) && ($_POST['AddSim'][$o]['phone']))
                     {
                         $model = new Sim;
                         $model->parent_agent_id = adminAgentId();
-                        $sim_count++;
                         $model->number_price = 0;
                         $model->operator_id = $_POST['AddSim'][0]['operator'];
                         $model->tariff_id = $_POST['AddSim'][0]['tariff'];
@@ -266,15 +265,19 @@ class SimController extends BaseGxController {
                         $model->operator_region_id=$_POST['AddSim'][0]['region'];
                         $model->company_id=$_POST['AddSim'][0]['company'];
 
-                        //try {
-                        $model->save();
-                        $model->parent_id = $model->id;
-                        $model->save();
+                        if ($model->countByAttributes(array('number' => $_POST['AddSim'][$o]['phone'])) == 0) {
+                            //try {
+                            $model->save();
+                            $model->parent_id = $model->id;
+                            $model->save();
+                            $sim_count++;
 
-                        Number::addNumber($model);
+                            Number::addNumber($model);
 
-                        $ids[$model->id] = $model->id;
-                        //} catch(Exception $e) {}
+                            $ids[$model->id] = $model->id;
+
+                            //} catch(Exception $e) {}
+                        }
                     }
                 }
 
@@ -283,7 +286,16 @@ class SimController extends BaseGxController {
                 if (empty($ids)) {
                     Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления(возможно данные уже есть в базе)!');
                     $activeTabs['tab2'] = true;
-                    $this->render('add', array('model' => $old_model, 'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'actMany' => $result, 'activeTabs' => $activeTabs));
+                    $this->render('add', array(
+                        'model' => $old_model,
+                        'tariffListArray' => $tariffListArray,
+                        'opListArray' => $opListArray,
+                        'whereListArray' => $whereListArray,
+                        'actMany' => $result,
+                        'activeTabs' => $activeTabs,
+                        'addSimByNumbers'=>$addSimByNumbers
+                        )
+                    );
                     exit;
                 }
 
@@ -389,8 +401,7 @@ class SimController extends BaseGxController {
             foreach ($icc_arr as $icc) {
                 if ($icc != '') {
                     if ($sim = Sim::model()->find('icc = "' . trim($icc) . '" or number = "' . trim($icc) . '" and parent_agent_id="'.loggedAgentId() .'"')) {
-                        $ids[] = $sim->id;
-
+                        $ids[$sim->id] = $sim->id;
                     }
                 }
             }
