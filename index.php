@@ -16,31 +16,17 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', true);
         $config = 'server_web_development.php';
         break;
-    case 'nomtel.gushchas.com':
-        define('LANGUAGE', 'ru');
-        define('TIMEZONE', 'Europe/Minsk');
-        define('YII_DEBUG', true);
-        $config = 'server_web_staging.php';
-        break;
     case 'nomtel.asiteplace.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
-        define('YII_DEBUG', true);
-        $config = 'server_web_asite_development.php';
-        break;
-    case 'nomtel.asiteapp.ru':
-   
-        define('LANGUAGE', 'ru');
-        define('TIMEZONE', 'Europe/Minsk');
-        define('YII_DEBUG', true);
+        define('YII_DEBUG', false);        
         $config = 'server_web_asite_production.php';
         break;
-        
  
-    case 'dnomtel.asiteapp.ru':
+    case 'dnomtel.asiteplace.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
-        define('YII_DEBUG', false);
+        define('YII_DEBUG', true);
         $config = 'server_web_asite_production.php';
         break;
     default:

@@ -27,6 +27,7 @@ return array(
         'application.commands.*',
         'application.vendors.*',
         'application.extensions.yii-mail.YiiMailMessage',
+        'application.extensions.giix-components.*'
     ),
     'modules' => array(),
     // application components
@@ -76,6 +77,10 @@ return array(
                     'class' => 'CFileLogRoute',
                     'levels' => 'error, warning',
                 ),
+    		array(
+        	    'class' => 'CProfileLogRoute',
+        	    'showInFireBug' => true,
+    		)
             ),
         ),
         'viewRenderer' => array(

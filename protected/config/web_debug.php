@@ -37,6 +37,4 @@ $config['components']['log'] = array(
     ),
 );
 
-$config['import'][] = 'application.extensions.giix-components.*';
-
 return $config;
