@@ -30,7 +30,8 @@ switch (gethostname()) {
     case 'h2068869.stratoserver.net':
         $base_config_name = 'server_console_staging.php';
         break;
-    case 'hawking.timeweb.ru':
+   
+    case 'www.asiteplace.ru':
         $base_config_name = 'server_web_asite_production.php';
         break;
     default:
