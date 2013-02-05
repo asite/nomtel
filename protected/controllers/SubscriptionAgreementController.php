@@ -6,7 +6,6 @@ class SubscriptionAgreementController extends BaseGxController {
     {
         return array(
             array('allow', 'roles' => array('agent')),
-            array('allow', 'roles' => array('support')),
         );
     }
 
@@ -161,7 +160,7 @@ class SubscriptionAgreementController extends BaseGxController {
 
                 NumberHistory::addHistoryNumber($number->id,'Оформлен договор {SubscriptionAgreement:'.$agreement->id.'}');
                 $trx->commit();
-                $this->redirect(isSupport() ?array('support/numberStatus'):array('sim/list'));
+                $this->redirect(array('sim/list'));
             }
         }
 

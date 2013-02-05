@@ -16,7 +16,6 @@ return array(
     'support' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
-            'createSubscriptionAgreement'
         )
     ),
 
