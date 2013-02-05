@@ -122,6 +122,14 @@ h1 {
     margin-left: 220px;
 }
 
+.form-label-width-220 label.control-label {
+    width: 220px;
+}
+
+.form-label-width-220 div.controls {
+    margin-left: 240px;
+}
+
 .form-container-horizontal {
 }
 

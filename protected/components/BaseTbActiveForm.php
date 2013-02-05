@@ -20,6 +20,19 @@ class BaseTbActiveForm extends TbActiveForm
         $this->pickerRow('datetime', $model, $field, $htmlOptions, $options);
     }
 
+    public function maskFieldRow($model, $field, $mask, $htmlOptions = array())
+    {
+        Yii::app()->getClientScript()->registerScriptFile('/static/bootstrap-inputmask.min.js');
+        $id=CHtml::activeId($model,$field);
+
+        // force mask input to reformat entered data
+        Yii::app()->getClientScript()->registerScript('mask_'.$id,"$('#$id').inputmask($('#$id').data());",CClientScript::POS_END);
+
+        $htmlOptions['data-mask']=$mask;
+
+        return $this->textFieldRow($model, $field, $htmlOptions);
+    }
+
     protected function pickerRow($mode, $model, $field, $htmlOptions = array(), $options = array())
     {
         echo $this->textFieldRow($model, $field, $htmlOptions);
