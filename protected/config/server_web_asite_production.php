@@ -12,7 +12,7 @@ $config = CMap::mergeArray(
         'params' => array(
             'adminEmail' => 'gghz@bk.ru',
             'adminEmailFrom' => 'info@asiteapp.ru',
-            'supportEmail' => array('alegudmail@gmail.com', '9292000001@mail.ru'),
+            'supportEmail' => array('alegudmail@gmail.com', '1@500099.ru'),
             'supportEmailFrom' => 'info@asiteapp.ru'
         )
     )

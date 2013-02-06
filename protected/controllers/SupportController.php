@@ -40,6 +40,10 @@ class SupportController extends BaseGxController
                 $mail->setFrom(Yii::app()->params['supportEmailFrom']);
                 $mail->setTo($recipients);
                 $mail->setBody($body);
+                
+                $message = "Ваше обращение $report_number принято. Срок рассмотрения 24 часа. Спасибо";
+                $message = urlencode($message);
+                file_get_contents("http://api.infosmska.ru/interfaces/SendMessages.ashx?login=ghz&pwd=zerozz&phones=7$report->abonent_number&message=$message&sender=nomtel");
 
                 if (Yii::app()->mail->send($mail))
                     Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$report_number)));

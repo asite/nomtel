@@ -35,6 +35,10 @@
             array('label' => Yii::t('app', 'Inbox'), 'url' => $this->createUrl('message/inbox'), 'active' => ($this->route == 'message/inbox' || $_GET['type'] == 'inbox')),
             array('label' => Yii::t('app', 'Outbox'), 'url' => $this->createUrl('message/outbox'), 'active' => ($this->route == 'message/outbox' || $_GET['type'] == 'outbox' || $this->route == 'message/create')),
             '',
+            
+               array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
+               
+                 '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
     }

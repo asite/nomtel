@@ -14,8 +14,8 @@ class NumberReport extends CFormModel
 
     public function attributeLabels() {
         return array(
-            'number'=>Yii::t('app','Number'),
-            'abonent_number'=>Yii::t('app','Abonent Number'),
+            'number'=>Yii::t('app','problem number'),
+            'abonent_number'=>Yii::t('app','incoming number'),
             'message'=>Yii::t('app','Message')
         );
     }
