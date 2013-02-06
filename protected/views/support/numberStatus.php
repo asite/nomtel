@@ -141,8 +141,8 @@ function setStatus(status) {
     <?php $d=$this->widget('bootstrap.widgets.TbButton',array('label'=>Yii::t('app','Save'),'buttonType'=>'submit','type'=>'primary','icon'=>'ok white')); ?>
     </div>
 
+<script>statusProcessVisibleItems();</script>
 <?php } ?>
 <?php
 $this->endWidget();
 ?>
-<script>statusProcessVisibleItems();</script>

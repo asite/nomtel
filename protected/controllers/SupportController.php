@@ -7,6 +7,8 @@ class SupportController extends BaseGxController
         return array(
             array('allow', 'actions' => array('number'), 'roles' => array('agent')),
             array('allow', 'actions' => array('numberStatus'), 'roles' => array('support')),
+            array('allow', 'actions' => array('callback'), 'roles' => array('support')),
+            array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
         );
     }
 
@@ -40,7 +42,7 @@ class SupportController extends BaseGxController
                 $mail->setFrom(Yii::app()->params['supportEmailFrom']);
                 $mail->setTo($recipients);
                 $mail->setBody($body);
-                
+
                 $message = "Ваше обращение $report_number принято. Срок рассмотрения 24 часа. Спасибо";
                 $message = urlencode($message);
                 file_get_contents("http://api.infosmska.ru/interfaces/SendMessages.ashx?login=ghz&pwd=zerozz&phones=7$report->abonent_number&message=$message&sender=nomtel");
@@ -77,7 +79,7 @@ class SupportController extends BaseGxController
                 $person->setAttributes($_POST['Person']);
             }
 
-            if (isset($_GET['number'])) $number->setAttributes(array('number'=>$_GET['number']));
+            if ($_POST['NumberSupportNumber']['number']=='' && isset($_GET['number'])) $number->setAttributes(array('number'=>$_GET['number']));
 
             if ($number->validate()) {
                 $data['showStatusForm']=true;
@@ -148,5 +150,25 @@ class SupportController extends BaseGxController
         }
 
         $this->render('numberStatus', $data);
+    }
+
+    public function actionCallback() {
+        $model = new Number('search');
+        $model->unsetAttributes();
+        if(isset($_GET['Number'])){
+            $model->setAttributes($_GET['Number']);
+        }
+
+        $dataProvider = $model->search();
+        $dataProvider->criteria->addColumnCondition(array('support_status' => 'CALLBACK'));
+        $dataProvider->criteria->order = "support_callback_dt ASC";
+
+        $this->render('callback',array(
+            'model'=>$model,
+            'dataProvider'=>$dataProvider
+        ));
+    }
+    public function actionStatistic() {
+        $this->render('statistic');
     }
 }
