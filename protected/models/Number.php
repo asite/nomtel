@@ -22,7 +22,7 @@ class Number extends BaseNumber
     const SUPPORT_STATUS_REJECT='REJECT';
     const SUPPORT_STATUS_ACTIVE='ACTIVE';
     const SUPPORT_STATUS_SERVICE_INFO='SERVICE_INFO';
-    
+
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
@@ -78,7 +78,7 @@ class Number extends BaseNumber
         $labels=self::getSupportStatusLabels();
         return $labels[$status];
     }
-    
+
     public static function getBalanceStatusDropDownList($items=array()) {
         $labels=self::getBalanceStatusLabels();
         return array_merge($items,$labels);
@@ -106,7 +106,7 @@ class Number extends BaseNumber
         $labels=self::getBalanceStatusLabels();
         return $labels[$status];
     }
-    
+
     public function addNumber($sim) {
         if ($sim->number) {
             $number = self::model()->findByAttributes(array('number'=>$sim->number));
@@ -124,5 +124,15 @@ class Number extends BaseNumber
             }
             NumberHistory::addHistoryNumber($number->id,'SIM {Sim:'.$sim->id.'} добавлена в базу');
         }
+    }
+
+    public function getSupportStatusArray() {
+        return array(
+            self::SUPPORT_STATUS_UNAVAILABLE=>0,
+            self::SUPPORT_STATUS_CALLBACK=>0,
+            self::SUPPORT_STATUS_REJECT=>0,
+            self::SUPPORT_STATUS_ACTIVE=>0,
+            self::SUPPORT_STATUS_SERVICE_INFO=>0
+        );
     }
 }

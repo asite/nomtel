@@ -44,7 +44,7 @@ return array (
   'No Image yet uploaded' => '',
   'NumberHistory|NumberHistories' => '',
   'Oparation' => '',
-  'Operator' => '',
+  'Operator' => 'Оператор',
   'PersonFile|PersonFiles' => '',
   'Person|People' => '',
   'Price' => '',
@@ -283,4 +283,9 @@ return array (
   'incoming number'=>'Номер с которого обратились',
   'Support Getting Passport Variant'=>'Вариант получения паспорта',
   'Support Number Region Usage'=>'Регион использования номера',
+  'Call back'=>'Перезвонить',
+  'Statistic'=>'Статистика',
+  'Process'=>'Обработать',
+  'Action'=>'Действие',
+  'Number of completed'=>'Количество выполненных',
 );

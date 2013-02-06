@@ -169,6 +169,22 @@ class SupportController extends BaseGxController
         ));
     }
     public function actionStatistic() {
-        $this->render('statistic');
+        $model = Yii::app()->db->createCommand()
+                                ->select('count(support_status) as count, support_status')
+                                ->from('number')
+                                ->where('support_operator_id=:val', array(':val'=>loggedSupportOperatorId()))
+                                ->group('support_status')
+                                ->queryAll();
+
+        $data = Number::getSupportStatusArray();
+        $supportOperator = SupportOperator::model()->findByPk(loggedSupportOperatorId());
+        foreach ($model as $v) {
+            $data[$v['support_status']]=$v['count'];
+        }
+
+        $this->render('statistic',array(
+            'data'=>$data,
+            'supportOperator'=>$supportOperator
+        ));
     }
 }
