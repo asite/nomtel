@@ -50,7 +50,6 @@ class SimController extends BaseGxController {
                             $text = preg_replace('/(\s){2,}/', "$1", $text);
                             $sim = explode(" ", $text);
 
-
                             if (!isset($sim[2])) $sim[2] = '';
 
                             if ($sim[0] && $sim[1]) {
@@ -62,7 +61,7 @@ class SimController extends BaseGxController {
                                 $model->number = $sim[2];
                                 //print_r($model->countByAttributes(array('icc'=>$sim[1],'number'=>$sim[2]))); exit;
                                 //try {
-                                if ($model->countByAttributes(array('icc' => $sim[1], 'number' => $sim[2])) == 0) {
+                                if ($model->countByAttributes(array('number' => $sim[2])) == 0) {
                                     $model->save();
                                     $model->parent_id = $model->id;
                                     $model->save();
