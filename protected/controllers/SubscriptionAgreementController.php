@@ -5,9 +5,9 @@ class SubscriptionAgreementController extends BaseGxController {
     public function additionalAccessRules()
     {
         return array(
-            array('deny', 'actions'=>array('update'), 'roles'=>'agent'),
+            array('deny', 'actions'=>array('update'), 'roles'=>array('agent')),
             array('allow', 'roles' => array('agent')),
-            array('allow', 'actions'=>array('update'), 'roles'=>'support'),
+            array('allow', 'actions'=>array('update'), 'roles'=>array('support')),
         );
     }
 
@@ -170,7 +170,11 @@ class SubscriptionAgreementController extends BaseGxController {
 
                 NumberHistory::addHistoryNumber($number->id,'Отредактирован договор {SubscriptionAgreement:'.$agreement->id.'}');
                 $trx->commit();
-                $this->redirect(array('sim/list'));
+                if (Yii::app()->user->role=='support') {
+                    $this->redirect(array('support/numberStatus'));
+                } else {
+                    $this->redirect(array('sim/list'));
+                }
             }
         }
 

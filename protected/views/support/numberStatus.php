@@ -51,13 +51,25 @@ function setStatus(status) {
 }
 </script>
 <?php
-    foreach(Number::getSupportStatusLabels() as $status_key=>$status_label) {
-        $d=$this->widget('bootstrap.widgets.TbButton',array(
-            'label'=>$status_label,
-            'htmlOptions'=>array('onclick'=>'setStatus("'.$status_key.'")')
-        ));
-        echo "&nbsp;";
-    }
+    if ($numberObj->status==Number::STATUS_FREE) {
+        foreach(Number::getSupportStatusLabels() as $status_key=>$status_label) {
+            $d=$this->widget('bootstrap.widgets.TbButton',array(
+                'label'=>$status_label,
+                'htmlOptions'=>array('onclick'=>'setStatus("'.$status_key.'")')
+            ));
+            echo "&nbsp;";
+        }
+    } else {
+            $d=$this->widget('bootstrap.widgets.TbButton',array(
+                'label'=>'Полная форма договора',
+                'url'=>$this->createUrl('subscriptionAgreement/update',array('number_id'=>$numberObj->id))
+            ));
+            echo "&nbsp;";
+            $d=$this->widget('bootstrap.widgets.TbButton',array(
+                'label'=>Number::getSupportStatusLabel('SERVICE_INFO'),
+                'htmlOptions'=>array('onclick'=>'setStatus("SERVICE_INFO")')
+            ));
+   }
 ?>
 
 

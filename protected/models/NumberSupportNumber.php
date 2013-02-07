@@ -6,7 +6,7 @@ class NumberSupportNumber extends CFormModel
     public function rules() {
         return array(
             array('number','required'),
-            array('number','exist','className'=>'Number','criteria'=>array('condition'=>'status=:free_status','params'=>array(':free_status'=>Number::STATUS_FREE)),'attributeName'=>'number','message'=>'Номер {value} не свободен'),
+            array('number','exist','className'=>'Number','attributeName'=>'number','message'=>'Номер {value} отсутствует в базе'),
         );
     }
 
