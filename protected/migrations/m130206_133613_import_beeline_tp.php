@@ -43,7 +43,7 @@ class m130206_133613_import_beeline_tp extends CDbMigration
             if ($sim->countByAttributes(array('number' => $csv_number))>1) {
                 Sim::model()->updateAll(array('tariff_id' => $csv_tariff),'number=:number',array(':number'=>$csv_number));
                 NumberHistory::addHistoryNumber($sim->numberObjectBySimId->id,'Тариф сменен с "'.CHtml::encode($sim->tariff).'" на "'. CHtml::encode(Tariff::model()->findByPk($csv_tariff)).'"','База');
-                break;
+                continue;
             }
 
             $old_tariff = $sim->tariff;
@@ -51,7 +51,6 @@ class m130206_133613_import_beeline_tp extends CDbMigration
             $sim->agent_id = $agent_id;
             $sim->act_id = $act->id;
             $sim->save();
-
 
             $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id)
                     SELECT s.sim_price, s.personal_account, s.number,s.number_price, s.icc, s.parent_id , ".Yii::app()->db->quoteValue($agent_id).", " . Yii::app()->db->quoteValue($act->id) . ", NULL, NULL, s.operator_id, s.tariff_id, s.operator_region_id, s.company_id
