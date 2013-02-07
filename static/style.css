@@ -260,6 +260,9 @@ input[type="text"], input[type="password"], .ui-autocomplete-input, textarea, .u
 .number_info .w80 table tr th {
   width: 80px;
 }
+.number_info .w300 table tr th {
+  width: 300px;
+}
 .number_info .table_margin0 table {
   margin: 0;
 }

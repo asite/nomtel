@@ -280,8 +280,61 @@ if (isSupport()) {
             ),
         )); ?>
     </div>
-</div>
 
+
+
+
+        <div class="w300 table_margin0">
+           <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
+                'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
+                'data'=>$number,
+                'attributes'=>array(
+                    array(
+                        'name' => 'support_getting_passport_variant',
+                        'value' => $number->support_getting_passport_variant,
+                        'editable' => array(
+                            'type'   => 'text',
+                            'url' => $this->createUrl('number/saveSupportGettingPassportVariant',array('id'=>$number->id)),
+                            'options' => array(
+                                'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                            ),
+                            'source' => $number->support_getting_passport_variant,
+                            'success'   => 'js: function(data) {
+                                $.fn.yiiGridView.update("number-grid");
+                            }'
+                        )
+                    ),
+                ),
+            )); ?>
+        </div>
+       <div class="w300">
+            <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
+                'htmlOptions' => array('class'=> 'table  table-condensed'),
+                'data'=>$number,
+                'attributes'=>array(
+                    array(
+                        'name' => 'support_number_region_usage',
+                        'value' => $number->support_number_region_usage,
+                        'editable' => array(
+                            'type'   => 'text',
+                            'url' => $this->createUrl('number/saveSupportNumberRegionUsage',array('id'=>$number->id)),
+                            'options' => array(
+                                'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                            ),
+                            'source' => $number->support_number_region_usage,
+                            'success'   => 'js: function(data) {
+                                $.fn.yiiGridView.update("number-grid");
+                            }'
+                        )
+                    ),
+                    array(
+                        'label'=>'&nbsp;',
+                        'value'=>''
+                    ),
+                ),
+            )); ?>
+        </div>
+</div>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'number-grid',
     'dataProvider' => $numberHistory->search(),

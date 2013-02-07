@@ -21,8 +21,8 @@ class NumberSupportStatus extends CFormModel
             'status'=>Yii::t('app','Status'),
             'callback_dt'=>'Дата и время',
             'callback_name'=>Yii::t('app','Name'),
-            'getting_passport_variant'=>'Вариант получения паспорта',
-            'number_region_usage'=>'Регион использования номера'
+            'getting_passport_variant'=>Yii::t('app','Support Getting Passport Variant'),
+            'number_region_usage'=>Yii::t('app','Support Number Region Usage'),
         );
     }
 }

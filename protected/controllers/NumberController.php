@@ -180,5 +180,36 @@ class NumberController extends BaseGxController
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
+
+    public function actionSaveSupportGettingPassportVariant($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $object = $number->support_getting_passport_variant;
+                $number->support_getting_passport_variant = $_POST['value'];
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Вариант получения паспорта сменен с "'.$object.'" на "'.$_POST['value'].'"');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+    public function actionSaveSupportNumberRegionUsage($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $object = $number->support_number_region_usage;
+                $number->support_number_region_usage = $_POST['value'];
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Регион использования номера сменен с "'.$object.'" на "'.$_POST['value'].'"');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
 }
 

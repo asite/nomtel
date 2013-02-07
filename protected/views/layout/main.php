@@ -35,9 +35,9 @@
             array('label' => Yii::t('app', 'Inbox'), 'url' => $this->createUrl('message/inbox'), 'active' => ($this->route == 'message/inbox' || $_GET['type'] == 'inbox')),
             array('label' => Yii::t('app', 'Outbox'), 'url' => $this->createUrl('message/outbox'), 'active' => ($this->route == 'message/outbox' || $_GET['type'] == 'outbox' || $this->route == 'message/create')),
             '',
-            
+
                array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
-               
+
                  '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
@@ -67,6 +67,8 @@
     if (Yii::app()->user->role == 'support') {
         $menuLeft = array(
             array('label' => Number::label(2), 'url' => $this->createUrl('support/numberStatus'), 'active' => $this->route == 'support/numberStatus'),
+            array('label' => Yii::t('app','Call back'), 'url' => $this->createUrl('support/callback'), 'active' => $this->route == 'support/callback'),
+            array('label' => Yii::t('app','Statistic'), 'url' => $this->createUrl('support/statistic'), 'active' => $this->route == 'support/statistic'),
             //array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
             //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
             '',
