@@ -5,7 +5,9 @@ class SubscriptionAgreementController extends BaseGxController {
     public function additionalAccessRules()
     {
         return array(
+            array('deny', 'actions'=>array('update'), 'roles'=>'agent'),
             array('allow', 'roles' => array('agent')),
+            array('allow', 'actions'=>array('update'), 'roles'=>'support'),
         );
     }
 
@@ -100,6 +102,93 @@ class SubscriptionAgreementController extends BaseGxController {
             $errors[CHtml::activeId($person, $attribute)] = $error;
 
         return $errors;
+    }
+
+    public function actionUpdate($number_id)
+    {
+        $number=$this->loadModel($number_id,'Number');
+        $agreement=SubscriptionAgreement::model()->find(array(
+            'condition'=>'number_id=:number_id',
+            'order'=>'id desc',
+            'params'=>array(':number_id'=>$number->id)
+        ));
+        $sim=Sim::model()->find(array(
+            'condition'=>'parent_id=:sim_id',
+            'order'=>'id desc',
+            'params'=>array(':sim_id'=>$number->sim_id)
+        ));
+        $person=$agreement->person;
+
+        $this->checkPermissions('updateSubscriptionAgreement',array(
+            'number_status'=>$number->status,
+            'parent_agent_id'=>$sim->parent_agent_id,
+        ));
+
+        if (Yii::app()->getRequest()->getIsAjaxRequest()) {
+            $result = $this->validate($agreement, $sim, $person);
+            echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
+            Yii::app()->end();
+        }
+
+        if (isset($_POST['Person'])) {
+            $errors=$this->validate($agreement,$sim,$person);
+
+            $person_files=array();
+            foreach(explode(',',$_POST['person_files']) as $file_id)
+                if ($file_id) $person_files[]=$file_id;
+
+            $agreement_files=array();
+            foreach(explode(',',$_POST['agreement_files']) as $file_id)
+                if ($file_id) $agreement_files[]=$file_id;
+
+            if (empty($errors)) {
+                $trx=Yii::app()->db->beginTransaction();
+
+                $person->save();
+                $number->save();
+
+                $agreement->setScenario('create');
+                $agreement->save();
+
+                // save person files
+                PersonFile::model()->deleteAll('person_id=:person_id',array(':person_id'=>$person->id));
+                foreach($person_files as $file_id) {
+                    $personFile=new PersonFile();
+                    $personFile->person_id=$person->id;
+                    $personFile->file_id=$file_id;
+                    $personFile->save();
+                }
+
+                // save agreement files
+                SubscriptionAgreementFile::model()->deleteAll('subscription_agreement_id=:subscription_agreement_id',array(':subscription_agreement_id'=>$agreement->id));
+                foreach($agreement_files as $file_id) {
+                    $agreementFile=new SubscriptionAgreementFile();
+                    $agreementFile->subscription_agreement_id=$agreement->id;
+                    $agreementFile->file_id=$file_id;
+                    $agreementFile->save();
+                }
+
+                NumberHistory::addHistoryNumber($number->id,'Отредактирован договор {SubscriptionAgreement:'.$agreement->id.'}');
+                $trx->commit();
+                $this->redirect(array('sim/list'));
+            }
+        }
+
+        $person_files=array();
+        foreach($person->files as $file)
+            $person_files[]=$file->getUploaderInfo();
+
+        $agreement_files=array();
+        foreach($agreement->files as $file)
+            $agreement_files[]=$file->getUploaderInfo();
+
+        $this->render('update',array(
+            'sim'=>$sim,
+            'agreement'=>$agreement,
+            'person'=>$person,
+            'person_files'=>json_encode($person_files),
+            'agreement_files'=>json_encode($agreement_files)
+        ));
     }
 
     public function actionCreate($id,$sim_id)

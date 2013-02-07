@@ -9,6 +9,15 @@ $this->breadcrumbs = array(
 
 <h1><?=$number->adminLabel(Number::label(1))?></h1>
 
+<?php
+if ($number->status!=Number::STATUS_FREE) {
+    $this->widget('bootstrap.widgets.TbButton',array(
+        'url'=>$this->createUrl('subscriptionAgreement/update',array('number_id'=>$number->id)),
+        'label'=>SubscriptionAgreement::label()
+    ));
+}
+?>  <br/><br/>
+
 <div class="number_info">
     <div class="w80 cfix">
         <div style="float:left;width:40%;">

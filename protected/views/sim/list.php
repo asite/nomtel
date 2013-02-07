@@ -129,7 +129,7 @@ $('#SimSearch_operator_id').live('change',function(){
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:40px;text-align:center;vertical-align:middle'),
-            'template'=>'{view} {feedback} {agreement}',
+            'template'=>'{view} {feedback} {createAgreement} {viewAgreement}',
             'buttons'=>array(
                 'view'=>array(
                     'url'=>'Yii::app()->createUrl("number/".(Yii::app()->user->checkAccess("editNumberCard") ? "edit":"view"),array("id"=>$data["number_id"]))',
@@ -141,11 +141,17 @@ $('#SimSearch_operator_id').live('change',function(){
                     'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data["sim_id"]))',
                     'visible'=>'!isAdmin()'
                 ),
-                'agreement'=>array(
+                'createAgreement'=>array(
                     'label'=>Yii::t('app','Create subscription agreement'),
                     'icon'=>'file',
                     'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$data["sim_id"]))',
                     'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))'
+                ),
+                'viewAgreement'=>array(
+                    'label'=>Yii::t('app','Договор'),
+                    'icon'=>'file',
+                    'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/update",array("number_id"=>$data["number_id"]))',
+                    'visible'=>'Yii::app()->user->checkAccess("updateSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))'
                 ),
             )
         ),
