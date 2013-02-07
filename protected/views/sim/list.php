@@ -132,7 +132,7 @@ $('#SimSearch_operator_id').live('change',function(){
             'template'=>'{view} {feedback} {agreement}',
             'buttons'=>array(
                 'view'=>array(
-                    'url'=>'Yii::app()->createUrl("number/".((Yii::app()->user->role=="admin")?"edit":"view"),array("id"=>$data["number_id"]))',
+                    'url'=>'Yii::app()->createUrl("number/".(Yii::app()->user->checkAccess("editNumberCard") ? "edit":"view"),array("id"=>$data["number_id"]))',
                 ),
 
                 'feedback'=>array(

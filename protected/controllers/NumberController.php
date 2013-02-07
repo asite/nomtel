@@ -5,7 +5,7 @@ class NumberController extends BaseGxController
     public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array('list','view'), 'roles' => array('agent','support')),
-            array('allow', 'roles' => array('support')),
+            array('allow', 'roles' => array('editNumberCard')),
         );
     }
 

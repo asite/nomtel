@@ -9,7 +9,8 @@ return array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
             'createSubscriptionAgreementForOwnSim',
-            'deleteAct'
+            'deleteAct',
+            'editNumberCard'
         )
     ),
 
@@ -23,7 +24,8 @@ return array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
             'createSubscriptionAgreementForOwnSim',
-            'deleteAct'
+            'deleteAct',
+            'editNumberCardBySamvel'
         )
     ),
 
@@ -43,5 +45,17 @@ return array(
     'deleteAct'=>array(
         'type' => CAuthItem::TYPE_OPERATION,
         'bizRule' => 'return $params["act"]->agent->parent_id==loggedAgentId();'
+    ),
+
+    'editNumberCard'=>array(
+        'type' => CAuthItem::TYPE_OPERATION,
+    ),
+
+    'editNumberCardBySamvel'=>array(
+        'type' => CAuthItem::TYPE_OPERATION,
+        'bizRule' => 'return loggedAgentId()==samvelAgentId();',
+        'children' => array(
+            'editNumberCard'
+        )
     )
 );
