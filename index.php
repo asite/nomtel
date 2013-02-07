@@ -23,7 +23,7 @@ switch ($_SERVER['SERVER_NAME']) {
         $config = 'server_web_asite_production.php';
         break;
  
-    case 'dnomtel.asiteplace.ru':
+    case 'test.asiteplace.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);

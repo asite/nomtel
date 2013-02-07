@@ -5,8 +5,8 @@ $config = CMap::mergeArray(
         'components' => array(
             'db' => array(
                 'connectionString' => 'mysql:host=localhost;dbname=crm',
-                'username' => 'crm',
-                'password' => '30i5FQoR',
+                'username' => 'test',
+                'password' => 'sMJngolM',
             ),
         ),
         'params' => array(
