@@ -92,16 +92,16 @@ function setStatus(status) {
                     <?php echo $form->textFieldRow($status,'number_region_usage',array('class'=>'span4')); ?>
                 </div>
             </div>
-
+<?php $disabled=$person->id ? 'disabled':''; ?>
         <fieldset>
             <legend><?php echo Yii::t('app','Subscriber');?></legend>
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'surname',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'surname',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                    <?php echo $form->textFieldRow($person,'name',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'name',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                    <?php echo $form->textFieldRow($person,'middle_name',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'middle_name',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-100">
                     <?php echo $form->textFieldRow($person,'phone',array('class'=>'span2','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
@@ -114,34 +114,34 @@ function setStatus(status) {
             <legend><?php echo Yii::t('app','Passport');?></legend>
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'passport_series',array('class'=>'span1','maxlength'=>10,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_series',array('disabled'=>$disabled,'class'=>'span1','maxlength'=>10,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-80">
-                    <?php echo $form->textFieldRow($person,'passport_number',array('class'=>'span2','maxlength'=>20,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_number',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>20,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-120">
-                    <?php echo $form->maskFieldRow($person,'passport_issue_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->maskFieldRow($person,'passport_issue_date','99.99.9999',array('disabled'=>$disabled,'class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'passport_issuer',array('class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_issuer',array('disabled'=>$disabled,'class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                     <?php echo $form->maskFieldRow($person,'birth_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                     <?php echo $form->maskFieldRow($person,'birth_date','99.99.9999',array('disabled'=>$disabled,'class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'birth_place',array('class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'birth_place',array('disabled'=>$disabled,'class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'registration_address',array('class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'registration_address',array('disabled'=>$disabled,'class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
         </fieldset>

@@ -11,7 +11,7 @@ class NumberSupportStatus extends CFormModel
         return array(
             array('status','required'),
             array('callback_dt,callback_name','required','on'=>Number::SUPPORT_STATUS_CALLBACK),
-            array('getting_passport_variant,number_region_usage','required','on'=>Number::SUPPORT_STATUS_ACTIVE),
+            array('number_region_usage','required','on'=>Number::SUPPORT_STATUS_ACTIVE),
             array('callback_dt','date','format'=>'dd.MM.yyyy hh:mm:ss'),
         );
     }
