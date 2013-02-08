@@ -51,7 +51,7 @@ return array (
   'Size should be less then 2MB !!!' => '',
   'Skype' => '',
   'SubscriptionAgreementFile|SubscriptionAgreementFiles' => '',
-  'SubscriptionAgreement|SubscriptionAgreements' => '',
+  'SubscriptionAgreement|SubscriptionAgreements' => 'Договор|Договоры',
   'Support Callback Dt' => '',
   'Support Callback Name' => '',
   'Support Dt' => '',

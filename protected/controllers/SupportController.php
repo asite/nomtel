@@ -5,7 +5,7 @@ class SupportController extends BaseGxController
 
     public function additionalAccessRules() {
         return array(
-            array('allow', 'actions' => array('number'), 'roles' => array('agent')),
+            array('allow', 'actions' => array('number'), 'roles' => array('agent','support')),
             array('allow', 'actions' => array('numberStatus'), 'roles' => array('support')),
             array('allow', 'actions' => array('callback'), 'roles' => array('support')),
             array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
@@ -64,6 +64,7 @@ class SupportController extends BaseGxController
     public function actionNumberStatus() {
         $number=new NumberSupportNumber();
         $status=new NumberSupportStatus($_POST['NumberSupportStatus']['status']);
+        $status->status=Number::SUPPORT_STATUS_ACTIVE;
         $person=new Person();
 
         $data=array('number'=>$number,'status'=>$status,'person'=>$person,'showStatusForm'=>false);
@@ -73,13 +74,29 @@ class SupportController extends BaseGxController
             $_POST['NumberSupportNumber']['number']=preg_replace('%^8%','',$_POST['NumberSupportNumber']['number']);
 
             $number->setAttributes($_POST['NumberSupportNumber']);
+            if ($_POST['NumberSupportNumber']['number']=='' && isset($_GET['number'])) $number->setAttributes(array('number'=>$_GET['number']));
+
+            $numberObj=Number::model()->findByAttributes(array('number'=>$number->number));
+            $data['numberObj']=$numberObj;
+
+            if ($numberObj && $numberObj->status!=Number::STATUS_FREE) {
+                $agreement=SubscriptionAgreement::model()->find(array(
+                    'condition'=>'number_id=:number_id',
+                    'order'=>'id desc',
+                    'params'=>array(':number_id'=>$numberObj->id)
+                ));
+                $person=$agreement->person;
+                $data['person']=$person;
+            }
+            if ($numberObj) {
+                $status->getting_passport_variant=$numberObj->support_getting_passport_variant;
+                $status->number_region_usage=$numberObj->support_number_region_usage;
+            }
 
             if (isset($_POST['NumberSupportStatus'])) {
                 $status->setAttributes($_POST['NumberSupportStatus']);
                 $person->setAttributes($_POST['Person']);
             }
-
-            if ($_POST['NumberSupportNumber']['number']=='' && isset($_GET['number'])) $number->setAttributes(array('number'=>$_GET['number']));
 
             if ($number->validate()) {
                 $data['showStatusForm']=true;
@@ -94,8 +111,12 @@ class SupportController extends BaseGxController
                     if ($status->validate()) {
                         $number=Number::model()->findByAttributes(array('number'=>$number->number));
                         $number->support_operator_id=loggedSupportOperatorId();
-                        $number->support_status=$status->status;
-                        $number->support_dt=new EDateTime();
+
+                        // do not change support status if number already has subscription agreement
+                        if (!$numberObj) {
+                            $number->support_status=$status->status;
+                            $number->support_dt=new EDateTime();
+                        }
 
                         if ($status->status==Number::SUPPORT_STATUS_CALLBACK) {
                             $number->support_callback_dt=new EDateTime($status->callback_dt);
@@ -115,24 +136,33 @@ class SupportController extends BaseGxController
 
                                 $trx=Yii::app()->db->beginTransaction();
 
-                                $number->status=Number::STATUS_ACTIVE;
-                                $number->support_getting_passport_variant=$status->getting_passport_variant;
-                                $number->support_number_region_usage=$status->number_region_usage;
+                                if (!$agreement) {
+                                    $number->status=Number::STATUS_ACTIVE;
+                                    $number->support_getting_passport_variant=$status->getting_passport_variant;
+                                    $number->support_number_region_usage=$status->number_region_usage;
 
 
-                                $number->save();
+                                    $number->save();
 
-                                $person->save();
+                                    $person->save();
 
-                                $agreement=new SubscriptionAgreement();
-                                $agreement->save();
-                                $agreement->dt=new EDateTime();
-                                $agreement->fillDefinedId();
-                                $agreement->person_id=$person->id;
-                                $agreement->number_id=$number->id;
-                                $agreement->save();
+                                    $agreement=new SubscriptionAgreement();
+                                    $agreement->save();
+                                    $agreement->dt=new EDateTime();
+                                    $agreement->fillDefinedId();
+                                    $agreement->person_id=$person->id;
+                                    $agreement->number_id=$number->id;
+                                    $agreement->save();
 
-                                NumberHistory::addHistoryNumber($number->id,'Оформлен договор {SubscriptionAgreement:'.$agreement->id.'}');
+                                    NumberHistory::addHistoryNumber($number->id,'Оформлен договор {SubscriptionAgreement:'.$agreement->id.'}');
+                                } else {
+                                    $number->support_getting_passport_variant=$status->getting_passport_variant;
+                                    $number->support_number_region_usage=$status->number_region_usage;
+                                    $number->save();
+
+                                    $person->save();
+                                    NumberHistory::addHistoryNumber($number->id,'Отредактирован договор {SubscriptionAgreement:'.$agreement->id.'}');
+                                }
 
                                 $trx->commit();
 

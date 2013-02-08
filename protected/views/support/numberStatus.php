@@ -51,13 +51,25 @@ function setStatus(status) {
 }
 </script>
 <?php
-    foreach(Number::getSupportStatusLabels() as $status_key=>$status_label) {
-        $d=$this->widget('bootstrap.widgets.TbButton',array(
-            'label'=>$status_label,
-            'htmlOptions'=>array('onclick'=>'setStatus("'.$status_key.'")')
-        ));
-        echo "&nbsp;";
-    }
+    if ($numberObj->status==Number::STATUS_FREE) {
+        foreach(Number::getSupportStatusLabels() as $status_key=>$status_label) {
+            $d=$this->widget('bootstrap.widgets.TbButton',array(
+                'label'=>$status_label,
+                'htmlOptions'=>array('onclick'=>'setStatus("'.$status_key.'")')
+            ));
+            echo "&nbsp;";
+        }
+    } else {
+            $d=$this->widget('bootstrap.widgets.TbButton',array(
+                'label'=>'Полная форма договора',
+                'url'=>$this->createUrl('subscriptionAgreement/update',array('number_id'=>$numberObj->id))
+            ));
+            echo "&nbsp;";
+            $d=$this->widget('bootstrap.widgets.TbButton',array(
+                'label'=>Number::getSupportStatusLabel('SERVICE_INFO'),
+                'htmlOptions'=>array('onclick'=>'setStatus("SERVICE_INFO")')
+            ));
+   }
 ?>
 
 
@@ -108,7 +120,7 @@ function setStatus(status) {
                     <?php echo $form->textFieldRow($person,'passport_number',array('class'=>'span2','maxlength'=>20,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-120">
-                    <?php echo $form->pickerDateRow($person,'passport_issue_date',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->maskFieldRow($person,'passport_issue_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
@@ -120,7 +132,7 @@ function setStatus(status) {
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->pickerDateRow($person,'birth_date',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                     <?php echo $form->maskFieldRow($person,'birth_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-140">
                     <?php echo $form->textFieldRow($person,'birth_place',array('class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>

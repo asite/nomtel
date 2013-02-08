@@ -21,4 +21,8 @@ class SubscriptionAgreement extends BaseSubscriptionAgreement
 
         return $rules;
     }
+
+    public function __toString() {
+        return $this->defined_id;
+    }
 }

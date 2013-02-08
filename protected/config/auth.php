@@ -9,13 +9,17 @@ return array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
             'createSubscriptionAgreementForOwnSim',
-            'deleteAct'
+            'updateSubscriptionAgreementForOwnSim',
+            'deleteAct',
+            'editNumberCard'
         )
     ),
 
     'support' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
+            'updateSubscriptionAgreementForOwnSim',
+            'editNumberCard'
         )
     ),
 
@@ -23,7 +27,8 @@ return array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
             'createSubscriptionAgreementForOwnSim',
-            'deleteAct'
+            'deleteAct',
+            'editNumberCardBySamvel'
         )
     ),
 
@@ -35,13 +40,38 @@ return array(
         )
     ),
 
+    'updateSubscriptionAgreementForOwnSim' => array (
+        'type' => CAuthItem::TYPE_TASK,
+        'bizRule' => 'return $params["parent_agent_id"]==loggedAgentId();',
+        'children' => array(
+            'updateSubscriptionAgreement'
+        )
+    ),
+
     'createSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
         'bizRule' => 'return $params["number_status"]==Number::STATUS_FREE;'
     ),
 
+    'updateSubscriptionAgreement' => array(
+        'type' => CAuthItem::TYPE_OPERATION,
+        'bizRule' => 'return $params["number_status"]!=Number::STATUS_FREE;'
+    ),
+
     'deleteAct'=>array(
         'type' => CAuthItem::TYPE_OPERATION,
         'bizRule' => 'return $params["act"]->agent->parent_id==loggedAgentId();'
+    ),
+
+    'editNumberCard'=>array(
+        'type' => CAuthItem::TYPE_OPERATION,
+    ),
+
+    'editNumberCardBySamvel'=>array(
+        'type' => CAuthItem::TYPE_OPERATION,
+        'bizRule' => 'return loggedAgentId()==samvelAgentId();',
+        'children' => array(
+            'editNumberCard'
+        )
     )
 );

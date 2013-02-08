@@ -24,3 +24,8 @@ function adminAgentId()
 {
     return 1;
 }
+
+function samvelAgentId()
+{
+    return 20;
+}
