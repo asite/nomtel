@@ -23,7 +23,7 @@ $('#SimSearch_operator_id').live('change',function(){
 
 <h1><?php echo GxHtml::encode(Sim::label(2)); ?></h1>
 
-<a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#SimSearch_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('keydown', {keyCode: 13}));"><?php echo Yii::t('app', 'Without number') ?></a>
+<a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#SimSearch_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('change'));"><?php echo Yii::t('app', 'Without number') ?></a>
 
 <?php $this->widget('bootstrap.widgets.TbButton', array(
     'type'=>'button',
@@ -41,7 +41,7 @@ $('#SimSearch_operator_id').live('change',function(){
         array(
             'label'=>Yii::t('app','All'),
             'htmlOptions'=>array(
-                'onclick'=>"jQuery('#SimSearch_operator_id').val('').trigger(jQuery.Event('keydown', {keyCode: 13}))",
+                'onclick'=>"jQuery('#SimSearch_operator_id').val('').trigger(jQuery.Event('change'))",
                 'data-id'=>'',
                 'style'=>"margin-bottom:10px;"
             )
@@ -49,7 +49,7 @@ $('#SimSearch_operator_id').live('change',function(){
         array(
             'label'=>Yii::t('app','Bilain'),
             'htmlOptions'=>array(
-                'onclick'=>"jQuery('#SimSearch_operator_id').val(".Operator::OPERATOR_BEELINE_ID.").trigger(jQuery.Event('keydown', {keyCode: 13}))",
+                'onclick'=>"jQuery('#SimSearch_operator_id').val(".Operator::OPERATOR_BEELINE_ID.").trigger(jQuery.Event('change'))",
                 'data-id'=>Operator::OPERATOR_BEELINE_ID,
                 'style'=>"margin-bottom:10px;"
             )
@@ -57,7 +57,7 @@ $('#SimSearch_operator_id').live('change',function(){
         array(
             'label'=>Yii::t('app','Megafon'),
             'htmlOptions'=>array(
-                'onclick'=>"jQuery('#SimSearch_operator_id').val(".Operator::OPERATOR_MEGAFON_ID.").trigger(jQuery.Event('keydown', {keyCode: 13}))",
+                'onclick'=>"jQuery('#SimSearch_operator_id').val(".Operator::OPERATOR_MEGAFON_ID.").trigger(jQuery.Event('change'))",
                 'data-id'=>Operator::OPERATOR_MEGAFON_ID,
                 'style'=>"margin-bottom:10px;"
             )
