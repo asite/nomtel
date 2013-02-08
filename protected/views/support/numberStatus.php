@@ -7,12 +7,38 @@ $this->breadcrumbs = array(
 
 <h1><?=Yii::t('app','Number')?></h1>
 
+<script>
+    function checkForm(form) {
+        // check if there any active upload
+        var uploadIsActive=false;
+        $('form').each(function(){
+            if ($(this).data('fileupload')) {
+                if ($(this).data('fileupload')._active) uploadIsActive=true;
+                var ids='';
+                $(this).find('input[name="file_id"]').each(function(){
+                    if (ids!='') ids+=',';
+                    ids+=$(this).val();
+                });
+                $("#"+$(this).attr('id')+'-field').val(ids);
+            }
+        });
+
+        if (uploadIsActive) {
+            alert('Загрузка файлов на сервер еще не закончена');
+            return false;
+        }
+        return true;
+    }
+</script>
+
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
     'id' => 'report-form',
     'type' => 'horizontal',
-    //'htmlOptions' => array ('class'=>'well')
+    'htmlOptions'=>array('onsubmit'=>'return checkForm(this);')
 ));
 ?>
+
+<input type="hidden" name="person_files" id="File-form-field" value=""/>
 
 <?php echo $form->errorSummary($number); ?>
 
@@ -32,23 +58,47 @@ function statusProcessVisibleItems() {
     var status=$("#NumberSupportStatus_status").val();
     if (status=='') return;
 
-    $("#callback, #active, .form-actions").hide();
+    $("#callback, #active, #scans, .form-actions").hide();
     switch (status) {
         case 'CALLBACK':
             $("#callback, .form-actions").show();
             break;
         case 'ACTIVE':
-            $("#active, .form-actions").show();
+            $("#active, #scans, .form-actions").show();
+            checkUploadSize();
             break;
         default:
             $("#report-form").submit();
     }
 }
 
+function checkUploadSize() {
+    var height_required=$("#scans").height();
+    var height_actual=$("#scans_shadow").height();
+    if ($('#File-form .files tr').size()==0) height_required-=50;
+    if (height_actual!=height_required) $("#scans_shadow").height(height_required);
+
+    var top_required=$("#scans_shadow").position().top;
+    var top_actual=$("#scans").position().top;
+    if (top_actual!=top_required) $("#scans").css('top',top_required);
+}
+
 function setStatus(status) {
     $("#NumberSupportStatus_status").val(status);
     statusProcessVisibleItems();
 }
+
+function UploaderAddFiles(id,files) {
+    var form=$("#"+id);
+    var uploader=form.data('fileupload');
+
+    var download=uploader._renderDownload(files);
+
+    download.appendTo(uploader.options.filesContainer);
+    uploader._forceReflow(download);
+    uploader._transition(download);
+}
+
 </script>
 <?php
     if ($numberObj->status==Number::STATUS_FREE) {
@@ -75,7 +125,7 @@ function setStatus(status) {
 
 <?php echo $form->hiddenField($status, 'status') ?>
 
-<div style="margin-top:20px;"></div>
+<div style="margin-top:10px;"></div>
 
 <?php echo $form->errorSummary(array($status,$person)); ?>
 
@@ -92,16 +142,18 @@ function setStatus(status) {
                     <?php echo $form->textFieldRow($status,'number_region_usage',array('class'=>'span4')); ?>
                 </div>
             </div>
-<?php $disabled=$person->id ? 'disabled':''; ?>
+
+        <div id="scans_shadow" style="clear:both;"></div>
+
         <fieldset>
             <legend><?php echo Yii::t('app','Subscriber');?></legend>
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'surname',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'surname',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                    <?php echo $form->textFieldRow($person,'name',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'name',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 
-                    <?php echo $form->textFieldRow($person,'middle_name',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'middle_name',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-100">
                     <?php echo $form->textFieldRow($person,'phone',array('class'=>'span2','maxlength'=>50,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
@@ -114,34 +166,34 @@ function setStatus(status) {
             <legend><?php echo Yii::t('app','Passport');?></legend>
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'passport_series',array('disabled'=>$disabled,'class'=>'span1','maxlength'=>10,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_series',array('class'=>'span1','maxlength'=>10,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-80">
-                    <?php echo $form->textFieldRow($person,'passport_number',array('disabled'=>$disabled,'class'=>'span2','maxlength'=>20,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_number',array('class'=>'span2','maxlength'=>20,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-120">
-                    <?php echo $form->maskFieldRow($person,'passport_issue_date','99.99.9999',array('disabled'=>$disabled,'class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->maskFieldRow($person,'passport_issue_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'passport_issuer',array('disabled'=>$disabled,'class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_issuer',array('class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                     <?php echo $form->maskFieldRow($person,'birth_date','99.99.9999',array('disabled'=>$disabled,'class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                     <?php echo $form->maskFieldRow($person,'birth_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'birth_place',array('disabled'=>$disabled,'class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'birth_place',array('class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'registration_address',array('disabled'=>$disabled,'class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'registration_address',array('class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
         </fieldset>
@@ -153,8 +205,34 @@ function setStatus(status) {
     <?php $d=$this->widget('bootstrap.widgets.TbButton',array('label'=>Yii::t('app','Save'),'buttonType'=>'submit','type'=>'primary','icon'=>'ok white')); ?>
     </div>
 
-<script>statusProcessVisibleItems();</script>
 <?php } ?>
 <?php
 $this->endWidget();
 ?>
+
+<div id="scans" style="display:none;position:absolute;">   <?php //top:330px; ?>
+<h3>Сканы паспорта</h3>
+<?php
+$this->widget('bootstrap.widgets.TbFileUpload', array(
+    'url' => $this->createUrl("file/upload",array('name'=>'File')),
+    'model' => new File(),
+    'attribute' => 'url',
+    'multiple' => true,
+    'formView'=>'application.views.fileupload.form',
+    'uploadView'=>'application.views.fileupload.upload',
+    'downloadView'=>'application.views.fileupload.download',
+    'options' => array(
+        'maxFileSize' => 1024*1024*10,
+        'acceptFileTypes' => 'js:/(\.|\/)(jpe?g|png)$/i',
+        'autoUpload' => true,
+        'previewSourceMaxFileSize' => 1024*1024*10,
+        'previewMaxWidth' => Yii::app()->params['thumbs']['uploader']['width'],
+        'previewMaxHeight' => Yii::app()->params['thumbs']['uploader']['height'],
+        'limitConcurrentUploads' => 2,
+    )));
+?>
+</div>
+
+<?php if ($person_files!='') Yii::app()->clientScript->registerScript('File-form',"UploaderAddFiles('File-form',$person_files);",CClientScript::POS_READY); ?>
+<script>$(function(){statusProcessVisibleItems();});</script>
+<script>setInterval('checkUploadSize()',250);</script>

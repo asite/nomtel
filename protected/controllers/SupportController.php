@@ -87,7 +87,26 @@ class SupportController extends BaseGxController
                 ));
                 $person=$agreement->person;
                 $data['person']=$person;
+                $person_files=array();
+                foreach($person->files as $file)
+                    $person_files[]=$file->getUploaderInfo();
+
+                $data['person_files']=json_encode($person_files);
             }
+
+            if (isset($_POST['person_files'])) {
+                $person_files=array();
+                foreach(explode(',',$_POST['person_files']) as $file_id)
+                    if ($file_id) $person_files[]=$file_id;
+
+                $person_files_json=array();
+                foreach($person_files as $file_id) {
+                    $file=File::model()->findByPk($file_id);
+                    $person_files_json[]=$file->getUploaderInfo();
+                }
+                $data['person_files']=json_encode($person_files_json);
+            }
+
             if ($numberObj) {
                 $status->getting_passport_variant=$numberObj->support_getting_passport_variant;
                 $status->number_region_usage=$numberObj->support_number_region_usage;
@@ -136,6 +155,7 @@ class SupportController extends BaseGxController
 
                                 $trx=Yii::app()->db->beginTransaction();
 
+
                                 if (!$agreement) {
                                     $number->status=Number::STATUS_ACTIVE;
                                     $number->support_getting_passport_variant=$status->getting_passport_variant;
@@ -145,6 +165,13 @@ class SupportController extends BaseGxController
                                     $number->save();
 
                                     $person->save();
+
+                                    foreach($person_files as $file_id) {
+                                        $personFile=new PersonFile();
+                                        $personFile->person_id=$person->id;
+                                        $personFile->file_id=$file_id;
+                                        $personFile->save();
+                                    }
 
                                     $agreement=new SubscriptionAgreement();
                                     $agreement->save();
@@ -159,6 +186,15 @@ class SupportController extends BaseGxController
                                     $number->support_getting_passport_variant=$status->getting_passport_variant;
                                     $number->support_number_region_usage=$status->number_region_usage;
                                     $number->save();
+
+                                    // save person files
+                                    PersonFile::model()->deleteAll('person_id=:person_id',array(':person_id'=>$person->id));
+                                    foreach($person_files as $file_id) {
+                                        $personFile=new PersonFile();
+                                        $personFile->person_id=$person->id;
+                                        $personFile->file_id=$file_id;
+                                        $personFile->save();
+                                    }
 
                                     $person->save();
                                     NumberHistory::addHistoryNumber($number->id,'Отредактирован договор {SubscriptionAgreement:'.$agreement->id.'}');
