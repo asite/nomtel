@@ -94,7 +94,7 @@ class SupportController extends BaseGxController
     public function actionNumberStatus() {
         $number=new NumberSupportNumber();
         $status=new NumberSupportStatus($_POST['NumberSupportStatus']['status']);
-        $status->status=Number::SUPPORT_STATUS_ACTIVE;
+        $status->status=Number::SUPPORT_STATUS_PREACTIVE;
         $person=new Person();
 
         $data=array('number'=>$number,'status'=>$status,'person'=>$person,'showStatusForm'=>false);
@@ -159,10 +159,10 @@ class SupportController extends BaseGxController
 
                     if ($status->validate()) {
                         $number=Number::model()->findByAttributes(array('number'=>$number->number));
-                        $number->support_operator_id=loggedSupportOperatorId();
 
-                        // do not change support status if number already has subscription agreement
-                        if (!$numberObj) {
+                        // change info only if no scan received
+                        if ($number->support_status!=Number::SUPPORT_STATUS_ACTIVE) {
+                            $number->support_operator_id=loggedSupportOperatorId();
                             $number->support_status=$status->status;
                             $number->support_dt=new EDateTime();
                         }
@@ -180,11 +180,12 @@ class SupportController extends BaseGxController
                                 Yii::app()->user->setFlash('success','Данные сохранены');
                                 $this->redirect(array('numberStatus'));
                                 break;
-                            case Number::SUPPORT_STATUS_ACTIVE:
+                            case Number::SUPPORT_STATUS_PREACTIVE:
                                 if (!$person->validate()) break;
 
                                 $trx=Yii::app()->db->beginTransaction();
 
+                                if (count($person_files)>0) $number->support_status=Number::SUPPORT_STATUS_ACTIVE;
 
                                 if (!$agreement) {
                                     $number->status=Number::STATUS_ACTIVE;
@@ -218,12 +219,15 @@ class SupportController extends BaseGxController
                                     $number->save();
 
                                     // save person files
-                                    PersonFile::model()->deleteAll('person_id=:person_id',array(':person_id'=>$person->id));
+                                    //PersonFile::model()->deleteAll('person_id=:person_id',array(':person_id'=>$person->id));
                                     foreach($person_files as $file_id) {
-                                        $personFile=new PersonFile();
-                                        $personFile->person_id=$person->id;
-                                        $personFile->file_id=$file_id;
-                                        $personFile->save();
+                                        $personFile=PersonFile::model()->findByAttributes(array('person_id'=>$person->id,'file_id'=>$file_id));
+                                        if (!$personFile) {
+                                            $personFile=new PersonFile();
+                                            $personFile->person_id=$person->id;
+                                            $personFile->file_id=$file_id;
+                                            $personFile->save();
+                                        }
                                     }
 
                                     $person->save();

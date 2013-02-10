@@ -63,7 +63,7 @@ function statusProcessVisibleItems() {
         case 'CALLBACK':
             $("#callback, .form-actions").show();
             break;
-        case 'ACTIVE':
+        case 'PREACTIVE':
             $("#active, #scans, .form-actions").show();
             checkUploadSize();
             break;
@@ -103,6 +103,7 @@ function UploaderAddFiles(id,files) {
 <?php
     if ($numberObj->status==Number::STATUS_FREE) {
         foreach(Number::getSupportStatusLabels() as $status_key=>$status_label) {
+            if ($status_key=='ACTIVE') continue;
             $this->widget('bootstrap.widgets.TbButton',array(
                 'label'=>$status_label,
                 'htmlOptions'=>array('onclick'=>'setStatus("'.$status_key.'")')
