@@ -6,7 +6,7 @@ class SupportController extends BaseGxController
     public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array('number'), 'roles' => array('agent','support')),
-            array('allow', 'actions' => array('numberStatus'), 'roles' => array('support')),
+            array('allow', 'actions' => array('numberStatus','sendSmsWithAddress','sendSmsWithEmail'), 'roles' => array('support')),
             array('allow', 'actions' => array('callback'), 'roles' => array('support')),
             array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
         );
@@ -44,8 +44,7 @@ class SupportController extends BaseGxController
                 $mail->setBody($body);
 
                 $message = "Ваше обращение $report_number принято. Срок рассмотрения 24 часа. Спасибо";
-                $message = urlencode($message);
-                file_get_contents("http://api.infosmska.ru/interfaces/SendMessages.ashx?login=ghz&pwd=zerozz&phones=7$report->abonent_number&message=$message&sender=nomtel");
+                Sms::send($report->abonent_number,$message);
 
                 if (Yii::app()->mail->send($mail))
                     Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$report_number)));
@@ -59,6 +58,37 @@ class SupportController extends BaseGxController
         $this->render('number', array(
             'report' => $report
         ));
+    }
+
+    public function actionSendSmsWithAddress($number) {
+        $numberObj=Number::model()->findByAttributes(array('number'=>$number));
+        if (!$numberObj) throw new CHttpException(403);
+
+        $message="Вы можете пройти регистрацию в офисах компании:\nг. Тюмень, ул. Баумана 27\nг. Тюмень, ул. 50 лет октября, 36/1 оф 506.";
+        Sms::send($numberObj->number,$message);
+
+        $numberObj->support_sent_sms_address=1;
+        $numberObj->save();
+
+        Yii::app()->user->setFlash('success','Смс сообщение с адресами отправлено');
+
+        $this->redirect(array('support/numberStatus'));
+    }
+
+    public function actionSendSmsWithEmail($number) {
+        $numberObj=Number::model()->findByAttributes(array('number'=>$number));
+        if (!$numberObj) throw new CHttpException(403);
+
+        $supportOperator=SupportOperator::model()->findByPk(loggedSupportOperatorId());
+        $message="Пришлите пожалуйста копию вашего паспорта с данными и прописку на почту ".$supportOperator->email;
+        Sms::send($numberObj->number,$message);
+
+        $numberObj->support_sent_sms_email=1;
+        $numberObj->save();
+
+        Yii::app()->user->setFlash('success',"Смс сообщение с email адресом '{$supportOperator->email}' отправлено");
+
+        $this->redirect(array('support/numberStatus'));
     }
 
     public function actionNumberStatus() {
