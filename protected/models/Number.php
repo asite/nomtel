@@ -107,6 +107,18 @@ class Number extends BaseNumber
         return $labels[$status];
     }
 
+    public function getBalanceStatusOrder() {
+        return "(CASE balance_status
+           WHEN '".self::BALANCE_STATUS_POSITIVE_DYNAMIC."' THEN 0
+           WHEN '".self::BALANCE_STATUS_POSITIVE_STATIC."' THEN 1
+           WHEN '".self::BALANCE_STATUS_NEGATIVE_DYNAMIC."' THEN 2
+           WHEN '".self::BALANCE_STATUS_NEGATIVE_STATIC."' THEN 3
+           WHEN '".self::BALANCE_STATUS_MISSING."' THEN 4
+           WHEN '".self::BALANCE_STATUS_NORMAL."' THEN 5
+           WHEN '".self::BALANCE_STATUS_NEW."' THEN 6
+        END)";
+    }
+
     public function addNumber($sim) {
         if ($sim->number) {
             $number = self::model()->findByAttributes(array('number'=>$sim->number));

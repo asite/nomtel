@@ -8,6 +8,7 @@ class SupportController extends BaseGxController
             array('allow', 'actions' => array('number'), 'roles' => array('agent','support')),
             array('allow', 'actions' => array('numberStatus'), 'roles' => array('support')),
             array('allow', 'actions' => array('callback'), 'roles' => array('support')),
+            array('allow', 'actions' => array('numberForCalls'), 'roles' => array('support')),
             array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
         );
     }
@@ -226,10 +227,39 @@ class SupportController extends BaseGxController
         }
 
         $dataProvider = $model->search();
-        $dataProvider->criteria->addColumnCondition(array('support_status' => 'CALLBACK'));
+        $dataProvider->criteria->addColumnCondition(array('support_status' => SUPPORT_STATUS_CALLBACK));
         $dataProvider->criteria->order = "support_callback_dt ASC";
 
         $this->render('callback',array(
+            'model'=>$model,
+            'dataProvider'=>$dataProvider
+        ));
+    }
+    public function actionNumberForCalls() {
+        if (isset($_POST['getnumbers'])) {
+            $criteria = new CDbCriteria();
+            $criteria->addCondition('support_operator_id is NULL');
+            $criteria->addColumnCondition(array('status' => Number::STATUS_FREE));
+            $criteria->order = Number::getBalanceStatusOrder();
+            $criteria->limit = '20';
+            if (Number::model()->count($criteria)>0) {
+                Number::model()->updateAll(array('support_operator_id' => loggedSupportOperatorId()), $criteria);
+                Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно получены.');
+            } else Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Нет данных для обработки.');
+            $this->refresh();
+        }
+        $model = new Number('search');
+        $model->unsetAttributes();
+        if(isset($_GET['Number'])){
+            $model->setAttributes($_GET['Number']);
+        }
+
+        $dataProvider = $model->search();
+        $dataProvider->criteria->addCondition('support_operator_id='.loggedSupportOperatorId());
+        $dataProvider->criteria->addCondition('status="'.Number::STATUS_FREE.'"');
+        $dataProvider->criteria->order = Number::getBalanceStatusOrder();
+
+        $this->render('numberForCalls',array(
             'model'=>$model,
             'dataProvider'=>$dataProvider
         ));
@@ -238,7 +268,7 @@ class SupportController extends BaseGxController
         $model = Yii::app()->db->createCommand()
                                 ->select('count(support_status) as count, support_status')
                                 ->from('number')
-                                ->where('support_operator_id=:val', array(':val'=>loggedSupportOperatorId()))
+                                ->where('support_operator_id=:val and support_status is not null', array(':val'=>loggedSupportOperatorId()))
                                 ->group('support_status')
                                 ->queryAll();
 
