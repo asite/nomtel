@@ -6,7 +6,7 @@ class SupportController extends BaseGxController
     public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array('number'), 'roles' => array('agent','support')),
-            array('allow', 'actions' => array('numberStatus'), 'roles' => array('support')),
+            array('allow', 'actions' => array('numberStatus','sendSmsWithAddress','sendSmsWithEmail'), 'roles' => array('support')),
             array('allow', 'actions' => array('callback'), 'roles' => array('support')),
             array('allow', 'actions' => array('numberForCalls'), 'roles' => array('support')),
             array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
@@ -45,8 +45,7 @@ class SupportController extends BaseGxController
                 $mail->setBody($body);
 
                 $message = "Ваше обращение $report_number принято. Срок рассмотрения 24 часа. Спасибо";
-                $message = urlencode($message);
-                file_get_contents("http://api.infosmska.ru/interfaces/SendMessages.ashx?login=ghz&pwd=zerozz&phones=7$report->abonent_number&message=$message&sender=nomtel");
+                Sms::send($report->abonent_number,$message);
 
                 if (Yii::app()->mail->send($mail))
                     Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$report_number)));
@@ -62,10 +61,41 @@ class SupportController extends BaseGxController
         ));
     }
 
+    public function actionSendSmsWithAddress($number) {
+        $numberObj=Number::model()->findByAttributes(array('number'=>$number));
+        if (!$numberObj) throw new CHttpException(403);
+
+        $message="Вы можете пройти регистрацию в офисах компании:\nг. Тюмень, ул. Баумана 27\nг. Тюмень, ул. 50 лет октября, 36/1 оф 506.";
+        Sms::send($numberObj->number,$message);
+
+        $numberObj->support_sent_sms_address=1;
+        $numberObj->save();
+
+        Yii::app()->user->setFlash('success','Смс сообщение с адресами отправлено');
+
+        $this->redirect(array('support/numberStatus'));
+    }
+
+    public function actionSendSmsWithEmail($number) {
+        $numberObj=Number::model()->findByAttributes(array('number'=>$number));
+        if (!$numberObj) throw new CHttpException(403);
+
+        $supportOperator=SupportOperator::model()->findByPk(loggedSupportOperatorId());
+        $message="Пришлите пожалуйста копию вашего паспорта с данными и прописку на почту ".$supportOperator->email;
+        Sms::send($numberObj->number,$message);
+
+        $numberObj->support_sent_sms_email=1;
+        $numberObj->save();
+
+        Yii::app()->user->setFlash('success',"Смс сообщение с email адресом '{$supportOperator->email}' отправлено");
+
+        $this->redirect(array('support/numberStatus'));
+    }
+
     public function actionNumberStatus() {
         $number=new NumberSupportNumber();
         $status=new NumberSupportStatus($_POST['NumberSupportStatus']['status']);
-        $status->status=Number::SUPPORT_STATUS_ACTIVE;
+        $status->status=Number::SUPPORT_STATUS_PREACTIVE;
         $person=new Person();
 
         $data=array('number'=>$number,'status'=>$status,'person'=>$person,'showStatusForm'=>false);
@@ -130,10 +160,10 @@ class SupportController extends BaseGxController
 
                     if ($status->validate()) {
                         $number=Number::model()->findByAttributes(array('number'=>$number->number));
-                        $number->support_operator_id=loggedSupportOperatorId();
 
-                        // do not change support status if number already has subscription agreement
-                        if (!$numberObj) {
+                        // change info only if no scan received
+                        if ($number->support_status!=Number::SUPPORT_STATUS_ACTIVE) {
+                            $number->support_operator_id=loggedSupportOperatorId();
                             $number->support_status=$status->status;
                             $number->support_dt=new EDateTime();
                         }
@@ -151,11 +181,12 @@ class SupportController extends BaseGxController
                                 Yii::app()->user->setFlash('success','Данные сохранены');
                                 $this->redirect(array('numberStatus'));
                                 break;
-                            case Number::SUPPORT_STATUS_ACTIVE:
+                            case Number::SUPPORT_STATUS_PREACTIVE:
                                 if (!$person->validate()) break;
 
                                 $trx=Yii::app()->db->beginTransaction();
 
+                                if (count($person_files)>0) $number->support_status=Number::SUPPORT_STATUS_ACTIVE;
 
                                 if (!$agreement) {
                                     $number->status=Number::STATUS_ACTIVE;
@@ -189,12 +220,15 @@ class SupportController extends BaseGxController
                                     $number->save();
 
                                     // save person files
-                                    PersonFile::model()->deleteAll('person_id=:person_id',array(':person_id'=>$person->id));
+                                    //PersonFile::model()->deleteAll('person_id=:person_id',array(':person_id'=>$person->id));
                                     foreach($person_files as $file_id) {
-                                        $personFile=new PersonFile();
-                                        $personFile->person_id=$person->id;
-                                        $personFile->file_id=$file_id;
-                                        $personFile->save();
+                                        $personFile=PersonFile::model()->findByAttributes(array('person_id'=>$person->id,'file_id'=>$file_id));
+                                        if (!$personFile) {
+                                            $personFile=new PersonFile();
+                                            $personFile->person_id=$person->id;
+                                            $personFile->file_id=$file_id;
+                                            $personFile->save();
+                                        }
                                     }
 
                                     $person->save();

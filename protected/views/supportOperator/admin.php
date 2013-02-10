@@ -38,6 +38,7 @@ $('.search-form form').submit(function(){
 		'surname',
 		'middle_name',
 		'phone',
+        'email',
 		array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),

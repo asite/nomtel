@@ -15,7 +15,9 @@
  * @property string $surname
  * @property string $middle_name
  * @property string $phone
+ * @property string $email
  *
+ * @property Number[] $numbers
  * @property User $user
  */
 abstract class BaseSupportOperator extends BaseGxActiveRecord {
@@ -38,15 +40,16 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('user_id, name, surname, middle_name, phone', 'required'),
+			array('user_id, name, surname, middle_name, phone, email', 'required'),
 			array('user_id', 'numerical', 'integerOnly'=>true),
-			array('name, surname, middle_name, phone', 'length', 'max'=>200),
-			array('id, user_id, name, surname, middle_name, phone', 'safe', 'on'=>'search'),
+			array('name, surname, middle_name, phone, email', 'length', 'max'=>200),
+			array('id, user_id, name, surname, middle_name, phone, email', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'numbers' => array(self::HAS_MANY, 'Number', 'support_operator_id'),
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 		);
 	}
@@ -64,6 +67,8 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 			'surname' => Yii::t('app', 'Surname'),
 			'middle_name' => Yii::t('app', 'Middle Name'),
 			'phone' => Yii::t('app', 'Phone'),
+			'email' => Yii::t('app', 'Email'),
+			'numbers' => null,
 			'user' => null,
 		);
 	}
@@ -77,6 +82,7 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 		$criteria->compare('surname', $this->surname, true);
 		$criteria->compare('middle_name', $this->middle_name, true);
 		$criteria->compare('phone', $this->phone, true);
+		$criteria->compare('email', $this->email, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

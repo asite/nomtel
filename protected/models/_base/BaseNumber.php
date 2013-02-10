@@ -25,6 +25,8 @@
  * @property string $support_callback_name
  * @property string $support_getting_passport_variant
  * @property string $support_number_region_usage
+ * @property integer $support_sent_sms_address
+ * @property integer $support_sent_sms_email
  *
  * @property BalanceReportNumber[] $balanceReportNumbers
  * @property BonusReportNumber[] $bonusReportNumbers
@@ -54,7 +56,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('number', 'required'),
-			array('support_operator_id', 'numerical', 'integerOnly'=>true),
+			array('support_operator_id, support_sent_sms_address, support_sent_sms_email', 'numerical', 'integerOnly'=>true),
 			array('sim_id, codeword, service_password', 'length', 'max'=>20),
 			array('number, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>7),
@@ -62,11 +64,11 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			array('support_status', 'length', 'max'=>12),
 			array('support_callback_name, support_getting_passport_variant, support_number_region_usage', 'length', 'max'=>200),
 			array('balance_status_changed_dt, support_dt, support_callback_dt', 'safe'),
-			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_address, support_sent_sms_email', 'default', 'setOnEmpty' => true, 'value' => null),
             array('balance_status_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_callback_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage', 'safe', 'on'=>'search'),
+			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_address, support_sent_sms_email', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -104,6 +106,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'support_callback_name' => Yii::t('app', 'Support Callback Name'),
 			'support_getting_passport_variant' => Yii::t('app', 'Support Getting Passport Variant'),
 			'support_number_region_usage' => Yii::t('app', 'Support Number Region Usage'),
+			'support_sent_sms_address' => Yii::t('app', 'Support Sent Sms Address'),
+			'support_sent_sms_email' => Yii::t('app', 'Support Sent Sms Email'),
 			'balanceReportNumbers' => null,
 			'bonusReportNumbers' => null,
 			'sim' => null,
@@ -132,6 +136,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('support_callback_name', $this->support_callback_name, true);
 		$criteria->compare('support_getting_passport_variant', $this->support_getting_passport_variant, true);
 		$criteria->compare('support_number_region_usage', $this->support_number_region_usage, true);
+		$criteria->compare('support_sent_sms_address', $this->support_sent_sms_address);
+		$criteria->compare('support_sent_sms_email', $this->support_sent_sms_email);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
