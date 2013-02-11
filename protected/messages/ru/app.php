@@ -288,4 +288,6 @@ return array (
   'Process'=>'Обработать',
   'Action'=>'Действие',
   'Number of completed'=>'Количество выполненных',
+  'Operator Numbers' => 'Номера оператора',
+  'Get Numbers' => 'Получить номера',
 );

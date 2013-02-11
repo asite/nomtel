@@ -63,7 +63,7 @@ function statusProcessVisibleItems() {
         case 'CALLBACK':
             $("#callback, .form-actions").show();
             break;
-        case 'ACTIVE':
+        case 'PREACTIVE':
             $("#active, #scans, .form-actions").show();
             checkUploadSize();
             break;
@@ -103,7 +103,8 @@ function UploaderAddFiles(id,files) {
 <?php
     if ($numberObj->status==Number::STATUS_FREE) {
         foreach(Number::getSupportStatusLabels() as $status_key=>$status_label) {
-            $d=$this->widget('bootstrap.widgets.TbButton',array(
+            if ($status_key=='ACTIVE') continue;
+            $this->widget('bootstrap.widgets.TbButton',array(
                 'label'=>$status_label,
                 'htmlOptions'=>array('onclick'=>'setStatus("'.$status_key.'")')
             ));
@@ -135,8 +136,19 @@ function UploaderAddFiles(id,files) {
     </div>
 
     <div id="active" style="display:none;">
+<?php
+        $this->widget('bootstrap.widgets.TbButton',array(
+            'label'=>'Регистрация в офис',
+            'url'=>$this->createUrl('support/sendSmsWithAddress',array('number'=>$number->number)),
+        ));
+        echo "&nbsp;";
+        $this->widget('bootstrap.widgets.TbButton',array(
+            'label'=>'Вышлют по email',
+            'url'=>$this->createUrl('support/sendSmsWithEmail',array('number'=>$number->number)),
+        ));
+?><br/><br/>
 
-            <div class="form-container-horizontal">
+        <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-220">
                     <?php echo $form->textFieldRow($status,'getting_passport_variant',array('class'=>'span4')); ?>
                     <?php echo $form->textFieldRow($status,'number_region_usage',array('class'=>'span4')); ?>

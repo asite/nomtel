@@ -35,6 +35,7 @@
         <?php echo $form->textFieldRow($model,'surname',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php echo $form->textFieldRow($model,'middle_name',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php echo $form->textFieldRow($model,'phone',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+            <?php echo $form->textFieldRow($model,'email',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php
         echo '<div class="form-actions">';
         echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Save'), array('class'=>'btn btn-primary', 'type'=>'submit'));
