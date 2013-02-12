@@ -82,7 +82,7 @@
     if (Yii::app()->user->role == 'abonent') {
         $menuLeft = array(
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('pOSite/logout')),
         );
     }
 

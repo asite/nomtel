@@ -29,7 +29,7 @@
     <div class="modal-footer">
         <?php $this->widget('bootstrap.widgets.TbButton',array(
             'label'=>'Назад',
-            'url'=>$this->createUrl('site/loginPO'),
+            'url'=>$this->createUrl('pOSite/login'),
             'icon'=>'chevron-left',
             'htmlOptions'=>array('style'=>'float:left;')));
         ?>

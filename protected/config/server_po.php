@@ -4,7 +4,7 @@ return array(
     'components'=>array(
         'urlManager'=>array(
             'rules'=>array(
-                '/'=>'site/loginPO'
+                '/'=>'pOSite/login'
             )
         ),
         'user'=>array(
