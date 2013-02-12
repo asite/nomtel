@@ -18,6 +18,8 @@
  *
  * @property Agent[] $agents
  * @property Agent[] $agents1
+ * @property Number[] $numbers
+ * @property SupportOperator[] $supportOperators
  */
 abstract class BaseUser extends BaseGxActiveRecord {
 
@@ -54,6 +56,8 @@ abstract class BaseUser extends BaseGxActiveRecord {
 		return array(
 			'agents' => array(self::HAS_MANY, 'Agent', 'user_id'),
 			'agents1' => array(self::HAS_MANY, 'Agent', 'parent_id'),
+			'numbers' => array(self::HAS_MANY, 'Number', 'user_id'),
+			'supportOperators' => array(self::HAS_MANY, 'SupportOperator', 'user_id'),
 		);
 	}
 
@@ -72,6 +76,8 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			'blocked_until' => Yii::t('app', 'Blocked Until'),
 			'agents' => null,
 			'agents1' => null,
+			'numbers' => null,
+			'supportOperators' => null,
 		);
 	}
 

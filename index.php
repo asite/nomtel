@@ -16,19 +16,36 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', true);
         $config = 'server_web_development.php';
         break;
+
+    case 'po.nomtel.lan':
+        define('LANGUAGE', 'ru');
+        define('TIMEZONE', 'Europe/Minsk');
+        define('YII_DEBUG', true);
+        $config = 'server_web_po_development.php';
+        break;
+
     case 'nomtel.asiteplace.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', false);        
         $config = 'server_web_asite_production.php';
         break;
- 
+
+    case 'www.500099.ru':
+    case '500099.ru':
+        define('LANGUAGE', 'ru');
+        define('TIMEZONE', 'Europe/Minsk');
+        define('YII_DEBUG', false);
+        $config = 'server_web_po_asite_production.php';
+        break;
+
     case 'test.asiteplace.ru':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Europe/Minsk');
         define('YII_DEBUG', true);
         $config = 'server_web_asite_production.php';
         break;
+
     default:
         die('unknown domain name');
         break;

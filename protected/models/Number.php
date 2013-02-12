@@ -29,6 +29,29 @@ class Number extends BaseNumber
         return parent::model($className);
     }
 
+    public static function getNumberFromFormatted($formattedNumber) {
+        $formattedNumber=preg_replace('%[^0-9]%','',$formattedNumber);
+        $formattedNumber=preg_replace('%^8%','',$formattedNumber);
+        return $formattedNumber;
+    }
+
+    public function restorePassword() {
+        $user=$this->user;
+        if (!$user) {
+            $user=new User();
+            $user->username=$this->number;
+            $user->status=ModelLoggableBehavior::STATUS_ACTIVE;
+            $user->save();
+            $this->user_id=$user->id;
+            $this->save();
+        }
+        $password=rand(100000,999999);
+        $user->password=$password;
+        $user->encryptPwd();
+        $user->save();
+        Sms::send($this->number,"Ваш новый пароль для личного кабинета $password, личный кабинет находится по адресу www.500099.ru");
+    }
+
     public static function getStatusDropDownList($items=array()) {
         $labels=self::getStatusLabels();
         return array_merge($items,$labels);

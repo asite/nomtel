@@ -79,6 +79,13 @@
         );
     }
 
+    if (Yii::app()->user->role == 'abonent') {
+        $menuLeft = array(
+            '',
+            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+        );
+    }
+
     $this->widget('bootstrap.widgets.TbMenu', array(
         'type' => 'list',
         'items' => $menuLeft,

@@ -101,8 +101,7 @@ class SupportController extends BaseGxController
         $data=array('number'=>$number,'status'=>$status,'person'=>$person,'showStatusForm'=>false);
 
         if (isset($_POST['NumberSupportNumber']) || isset($_GET['number'])) {
-            $_POST['NumberSupportNumber']['number']=preg_replace('%[^0-9]%','',$_POST['NumberSupportNumber']['number']);
-            $_POST['NumberSupportNumber']['number']=preg_replace('%^8%','',$_POST['NumberSupportNumber']['number']);
+            $_POST['NumberSupportNumber']['number']=Number::getNumberFromFormatted($_POST['NumberSupportNumber']['number']);
 
             $number->setAttributes($_POST['NumberSupportNumber']);
             if ($_POST['NumberSupportNumber']['number']=='' && isset($_GET['number'])) $number->setAttributes(array('number'=>$_GET['number']));

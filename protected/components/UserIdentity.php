@@ -10,17 +10,31 @@ class UserIdentity extends CUserIdentity
         $result = User::model()->login($this->username, $this->password);
         if ($result instanceof User) {
             $this->_id = $result->id;
-            $agent = Agent::model()->findByAttributes(array('user_id' => $this->_id));
-            if ($agent) {
-                $this->setState('agentId', $agent->id);
-            }
-            $supportOperator = SupportOperator::model()->findByAttributes(array('user_id' => $this->_id));
-            if ($supportOperator) {
-                $this->setState('supportOperatorId', $supportOperator->id);
-                $this->setState('agentId', adminAgentId());
+            if (isPO()) {
+                $number = Number::model()->findByAttributes(array('user_id' => $this->_id));
+                if ($number) {
+                    $this->setState('numberId', $number->id);
+                    $this->setState('role','abonent');
+                    return true;
+                }
+            } else {
+                $agent = Agent::model()->findByAttributes(array('user_id' => $this->_id));
+                if ($agent) {
+                    $this->setState('agentId', $agent->id);
+                    $this->setState('role',$agent->id==adminAgentId() ? 'admin':'support');
+                    return true;
+                }
+                $supportOperator = SupportOperator::model()->findByAttributes(array('user_id' => $this->_id));
+                if ($supportOperator) {
+                    $this->setState('supportOperatorId', $supportOperator->id);
+                    $this->setState('agentId', adminAgentId());
+                    $this->setState('role','support');
+                    return true;
+                }
             }
 
-            return true;
+            Yii::t('app', 'Invalid username/password');
+            return false;
         } else {
             $this->errorMessage = $result;
             return false;
