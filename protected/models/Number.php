@@ -35,6 +35,10 @@ class Number extends BaseNumber
         return $formattedNumber;
     }
 
+    public function getFormattedNumber() {
+        return preg_replace('%^(\d\d\d)(\d\d\d)(\d\d)(\d\d)$%','8 ($1) $2-$3-$4',$this->number);
+    }
+
     public function restorePassword() {
         $user=$this->user;
         if (!$user) {

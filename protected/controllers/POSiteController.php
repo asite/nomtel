@@ -73,6 +73,10 @@ class POSiteController extends Controller
 
     public function actionIndex()
     {
-        $this->render('index');
+        $number=Number::model()->findByPk(loggedNumberId());
+
+        $this->render('index',array(
+            'number'=>$number
+        ));
     }
 }

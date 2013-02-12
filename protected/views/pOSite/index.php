@@ -1,3 +1,1 @@
-<?php
-
-?>
+<h2>Личный кабинет номера <?=$number->formattedNumber?></h2>

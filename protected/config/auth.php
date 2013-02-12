@@ -23,7 +23,7 @@ return array(
         )
     ),
 
-    'abonent' => array(
+    'number' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
         )

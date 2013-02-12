@@ -10,8 +10,12 @@ function isSupport()
     return Yii::app()->user->role=='support';
 }
 
-function isAbonent() {
-    return Yii::app()->user->role=='abonent';
+function isNumber() {
+    return Yii::app()->user->role=='number';
+}
+
+function loggedNumberId() {
+    return Yii::app()->user->getState('numberId');
 }
 
 function isPO() {

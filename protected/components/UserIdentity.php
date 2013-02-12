@@ -14,7 +14,7 @@ class UserIdentity extends CUserIdentity
                 $number = Number::model()->findByAttributes(array('user_id' => $this->_id));
                 if ($number) {
                     $this->setState('numberId', $number->id);
-                    $this->setState('role','abonent');
+                    $this->setState('role','number');
                     return true;
                 }
             } else {
