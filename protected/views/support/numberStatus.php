@@ -121,6 +121,11 @@ function UploaderAddFiles(id,files) {
                 'htmlOptions'=>array('onclick'=>'setStatus("SERVICE_INFO")')
             ));
    }
+    $this->widget('bootstrap.widgets.TbButton',array(
+        'label'=>'доступ к ЛК',
+        'url'=>$this->createUrl('support/sendSmsWithPOData',array('number'=>$number->number)),
+    ));
+
 ?>
 
 

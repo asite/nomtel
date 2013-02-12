@@ -6,7 +6,7 @@ class SupportController extends BaseGxController
     public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array('number'), 'roles' => array('agent','support')),
-            array('allow', 'actions' => array('numberStatus','sendSmsWithAddress','sendSmsWithEmail'), 'roles' => array('support')),
+            array('allow', 'actions' => array('numberStatus','sendSmsWithAddress','sendSmsWithEmail','sendSMSWithPOData'), 'roles' => array('support')),
             array('allow', 'actions' => array('callback'), 'roles' => array('support')),
             array('allow', 'actions' => array('numberForCalls'), 'roles' => array('support')),
             array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
@@ -72,6 +72,17 @@ class SupportController extends BaseGxController
         $numberObj->save();
 
         Yii::app()->user->setFlash('success','Смс сообщение с адресами отправлено');
+
+        $this->redirect(array('support/numberStatus'));
+    }
+
+    public function actionSendSmsWithPOData($number) {
+        $numberObj=Number::model()->findByAttributes(array('number'=>$number));
+        if (!$numberObj) throw new CHttpException(403);
+
+        $numberObj->restorePassword();
+
+        Yii::app()->user->setFlash('success','SMS сообщение с новыми данными для доступа к личному кабинету отослано абоненту');
 
         $this->redirect(array('support/numberStatus'));
     }
