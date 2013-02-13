@@ -20,12 +20,23 @@ class File extends BaseFile
         return Yii::getPathOfAlias('webroot.var.files').$this->calculateSubfolder($this->id);
     }
 
+    public static function getProtectedId($id) {
+        return $id.substr(sha1($id.'j3yvbzfXEZWYtprb'),0,16);
+    }
+
+    public static function getIdFromProtected($protectedId) {
+        $id=substr($protectedId,0,strlen($protectedId)-16);
+        if (self::getProtectedId($id)!=$protectedId) return null;
+
+        return $id;
+    }
+
     public function getUploaderInfo() {
         $name=basename($this->url);
         $type=preg_replace('%^.*\.%','',$name);
         $path=str_replace('/var/files',Yii::getPathOfAlias('webroot.var.files'),$this->url);
         return array(
-            'id' => $this->id,
+            'id' => self::getProtectedId($this->id),
             'name' => $name,
             'type' => $type,
             'size' => filesize($path),

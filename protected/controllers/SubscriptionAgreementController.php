@@ -135,11 +135,11 @@ class SubscriptionAgreementController extends BaseGxController {
 
             $person_files=array();
             foreach(explode(',',$_POST['person_files']) as $file_id)
-                if ($file_id) $person_files[]=$file_id;
+                if ($file_id && File::getIdFromProtected($file_id)) $person_files[]=File::getIdFromProtected($file_id);
 
             $agreement_files=array();
             foreach(explode(',',$_POST['agreement_files']) as $file_id)
-                if ($file_id) $agreement_files[]=$file_id;
+                if ($file_id && File::getIdFromProtected($file_id)) $agreement_files[]=File::getIdFromProtected($file_id);
 
             if (empty($errors)) {
                 $trx=Yii::app()->db->beginTransaction();
@@ -216,11 +216,11 @@ class SubscriptionAgreementController extends BaseGxController {
 
             $person_files=array();
             foreach(explode(',',$_POST['person_files']) as $file_id)
-                if ($file_id) $person_files[]=$file_id;
+                if ($file_id && File::getIdFromProtected($file_id)) $person_files[]=File::getIdFromProtected($file_id);
 
             $agreement_files=array();
             foreach(explode(',',$_POST['agreement_files']) as $file_id)
-                if ($file_id) $agreement_files[]=$file_id;
+                if ($file_id && File::getIdFromProtected($file_id)) $agreement_files[]=File::getIdFromProtected($file_id);
 
             if (empty($errors)) {
                 $trx=Yii::app()->db->beginTransaction();

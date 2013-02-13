@@ -290,4 +290,5 @@ return array (
   'Number of completed'=>'Количество выполненных',
   'Operator Numbers' => 'Номера оператора',
   'Get Numbers' => 'Получить номера',
+  'Make Exel'=>'Сформировать отчет',
 );

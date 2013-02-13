@@ -582,23 +582,12 @@ class SimController extends BaseGxController {
         Yii::app()->end();
     }
 
-    public function actionList()
-    {
-        if (isset($_REQUEST['passSIM'])) {
-            $sessionData=new SessionData(__CLASS__);
-            $data=array();
-            foreach(explode(',', $_POST['ids']) as $v)
-                if ($v!='') $data[$v]=$v;
-            $key=$sessionData->add($data);
-
-            $this->redirect(array('sim/move', 'key' => $key));
-        }
-
+    private static function getSimListDataProvider($pager=true) {
         $model = new SimSearch();
         $model->unsetAttributes();
 
-        if (isset($_GET['SimSearch']))
-            $model->setAttributes($_GET['SimSearch']);
+        if (isset($_REQUEST['SimSearch']))
+            $model->setAttributes($_REQUEST['SimSearch']);
 
         $criteria = new CDbCriteria();
         $criteria->compare('s.parent_agent_id',loggedAgentId());
@@ -636,14 +625,43 @@ class SimController extends BaseGxController {
                     'agent_id','number','icc','operator_id','tariff_id','status','balance_status'
                 ),
             ),
-            'pagination' => array(
-                'pageSize' => Sim::ITEMS_PER_PAGE,
-            ),
+            'pagination' => $pager?array('pageSize' => Sim::ITEMS_PER_PAGE):false
         ));
+        $list['model'] = $model;
+        $list['dataProvider'] = $dataProvider;
+        return $list;
+    }
+
+    public function actionList()
+    {
+        if (isset($_REQUEST['passSIM'])) {
+            $sessionData=new SessionData(__CLASS__);
+            $data=array();
+            foreach(explode(',', $_POST['ids']) as $v)
+                if ($v!='') $data[$v]=$v;
+            $key=$sessionData->add($data);
+
+            $this->redirect(array('sim/move', 'key' => $key));
+        }
+
+        $list = self::getSimListDataProvider();
+        if (isset($_REQUEST['exportExel'])) {
+            $columns = array(
+                'agent' => array('name'=>Yii::t('app','Agent'),'value'=>'$data["name"]." ".$data["surname"]'),
+                'number' => array('name'=>Yii::t('app','Number'),'value'=>'$data["number"]'),
+                'ICC' => array('name'=>Yii::t('app','ICC'),'value'=>'$data["icc"]'),
+                'operator' => array('name'=>Yii::t('app','Operator'),'value'=>'$data["operator"]'),
+                'tariff' => array('name'=>Yii::t('app','Tariff'),'value'=>'$data["tariff"]'),
+                'status' => array('name'=>Yii::t('app','Status'),'value'=>'Number::getStatusLabel($data["status"])'),
+                'balance_status' => array('name'=>Yii::t('app','Balance Status'),'value'=>'Number::getBalanceStatusLabel($data["balance_status"])')
+            );
+            $this->exportExel($list['dataProvider'], $columns);
+        }
 
         $this->render('list', array(
-            'model' => $model,
-            'dataProvider' => $dataProvider
+            'model' => $list['model'],
+            'dataProvider' => $list['dataProvider']
         ));
     }
+
 }

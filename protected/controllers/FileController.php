@@ -4,7 +4,7 @@ class FileController extends BaseGxController
     public function additionalAccessRules()
     {
         return array(
-            array('allow', 'users' => array('*')),
+            array('allow', 'users' => array('@')),
         );
     }
 

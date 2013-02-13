@@ -138,7 +138,7 @@ class SupportController extends BaseGxController
             if (isset($_POST['person_files'])) {
                 $person_files=array();
                 foreach(explode(',',$_POST['person_files']) as $file_id)
-                    if ($file_id) $person_files[]=$file_id;
+                    if ($file_id && File::getIdFromProtected($file_id)) $person_files[]=File::getIdFromProtected($file_id);
 
                 $person_files_json=array();
                 foreach($person_files as $file_id) {
