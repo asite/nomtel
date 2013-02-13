@@ -182,39 +182,45 @@ function UploaderAddFiles(id,files) {
         <fieldset>
             <legend><?php echo Yii::t('app','Passport');?></legend>
             <div class="form-container-horizontal">
-                <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'passport_series',array('class'=>'span1','maxlength'=>10,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
-                </div>
                 <div class="form-container-item form-label-width-80">
+                    <?php echo $form->textFieldRow($person,'passport_series',array('class'=>'span2','maxlength'=>10,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                     <?php echo $form->textFieldRow($person,'passport_number',array('class'=>'span2','maxlength'=>20,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
-                <div class="form-container-item form-label-width-120">
+                <div class="form-container-item form-label-width-60">
+                    <?php echo $form->radioButtonListRow($person,'sex',Person::getSexLabels(),array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                </div>
+                <div class="form-container-item form-label-width-140">
+                    <?php echo $form->maskFieldRow($person,'birth_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                </div>
+            </div>
+
+            <div class="form-container-horizontal">
+                <div class="form-container-item form-label-width-140">
+                    <?php echo $form->textareaRow($person,'birth_place',array('class'=>'span6','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                </div>
+            </div>
+
+            <div class="form-container-horizontal">
+                <div class="form-container-item form-label-width-140">
+                    <?php echo $form->textareaRow($person,'passport_issuer',array('class'=>'span6','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                </div>
+            </div>
+
+            <div class="form-container-horizontal">
+                <div class="form-container-item form-label-width-140">
                     <?php echo $form->maskFieldRow($person,'passport_issue_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
-            </div>
-
-            <div class="form-container-horizontal">
-                <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'passport_issuer',array('class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                <div class="form-container-item form-label-width-200">
+                    <?php echo $form->textFieldRow($person,'passport_issuer_subdivision_code',array('class'=>'span2','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
 
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                     <?php echo $form->maskFieldRow($person,'birth_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
-                </div>
-                <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'birth_place',array('class'=>'span3','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
-                </div>
-            </div>
-
-            <div class="form-container-horizontal">
-                <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'registration_address',array('class'=>'span7','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textareaRow($person,'registration_address',array('class'=>'span6','errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
             </div>
         </fieldset>
-
 
     </div>
 

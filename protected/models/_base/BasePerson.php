@@ -10,6 +10,7 @@
  * followed by relations of table "person" available as properties of the model.
  *
  * @property string $id
+ * @property string $sex
  * @property string $name
  * @property string $surname
  * @property string $middle_name
@@ -19,6 +20,7 @@
  * @property string $passport_number
  * @property string $passport_issue_date
  * @property string $passport_issuer
+ * @property string $passport_issuer_subdivision_code
  * @property string $birth_date
  * @property string $birth_place
  * @property string $registration_address
@@ -41,19 +43,21 @@ abstract class BasePerson extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'name';
+		return 'sex';
 	}
 
 	public function rules() {
 		return array(
-			array('name, surname, middle_name, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
-			array('name, surname, middle_name, phone, email, passport_issuer, birth_place, registration_address', 'length', 'max'=>200),
+			array('sex, name, surname, middle_name, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
+			array('sex', 'length', 'max'=>1),
+			array('name, surname, middle_name, phone, email, passport_issuer_subdivision_code', 'length', 'max'=>200),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_number', 'length', 'max'=>20),
-			array('phone, email', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>500),
+			array('phone, email, passport_issuer_subdivision_code', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birth_date','date','format'=>'dd.MM.yyyy'),
-			array('id, name, surname, middle_name, phone, email, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'safe', 'on'=>'search'),
+			array('id, sex, name, surname, middle_name, phone, email, passport_series, passport_number, passport_issue_date, passport_issuer, passport_issuer_subdivision_code, birth_date, birth_place, registration_address', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -73,6 +77,7 @@ abstract class BasePerson extends BaseGxActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id' => Yii::t('app', 'ID'),
+			'sex' => Yii::t('app', 'Sex'),
 			'name' => Yii::t('app', 'Name'),
 			'surname' => Yii::t('app', 'Surname'),
 			'middle_name' => Yii::t('app', 'Middle Name'),
@@ -82,6 +87,7 @@ abstract class BasePerson extends BaseGxActiveRecord {
 			'passport_number' => Yii::t('app', 'Passport Number'),
 			'passport_issue_date' => Yii::t('app', 'Passport Issue Date'),
 			'passport_issuer' => Yii::t('app', 'Passport Issuer'),
+			'passport_issuer_subdivision_code' => Yii::t('app', 'Passport Issuer Subdivision Code'),
 			'birth_date' => Yii::t('app', 'Birth Date'),
 			'birth_place' => Yii::t('app', 'Birth Place'),
 			'registration_address' => Yii::t('app', 'Registration Address'),
@@ -94,6 +100,7 @@ abstract class BasePerson extends BaseGxActiveRecord {
 		$criteria = new CDbCriteria;
 
 		$criteria->compare('id', $this->id, true);
+		$criteria->compare('sex', $this->sex, true);
 		$criteria->compare('name', $this->name, true);
 		$criteria->compare('surname', $this->surname, true);
 		$criteria->compare('middle_name', $this->middle_name, true);
@@ -103,6 +110,7 @@ abstract class BasePerson extends BaseGxActiveRecord {
 		$criteria->compare('passport_number', $this->passport_number, true);
 		$criteria->compare('passport_issue_date', $this->passport_issue_date, true);
 		$criteria->compare('passport_issuer', $this->passport_issuer, true);
+		$criteria->compare('passport_issuer_subdivision_code', $this->passport_issuer_subdivision_code, true);
 		$criteria->compare('birth_date', $this->birth_date, true);
 		$criteria->compare('birth_place', $this->birth_place, true);
 		$criteria->compare('registration_address', $this->registration_address, true);

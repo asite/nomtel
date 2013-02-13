@@ -65,6 +65,13 @@ h1 {
 }
 
 
+.form-label-width-60 label.control-label {
+    width: 60px;
+}
+
+.form-label-width-60 div.controls {
+    margin-left: 80px;
+}
 
 .form-label-width-80 label.control-label {
     width: 80px;
