@@ -1,3 +1,6 @@
+Уважаемый Абонент! Ваш номер обслуживается ООО "Номтел". ФЗ 126 "О связи" обязывает нас знать конечного пользователя номера.
+Просим пройти процедуру регистрации. С вами свяжется наш оператор и оповестит вас о успешном подтверждении данных.
+
 <script>
     function checkForm(form) {
         // check if there any active upload
@@ -56,8 +59,6 @@
 
 <input type="hidden" name="person_files" id="File-form-field" value=""/>
 
-<div id="scans_shadow" style="clear:both;"></div>
-
 <fieldset>
     <legend><?php echo Yii::t('app','Subscriber');?></legend>
     <div class="form-container-horizontal">
@@ -111,7 +112,7 @@
     </div>
 </fieldset>
 
-
+<div id="scans_shadow" style="clear:both;"></div>
 
 <div class="form-actions">
     <?php $d=$this->widget('bootstrap.widgets.TbButton',array('label'=>Yii::t('app','Save'),'buttonType'=>'submit','type'=>'primary','icon'=>'ok white')); ?>

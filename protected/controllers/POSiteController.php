@@ -78,7 +78,14 @@ class POSiteController extends Controller
         $number=Number::model()->findByPk(loggedNumberId());
         $data['number']=$number;
 
-        $needPassport=SubscriptionAgreement::model()->countByAttributes(array('number_id'=>$number->id))==0;
+        $needPassport=true;
+        $agreement=SubscriptionAgreement::model()->find(array(
+            'condition'=>'number_id=:number_id',
+            'params'=>array('number_id'=>$number->id),
+            'order'=>'id desc'
+        ));
+        if ($agreement && $agreement->person && !empty($agreement->person->files)) $needPassport=false;
+
         $data['needPassport']=$needPassport;
 
         if ($needPassport) $this->processPassport($data);
@@ -171,6 +178,7 @@ class POSiteController extends Controller
 
         $trx->commit();
 
-        Yii::app()->user->setFlash('success','Данные сохранены');
+        Yii::app()->user->setFlash('success','Ваши данные сохранены');
+        $this->redirect('index');
     }
 }
