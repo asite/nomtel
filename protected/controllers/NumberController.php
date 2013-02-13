@@ -80,9 +80,6 @@ class NumberController extends BaseGxController
             'SubscriptionAgreement'=>$params['SubscriptionAgreement'],
             'BalanceReportNumber'=>$params['BalanceReportNumber'],
             'numberHistory'=>$params['numberHistory'],
-            //'tariff'=>$tariff,
-            //'operatorRegion'=>$operatorRegion,
-            //'company'=>$company
         ));
     }
 

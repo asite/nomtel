@@ -23,6 +23,9 @@ class NumberHistory extends BaseNumberHistory
                 case 'agent':
                     $who='Агент {Agent:'.loggedAgentId().'}';
                     break;
+                case 'number':
+                    $who='Номер {Number:'.loggedNumberId().'}';
+                    break;
                 case 'support':
                     $who='Техподдержка {SupportOperator:'.loggedSupportOperatorId().'}';
             }

@@ -183,10 +183,10 @@ function UploaderAddFiles(id,files) {
             <legend><?php echo Yii::t('app','Passport');?></legend>
             <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-140">
-                    <?php echo $form->textFieldRow($person,'passport_series',array('class'=>'span1','maxlength'=>10,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_series',array('class'=>'span1','maxlength'=>10,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-80">
-                    <?php echo $form->textFieldRow($person,'passport_number',array('class'=>'span2','maxlength'=>20,'onchange'=>'checkPassport()','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+                    <?php echo $form->textFieldRow($person,'passport_number',array('class'=>'span2','maxlength'=>20,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
                 </div>
                 <div class="form-container-item form-label-width-120">
                     <?php echo $form->maskFieldRow($person,'passport_issue_date','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>

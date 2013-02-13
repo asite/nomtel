@@ -53,7 +53,7 @@ class Number extends BaseNumber
         $user->password=$password;
         $user->encryptPwd();
         $user->save();
-        //Sms::send($this->number,"Ваш новый пароль для личного кабинета $password, личный кабинет находится по адресу www.500099.ru");
+        Sms::send($this->number,"Ваш новый пароль для личного кабинета $password, личный кабинет находится по адресу www.500099.ru");
     }
 
     public static function getStatusDropDownList($items=array()) {
