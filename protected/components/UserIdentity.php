@@ -21,7 +21,7 @@ class UserIdentity extends CUserIdentity
                 $agent = Agent::model()->findByAttributes(array('user_id' => $this->_id));
                 if ($agent) {
                     $this->setState('agentId', $agent->id);
-                    $this->setState('role',$agent->id==adminAgentId() ? 'admin':'support');
+                    $this->setState('role',$agent->id==adminAgentId() ? 'admin':'agent');
                     return true;
                 }
                 $supportOperator = SupportOperator::model()->findByAttributes(array('user_id' => $this->_id));

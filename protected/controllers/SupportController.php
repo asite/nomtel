@@ -8,7 +8,7 @@ class SupportController extends BaseGxController
             array('allow', 'actions' => array('number'), 'roles' => array('agent','support')),
             array('allow', 'actions' => array('numberStatus','sendSmsWithAddress','sendSmsWithEmail','sendSMSWithPOData'), 'roles' => array('support')),
             array('allow', 'actions' => array('callback'), 'roles' => array('support')),
-            array('allow', 'actions' => array('numberForCalls'), 'roles' => array('support')),
+            array('allow', 'actions' => array('numberForCalls','numberForApprove'), 'roles' => array('support')),
             array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
         );
     }
@@ -281,6 +281,7 @@ class SupportController extends BaseGxController
             'dataProvider'=>$dataProvider
         ));
     }
+
     public function actionNumberForCalls() {
         if (isset($_POST['getnumbers'])) {
             $criteria = new CDbCriteria();
@@ -301,7 +302,7 @@ class SupportController extends BaseGxController
         }
 
         $dataProvider = $model->search();
-        $dataProvider->criteria->addCondition('support_operator_id='.loggedSupportOperatorId());
+        $dataProvider->criteria->compare('support_operator_id',loggedSupportOperatorId());
         $dataProvider->criteria->addCondition('status="'.Number::STATUS_FREE.'"');
         $dataProvider->criteria->order = Number::getBalanceStatusOrder();
 
@@ -310,6 +311,25 @@ class SupportController extends BaseGxController
             'dataProvider'=>$dataProvider
         ));
     }
+
+    public function actionNumberForApprove() {
+        $model = new Number('search');
+        $model->unsetAttributes();
+        if(isset($_GET['Number'])){
+            $model->setAttributes($_GET['Number']);
+        }
+
+        $dataProvider = $model->search();
+        $dataProvider->criteria->compare('support_operator_id',loggedSupportOperatorId());
+        $dataProvider->criteria->addCondition('support_passport_need_validation=1');
+        $dataProvider->criteria->order = Number::getBalanceStatusOrder();
+
+        $this->render('numberForApprove',array(
+            'model'=>$model,
+            'dataProvider'=>$dataProvider
+        ));
+    }
+
     public function actionStatistic() {
         $model = Yii::app()->db->createCommand()
                                 ->select('count(support_status) as count, support_status')

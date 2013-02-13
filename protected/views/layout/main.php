@@ -68,6 +68,7 @@
         $menuLeft = array(
             array('label' => Number::label(2), 'url' => $this->createUrl('support/numberStatus'), 'active' => $this->route == 'support/numberStatus'),
             array('label' => Yii::t('app','Call back'), 'url' => $this->createUrl('support/callback'), 'active' => $this->route == 'support/callback'),
+            array('label' => Yii::t('app','Numbers for Approve'), 'url' => $this->createUrl('support/numberForApprove'), 'active' => $this->route == 'support/numberForApprove'),
             array('label' => Yii::t('app','Operator Numbers'), 'url' => $this->createUrl('support/numberForCalls'), 'active' => $this->route == 'support/numberForCalls'),
             array('label' => Yii::t('app','Statistic'), 'url' => $this->createUrl('support/statistic'), 'active' => $this->route == 'support/statistic'),
             //array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
