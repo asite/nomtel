@@ -78,6 +78,9 @@ class POSiteController extends Controller
         $number=Number::model()->findByPk(loggedNumberId());
         $data['number']=$number;
 
+        $sim=Sim::model()->findByAttributes(array('parent_id'=>$number->sim_id,'agent_id'=>null));
+        $data['sim']=$sim;
+
         $needPassport=true;
         $agreement=SubscriptionAgreement::model()->find(array(
             'condition'=>'number_id=:number_id',

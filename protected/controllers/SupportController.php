@@ -198,6 +198,8 @@ class SupportController extends BaseGxController
 
                                 if (count($person_files)>0) $number->support_status=Number::SUPPORT_STATUS_ACTIVE;
 
+                                $number->support_passport_need_validation=0;
+
                                 if (!$agreement) {
                                     $number->status=Number::STATUS_ACTIVE;
                                     $number->support_getting_passport_variant=$status->getting_passport_variant;
@@ -312,7 +314,7 @@ class SupportController extends BaseGxController
         $model = Yii::app()->db->createCommand()
                                 ->select('count(support_status) as count, support_status')
                                 ->from('number')
-                                ->where('support_operator_id=:val and support_status is not null', array(':val'=>loggedSupportOperatorId()))
+                                ->where('support_operator_id=:val and support_status is not null and support_passport_need_validation=0', array(':val'=>loggedSupportOperatorId()))
                                 ->group('support_status')
                                 ->queryAll();
 
