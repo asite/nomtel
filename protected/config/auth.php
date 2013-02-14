@@ -9,7 +9,7 @@ return array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
             'createSubscriptionAgreementForOwnSim',
-            'updateSubscriptionAgreementForOwnSim',
+            'updateSubscriptionAgreement',
             'deleteAct',
             'editNumberCard'
         )
@@ -18,7 +18,7 @@ return array(
     'support' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
-            'updateSubscriptionAgreementForOwnSim',
+            'updateSubscriptionAgreement',
             'editNumberCard'
         )
     ),
@@ -33,6 +33,7 @@ return array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
             'createSubscriptionAgreementForOwnSim',
+            'updateSubscriptionAgreement',
             'deleteAct',
             'editNumberCardBySamvel'
         )
