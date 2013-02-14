@@ -4,21 +4,6 @@ $this->breadcrumbs = array(
     Yii::t('app', 'List'),
 );
 
-Yii::app()->clientScript->registerScript('search', "
-$('.search-button').click(function(){
-	$('.search-form').toggle();
-	return false;
-});
-$('.search-form form').submit(function(){
-	$.fn.yiiGridView.update('sim-grid', {
-		data: $(this).serialize()
-	});
-	return false;
-});
-$('#SimSearch_operator_id').live('change',function(){
-  $('[data-id='+$(this).val()+']').addClass('active').siblings().removeClass('active');
-})
-");
 ?>
 
 <h1><?php echo GxHtml::encode(Sim::label(2)); ?></h1>
@@ -128,6 +113,18 @@ $('#SimSearch_operator_id').live('change',function(){
             'value'=>'Number::getStatusLabel($data["status"])',
             'filter'=>Number::getStatusDropDownList(),
             'header'=>Yii::t('app','Status'),
+        ),
+        array(
+            'name'=>'support_status',
+            'value'=>'Number::getSupportStatusLabel($data["support_status"])',
+            'filter'=>Number::getSupportStatusDropDownList(array('0'=>'БЕЗ СТАТУСА')),
+            'header'=>Yii::t('app','Support Status'),
+        ),
+        array(
+            'name'=>'support_operator_id',
+            'value'=>'CHtml::encode($data["so_surname"]." ".$data["so_name"])',
+            'filter'=>SupportOperator::getComboList(array(0=>'БЕЗ ОПЕРАТОРА')),
+            'header'=>SupportOperator::label(),
         ),
         array(
             'name'=>'balance_status',

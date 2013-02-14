@@ -602,6 +602,16 @@ class SimController extends BaseGxController {
         else
             $criteria->addCondition("(s.number='' or s.number is null)");
 
+        if ($model->support_status != '0')
+            $criteria->compare('n.support_status', $model->support_status);
+        else
+            $criteria->addCondition("n.support_status is null");
+
+        if ($model->support_operator_id != '0')
+            $criteria->compare('n.support_operator_id', $model->support_operator_id);
+        else
+            $criteria->addCondition("n.support_operator_id is null");
+
         $criteria->compare('s.icc',$model->icc);
         $criteria->compare('s.operator_id',$model->operator_id);
         $criteria->compare('s.tariff_id',$model->tariff_id);
@@ -612,17 +622,18 @@ class SimController extends BaseGxController {
             left outer join number n on (s.parent_id=n.sim_id)
             left outer join agent a on (a.id=s.agent_id)
             left outer join operator o on (o.id=s.operator_id)
+            left outer join support_operator so on (so.id=n.support_operator_id)
             left outer join tariff t on (t.id=s.tariff_id)
             where " . $criteria->condition;
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider = new CSqlDataProvider('select s.*,n.*,s.number,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id,n.status as number_status ' . $sql, array(
+        $dataProvider = new CSqlDataProvider('select s.*,n.*,s.number,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id,n.status as number_status,so.name as so_name,so.surname as so_surname ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'agent_id','number','icc','operator_id','tariff_id','status','balance_status'
+                    'agent_id','number','icc','operator_id','tariff_id','status','balance_status','support_status','support_operator_id'
                 ),
             ),
             'pagination' => $pager?array('pageSize' => Sim::ITEMS_PER_PAGE):false
