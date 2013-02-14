@@ -303,6 +303,6 @@ return array (
   'Order details' => 'Заказать детализацию',
   'Block' => 'Блокировать',
   'Other question' => 'Другой вопрос',
-  'Date Range' => 'Введите диапозон',
+  'Date Range' => 'Введите дату',
 
 );
