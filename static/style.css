@@ -284,3 +284,8 @@ table.margin_b0 {
 .service_buttons>a {
   margin: 0 20px 15px 0;
 }
+
+.get_specification {}
+.get_specification .control-group  {
+  display: inline-block;
+}

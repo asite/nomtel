@@ -19,22 +19,40 @@ else
     <?php $this->widget('bootstrap.widgets.TbButton',array(
         'label' => Yii::t('app','Restore the card'),
         'size' => 'medium',
-        'url' => $this->createUrl('sendServiceMail'),
+        'url' => $this->createUrl('sendRestoreCard'),
     )); ?>
     <?php $this->widget('bootstrap.widgets.TbButton',array(
         'label' => Yii::t('app','Change the tariff plan'),
         'size' => 'medium',
-        'url' => $this->createUrl('sendServiceMail'),
+        'url' => $this->createUrl('sendChangeTariff'),
     )); ?>
     <?php $this->widget('bootstrap.widgets.TbButton',array(
         'label' => Yii::t('app','Block'),
         'size' => 'medium',
-        'url' => $this->createUrl('sendServiceMail'),
+        'url' => $this->createUrl('sendBlock'),
     )); ?>
     <?php $this->widget('bootstrap.widgets.TbButton',array(
         'label' => Yii::t('app','Other question'),
         'size' => 'medium',
-        'url' => $this->createUrl('sendServiceMail'),
+        'url' => $this->createUrl('sendOtherQuestion'),
     )); ?>
 </div>
 <?php $this->endWidget();?>
+<div class="get_specification">
+    <?php $form = $this->beginWidget('BaseTbActiveForm', array(
+                    'id' => 'specification',
+                    'type' => 'horizontal',
+                    'action'=>$this->createUrl('sendSpecification'),
+                    'enableAjaxValidation' => true,
+                    'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
+              ));
+        ?>
+        <?php echo $form->dateRangeRow($model, 'dateRange',
+            array(
+                'options' => array(
+                    'callback'=>'js:function(start, end){console.log(start.toString("MMMM d, yyyy") + " - " + end.toString("MMMM d, yyyy"));}',
+                )
+        )); ?>
+        <?php $this->widget('bootstrap.widgets.TbButton',array('label'=>Yii::t('app','Order details'))); ?>
+    <?php $this->endWidget(); ?>
+</div>
