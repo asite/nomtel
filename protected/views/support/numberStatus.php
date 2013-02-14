@@ -120,9 +120,10 @@ function UploaderAddFiles(id,files) {
                 'label'=>Number::getSupportStatusLabel('SERVICE_INFO'),
                 'htmlOptions'=>array('onclick'=>'setStatus("SERVICE_INFO")')
             ));
+        echo "&nbsp;";
    }
     $this->widget('bootstrap.widgets.TbButton',array(
-        'label'=>'доступ к ЛК',
+        'label'=>'регистрация Online',
         'url'=>$this->createUrl('support/sendSmsWithPOData',array('number'=>$number->number)),
     ));
 
