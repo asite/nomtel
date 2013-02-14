@@ -5,9 +5,8 @@ class SubscriptionAgreementController extends BaseGxController {
     public function additionalAccessRules()
     {
         return array(
-            array('deny', 'actions'=>array('update'), 'roles'=>array('agent')),
             array('allow', 'roles' => array('agent')),
-            array('allow', 'actions'=>array('update'), 'roles'=>array('support')),
+            array('allow', 'actions'=>array('update','create'), 'roles'=>array('support')),
         );
     }
 
