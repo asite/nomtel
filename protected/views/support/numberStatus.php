@@ -233,6 +233,7 @@ function UploaderAddFiles(id,files) {
 $this->endWidget();
 ?>
 
+<?php if ($showStatusForm) { ?>
 <div id="scans" style="display:none;position:absolute;">   <?php //top:330px; ?>
 <h3>Сканы паспорта</h3>
 <?php
@@ -259,3 +260,4 @@ $this->widget('bootstrap.widgets.TbFileUpload', array(
 <?php if ($person_files!='') Yii::app()->clientScript->registerScript('File-form',"UploaderAddFiles('File-form',$person_files);",CClientScript::POS_READY); ?>
 <script>$(function(){statusProcessVisibleItems();});</script>
 <script>setInterval('checkUploadSize()',250);</script>
+<? } ?>
