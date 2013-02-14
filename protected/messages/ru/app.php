@@ -297,4 +297,11 @@ return array (
   'the Agent' => 'У агента',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
+  'Service Buttons' => 'Сервисные кнопки',
+  'Restore the card' => 'Восстановить карту',
+  'Change the tariff plan' => 'Сменить тарифный план',
+  'Order details' => 'Заказать детализацию',
+  'Block' => 'Блокировать',
+  'Other question' => 'Другой вопрос',
+
 );

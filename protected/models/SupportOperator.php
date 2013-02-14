@@ -4,7 +4,7 @@ Yii::import('application.models._base.BaseSupportOperator');
 
 class SupportOperator extends BaseSupportOperator
 {
-    const OPERATOR_GUDKOV_ID=1;
+    const OPERATOR_DEFAULT_ID=1;
 
     public static function model($className=__CLASS__) {
 		return parent::model($className);

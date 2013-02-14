@@ -25,4 +25,3 @@
     </div>
 
 <?php $this->endWidget(); ?>
-

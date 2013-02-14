@@ -87,11 +87,13 @@ class POSiteController extends Controller
             'params'=>array('number_id'=>$number->id),
             'order'=>'id desc'
         ));
-        if ($agreement && $agreement->person && !empty($agreement->person->files)) $needPassport=false;
+        if ($agreement && $number->support_passport_need_validation==0) $needPassport=false;
 
         $data['needPassport']=$needPassport;
 
         if ($needPassport) $this->processPassport($data);
+
+        $data['model']= new POSSpecification;
 
         $this->render('index',$data);
     }
@@ -138,7 +140,7 @@ class POSiteController extends Controller
         $number->support_passport_need_validation=1;
         $number->support_status=count($person_files)>0 ? Number::SUPPORT_STATUS_ACTIVE:Number::SUPPORT_STATUS_PREACTIVE;
 
-        if (!$number->support_operator_id) $number->support_operator_id=SupportOperator::OPERATOR_GUDKOV_ID;
+        if (!$number->support_operator_id) $number->support_operator_id=SupportOperator::OPERATOR_DEFAULT_ID;
 
         if (!$agreement) {
             $number->status=Number::STATUS_ACTIVE;

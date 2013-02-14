@@ -62,7 +62,7 @@ return array(
         'db' => array(
             'charset' => 'utf8',
             'enableProfiling' => ENABLE_PROFILING,
-            'schemaCachingDuration' => 3600,
+            'schemaCachingDuration' => 60,
         ),
         'cache' => array(
             'class' => 'CFileCache',
