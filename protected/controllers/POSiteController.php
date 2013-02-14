@@ -188,4 +188,8 @@ class POSiteController extends Controller
         Yii::app()->user->setFlash('success','Ваши данные сохранены');
         $this->redirect('index');
     }
+
+    public function actionSendRestoreCard() {
+
+    }
 }
