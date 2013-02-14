@@ -288,4 +288,9 @@ table.margin_b0 {
 .get_specification {}
 .get_specification .control-group  {
   display: inline-block;
+  margin: 0;
+}
+.get_specification .controls {float: left; margin: 0 10px 0 10px;}
+.get_specification .control-group button {
+  float: left;
 }
