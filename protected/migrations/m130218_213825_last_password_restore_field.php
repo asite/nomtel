@@ -4,7 +4,7 @@ class m130218_213825_last_password_restore_field extends CDbMigration
 {
 	public function up()
 	{
-        $this->db->execute("
+        $this->execute("
             ALTER TABLE `user`
             ADD `last_password_restore` timestamp NULL,
             COMMENT='';
