@@ -7,7 +7,9 @@ class POLoginForm extends CFormModel
 
     public function rules() {
         return array(
-            array('number,password','safe')
+            array('number,password','safe'),
+            array('number','required','on'=>'restore'),
+            array('number','validateNumber','skipOnError'=>true,'on'=>'restore')
         );
     }
 
@@ -16,5 +18,11 @@ class POLoginForm extends CFormModel
             'number'=>'Номер телефона',
             'password'=>'Пароль'
         );
+    }
+
+    public function validateNumber() {
+        if (Number::model()->countByAttributes(array('number'=>Number::getNumberFromFormatted($this->number)))!=1) {
+            $this->addError('number','Данный номер не существует');
+        }
     }
 }

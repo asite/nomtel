@@ -15,6 +15,7 @@
  * @property string $password
  * @property integer $failed_logins
  * @property string $blocked_until
+ * @property string $last_password_restore
  *
  * @property Agent[] $agents
  * @property Agent[] $agents1
@@ -45,10 +46,11 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			array('failed_logins', 'numerical', 'integerOnly'=>true),
 			array('status', 'length', 'max'=>7),
 			array('username, password', 'length', 'max'=>200),
-			array('blocked_until', 'safe'),
-			array('password, failed_logins, blocked_until', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('blocked_until, last_password_restore', 'safe'),
+			array('password, failed_logins, blocked_until, last_password_restore', 'default', 'setOnEmpty' => true, 'value' => null),
             array('blocked_until','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, status, username, password, failed_logins, blocked_until', 'safe', 'on'=>'search'),
+            array('last_password_restore','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+			array('id, status, username, password, failed_logins, blocked_until, last_password_restore', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -74,6 +76,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 			'password' => Yii::t('app', 'Password'),
 			'failed_logins' => Yii::t('app', 'Failed Logins'),
 			'blocked_until' => Yii::t('app', 'Blocked Until'),
+			'last_password_restore' => Yii::t('app', 'Last Password Restore'),
 			'agents' => null,
 			'agents1' => null,
 			'numbers' => null,
@@ -90,6 +93,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
 		$criteria->compare('password', $this->password, true);
 		$criteria->compare('failed_logins', $this->failed_logins);
 		$criteria->compare('blocked_until', $this->blocked_until, true);
+		$criteria->compare('last_password_restore', $this->last_password_restore, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
@@ -102,10 +106,12 @@ abstract class BaseUser extends BaseGxActiveRecord {
     public function convertDateTimeFieldsToEDateTime() {
         // rest of work will do setAttribute() routine
         $this->setAttribute('blocked_until',strval($this->blocked_until));
+        $this->setAttribute('last_password_restore',strval($this->last_password_restore));
     }
 
     public function convertDateTimeFieldsToString() {
         if (is_object($this->blocked_until) && get_class($this->blocked_until)=='EDateTime') $this->blocked_until=new EString($this->blocked_until->format(self::$mySqlDateTimeFormat));
+        if (is_object($this->last_password_restore) && get_class($this->last_password_restore)=='EDateTime') $this->last_password_restore=new EString($this->last_password_restore->format(self::$mySqlDateTimeFormat));
     }
 
     public function afterFind() {
@@ -124,6 +130,7 @@ abstract class BaseUser extends BaseGxActiveRecord {
     public function setAttribute($name,$value) {
         if (is_string($value)) {
             if ($name=='blocked_until') $value=$this->convertStringToEDateTime($value,'datetime');
+            if ($name=='last_password_restore') $value=$this->convertStringToEDateTime($value,'datetime');
         }
         return parent::setAttribute($name,$value);
     }

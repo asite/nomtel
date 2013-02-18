@@ -52,6 +52,7 @@ class Number extends BaseNumber
         $password=rand(100000,999999);
         $user->password=$password;
         $user->encryptPwd();
+        $user->last_password_restore=new EDateTime();
         $user->save();
         Sms::send($this->number,"Ваш новый пароль для личного кабинета $password, личный кабинет находится по адресу www.500099.ru");
     }

@@ -32,17 +32,32 @@ class POSiteController extends Controller
 
         if (!Yii::app()->user->isGuest) $this->redirect(array('site/index'));
 
-        $loginForm=new POLoginForm();
+
+        $restore=isset($_POST['restore']);
+        $loginForm=new POLoginForm($restore ? 'restore':'');
         if (isset($_POST['POLoginForm'])) {
             $loginForm->setAttributes($_POST['POLoginForm']);
 
             if ($loginForm->validate()) {
-                $identity = new UserIdentity(Number::getNumberFromFormatted($loginForm->number),$loginForm->password);
-                if ($identity->authenticate()) {
-                    Yii::app()->user->login($identity);
-                    $this->redirect(array('index'));
+                if ($restore) {
+                    $number=Number::model()->findByAttributes(array('number'=>(Number::getNumberFromFormatted($loginForm->number))));
+                    if ($number->user && $number->user->last_password_restore &&
+                        ($number->user->last_password_restore->modify("+5 minute")>new EDateTime())) {
+                        Yii::app()->user->setFlash('error','Пароль можно восстанавливать не чаще одного раза в 5 минут');
+                        $this->redirect(array('login'));
+                    } else {
+                        $number->restorePassword();
+                        Yii::app()->user->setFlash('success','Новый пароль выслан вам по SMS');
+                        $this->redirect(array('login'));
+                    }
+                } else {
+                    $identity = new UserIdentity(Number::getNumberFromFormatted($loginForm->number),$loginForm->password);
+                    if ($identity->authenticate()) {
+                        Yii::app()->user->login($identity);
+                        $this->redirect(array('index'));
+                    }
+                    $loginForm->addError('password',$identity->errorMessage);
                 }
-                $loginForm->addError('password',$identity->errorMessage);
             }
         }
 
@@ -51,25 +66,6 @@ class POSiteController extends Controller
 
         $loginForm->password='';
         $this->render('login',array('model'=>$loginForm));
-    }
-
-    public function actionRestorePassword()
-    {
-        $this->layout = '/layout/simple';
-
-        $model=new PORestorePasswordForm();
-        if (isset($_POST['PORestorePasswordForm'])) {
-            $model->setAttributes($_POST['PORestorePasswordForm']);
-
-            if ($model->validate()) {
-                $number=Number::model()->findByAttributes(array('number'=>(Number::getNumberFromFormatted($model->number))));
-                $number->restorePassword();
-                Yii::app()->user->setFlash('success','Новый пароль выслан вам по SMS');
-                $this->redirect(array('restorePassword'));
-            }
-        }
-
-        $this->render('restorePassword',array('model'=>$model));
     }
 
     public function actionLogout()
