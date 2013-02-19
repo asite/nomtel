@@ -46,6 +46,7 @@ class POSupportController extends Controller
 
         $recipients=Yii::app()->params['supportEmail'];
         if (!is_array($recipients)) $recipients=array($recipients);
+        print_r($report['message']); exit;
 
         $mail = new YiiMailMessage();
         $mail->setSubject(Yii::t('app', 'Problem with number'));
@@ -54,7 +55,7 @@ class POSupportController extends Controller
         $mail->setBody($body);
 
         $message = "Ваше обращение ".$report['report_number']." принято. Срок рассмотрения 24 часа. Спасибо";
-        Sms::send($report['number'],$report['message']);
+        Sms::send($report['number'],$report['report_number']);
 
         if (Yii::app()->mail->send($mail))
             Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$report['report_number'])));

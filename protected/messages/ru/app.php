@@ -306,4 +306,5 @@ return array (
   'total cost simcard' => 'Общая стоимость симкарт:',
   'Subscriber data' => 'Данные абонента',
   'Your Tariff' => 'Ваш тариф',
+  'Login' => 'Вход',
 );
