@@ -196,6 +196,7 @@ class AgentController extends BaseGxController
                 $this->performAjaxValidation($Act, 'debit-form');
                 if ($Act->validate()) {
                     $Act->save();
+                    Agent::deltaBalance($Act->agent_id, -$Act->sum);
                     $this->redirect(array('view', 'id' => $model->id));
                 }
             }
