@@ -8,7 +8,7 @@ $this->breadcrumbs = array(
 
 <h1><?=Number::label(2)?></h1>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'number-grid',
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

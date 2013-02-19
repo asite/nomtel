@@ -32,7 +32,7 @@ $('.search-form form').submit(function(){
 
 <h2>По агентам</h2>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'agent-grid',
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
@@ -56,7 +56,7 @@ $('.search-form form').submit(function(){
 
 <h2>По номерам</h2>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'number-grid',
     'dataProvider' => $dataProvider2,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

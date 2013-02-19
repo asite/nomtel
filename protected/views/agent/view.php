@@ -130,7 +130,7 @@ $this->breadcrumbs = array(
 
 <h3 class="h3-balance">Баланс: <?php echo $model->balance; ?></h3>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'log-grid',
     'dataProvider' => $logDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

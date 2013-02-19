@@ -656,7 +656,7 @@ class SimController extends BaseGxController {
         }
 
         $list = self::getSimListDataProvider();
-        if (isset($_REQUEST['exportExel'])) {
+        /*if (isset($_REQUEST['exportExel'])) {
             $columns = array(
                 'agent' => array('name'=>Yii::t('app','Agent'),'value'=>'$data["name"]." ".$data["surname"]'),
                 'number' => array('name'=>Yii::t('app','Number'),'value'=>'$data["number"]'),
@@ -667,7 +667,7 @@ class SimController extends BaseGxController {
                 'balance_status' => array('name'=>Yii::t('app','Balance Status'),'value'=>'Number::getBalanceStatusLabel($data["balance_status"])')
             );
             $this->exportExel($list['dataProvider'], $columns);
-        }
+        }*/
 
         $this->render('list', array(
             'model' => $list['model'],

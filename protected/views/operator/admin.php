@@ -22,7 +22,7 @@ $('.search-form form').submit(function(){
 <h1><?php echo GxHtml::encode($model->label(2)); ?></h1>
 
 <a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('create') ?>"><?php echo Yii::t('app', 'Create') ?></a>
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
 	'id' => 'operator-grid',
 	'dataProvider' => $model->search(),
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

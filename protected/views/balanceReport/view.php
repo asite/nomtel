@@ -29,7 +29,7 @@ $('.search-form form').submit(function(){
     ),
 )); ?>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'balanceReportNumber-grid',
     'dataProvider' => $balanceReportNumberDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

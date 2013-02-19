@@ -7,7 +7,7 @@
 <h1><?php echo Yii::t('app','Outbox') ?></h1>
 
 <?php
-$this->widget('bootstrap.widgets.TbGridView', array(
+$this->widget('TbExtendedGridViewExport', array(
   'itemsCssClass' => 'table table-striped table-bordered table-condensed',
   'id' => 'outbox-grid',
   'dataProvider' => $dataProvider,

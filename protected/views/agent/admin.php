@@ -22,7 +22,7 @@ $('.search-form form').submit(function(){
 <h1><?php echo GxHtml::encode($model->label(2)); ?></h1>
 
 <a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('create') ?>"><?php echo Yii::t('app', 'Create') ?></a>
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
 	'id' => 'agent-grid',
 	'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
@@ -31,22 +31,6 @@ $('.search-form form').submit(function(){
         'surname',
 		'name',
 		'middle_name',
-        /*
-        'phone_1',
-        'phone_2',
-        'phone_3',
-        'email',
-        'skype',
-        'icq',
-        'passport_series',
-        'passport_number',
-        'passport_issue_date',
-        'passport_issuer',
-        'birthday_date',
-        'birthday_place',
-        'registration_address',
-        'balance',
-        */
         'balance',
 		array(
 			'class' => 'bootstrap.widgets.TbButtonColumn',

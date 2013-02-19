@@ -82,6 +82,9 @@
 
     if (Yii::app()->user->role == 'number') {
         $menuLeft = array(
+            array('label' => Yii::t('app', 'Subscriber data'), 'url' => $this->createUrl('pOSite/index'), 'active' => $this->route == 'pOSite/index'),
+            array('label' => Yii::t('app', 'Your Tariff'), 'url' => $this->createUrl('pOSite/tariff'), 'active' => $this->route == 'pOSite/tariff'),
+            array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('pOSupport/index'), 'active' => $this->route == 'pOSupport/index'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('pOSite/logout')),
         );

@@ -7,6 +7,11 @@ class Person extends BasePerson
     const SEX_MALE='M';
     const SEX_FEMALE='F';
 
+    public function __toString()
+    {
+        return $this->surname . ' ' . $this->name . ' ' . $this->middle_name;
+    }
+
     public static function getSexLabels() {
         static $labels;
 

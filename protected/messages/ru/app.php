@@ -304,4 +304,6 @@ return array (
   'the Agent' => 'У агента',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
+  'Subscriber data' => 'Данные абонента',
+  'Your Tariff' => 'Ваш тариф',
 );

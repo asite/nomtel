@@ -37,7 +37,7 @@ $('.search-form form').submit(function(){
 
 <h2><?php echo GxHtml::encode(Sim::model()->label(2)); ?></h2>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'delivery-report-grid',
     'dataProvider' => $sim->search(),
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

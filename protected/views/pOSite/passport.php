@@ -129,8 +129,12 @@
 $this->endWidget();
 ?>
 
-<div id="scans" style="position:absolute;">
-<h3>Сканы паспорта</h3>
+<div id="scans" style="position:absolute; width: 760px;">
+<div class="pOS_load_passport cfix">
+    <a href="/static/passport.jpg" target="_blank"><img style="margin-left: 30px;" src="/static/passport.jpg" width="130" align="right" alt=""></a>
+    Ваши данные необходимо подтвердить копиями страниц паспорта с данными и с адресом регистрации.
+    <h3>Сканы паспорта</h3>
+</div>
 <?php
     $this->widget('bootstrap.widgets.TbFileUpload', array(
     'url' => $this->createUrl("file/upload",array('name'=>'File')),

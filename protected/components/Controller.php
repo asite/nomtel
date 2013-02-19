@@ -81,5 +81,29 @@ class Controller extends CController
         $objWriter->save('php://output');
         exit;
     }
+
+    public function export($array, $step, $col_sep=";", $qut='"', $row_sep="\n") {
+        if ($step==0) {
+            $m=array();
+            preg_match_all('%<th[^>]*>.*?</th>%i',$array,$m);
+            foreach($m[0] as $v) {
+                $output .= "$col_sep$qut".strip_tags(html_entity_decode($v)).$qut;
+            }
+            $output = substr($output, 1).$row_sep;
+        }
+
+        $m=array();
+        preg_match_all('%<tr[^>]*>.*?</tr>%i',$array,$m);
+        foreach($m[0] as $v) {
+            preg_match_all('%<td[^>]*>.*?</td>%i',$v,$mm);
+            $tmp = '';
+            foreach($mm[0] as $vv) {
+               $tmp .= "$col_sep$qut".strip_tags(str_replace('"','""',html_entity_decode($vv))).$qut;
+            }
+            $output .= substr($tmp, 1).$row_sep;
+        }
+
+        return $output;
+    }
 }
 

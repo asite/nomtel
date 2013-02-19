@@ -7,6 +7,7 @@ class NumberHistory extends BaseNumberHistory
     static $linksForShortcuts = array(
         'Agent'=>true,
         'Act'=>true,
+        'SupportOperator'=>true,
     );
 
 

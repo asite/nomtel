@@ -17,7 +17,7 @@ $this->renderPartial('_form', array(
 <h2><?php echo GxHtml::encode($model2->label(2)); ?></h2>
 
 <a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('tariff/create',array('parent_id'=>$model->id)) ?>"><?php echo Yii::t('app', 'Create') ?></a>
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'tariff-grid',
     'dataProvider' => $model2->search(),
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',

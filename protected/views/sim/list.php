@@ -50,21 +50,12 @@ $this->breadcrumbs = array(
     ),
 )); ?>
 
-<?php $this->widget('bootstrap.widgets.TbButton', array(
-    'type'=>'button',
-    'label'=>Yii::t('app','Make Exel'),
-    'htmlOptions'=>array(
-        'onclick'=>'makeExel();return false;',
-        'style'=>"margin-bottom:10px;"
-    )
-)) ?>
-
 <style>
     #sim-grid tfoot {
         display:none;
     }
 </style>
-<?php $this->widget('bootstrap.widgets.TbExtendedGridView', array(
+<?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'sim-grid',
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
@@ -211,16 +202,5 @@ $this->breadcrumbs = array(
         }
         jQuery('#ids-input').val(ids);
         jQuery('#ids-form').submit();
-    }
-</script>
-<form method="post" action="?exportExel" id="makeexel-form">
-    <input type="hidden" name="YII_CSRF_TOKEN" value="<?php echo Yii::app()->request->csrfToken ?>">
-</form>
-<script type="text/javascript">
-    function makeExel() {
-        $('#sim-grid').find('[name^="SimSearch"]').each(function(){
-            $('#makeexel-form').append('<input type="hidden" name="'+$(this).attr('name')+'" value="'+$(this).val()+'">');
-        })
-        $('#makeexel-form').submit();
     }
 </script>
