@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title><?php echo CHtml::encode($this->pageTitle);?></title>
     <?php Yii::app()->clientScript->registerCssFile('/static/style.css'); ?>
+    <script type="text/javascript" src="/static/script.js"></script>
 </head>
 <body>
 <div class="content">

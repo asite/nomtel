@@ -6,7 +6,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
 
     public function init()
     {
-        if ($_GET['exportGridView']==$this->id) {
+        if ($_POST['exportGridView']==$this->id) {
             foreach ($this->columns as $k=>$v) {
                 if ($v['class']=='bootstrap.widgets.TbButtonColumn') unset($this->columns[$k]);
             }
@@ -16,8 +16,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
         parent::init();
     }
     public function renderContent() {
-        if ($_GET['exportGridView']==$this->id) {
-            $this->registerCustomClientScript();
+        if ($_POST['exportGridView']==$this->id) {
             ob_end_clean();
             $pageCount = floor(round($this->dataProvider->totalItemCount/$this->dataProvider->itemCount));
             $csv = '';
@@ -49,7 +48,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
 
     public function renderSummary() {
         echo '<div class="gridSummary cfix">';
-        echo '<a href="?exportGridView='.$this->id.'" style="float: left;" class="btn btn-small">Сформировать отчет</a>';
+        echo '<a onclick="return createFiltersForm(\''.$this->id.'\',\''.Yii::app()->request->csrfToken.'\')" style="float: left;" class="btn btn-small">Сформировать отчет</a>';
         parent::renderSummary();
         echo '</div>';
     }
