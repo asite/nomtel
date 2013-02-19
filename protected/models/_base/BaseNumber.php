@@ -19,21 +19,22 @@
  * @property string $codeword
  * @property string $service_password
  * @property integer $support_operator_id
+ * @property string $support_operator_got_dt
  * @property string $support_dt
  * @property string $support_status
  * @property string $support_callback_dt
  * @property string $support_callback_name
  * @property string $support_getting_passport_variant
  * @property string $support_number_region_usage
- * @property integer $support_sent_sms_address
- * @property integer $support_sent_sms_email
+ * @property string $support_sent_sms_status
  * @property integer $user_id
+ * @property integer $support_passport_need_validation
  *
  * @property BalanceReportNumber[] $balanceReportNumbers
  * @property BonusReportNumber[] $bonusReportNumbers
- * @property User $user
  * @property Sim $sim
  * @property SupportOperator $supportOperator
+ * @property User $user
  * @property NumberHistory[] $numberHistories
  * @property SubscriptionAgreement[] $subscriptionAgreements
  */
@@ -58,19 +59,21 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('number', 'required'),
-			array('support_operator_id, support_sent_sms_address, support_sent_sms_email, user_id', 'numerical', 'integerOnly'=>true),
+			array('support_operator_id, user_id, support_passport_need_validation', 'numerical', 'integerOnly'=>true),
 			array('sim_id, codeword, service_password', 'length', 'max'=>20),
 			array('number, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>7),
 			array('balance_status', 'length', 'max'=>16),
 			array('support_status', 'length', 'max'=>12),
 			array('support_callback_name, support_getting_passport_variant, support_number_region_usage', 'length', 'max'=>200),
-			array('balance_status_changed_dt, support_dt, support_callback_dt', 'safe'),
-			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_address, support_sent_sms_email, user_id', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('support_sent_sms_status', 'length', 'max'=>6),
+			array('balance_status_changed_dt, support_operator_got_dt, support_dt, support_callback_dt', 'safe'),
+			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation', 'default', 'setOnEmpty' => true, 'value' => null),
             array('balance_status_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
+            array('support_operator_got_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_callback_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_address, support_sent_sms_email, user_id', 'safe', 'on'=>'search'),
+			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -78,9 +81,9 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		return array(
 			'balanceReportNumbers' => array(self::HAS_MANY, 'BalanceReportNumber', 'number_id'),
 			'bonusReportNumbers' => array(self::HAS_MANY, 'BonusReportNumber', 'number_id'),
-			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'sim' => array(self::BELONGS_TO, 'Sim', 'sim_id'),
 			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
+			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'numberHistories' => array(self::HAS_MANY, 'NumberHistory', 'number_id'),
 			'subscriptionAgreements' => array(self::HAS_MANY, 'SubscriptionAgreement', 'number_id'),
 		);
@@ -103,20 +106,21 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'codeword' => Yii::t('app', 'Codeword'),
 			'service_password' => Yii::t('app', 'Service Password'),
 			'support_operator_id' => null,
+			'support_operator_got_dt' => Yii::t('app', 'Support Operator Got Dt'),
 			'support_dt' => Yii::t('app', 'Support Dt'),
 			'support_status' => Yii::t('app', 'Support Status'),
 			'support_callback_dt' => Yii::t('app', 'Support Callback Dt'),
 			'support_callback_name' => Yii::t('app', 'Support Callback Name'),
 			'support_getting_passport_variant' => Yii::t('app', 'Support Getting Passport Variant'),
 			'support_number_region_usage' => Yii::t('app', 'Support Number Region Usage'),
-			'support_sent_sms_address' => Yii::t('app', 'Support Sent Sms Address'),
-			'support_sent_sms_email' => Yii::t('app', 'Support Sent Sms Email'),
+			'support_sent_sms_status' => Yii::t('app', 'Support Sent Sms Status'),
 			'user_id' => null,
+			'support_passport_need_validation' => Yii::t('app', 'Support Passport Need Validation'),
 			'balanceReportNumbers' => null,
 			'bonusReportNumbers' => null,
-			'user' => null,
 			'sim' => null,
 			'supportOperator' => null,
+			'user' => null,
 			'numberHistories' => null,
 			'subscriptionAgreements' => null,
 		);
@@ -135,15 +139,16 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('codeword', $this->codeword, true);
 		$criteria->compare('service_password', $this->service_password, true);
 		$criteria->compare('support_operator_id', $this->support_operator_id);
+		$criteria->compare('support_operator_got_dt', $this->support_operator_got_dt, true);
 		$criteria->compare('support_dt', $this->support_dt, true);
 		$criteria->compare('support_status', $this->support_status, true);
 		$criteria->compare('support_callback_dt', $this->support_callback_dt, true);
 		$criteria->compare('support_callback_name', $this->support_callback_name, true);
 		$criteria->compare('support_getting_passport_variant', $this->support_getting_passport_variant, true);
 		$criteria->compare('support_number_region_usage', $this->support_number_region_usage, true);
-		$criteria->compare('support_sent_sms_address', $this->support_sent_sms_address);
-		$criteria->compare('support_sent_sms_email', $this->support_sent_sms_email);
+		$criteria->compare('support_sent_sms_status', $this->support_sent_sms_status, true);
 		$criteria->compare('user_id', $this->user_id);
+		$criteria->compare('support_passport_need_validation', $this->support_passport_need_validation);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
@@ -156,12 +161,14 @@ abstract class BaseNumber extends BaseGxActiveRecord {
     public function convertDateTimeFieldsToEDateTime() {
         // rest of work will do setAttribute() routine
         $this->setAttribute('balance_status_changed_dt',strval($this->balance_status_changed_dt));
+        $this->setAttribute('support_operator_got_dt',strval($this->support_operator_got_dt));
         $this->setAttribute('support_dt',strval($this->support_dt));
         $this->setAttribute('support_callback_dt',strval($this->support_callback_dt));
     }
 
     public function convertDateTimeFieldsToString() {
         if (is_object($this->balance_status_changed_dt) && get_class($this->balance_status_changed_dt)=='EDateTime') $this->balance_status_changed_dt=new EString($this->balance_status_changed_dt->format(self::$mySqlDateTimeFormat));
+        if (is_object($this->support_operator_got_dt) && get_class($this->support_operator_got_dt)=='EDateTime') $this->support_operator_got_dt=new EString($this->support_operator_got_dt->format(self::$mySqlDateTimeFormat));
         if (is_object($this->support_dt) && get_class($this->support_dt)=='EDateTime') $this->support_dt=new EString($this->support_dt->format(self::$mySqlDateTimeFormat));
         if (is_object($this->support_callback_dt) && get_class($this->support_callback_dt)=='EDateTime') $this->support_callback_dt=new EString($this->support_callback_dt->format(self::$mySqlDateTimeFormat));
     }
@@ -182,6 +189,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
     public function setAttribute($name,$value) {
         if (is_string($value)) {
             if ($name=='balance_status_changed_dt') $value=$this->convertStringToEDateTime($value,'datetime');
+            if ($name=='support_operator_got_dt') $value=$this->convertStringToEDateTime($value,'datetime');
             if ($name=='support_dt') $value=$this->convertStringToEDateTime($value,'datetime');
             if ($name=='support_callback_dt') $value=$this->convertStringToEDateTime($value,'datetime');
         }

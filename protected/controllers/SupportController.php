@@ -68,7 +68,7 @@ class SupportController extends BaseGxController
         $message="Вы можете пройти регистрацию в офисах компании:\nг. Тюмень, ул. Баумана 27\nг. Тюмень, ул. 50 лет октября, 36/1 оф 506.";
         Sms::send($numberObj->number,$message);
 
-        $numberObj->support_sent_sms_address=1;
+        $numberObj->support_sent_sms_status=Number::SUPPORT_SMS_STATUS_OFFICE;
         $numberObj->save();
 
         Yii::app()->user->setFlash('success','Смс сообщение с адресами отправлено');
@@ -81,6 +81,8 @@ class SupportController extends BaseGxController
         if (!$numberObj) throw new CHttpException(403);
 
         $numberObj->restorePassword();
+        $numberObj->support_sent_sms_status=Number::SUPPORT_SMS_STATUS_LK;
+        $numberObj->save();
 
         Yii::app()->user->setFlash('success','SMS сообщение с новыми данными для доступа к личному кабинету отослано абоненту');
 
@@ -95,7 +97,7 @@ class SupportController extends BaseGxController
         $message="Пришлите пожалуйста копию вашего паспорта с данными и прописку на почту ".$supportOperator->email;
         Sms::send($numberObj->number,$message);
 
-        $numberObj->support_sent_sms_email=1;
+        $numberObj->support_sent_sms_status=Number::SUPPORT_SMS_STATUS_EMAIL;
         $numberObj->save();
 
         Yii::app()->user->setFlash('success',"Смс сообщение с email адресом '{$supportOperator->email}' отправлено");
@@ -290,7 +292,7 @@ class SupportController extends BaseGxController
             $criteria->order = Number::getBalanceStatusOrder();
             $criteria->limit = '20';
             if (Number::model()->count($criteria)>0) {
-                Number::model()->updateAll(array('support_operator_id' => loggedSupportOperatorId()), $criteria);
+                Number::model()->updateAll(array('support_operator_id' => loggedSupportOperatorId(),'support_operator_got_dt' => new CDbExpression('NOW()')), $criteria);
                 Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно получены.');
             } else Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Нет данных для обработки.');
             $this->refresh();

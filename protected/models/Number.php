@@ -9,6 +9,10 @@ class Number extends BaseNumber
     const STATUS_ACTIVE = 'ACTIVE';
     const STATUS_BLOCKED = 'BLOCKED';
 
+    const SUPPORT_SMS_STATUS_OFFICE = 'OFFICE';
+    const SUPPORT_SMS_STATUS_EMAIL = 'EMAIL';
+    const SUPPORT_SMS_STATUS_LK = 'LK';
+
     const BALANCE_STATUS_NORMAL = 'NORMAL';
     const BALANCE_STATUS_POSITIVE_STATIC = 'POSITIVE_STATIC';
     const BALANCE_STATUS_NEGATIVE_STATIC = 'NEGATIVE_STATIC';
@@ -75,6 +79,30 @@ class Number extends BaseNumber
         }
 
         return $labels;
+    }
+
+    public static function getSupportSMSStatusDropDownList($items=array()) {
+        $labels=self::getSupportSMSStatusLabels();
+        return array_merge($items,$labels);
+    }
+
+    public static function getSupportSMSStatusLabels() {
+        static $labels;
+
+        if (!$labels) {
+            $labels=array(
+                self::SUPPORT_SMS_STATUS_OFFICE=>Yii::t('app','OFFICE'),
+                self::SUPPORT_SMS_STATUS_EMAIL=>Yii::t('app','EMAIL'),
+                self::SUPPORT_SMS_STATUS_LK=>Yii::t('app','LK')
+            );
+        }
+
+        return $labels;
+    }
+
+    public function getSupportSMSStatusLabel($status) {
+        $labels=self::getSupportSMSStatusLabels();
+        return $labels[$status];
     }
 
     public function getStatusLabel($status) {

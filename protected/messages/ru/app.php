@@ -307,4 +307,9 @@ return array (
   'Subscriber data' => 'Данные абонента',
   'Your Tariff' => 'Ваш тариф',
   'Login' => 'Вход',
+  'Set Numbers'=>'Выдать номера',
+  'Getting Date'=>'Дата получения',
+  'OFFICE'=>'Офис',
+  'EMAIL'=>'E-Mail',
+  'LK'=>'Личный кабинет',
 );

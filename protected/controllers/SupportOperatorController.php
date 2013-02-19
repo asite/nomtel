@@ -43,6 +43,36 @@ class SupportOperatorController extends BaseGxController
         ));
     }
 
+    public function actionView() {
+        if (isset($_POST['setnumbers'])) {
+            $criteria = new CDbCriteria();
+            $criteria->addCondition('support_operator_id is NULL');
+            $criteria->addColumnCondition(array('status' => Number::STATUS_FREE));
+            $criteria->order = Number::getBalanceStatusOrder();
+            $criteria->limit = "20";
+            if (Number::model()->count($criteria)>0) {
+                Number::model()->updateAll(array('support_operator_id' => $_GET['id'],'support_operator_got_dt' => new CDbExpression('NOW()')), $criteria);
+                Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно переданы.');
+            } else Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Нет данных для обработки.');
+            $this->refresh();
+        }
+
+        $model = new Number('search');
+        $model->unsetAttributes();
+        if(isset($_GET['Number'])){
+            $model->setAttributes($_GET['Number']);
+        }
+
+        $dataProvider = $model->search();
+        $dataProvider->criteria->compare('support_operator_id',$_GET['id']);
+        $dataProvider->criteria->order = 'support_operator_got_dt DESC';
+
+        $this->render('view',array(
+            'model'=>$model,
+            'dataProvider'=>$dataProvider
+        ));
+    }
+
     public function actionCreate() {
         $model = new SupportOperator;
         $user = new User('create');

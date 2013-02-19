@@ -42,7 +42,7 @@ $('.search-form form').submit(function(){
 		array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
-            'template'=>'{update} {delete}',
+            'template'=>'{view} {update} {delete}',
             'deleteConfirmation' => Yii::t('app','Are you sure to delete this Technical Support User?'),
         ),
 	),
