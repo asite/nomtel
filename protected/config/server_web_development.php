@@ -13,7 +13,15 @@ $config = CMap::mergeArray(
             'adminEmail' => 'pavimus@gmail.com',
             'adminEmailFrom' => 'info@nomtel.com',
             'supportEmail' => array('pavimus@gmail.com','pavimus@gmail.com'),
-            'supportEmailFrom' => 'info@asiteapp.ru'
+            'supportEmailFrom' => 'info@asiteapp.ru',
+            'megafonBalanceEmails' => array(
+                'host'=>'mail.asiteplace.ru',
+                'port'=>'110',
+                'type'=>'pop3',
+                'ssl'=>true,
+                'login'=>'robot@asiteplace.ru',
+                'password'=>'XWfVmXW4'
+            )
         )
     )
 );

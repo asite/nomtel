@@ -46,7 +46,6 @@ class POSupportController extends Controller
 
         $recipients=Yii::app()->params['supportEmail'];
         if (!is_array($recipients)) $recipients=array($recipients);
-        print_r($report['message']); exit;
 
         $mail = new YiiMailMessage();
         $mail->setSubject(Yii::t('app', 'Problem with number'));
@@ -93,7 +92,7 @@ class POSupportController extends Controller
             $model->setAttributes($_POST['POSSpecification']);
             $this->performAjaxValidation($model,'specification');
 
-            $this->sendEMail(Yii::t('app','Order details')." по дате ".$model->dateRange);
+            $this->sendEMail(Yii::t('app','Order details')." по датам ".$model->dateRange);
 
             $this->redirect(array('index'));
         }
