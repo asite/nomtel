@@ -8,10 +8,11 @@ class CronController extends Controller
 
     protected function beforeAction(CAction $action) {
         $this->endTime=time()+self::MAX_WORKING_TIME;
+        return true;
     }
 
     private function haveTime() {
-        return time()<$this->endTime();
+        return time()<$this->endTime;
     }
 
     public function actionImportMegafonBalanceEmails() {

@@ -10,7 +10,8 @@ class MegafonBalanceEmailImporter
     }
 
     private function parse($mail) {
-
+        var_dump($mail);
+        return true;
     }
 
     private function log($msg,$level=CLogger::LEVEL_INFO) {
@@ -55,6 +56,7 @@ class MegafonBalanceEmailImporter
     }
 
     private function process($data) {
+        return true;
         $trx=Yii::app()->db->beginTransaction();
 
         $number=Number::model()->findByAttributes(array('number'=>$data['number']));
@@ -106,12 +108,12 @@ class MegafonBalanceEmailImporter
         $data=$this->parse($mail);
         if ($data!==false) {
             if ($this->process($data)) {
-                $this->emailProcessor->deleteMail();
+                $this->emailProcessor->emailProcessed();
             } else {
-                $this->emailProcessor->skipEmail();
+                $this->emailProcessor->emailSkipped();
             }
         } else {
-            $this->emailProcessor->skipEmail();
+            $this->emailProcessor->emailSkipped();
         }
 
         return true;

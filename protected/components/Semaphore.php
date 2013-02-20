@@ -23,8 +23,8 @@ class Semaphore {
     }
 
     public function release() {
-        if (!sem_release($this->_semId));
-        throw new CException(Yii::t('app',"Can't release semaphore ':name'",array(':name'=>$this->_name)));
+        if (!sem_release($this->_semId))
+            throw new CException(Yii::t('app',"Can't release semaphore ':name'",array(':name'=>$this->_name)));
     }
 
     public function __destruct() {
