@@ -350,7 +350,11 @@ if ($number->status!=Number::STATUS_FREE) {
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'columns' => array(
         'dt',
-        'who',
+        array(
+            'name'=>'who',
+            'type'=>'html',
+            'value'=>'NumberHistory::replaceShortcutsByLinks($data->who)',
+        ),
         array(
             'name'=>'comment',
             'type'=>'html',
