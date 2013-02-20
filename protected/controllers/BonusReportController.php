@@ -33,6 +33,7 @@ class BonusReportController extends BaseGxController
                  where bonus_report_agent.bonus_report_id=:bonus_report_id")->queryColumn(array(':bonus_report_id' => $id));
 
             BonusReportAgent::model()->deleteAllByAttributes(array('bonus_report_id' => $id));
+            BonusReportNumber::model()->deleteAllByAttributes(array('bonus_report_id' => $id));
             Payment::model()->deleteByPk($paymentIds);
 
             BonusReport::model()->deleteByPk($id);
