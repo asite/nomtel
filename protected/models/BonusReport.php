@@ -11,6 +11,6 @@ class BonusReport extends BaseBonusReport
 
     public function __toString()
     {
-        return $this->operator . ' ' . $this->dt;
+        return $this->comment;
     }
 }
