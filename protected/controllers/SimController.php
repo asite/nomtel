@@ -462,9 +462,9 @@ class SimController extends BaseGxController {
             $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id)
               SELECT " . Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']) . ", s.personal_account, s.number,s.number_price, s.icc, s.parent_id ,s.agent_id, " . Yii::app()->db->quoteValue($model->id) . ", NULL, NULL, s.operator_id, s.tariff_id, s.operator_region_id, s.company_id
               FROM sim as s
-              WHERE id IN ($ids_string)";
+              WHERE id IN ($ids_string) AND s.parent_agent_id = :parent_agent_id AND agent_id is null";
 
-            Yii::app()->db->createCommand($sql)->execute();
+            Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>loggedAgentId()));
 
             $model->agent->recalcBalance();
             $model->agent->save();
