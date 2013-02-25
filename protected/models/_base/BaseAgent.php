@@ -39,11 +39,11 @@
  * @property User $parent
  * @property AgentReferralRate[] $agentReferralRates
  * @property BonusReportAgent[] $bonusReportAgents
+ * @property BonusReportNumber[] $bonusReportNumbers
+ * @property BonusReportNumber[] $bonusReportNumbers1
  * @property Payment[] $payments
  * @property Sim[] $sims
  * @property Sim[] $sims1
- * @property Ticket[] $tickets
- * @property Ticket[] $tickets1
  */
 abstract class BaseAgent extends BaseGxActiveRecord {
 
@@ -87,11 +87,11 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'parent' => array(self::BELONGS_TO, 'User', 'parent_id'),
 			'agentReferralRates' => array(self::HAS_MANY, 'AgentReferralRate', 'agent_id'),
 			'bonusReportAgents' => array(self::HAS_MANY, 'BonusReportAgent', 'agent_id'),
+			'bonusReportNumbers' => array(self::HAS_MANY, 'BonusReportNumber', 'agent_id'),
+			'bonusReportNumbers1' => array(self::HAS_MANY, 'BonusReportNumber', 'parent_agent_id'),
 			'payments' => array(self::HAS_MANY, 'Payment', 'agent_id'),
 			'sims' => array(self::HAS_MANY, 'Sim', 'parent_agent_id'),
 			'sims1' => array(self::HAS_MANY, 'Sim', 'agent_id'),
-			'tickets' => array(self::HAS_MANY, 'Ticket', 'agent_id'),
-			'tickets1' => array(self::HAS_MANY, 'Ticket', 'whom'),
 		);
 	}
 
@@ -131,11 +131,11 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'parent' => null,
 			'agentReferralRates' => null,
 			'bonusReportAgents' => null,
+			'bonusReportNumbers' => null,
+			'bonusReportNumbers1' => null,
 			'payments' => null,
 			'sims' => null,
 			'sims1' => null,
-			'tickets' => null,
-			'tickets1' => null,
 		);
 	}
 

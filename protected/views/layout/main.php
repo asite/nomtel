@@ -32,10 +32,6 @@
             array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
             array('label' => Yii::t('app', 'Operators'), 'url' => $this->createUrl('operator/admin'), 'active' => $this->id == 'operator'),
             '',
-            array('label' => Yii::t('app', 'messages'), 'itemOptions' => array('class' => 'nav-header')),
-            array('label' => Yii::t('app', 'Inbox'), 'url' => $this->createUrl('message/inbox'), 'active' => ($this->route == 'message/inbox' || $_GET['type'] == 'inbox')),
-            array('label' => Yii::t('app', 'Outbox'), 'url' => $this->createUrl('message/outbox'), 'active' => ($this->route == 'message/outbox' || $_GET['type'] == 'outbox' || $this->route == 'message/create')),
-            '',
 
                array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
 
@@ -56,10 +52,6 @@
             array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list'),
             //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
             array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
-            '',
-            array('label' => Yii::t('app', 'messages'), 'itemOptions' => array('class' => 'nav-header')),
-            array('label' => Yii::t('app', 'Inbox'), 'url' => $this->createUrl('message/inbox'), 'active' => $this->route == ($this->route == 'message/inbox' || $_GET['type'] == 'inbox')),
-            array('label' => Yii::t('app', 'Outbox'), 'url' => $this->createUrl('message/outbox'), 'active' => ($this->route == 'message/outbox' || $_GET['type'] == 'outbox' || $this->route == 'message/create')),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
@@ -98,150 +90,6 @@
     ?>
 </div>
 <div class="contentRight">
-
-
-    <?php
-    /*
-if (isAdmin()) {
-$menu=array(
-array(
-'class'=>'bootstrap.widgets.TbMenu',
-'items'=>array(
-    array(
-        'label'=>Yii::t('app','MenuSim'),
-        'url'=>'#',
-        'items'=>
-        array(
-            array('label'=>Yii::t('app','addAct'), 'url'=>$this->createUrl('sim/delivery')),
-            array('label'=>Yii::t('app','addSim'), 'url'=>$this->createUrl('sim/add')),
-            array('label'=>Yii::t('app','Sim List'), 'url'=>$this->createUrl('sim/list')),
-            array('label'=>Yii::t('app','Mass select'), 'url'=>$this->createUrl('sim/massselect'))
-        )
-    )
-)
-),
-array(
-'class'=>'bootstrap.widgets.TbMenu',
-'items'=>array(
-    array(
-        'label'=>Yii::t('app','Agents'),
-        'url'=>$this->createUrl('agent/admin')
-    )
-)
-),
-array(
-'class'=>'bootstrap.widgets.TbMenu',
-'items'=>array(
-    array(
-        'label'=>Yii::t('app','Load Bonuses'),
-        'url'=>$this->createUrl('bonus/load')
-    )
-)
-),
-array(
-'class'=>'bootstrap.widgets.TbMenu',
-'items'=>array(
-    array(
-        'label'=>Act::model()->label(2),
-        'url'=>$this->createUrl('act/list')
-    )
-)
-),
-array(
-'class'=>'bootstrap.widgets.TbMenu',
-'items'=>array(
-    array(
-        'label'=>Yii::t('app','Operators'),
-        'url'=>$this->createUrl('operator/admin')
-    )
-)
-),
-array(
-'class'=>'bootstrap.widgets.TbMenu',
-'htmlOptions'=>array('class'=>'pull-right'),
-'items'=>array(
-    array(
-        'label'=>Yii::t('app','Logout'),
-        'url'=>$this->createUrl('site/logout')
-    )
-)
-)
-);
-} else {
-$menu=array(
-array(
-    'class'=>'bootstrap.widgets.TbMenu',
-    'items'=>array(
-        array(
-            'label'=>Yii::t('app','My Profile'),
-            'url'=>$this->createUrl('agent/view',array('id'=>loggedAgentId()))
-        )
-    )
-),
-array(
-    'class'=>'bootstrap.widgets.TbMenu',
-    'items'=>array(
-        array(
-            'label'=>Yii::t('app','Agents'),
-            'url'=>$this->createUrl('agent/admin')
-        )
-    )
-),
-array(
-    'class'=>'bootstrap.widgets.TbMenu',
-    'items'=>array(
-        array(
-            'label'=>Yii::t('app','Sim List'),
-            'url'=>$this->createUrl('sim/list'))
-        )
-),
-array(
-    'class'=>'bootstrap.widgets.TbMenu',
-    'items'=>array(
-        array(
-            'label'=>Act::model()->label(2),
-            'url'=>$this->createUrl('act/list')
-        )
-    )
-),
-array(
-    'class'=>'bootstrap.widgets.TbMenu',
-    'items'=>array(
-        array(
-            'label'=>Yii::t('app','messages'),
-            'url'=>'#',
-            'items'=>
-            array(
-                array('label'=>Yii::t('app','message to agent up'), 'url'=>$this->createUrl('message/agentUp')),
-                array('label'=>Yii::t('app','message to agent down'), 'url'=>$this->createUrl('message/agentDown'))
-            )
-        )
-    )
-),
-array(
-    'class'=>'bootstrap.widgets.TbMenu',
-    'htmlOptions'=>array('class'=>'pull-right'),
-    'items'=>array(
-        array(
-            'label'=>Yii::t('app','Logout'),
-            'url'=>$this->createUrl('site/logout')
-        )
-    )
-)
-);
-
-}
-
-    $this->widget('bootstrap.widgets.TbNavbar', array(
-        'fixed'=>false,
-        'type'=>'inverse',
-        'brand'=>Yii::app()->name,
-        'brandUrl'=>$this->createUrl('site/index'),
-        'collapse'=>true,
-        'items'=> $menu
-    ));
-*/
-    ?>
 
     <?php $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
     'homeLink' => CHtml::link(Yii::t('app', 'Home'), $this->createUrl('site/index')),
