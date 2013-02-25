@@ -229,6 +229,9 @@ class SubscriptionAgreementController extends BaseGxController {
                 $number->status=Number::STATUS_ACTIVE;
                 $number->save();
 
+                $message = "Компания Номтел благодарит Вас за регистрацию.";
+                Sms::send($number->number,$message);
+
                 $agreement->setScenario('create');
                 $agreement->person_id=$person->id;
                 $agreement->number_id=$number->id;

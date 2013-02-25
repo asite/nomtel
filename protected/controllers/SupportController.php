@@ -6,7 +6,7 @@ class SupportController extends BaseGxController
     public function additionalAccessRules() {
         return array(
             array('allow', 'actions' => array('number'), 'roles' => array('agent','support')),
-            array('allow', 'actions' => array('numberStatus','sendSmsWithAddress','sendSmsWithEmail','sendSMSWithPOData'), 'roles' => array('support')),
+            array('allow', 'actions' => array('numberStatus','sendSmsWithAddress','sendSmsWithEmail','sendSMSWithPOData', 'sendEMailHelpStatus'), 'roles' => array('support')),
             array('allow', 'actions' => array('callback'), 'roles' => array('support')),
             array('allow', 'actions' => array('numberForCalls','numberForApprove'), 'roles' => array('support')),
             array('allow', 'actions' => array('statistic'), 'roles' => array('support')),
@@ -59,6 +59,33 @@ class SupportController extends BaseGxController
         $this->render('number', array(
             'report' => $report
         ));
+    }
+
+    public function actionSendEMailHelpStatus($number) {
+        $numberObj=Number::model()->findByAttributes(array('number'=>$number));
+        $numberObj->support_status = Number::SUPPORT_STATUS_HELP;
+        if ($numberObj->save()) {
+            $body = 'Помощь оператору #'.$numberObj->number;
+
+            $recipients=Yii::app()->params['numberHelpEmail'];
+            if (!is_array($recipients)) $recipients=array($recipients);
+
+            $mail = new YiiMailMessage();
+            $mail->setSubject('Помощь оператору #'.$numberObj->number);
+            $mail->setFrom(Yii::app()->params['supportEmailFrom']);
+            $mail->setTo($recipients);
+            $mail->setBody($body);
+
+            $report_number=time();
+
+            if (Yii::app()->mail->send($mail))
+                Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$report_number)));
+            else
+                Yii::app()->user->setFlash('error', Yii::t('app', 'Problem sending email'));
+        }
+
+        $this->redirect(array('numberStatus'));
+
     }
 
     public function actionSendSmsWithAddress($number) {
@@ -207,10 +234,12 @@ class SupportController extends BaseGxController
                                     $number->support_getting_passport_variant=$status->getting_passport_variant;
                                     $number->support_number_region_usage=$status->number_region_usage;
 
-
                                     $number->save();
 
                                     $person->save();
+
+                                    $message = "Компания Номтел благодарит Вас за регистрацию.";
+                                    Sms::send($number->number,$message);
 
                                     foreach($person_files as $file_id) {
                                         $personFile=new PersonFile();

@@ -103,19 +103,23 @@ function UploaderAddFiles(id,files) {
 <?php
     if ($numberObj->status==Number::STATUS_FREE) {
         foreach(Number::getSupportStatusLabels() as $status_key=>$status_label) {
-            if ($status_key=='ACTIVE') continue;
+            if ($status_key=='ACTIVE' || $status_key=='PREACTIVE' || $status_key=='HELP') continue;
             $this->widget('bootstrap.widgets.TbButton',array(
                 'label'=>$status_label,
                 'htmlOptions'=>array('onclick'=>'setStatus("'.$status_key.'")')
             ));
             echo "&nbsp;";
         }
+        $d=$this->widget('bootstrap.widgets.TbButton',array(
+                'label'=>Number::getSupportStatusLabel('HELP'),
+                'url'=>$this->createUrl('support/sendEMailHelpStatus',array('number'=>$number->number)),
+        ));
     } else {
-            $d=$this->widget('bootstrap.widgets.TbButton',array(
+            /*$d=$this->widget('bootstrap.widgets.TbButton',array(
                 'label'=>'Полная форма договора',
                 'url'=>$this->createUrl('subscriptionAgreement/update',array('number_id'=>$numberObj->id))
             ));
-            echo "&nbsp;";
+            echo "&nbsp;";*/
             $d=$this->widget('bootstrap.widgets.TbButton',array(
                 'label'=>Number::getSupportStatusLabel('SERVICE_INFO'),
                 'htmlOptions'=>array('onclick'=>'setStatus("SERVICE_INFO")')
@@ -123,7 +127,7 @@ function UploaderAddFiles(id,files) {
         echo "&nbsp;";
    }
     $this->widget('bootstrap.widgets.TbButton',array(
-        'label'=>'регистрация Online',
+        'label'=>'Адрес личного кабинет',
         'url'=>$this->createUrl('support/sendSmsWithPOData',array('number'=>$number->number)),
     ));
 
@@ -144,19 +148,23 @@ function UploaderAddFiles(id,files) {
     <div id="active" style="display:none;">
 <?php
         $this->widget('bootstrap.widgets.TbButton',array(
-            'label'=>'Регистрация в офис',
+            'label'=>'Адреса ОФИСОВ',
             'url'=>$this->createUrl('support/sendSmsWithAddress',array('number'=>$number->number)),
         ));
         echo "&nbsp;";
         $this->widget('bootstrap.widgets.TbButton',array(
-            'label'=>'Вышлют по email',
+            'label'=>'Адрес E-Mail',
             'url'=>$this->createUrl('support/sendSmsWithEmail',array('number'=>$number->number)),
         ));
 ?><br/><br/>
 
         <div class="form-container-horizontal">
                 <div class="form-container-item form-label-width-220">
-                    <?php echo $form->textFieldRow($status,'getting_passport_variant',array('class'=>'span4')); ?>
+                    <div class="control-group ">
+                        <label class="control-label"><?php echo Yii::t('app','Tariff'); ?>:</label>
+                        <div class="controls" style="padding-top: 5px;"><?php echo $numberObj->sim->tariff; ?></div>
+                    </div>
+                    <?php // echo $form->textFieldRow($status,'getting_passport_variant',array('class'=>'span4')); ?>
                     <?php echo $form->textFieldRow($status,'number_region_usage',array('class'=>'span4')); ?>
                 </div>
             </div>
@@ -236,7 +244,7 @@ $this->endWidget();
 
 <?php if ($showStatusForm) { ?>
 <div id="scans" style="display:none;position:absolute;">   <?php //top:330px; ?>
-<h3>Сканы паспорта</h3>
+<h3>Изображение документа</h3>
 <?php
 $this->widget('bootstrap.widgets.TbFileUpload', array(
     'url' => $this->createUrl("file/upload",array('name'=>'File')),

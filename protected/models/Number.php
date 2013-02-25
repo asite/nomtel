@@ -27,6 +27,7 @@ class Number extends BaseNumber
     const SUPPORT_STATUS_ACTIVE='ACTIVE';
     const SUPPORT_STATUS_PREACTIVE='PREACTIVE';
     const SUPPORT_STATUS_SERVICE_INFO='SERVICE_INFO';
+    const SUPPORT_STATUS_HELP='HELP';
 
     public static function model($className = __CLASS__)
     {
@@ -122,10 +123,11 @@ class Number extends BaseNumber
             $labels=array(
                 self::SUPPORT_STATUS_UNAVAILABLE=>'Недоступен',
                 self::SUPPORT_STATUS_CALLBACK=>'Перезвонить',
-                self::SUPPORT_STATUS_REJECT=>'Отказ по телефону',
+                self::SUPPORT_STATUS_REJECT=>'Отказ в регистрации',
                 self::SUPPORT_STATUS_PREACTIVE=>'Получены данные',
                 self::SUPPORT_STATUS_ACTIVE=>'Получены сканы',
-                self::SUPPORT_STATUS_SERVICE_INFO=>'Сервисная информация'
+                self::SUPPORT_STATUS_SERVICE_INFO=>'Сервисная информация',
+                self::SUPPORT_STATUS_HELP=>'HELP'
             );
         }
 
@@ -202,7 +204,8 @@ class Number extends BaseNumber
             self::SUPPORT_STATUS_CALLBACK=>0,
             self::SUPPORT_STATUS_REJECT=>0,
             self::SUPPORT_STATUS_ACTIVE=>0,
-            self::SUPPORT_STATUS_SERVICE_INFO=>0
+            self::SUPPORT_STATUS_SERVICE_INFO=>0,
+            self::SUPPORT_STATUS_HELP=>0
         );
     }
 }
