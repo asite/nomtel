@@ -23,6 +23,27 @@ return array(
         )
     ),
 
+    'supportMain' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+            'support',
+        )
+    ),
+
+    'supportAdmin' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+            'support',
+        )
+    ),
+
+    'supportMegafon' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+            'support',
+        )
+    ),
+
     'number' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(

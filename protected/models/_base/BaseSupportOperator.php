@@ -11,6 +11,7 @@
  *
  * @property integer $id
  * @property integer $user_id
+ * @property string $role
  * @property string $name
  * @property string $surname
  * @property string $middle_name
@@ -19,6 +20,8 @@
  *
  * @property Number[] $numbers
  * @property User $user
+ * @property Ticket[] $tickets
+ * @property TicketHistory[] $ticketHistories
  */
 abstract class BaseSupportOperator extends BaseGxActiveRecord {
 
@@ -35,15 +38,16 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'name';
+		return 'role';
 	}
 
 	public function rules() {
 		return array(
-			array('user_id, name, surname, middle_name, phone, email', 'required'),
+			array('user_id, role, name, surname, middle_name, phone, email', 'required'),
 			array('user_id', 'numerical', 'integerOnly'=>true),
+			array('role', 'length', 'max'=>14),
 			array('name, surname, middle_name, phone, email', 'length', 'max'=>200),
-			array('id, user_id, name, surname, middle_name, phone, email', 'safe', 'on'=>'search'),
+			array('id, user_id, role, name, surname, middle_name, phone, email', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -51,6 +55,8 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 		return array(
 			'numbers' => array(self::HAS_MANY, 'Number', 'support_operator_id'),
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
+			'tickets' => array(self::HAS_MANY, 'Ticket', 'support_operator_id'),
+			'ticketHistories' => array(self::HAS_MANY, 'TicketHistory', 'support_operator_id'),
 		);
 	}
 
@@ -63,6 +69,7 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'user_id' => null,
+			'role' => Yii::t('app', 'Role'),
 			'name' => Yii::t('app', 'Name'),
 			'surname' => Yii::t('app', 'Surname'),
 			'middle_name' => Yii::t('app', 'Middle Name'),
@@ -70,6 +77,8 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 			'email' => Yii::t('app', 'Email'),
 			'numbers' => null,
 			'user' => null,
+			'tickets' => null,
+			'ticketHistories' => null,
 		);
 	}
 
@@ -78,6 +87,7 @@ abstract class BaseSupportOperator extends BaseGxActiveRecord {
 
 		$criteria->compare('id', $this->id);
 		$criteria->compare('user_id', $this->user_id);
+		$criteria->compare('role', $this->role, true);
 		$criteria->compare('name', $this->name, true);
 		$criteria->compare('surname', $this->surname, true);
 		$criteria->compare('middle_name', $this->middle_name, true);

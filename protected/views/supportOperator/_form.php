@@ -28,14 +28,12 @@
         </fieldset>
         <fieldset><legend><?php echo Operator::label(1);?></legend>
 
-    	<?php //echo $form->errorSummary($model); ?>
-
-        <?php //echo $form->textFieldRow($model,'user_id',array('class'=>'span5')); ?>
+        <?php echo $form->dropDownListRow($model,'role',SupportOperator::getRoleDropDownList(array(""=>"")),array('errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php echo $form->textFieldRow($model,'surname',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php echo $form->textFieldRow($model,'middle_name',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php echo $form->textFieldRow($model,'phone',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
-            <?php echo $form->textFieldRow($model,'email',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
+        <?php echo $form->textFieldRow($model,'email',array('class'=>'span5','maxlength'=>200,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
         <?php
         echo '<div class="form-actions">';
         echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'Save'), array('class'=>'btn btn-primary', 'type'=>'submit'));
