@@ -92,7 +92,7 @@ class SupportController extends BaseGxController
         $numberObj=Number::model()->findByAttributes(array('number'=>$number));
         if (!$numberObj) throw new CHttpException(403);
 
-        $message="Вы можете пройти регистрацию в офисах компании:\nг. Тюмень, ул. Баумана 27\nг. Тюмень, ул. 50 лет октября, 36/1 оф 506.";
+        $message="Вы можете пройти регистрацию в офисах компании:\nг. Тюмень, ул. Баумана 27\nг. Тюмень, ул. 50 лет октября, 36/1 оф 507.";
         Sms::send($numberObj->number,$message);
 
         $numberObj->support_sent_sms_status=Number::SUPPORT_SMS_STATUS_OFFICE;
