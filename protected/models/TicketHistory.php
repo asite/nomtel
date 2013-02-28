@@ -20,4 +20,14 @@ class TicketHistory extends BaseTicketHistory
         return Ticket::getStatusLabel($status);
     }
 
+    public function search()
+    {
+        $data_provider = parent::search();
+
+        $data_provider->setSort(array(
+            'defaultOrder' => 'id asc'
+        ));
+        return $data_provider;
+    }
+
 }

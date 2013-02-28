@@ -57,7 +57,7 @@
         );
     }
 
-    if (Yii::app()->user->role == 'support') {
+    if (preg_match('/^support/',Yii::app()->user->role)) {
         $menuLeft = array(
             array('label' => Number::label(2), 'url' => $this->createUrl('support/numberStatus'), 'active' => $this->route == 'support/numberStatus'),
             array('label' => Yii::t('app','Call back'), 'url' => $this->createUrl('support/callback'), 'active' => $this->route == 'support/callback'),
@@ -68,9 +68,19 @@
             //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
             '',
             array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
+        );
+
+        if (Yii::app()->user->role=='supportAdmin') {
+            $menuLeft=array_merge($menuLeft,array(
+                '',
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketAdmin/index')),
+            ));
+        }
+
+        $menuLeft=array_merge($menuLeft,array(
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
-        );
+        ));
     }
 
     if (Yii::app()->user->role == 'number') {

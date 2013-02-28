@@ -4,6 +4,8 @@ Yii::import('application.models._base.BaseTicket');
 
 class Ticket extends BaseTicket
 {
+    const ITEMS_PER_PAGE=20;
+
     const STATUS_NEW='NEW';
     const STATUS_IN_WORK_MEGAFON='IN_WORK_MEGAFON';
     const STATUS_IN_WORK_OPERATOR='IN_WORK_OPERATOR';
@@ -46,4 +48,18 @@ class Ticket extends BaseTicket
         return $labels[$status];
     }
 
+    public function addHistory($comment) {
+        $history=new TicketHistory();
+        $history->ticket_id=$this->id;
+        $history->dt=new EDateTime();
+        $history->support_operator_id=loggedSupportOperatorId();
+        $history->comment=$comment;
+        $history->status=$this->status;
+
+        $history->save();
+    }
+
+    public function __toString() {
+        return 'Обращение #'.$this->id.' от '.$this->dt->format('d.m.Y');
+    }
 }

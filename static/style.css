@@ -318,3 +318,7 @@ table.margin_b0 {
 .backgroundwhite th, .backgroundwhite.table-striped td {
   background: white !important;
 }
+
+.hide-labels label{
+    display:none;
+}

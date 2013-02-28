@@ -39,10 +39,12 @@ abstract class BaseTicketHistory extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('id, ticket_id, dt, support_operator_id, comment, status', 'required'),
+			array('ticket_id, dt, support_operator_id, status', 'required'),
 			array('support_operator_id', 'numerical', 'integerOnly'=>true),
-			array('id, ticket_id', 'length', 'max'=>20),
+			array('ticket_id', 'length', 'max'=>20),
 			array('status', 'length', 'max'=>19),
+			array('comment', 'safe'),
+			array('comment', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
 			array('id, ticket_id, dt, support_operator_id, comment, status', 'safe', 'on'=>'search'),
 		);
