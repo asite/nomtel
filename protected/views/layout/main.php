@@ -84,6 +84,13 @@
             ));
         }
 
+        if (Yii::app()->user->role=='support') {
+            $menuLeft=array_merge($menuLeft,array(
+                '',
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticket/index')),
+            ));
+        }
+
         $menuLeft=array_merge($menuLeft,array(
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),

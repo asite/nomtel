@@ -33,19 +33,15 @@ class POSupportController extends Controller
     }
 
     public function actionList() {
-        $model = new Ticket();
-        $model->unsetAttributes();
-
-        if (isset($_REQUEST['TicketSearch']))
-            $model->setAttributes($_REQUEST['TicketSearch']);
-
         $criteria = new CDbCriteria();
         $criteria->addCondition("number_id=:number_id");
         $criteria->params = array(':number_id'=>loggedNumberId());
 
+        $dataProvider = new CActiveDataProvider('Ticket', array('criteria' => $criteria));
 
-
-        $this->render('list');
+        $this->render('list', array(
+            'dataProvider' => $dataProvider
+        ));
     }
 
 

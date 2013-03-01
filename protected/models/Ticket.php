@@ -50,6 +50,20 @@ class Ticket extends BaseTicket
         return $labels[$status];
     }
 
+    public static function getStatusPOLabel($status) {
+        switch ($status) {
+            case self::STATUS_DONE:
+                return Yii::t('app','DONE');
+                break;
+            case self::STATUS_REFUSED:
+                return Yii::t('app','REFUSED');
+                break;
+            default:
+                return Yii::t('app','IN_PROCESSING');
+                break;
+        }
+    }
+
     public function addHistory($comment) {
         $history=new TicketHistory();
         $history->ticket_id=$this->id;
@@ -88,7 +102,8 @@ class Ticket extends BaseTicket
 
     public function rules() {
         return array_merge(parent::rules(),array(
-            array('internal','required','on'=>'internalRequired','message'=>'Заполните пожалуйста это поле')
+            array('internal','required','on'=>'internalRequired','message'=>'Заполните пожалуйста это поле'),
+            array('response','required','on'=>'responseRequired','message'=>'Заполните пожалуйста это поле')
         ));
     }
 }

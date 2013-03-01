@@ -333,4 +333,6 @@ return array (
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
   'Support List' => 'Список обращений',
+  'IN_PROCESSING' => 'В обработке',
+  'Response' => 'Ответ',
 );

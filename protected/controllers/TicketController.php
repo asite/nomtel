@@ -1,32 +1,29 @@
 <?php
 
-class TicketMainController extends BaseGxController {
-    private $availableStatuses=array(
-        Ticket::STATUS_REFUSED_BY_ADMIN,
-        Ticket::STATUS_REFUSED_BY_OPERATOR,
-        Ticket::STATUS_REFUSED_BY_MEGAFON,
-        Ticket::STATUS_FOR_REVIEW,
-    );
+class TicketController extends BaseGxController {
 
     public function additionalAccessRules() {
         return array(
-            array('allow', 'roles' => array('supportMain')),
+            array('allow', 'roles' => array('support')),
         );
     }
 
-    public function getStatusDropDownList($items) {
-        $res=array();
-        foreach(Ticket::getStatusDropDownList($items) as $k=>$v)
-            if (isset($items[$k]) || in_array($k,$this->availableStatuses)) $res[$k]=$v;
-
-        return $res;
+    public function actionIndexMy() {
+        $this->actionIndex();
     }
 
     public function actionIndex() {
         $data=array();
 
         $criteria=new CDbCriteria();
-        $criteria->addInCondition('t.status',$this->availableStatuses);
+        $criteria->compare('t.status',Ticket::STATUS_IN_WORK_OPERATOR);
+
+        if ($this->action->id=='index') {
+            $criteria->addCondition('t.support_operator_id is null');
+        }
+        if ($this->action->id=='indexMy') {
+            $criteria->compare('t.support_operator_id',loggedSupportOperatorId());
+        }
 
         list($data['dataProvider'],$data['model'])=TicketSearch::getSqlDataProvider($criteria);
 

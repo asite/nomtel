@@ -26,11 +26,13 @@
 
 
 
+<div style="clear:both;">
 <?php $this->widget('bootstrap.widgets.TbListView',array(
     'dataProvider'=>$dataProvider,
     'itemView'=>'_item',
     'id'=>'listview',
 ));?>
+</div>
 
 <script>
     $('#filter').submit(function(){
