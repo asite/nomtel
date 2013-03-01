@@ -31,39 +31,27 @@
 
 
 <?php $form=$this->beginWidget('BaseTbActiveForm',array('htmlOptions'=>array('class'=>'hide-labels'))); ?>
-<fieldset><legend>Текст обращения</legend>
-<?=$form->textareaRow($ticket,'text',array('label'=>'Текст обращения','disabled'=>true,'class'=>'span8','rows'=>5));?>
+<fieldset><legend>Задание</legend>
+    <?=$form->textareaRow($ticket,'internal',array('label'=>'Текст обращения','disabled'=>true,'class'=>'span8','rows'=>5));?>
 </fieldset>
 
-<div style="margin-bottom:10px;">
-<?php $this->widget('bootstrap.widgets.TbButton',array(
-    'htmlOptions'=>array('onclick'=>'$("#Ticket_internal").val($("#Ticket_text").val());'),
-    'label'=>'Скопировать'
-));?>
-</div>
-
-<?=$form->textareaRow($ticket,'internal',array('class'=>'span8','rows'=>5));?>
+<?=$form->textareaRow($ticket,'response',array('class'=>'span8','rows'=>5));?>
 
 <div style="text-align:right;">
-    <?php $this->widget('bootstrap.widgets.TbButton',array(
+<?php $this->widget('bootstrap.widgets.TbButton',array(
     'buttonType'=>'submit',
-    'htmlOptions'=>array('name'=>'reject'),
+    'htmlOptions'=>array('name'=>'toAdmin'),
+    'label'=>'Вернуть администратору'
+));?> &nbsp;
+<?php $this->widget('bootstrap.widgets.TbButton',array(
+    'buttonType'=>'submit',
+    'htmlOptions'=>array('name'=>'refuse'),
     'label'=>'Отказать'
 ));?> &nbsp;
 <?php $this->widget('bootstrap.widgets.TbButton',array(
     'buttonType'=>'submit',
-    'htmlOptions'=>array('name'=>'toOperators'),
-    'label'=>'Передать операторам'
-));?> &nbsp;
-<?php $this->widget('bootstrap.widgets.TbButton',array(
-    'buttonType'=>'submit',
-    'htmlOptions'=>array('name'=>'toMegafon'),
-    'label'=>'Передать в мегафон'
-));?> &nbsp;
-<?php $this->widget('bootstrap.widgets.TbButton',array(
-    'buttonType'=>'submit',
-    'htmlOptions'=>array('name'=>'done'),
-    'label'=>'Выполнено'
+    'htmlOptions'=>array('name'=>'accept'),
+    'label'=>'Принять'
 ));?>
 </div>
 

@@ -14,6 +14,7 @@ class Ticket extends BaseTicket
     const STATUS_REFUSED_BY_OPERATOR='REFUSED_BY_OPERATOR';
     const STATUS_FOR_REVIEW='FOR_REVIEW';
     const STATUS_DONE='DONE';
+    const STATUS_REFUSED='REFUSED';
 
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
@@ -36,7 +37,8 @@ class Ticket extends BaseTicket
                 self::STATUS_REFUSED_BY_ADMIN=>Yii::t('app','REFUSED_BY_ADMIN'),
                 self::STATUS_REFUSED_BY_OPERATOR=>Yii::t('app','REFUSED_BY_OPERATOR'),
                 self::STATUS_FOR_REVIEW=>Yii::t('app','FOR_REVIEW'),
-                self::STATUS_DONE=>Yii::t('app','DONE')
+                self::STATUS_DONE=>Yii::t('app','DONE'),
+                self::STATUS_REFUSED=>Yii::t('app','REFUSED')
             );
         }
 
@@ -59,7 +61,34 @@ class Ticket extends BaseTicket
         $history->save();
     }
 
+    public function addMessage($idNumber, $message) {
+        $number=Number::model()->findByPk($idNumber);
+
+        $criteria = new CDbCriteria();
+        $criteria->addCondition('parent_id = :parent_id');
+        $criteria->addCondition('agent_id is null');
+        $criteria->params = array(':parent_id' => $number->sim_id);
+        $sim = Sim::model()->find($criteria);
+
+        $ticket = new Ticket;
+        $ticket->number_id = $idNumber;
+        $ticket->sim_id = $sim->id;
+        $ticket->agent_id = $sim->parent_agent_id;
+        $ticket->status = self::STATUS_NEW;
+        $ticket->dt = new EDateTime();
+        $ticket->text = $message;
+        $ticket->save();
+
+        return $ticket->id;
+    }
+
     public function __toString() {
         return 'Обращение #'.$this->id.' от '.$this->dt->format('d.m.Y');
+    }
+
+    public function rules() {
+        return array_merge(parent::rules(),array(
+            array('internal','required','on'=>'internalRequired','message'=>'Заполните пожалуйста это поле')
+        ));
     }
 }

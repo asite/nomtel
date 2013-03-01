@@ -19,7 +19,7 @@
 
 <div class="form-container-horizontal">
     <div class="form-container-item form-label-width-60">
-        <?=$form->dropDownListRow($model,'status',Ticket::getStatusDropDownList(array(''=>'')),array('class'=>'span2'))?>
+        <?=$form->dropDownListRow($model,'status',$this->getStatusDropDownList(array(''=>'')),array('class'=>'span2'))?>
     </div>
 </div>
 <?php $this->endWidget(); ?>

@@ -1,17 +1,32 @@
 <?php
 
-class TicketAdminController extends BaseGxController {
+class TicketMainController extends BaseGxController {
+    private $availableStatuses=array(
+        Ticket::STATUS_REFUSED_BY_ADMIN,
+        Ticket::STATUS_REFUSED_BY_OPERATOR,
+        Ticket::STATUS_REFUSED_BY_MEGAFON,
+        Ticket::STATUS_FOR_REVIEW,
+    );
 
     public function additionalAccessRules() {
         return array(
-            array('allow', 'roles' => array('supportAdmin')),
+            array('allow', 'roles' => array('supportMain')),
         );
+    }
+
+    public function getStatusDropDownList($items) {
+        $res=array();
+        foreach(Ticket::getStatusDropDownList($items) as $k=>$v)
+            if (isset($items[$k]) || in_array($k,$this->availableStatuses)) $res[$k]=$v;
+
+        return $res;
     }
 
     public function actionIndex() {
         $data=array();
 
         $criteria=new CDbCriteria();
+        $criteria->addInCondition('t.status',$this->availableStatuses);
 
         list($data['dataProvider'],$data['model'])=TicketSearch::getSqlDataProvider($criteria);
 
@@ -27,29 +42,24 @@ class TicketAdminController extends BaseGxController {
         if (isset($_POST['Ticket'])) {
             $ticket->setScenario('internalRequired');
             $ticket->setAttributes($_POST['Ticket']);
+
             if ($ticket->validate()) {
                 $ticket->setScenario('');
 
                 $ticket->support_operator_id=null;
 
-                $comment=$ticket->internal;
+                $comment=$ticket->response;
 
-                if (isset($_POST['done'])) {
-                    $ticket->response=$ticket->internal;
-                    $ticket->internal=null;
-                    $ticket->status=Ticket::STATUS_FOR_REVIEW;
+                if (isset($_POST['accept'])) {
+                    $ticket->status=Ticket::STATUS_DONE;
                 }
 
-                if (isset($_POST['toOperators'])) {
-                    $ticket->status=Ticket::STATUS_IN_WORK_OPERATOR;
+                if (isset($_POST['refuse'])) {
+                    $ticket->status=Ticket::STATUS_REFUSED;
                 }
 
-                if (isset($_POST['reject'])) {
-                    $ticket->status=Ticket::STATUS_REFUSED_BY_ADMIN;
-                }
-
-                if (isset($_POST['toMegafon'])) {
-                    $ticket->status=Ticket::STATUS_IN_WORK_MEGAFON;
+                if (isset($_POST['toAdmin'])) {
+                    $ticket->status=Ticket::STATUS_NEW;
                 }
 
                 $trx=Yii::app()->db->beginTransaction();

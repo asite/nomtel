@@ -1,0 +1,1 @@
+<h2><?php echo Yii::t('app', 'Support List'); ?></h2>

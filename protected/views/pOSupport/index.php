@@ -44,7 +44,7 @@
                 'errorOptions'=>array('hideErrorMessage'=>true),
                 'prepend'=>'<i class="icon-calendar"></i>',
                 'options' => array(
-                    'format' => 'dd.mm.yyyy'
+                    'format'=>'dd.MM.yyyy',
                 )
         )); ?>
         <?php echo CHtml::htmlButton(Yii::t('app','Order details'), array('class'=>'btn', 'type'=>'submit')); ?>

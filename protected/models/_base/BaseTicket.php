@@ -17,6 +17,8 @@
  * @property string $dt
  * @property string $status
  * @property string $text
+ * @property string $internal
+ * @property string $response
  *
  * @property Number $number
  * @property Sim $sim
@@ -48,9 +50,10 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 			array('agent_id, support_operator_id', 'numerical', 'integerOnly'=>true),
 			array('number_id, sim_id', 'length', 'max'=>20),
 			array('status', 'length', 'max'=>19),
-			array('support_operator_id', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('internal, response', 'safe'),
+			array('support_operator_id, internal, response', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, number_id, sim_id, agent_id, support_operator_id, dt, status, text', 'safe', 'on'=>'search'),
+			array('id, number_id, sim_id, agent_id, support_operator_id, dt, status, text, internal, response', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -79,6 +82,8 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 			'dt' => Yii::t('app', 'Dt'),
 			'status' => Yii::t('app', 'Status'),
 			'text' => Yii::t('app', 'Text'),
+			'internal' => Yii::t('app', 'Internal'),
+			'response' => Yii::t('app', 'Response'),
 			'number' => null,
 			'sim' => null,
 			'agent' => null,
@@ -98,6 +103,8 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('status', $this->status, true);
 		$criteria->compare('text', $this->text, true);
+		$criteria->compare('internal', $this->internal, true);
+		$criteria->compare('response', $this->response, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
