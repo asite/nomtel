@@ -30,6 +30,13 @@ class TicketController extends BaseGxController {
         $this->render('index',$data);
     }
 
+    public function actionAssignToMe($id) {
+        $ticket=$this->loadModel($id,'Ticket');
+        $ticket->support_operator_id=loggedSupportOperatorId();
+        $ticket->save();
+        $this->redirect(array('detail','id'=>$id));
+    }
+
     public function actionDetail($id) {
         $data=array();
 
@@ -48,15 +55,11 @@ class TicketController extends BaseGxController {
                 $comment=$ticket->response;
 
                 if (isset($_POST['accept'])) {
-                    $ticket->status=Ticket::STATUS_DONE;
+                    $ticket->status=Ticket::STATUS_FOR_REVIEW;
                 }
 
                 if (isset($_POST['refuse'])) {
-                    $ticket->status=Ticket::STATUS_REFUSED;
-                }
-
-                if (isset($_POST['toAdmin'])) {
-                    $ticket->status=Ticket::STATUS_NEW;
+                    $ticket->status=Ticket::STATUS_REFUSED_BY_OPERATOR;
                 }
 
                 $trx=Yii::app()->db->beginTransaction();

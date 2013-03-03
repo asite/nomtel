@@ -40,18 +40,13 @@
 <div style="text-align:right;">
 <?php $this->widget('bootstrap.widgets.TbButton',array(
     'buttonType'=>'submit',
-    'htmlOptions'=>array('name'=>'toAdmin'),
-    'label'=>'Вернуть администратору'
-));?> &nbsp;
-<?php $this->widget('bootstrap.widgets.TbButton',array(
-    'buttonType'=>'submit',
     'htmlOptions'=>array('name'=>'refuse'),
     'label'=>'Отказать'
 ));?> &nbsp;
 <?php $this->widget('bootstrap.widgets.TbButton',array(
     'buttonType'=>'submit',
     'htmlOptions'=>array('name'=>'accept'),
-    'label'=>'Принять'
+    'label'=>'Выполнено'
 ));?>
 </div>
 

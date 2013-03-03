@@ -8,7 +8,7 @@
     <div style="clear:both;margin-top:5px;"><?=CHtml::encode($data["internal"])?></div>
     <div style="text-align:right;margin:5px;">
         <?php $this->widget('bootstrap.widgets.TbButton',array(
-            'url'=>$this->createUrl('detail',array('id'=>$data["id"])),
+            'url'=>$this->createUrl($this->action->id=='index' ? 'assignToMe':'detail',array('id'=>$data["id"])),
             'label'=>'Приступить'
         ));?>
     </div>
