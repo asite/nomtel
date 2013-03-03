@@ -91,6 +91,13 @@
             ));
         }
 
+        if (Yii::app()->user->role=='supportMegafon') {
+            $menuLeft=array(
+                '',
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMegafon/index')),
+            );
+        }
+
         $menuLeft=array_merge($menuLeft,array(
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),

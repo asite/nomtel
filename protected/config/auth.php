@@ -40,7 +40,6 @@ return array(
     'supportMegafon' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
-            'support',
         )
     ),
 
