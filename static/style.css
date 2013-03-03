@@ -322,3 +322,42 @@ table.margin_b0 {
 .hide-labels label{
     display:none;
 }
+
+
+.li-item {
+    margin-bottom:10px;
+    border:1px #aaa solid;
+    border-radius: 5px;
+}
+
+.li-item .button-row {
+    text-align:right;
+    margin:5px;
+}
+
+.li-item .comment {
+    clear:both;
+    margin:5px;
+}
+
+.li-item table.table {
+    margin-bottom:5px;
+}
+
+.li-item table.table th {
+    text-align: right;
+}
+
+.li-item form {
+    margin-bottom:0px;
+}
+
+.li-item form textarea {
+    width:737px;
+    margin-left:5px;
+    margin-bottom:5px;
+}
+
+#filter div.control-group {
+    margin-bottom:0px;
+}

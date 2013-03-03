@@ -52,7 +52,7 @@ class TicketSearch extends CFormModel
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider = new CSqlDataProvider('select t.*,n.number,o.title as operator_title,ta.title as tariff_title ' . $sql, array(
+        $dataProvider = new CSqlDataProvider('select t.*,n.number,n.balance_status,o.title as operator_title,ta.title as tariff_title ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
