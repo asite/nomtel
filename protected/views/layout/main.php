@@ -36,7 +36,8 @@
                array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
 
             '',
-            array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMain/index')),
+            array('label' => 'Список обращений (Админ)', 'url' => $this->createUrl('ticketAdmin/index'),'active'=>Yii::app()->controller->id=='ticketAdmin'),
+            array('label' => 'Список обращений (Главный)', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
@@ -75,28 +76,28 @@
         if (Yii::app()->user->role=='supportAdmin') {
             $menuLeft=array_merge($menuLeft,array(
                 '',
-                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketAdmin/index')),
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketAdmin/index'),'active'=>Yii::app()->controller->id=='ticketAdmin'),
             ));
         }
 
         if (Yii::app()->user->role=='supportMain') {
             $menuLeft=array_merge($menuLeft,array(
                 '',
-                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMain/index')),
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
             ));
         }
 
         if (Yii::app()->user->role=='support') {
             $menuLeft=array_merge($menuLeft,array(
                 '',
-                array('label' => 'Список обращений', 'url' => $this->createUrl('ticket/index')),
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticket/index'),'active'=>Yii::app()->controller->id=='ticket'),
             ));
         }
 
         if (Yii::app()->user->role=='supportMegafon') {
             $menuLeft=array(
                 '',
-                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMegafon/index')),
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMegafon/index'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
             );
         }
 

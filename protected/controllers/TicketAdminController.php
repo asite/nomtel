@@ -12,6 +12,7 @@ class TicketAdminController extends BaseGxController {
         $data=array();
 
         $criteria=new CDbCriteria();
+        if (!isset($_GET['TicketSearch']['status'])) $_GET['TicketSearch']['status']=Ticket::STATUS_NEW;
 
         list($data['dataProvider'],$data['model'])=TicketSearch::getSqlDataProvider($criteria);
 

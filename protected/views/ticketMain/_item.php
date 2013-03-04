@@ -2,7 +2,7 @@
     <table class="table table-striped table-condensed">
         <tr>
             <th>Дата</th>
-            <td><?=new EDateTime($data["dt"],null,'date')?></td>
+            <td><?=new EDateTime($data["dt"])?></td>
             <th>Статус баланса</th>
             <td><?=Number::getBalanceStatusLabel($data["balance_status"])?></td>
             <th>Оператор</th>
