@@ -2,7 +2,7 @@
     <table class="table table-striped table-condensed">
         <tr>
             <th>Дата</th>
-            <td><?=new EDateTime($data["dt"],null,'date')?></td>
+            <td><?=new EDateTime($data["dt"])?></td>
             <th>Номер</th>
             <td><?=$data["number"]?></td>
         </tr>
@@ -13,6 +13,11 @@ $form=$this->beginWidget('BaseTbActiveForm',array('htmlOptions'=>array('class'=>
 
     <?=$form->textareaRow($ticket,'response',array('rows'=>5));?>
     <div class="button-row">
+        <?php $this->widget('bootstrap.widgets.TbButton',array(
+        'buttonType'=>'submit',
+        'htmlOptions'=>array('name'=>'download'),
+        'label'=>'Скачать заявление'
+    ));?> &nbsp;
         <?php $this->widget('bootstrap.widgets.TbButton',array(
         'buttonType'=>'submit',
         'htmlOptions'=>array('name'=>'refuse'),

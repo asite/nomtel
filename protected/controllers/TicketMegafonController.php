@@ -49,6 +49,24 @@ class TicketMegafonController extends BaseGxController {
 
                 $trx->commit();
 
+                if (isset($_POST['download'])) {
+                    $ticket=$this->loadModel($id,'Ticket');
+
+                    $number=$ticket->id;
+                    $date=new EDateTime();
+
+                    $data=array(
+                        'number'=>$number,
+                        'text'=>$ticket->internal,
+                        'day'=>$date->format('d'),
+                        'month'=>Yii::app()->dateFormatter->format('MMMM',$date->getTimestamp()),
+                        'year'=>$date->format('Y'),
+                    );
+
+                    $generator=new DocumentGenerator();
+                    $generator->generate('megafon_statement.docx','megafon_'.$number.'_'.date('Ymd').'.docx',$data);
+                }
+
                 $this->redirect(array('index'));
             }
         }
