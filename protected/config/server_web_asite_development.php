@@ -4,9 +4,9 @@ $config = CMap::mergeArray(
     require((YII_DEBUG ? 'web_debug.php' : 'web_production.php')), array(
         'components' => array(
             'db' => array(
-                'connectionString' => 'mysql:host=localhost;dbname=crm',
-                'username' => 'test',
-                'password' => 'sMJngolM',
+                'connectionString' => 'mysql:host=localhost;dbname=dev',
+                'username' => 'dev',
+                'password' => 'zerozz',
             ),
         ),
         'params' => array(

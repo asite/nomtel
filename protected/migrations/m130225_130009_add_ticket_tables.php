@@ -13,7 +13,7 @@ class m130225_130009_add_ticket_tables extends CDbMigration
           `support_operator_id` int(11) NULL,
           `dt` timestamp NOT NULL,
           `status` enum('NEW','IN_WORK_MEGAFON','IN_WORK_OPERATOR','REFUSED_BY_MEGAFON','REFUSED_BY_ADMIN','REFUSED_BY_OPERATOR','FOR_REVIEW','DONE') NOT NULL,
-          `text` mediumtext NOT NULL,
+          `text` mediumtext  COLLATE 'utf8_general_ci' NOT NULL,
           FOREIGN KEY (`number_id`) REFERENCES `number` (`id`),
           FOREIGN KEY (`sim_id`) REFERENCES `sim` (`id`),
           FOREIGN KEY (`agent_id`) REFERENCES `agent` (`id`),
