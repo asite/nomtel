@@ -4,7 +4,11 @@
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$ticket->number,
     'attributes'=>array(
-        'number',
+        array(
+            'name'=>'number',
+            'type'=>'html',
+            'value'=>CHtml::link($ticket->number->number,Yii::app()->controller->createUrl("support/numberStatus",array("number"=>$ticket->number->number)))
+        ),
         array(
             'name'=>'balance_status',
             'value'=>Number::getBalanceStatusLabel($ticket->number->balance_status)
