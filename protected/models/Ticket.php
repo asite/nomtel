@@ -92,6 +92,7 @@ class Ticket extends BaseTicket
         $ticket->dt = new EDateTime();
         $ticket->text = $message;
         $ticket->save();
+        //$ticket->addHistory($message);
 
         return $ticket->id;
     }

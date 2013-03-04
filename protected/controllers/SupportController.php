@@ -21,36 +21,15 @@ class SupportController extends BaseGxController
             $report->setAttributes($_POST['NumberReport']);
 
             if ($report->validate()) {
-                $report_number=time();
-                $report_dt=new EDateTime();
-
                 $number=Number::model()->findByAttributes(array('number'=>$report->number));
-                $agent=Agent::model()->findByPk(loggedAgentId());
-                $body = $this->renderPartial('numberMail', array(
-                    'report' => $report,
-                    'number' => $number,
-                    'agent' => $agent,
-                    'report_number' => $report_number,
-                    'report_dt' => $report_dt
-                ), true);
 
-                $recipients=Yii::app()->params['supportEmail'];
-                if (!is_array($recipients)) $recipients=array($recipients);
-                if ($agent->email!='') $recipients[]=$agent->email;
+                $message=$report->message."\n".'Номер с которого обратились: '.$report->abonent_number;
+                $idTicket=Ticket::addMessage($number->id,$message);
 
-                $mail = new YiiMailMessage();
-                $mail->setSubject(Yii::t('app', 'Problem with number'));
-                $mail->setFrom(Yii::app()->params['supportEmailFrom']);
-                $mail->setTo($recipients);
-                $mail->setBody($body);
+                $message = "Ваше обращение #".$idTicket." принято. Срок рассмотрения 24 часа. Спасибо!";
+                Sms::send($number->number,$message);
 
-                $message = "Ваше обращение $report_number принято. Срок рассмотрения 24 часа. Спасибо";
-                Sms::send($report->abonent_number,$message);
-
-                if (Yii::app()->mail->send($mail))
-                    Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$report_number)));
-                else
-                    Yii::app()->user->setFlash('error', Yii::t('app', 'Problem sending email'));
+                Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$idTicket)));
 
                 $this->redirect(array('number'));
             }

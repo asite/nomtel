@@ -81,6 +81,7 @@ class POSupportController extends Controller
 
         Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$idTicket)));
     }
+
     public function actionSendRestoreCard() {
         $message = Yii::t('app','Restore the card');
 
@@ -97,7 +98,6 @@ class POSupportController extends Controller
         $this->sendSMS($idTicket);
 
         $this->redirect(array('index'));
-
     }
 
     public function actionSendBlock() {
