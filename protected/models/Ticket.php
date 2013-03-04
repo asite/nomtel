@@ -68,7 +68,8 @@ class Ticket extends BaseTicket
         $history=new TicketHistory();
         $history->ticket_id=$this->id;
         $history->dt=new EDateTime();
-        $history->support_operator_id=loggedSupportOperatorId();
+        if (loggedSupportOperatorId()) $history->support_operator_id=loggedSupportOperatorId();
+        if (loggedAgentId()) $history->agent_id=loggedAgentId();
         $history->comment=$comment;
         $history->status=$this->status;
 
@@ -92,7 +93,7 @@ class Ticket extends BaseTicket
         $ticket->dt = new EDateTime();
         $ticket->text = $message;
         $ticket->save();
-        //$ticket->addHistory($message);
+        $ticket->addHistory($message);
 
         return $ticket->id;
     }

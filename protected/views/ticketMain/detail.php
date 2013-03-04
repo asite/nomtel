@@ -73,8 +73,8 @@ $this->endWidget();
     'columns' => array(
         array(
             'name'=>'support_operator_id',
-            'header'=>SupportOperator::label(),
-            'value'=>'$data->supportOperator'
+            'header'=>'Кто',
+            'value'=>'$data->supportOperator.$data->agent'
         ),
         array(
             'name'=>'dt',

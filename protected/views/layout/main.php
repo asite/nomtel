@@ -35,7 +35,9 @@
 
                array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
 
-                 '',
+            '',
+            array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMain/index')),
+            '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
     }

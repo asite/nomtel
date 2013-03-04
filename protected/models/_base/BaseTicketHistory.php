@@ -13,9 +13,11 @@
  * @property string $ticket_id
  * @property string $dt
  * @property integer $support_operator_id
+ * @property integer $agent_id
  * @property string $comment
  * @property string $status
  *
+ * @property Agent $agent
  * @property Ticket $ticket
  * @property SupportOperator $supportOperator
  */
@@ -39,19 +41,20 @@ abstract class BaseTicketHistory extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('ticket_id, dt, support_operator_id, status', 'required'),
-			array('support_operator_id', 'numerical', 'integerOnly'=>true),
+			array('ticket_id, dt, status', 'required'),
+			array('support_operator_id, agent_id', 'numerical', 'integerOnly'=>true),
 			array('ticket_id', 'length', 'max'=>20),
 			array('status', 'length', 'max'=>19),
 			array('comment', 'safe'),
-			array('comment', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('support_operator_id, agent_id, comment', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, ticket_id, dt, support_operator_id, comment, status', 'safe', 'on'=>'search'),
+			array('id, ticket_id, dt, support_operator_id, agent_id, comment, status', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
 			'ticket' => array(self::BELONGS_TO, 'Ticket', 'ticket_id'),
 			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
 		);
@@ -68,8 +71,10 @@ abstract class BaseTicketHistory extends BaseGxActiveRecord {
 			'ticket_id' => null,
 			'dt' => Yii::t('app', 'Dt'),
 			'support_operator_id' => null,
+			'agent_id' => null,
 			'comment' => Yii::t('app', 'Comment'),
 			'status' => Yii::t('app', 'Status'),
+			'agent' => null,
 			'ticket' => null,
 			'supportOperator' => null,
 		);
@@ -82,6 +87,7 @@ abstract class BaseTicketHistory extends BaseGxActiveRecord {
 		$criteria->compare('ticket_id', $this->ticket_id);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('support_operator_id', $this->support_operator_id);
+		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('comment', $this->comment, true);
 		$criteria->compare('status', $this->status, true);
 
