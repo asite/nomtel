@@ -73,6 +73,16 @@ class Ticket extends BaseTicket
         $history->comment=$comment;
         $history->status=$this->status;
 
+        if ($this->status==Ticket::STATUS_DONE) {
+            $message = "Ваше обращение #".$this->id." обработано (выполнено).";
+            Sms::send($this->number->number,$message);
+        }
+
+        if ($this->status==Ticket::STATUS_REFUSED) {
+            $message = "Ваше обращение #".$this->id." обработано (отказано).";
+            Sms::send($this->number->number,$message);
+        }
+
         $history->save();
     }
 
