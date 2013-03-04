@@ -32,6 +32,7 @@ class TicketController extends BaseGxController {
 
     public function actionAssignToMe($id) {
         $ticket=$this->loadModel($id,'Ticket');
+        if ($ticket->support_operator_id) $this->redirect(array('index'));
         $ticket->support_operator_id=loggedSupportOperatorId();
         $ticket->save();
         $this->redirect(array('detail','id'=>$id));
@@ -41,6 +42,7 @@ class TicketController extends BaseGxController {
         $data=array();
 
         $ticket=$this->loadModel($id,'Ticket');
+        if ($ticket->support_operator_id!=loggedSupportOperatorId()) $this->redirect(array('index'));
         $data['ticket']=$ticket;
 
         if (isset($_POST['Ticket'])) {
