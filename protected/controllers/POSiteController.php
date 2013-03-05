@@ -6,8 +6,8 @@ class POSiteController extends Controller
     public function additionalAccessRules()
     {
         return array(
-            array('allow', 'actions' => array('error', 'login', 'restorePassword','logout','tariff'), 'users' => array('*')),
-            array('allow', 'actions' => array('index'), 'users' => array('@')),
+            array('allow', 'actions' => array('error', 'login', 'restorePassword','logout'), 'users' => array('*')),
+            array('allow', 'actions' => array('index','tariff'), 'users' => array('@')),
         );
     }
 
