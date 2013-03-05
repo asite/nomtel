@@ -32,12 +32,18 @@
             array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
             array('label' => Yii::t('app', 'Operators'), 'url' => $this->createUrl('operator/admin'), 'active' => $this->id == 'operator'),
             '',
+<<<<<<< Updated upstream
 
                array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
 
             '',
             array('label' => 'Список обращений (Админ)', 'url' => $this->createUrl('ticketAdmin/index'),'active'=>Yii::app()->controller->id=='ticketAdmin'),
             array('label' => 'Список обращений (Главный)', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
+=======
+            array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
+            '',
+            array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
+>>>>>>> Stashed changes
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
@@ -55,6 +61,8 @@
             array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list'),
             //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
             array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
+            '',
+            array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
@@ -77,6 +85,8 @@
             $menuLeft=array_merge($menuLeft,array(
                 '',
                 array('label' => 'Список обращений', 'url' => $this->createUrl('ticketAdmin/index'),'active'=>Yii::app()->controller->id=='ticketAdmin'),
+                '',
+                array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             ));
         }
 
@@ -84,6 +94,8 @@
             $menuLeft=array_merge($menuLeft,array(
                 '',
                 array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
+                '',
+                array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             ));
         }
 
@@ -91,6 +103,8 @@
             $menuLeft=array_merge($menuLeft,array(
                 '',
                 array('label' => 'Список обращений', 'url' => $this->createUrl('ticket/index'),'active'=>Yii::app()->controller->id=='ticket'),
+                '',
+                array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             ));
         }
 

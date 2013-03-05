@@ -335,4 +335,5 @@ return array (
   'Support List' => 'Список обращений',
   'IN_PROCESSING' => 'В обработке',
   'Response' => 'Ответ',
+  'Send Sms' => 'Отправка СМС',
 );
