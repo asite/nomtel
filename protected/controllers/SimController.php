@@ -431,15 +431,24 @@ class SimController extends BaseGxController {
             $model = new Act;
             $this->performAjaxValidation($model, 'move-sim');
 
-            $totalNumberPrice = Sim::model()->getTotalNumberPrice($moveSimCards);
+            $trx = Yii::app()->db->beginTransaction();
+
+            $criteria = new CDbCriteria();
+            $criteria->addInCondition('id', $moveSimCards);
+            $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
+            $criteria->addCondition('agent_id is null');
+
+            $idsToMove=Yii::app()->db->createCommand("select id from sim where ".$criteria->condition)->queryColumn($criteria->params);
+            $ids_string = implode(",", $idsToMove);
+
+            $totalNumberPrice = Sim::model()->getTotalNumberPrice($idsToMove);
             $totalSimPrice = $countMoveSimCards * $_POST['Move']['PriceForSim'];
             if ($countMoveSimCards == 0) {
+                $trx->rollback();
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
                 $this->redirect(Yii::app()->createUrl('sim/add'));
                 exit;
             }
-
-            $trx = Yii::app()->db->beginTransaction();
 
             $model = new Act;
             $model->agent_id = $agent_id;
@@ -448,21 +457,18 @@ class SimController extends BaseGxController {
             $model->type = Act::TYPE_SIM;
             $model->save();
 
-            $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $moveSimCards);
-            $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
-            $criteria->addCondition('agent_id is null');
-            $ids_string = implode(",", $moveSimCards);
-
             // update Agent stats
             Agent::deltaSimCount($agent_id, $countMoveSimCards);
+
+            $criteria = new CDbCriteria();
+            $criteria->addInCondition('id', $idsToMove);
 
             Sim::model()->updateAll(array('agent_id' => $agent_id, 'act_id' => $model->id, 'sim_price' => $_POST['Move']['PriceForSim']), $criteria);
 
             $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id)
               SELECT " . Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']) . ", s.personal_account, s.number,s.number_price, s.icc, s.parent_id ,s.agent_id, " . Yii::app()->db->quoteValue($model->id) . ", NULL, NULL, s.operator_id, s.tariff_id, s.operator_region_id, s.company_id
               FROM sim as s
-              WHERE id IN ($ids_string) AND s.parent_agent_id = :parent_agent_id AND agent_id is null";
+              WHERE id IN ($ids_string)";
 
             Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>loggedAgentId()));
 
