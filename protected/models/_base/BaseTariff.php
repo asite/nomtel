@@ -12,6 +12,7 @@
  * @property integer $id
  * @property integer $operator_id
  * @property string $title
+ * @property string $description
  * @property string $price_agent_sim
  * @property string $price_license_fee
  *
@@ -42,7 +43,9 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 			array('operator_id', 'numerical', 'integerOnly'=>true),
 			array('title', 'length', 'max'=>50),
 			array('price_agent_sim, price_license_fee', 'length', 'max'=>14),
-			array('id, operator_id, title, price_agent_sim, price_license_fee', 'safe', 'on'=>'search'),
+			array('description', 'safe'),
+			array('description', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, operator_id, title, description, price_agent_sim, price_license_fee', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -63,6 +66,7 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 			'id' => Yii::t('app', 'ID'),
 			'operator_id' => null,
 			'title' => Yii::t('app', 'Title'),
+			'description' => Yii::t('app', 'Description'),
 			'price_agent_sim' => Yii::t('app', 'Price Agent Sim'),
 			'price_license_fee' => Yii::t('app', 'Price License Fee'),
 			'sims' => null,
@@ -76,6 +80,7 @@ abstract class BaseTariff extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id);
 		$criteria->compare('operator_id', $this->operator_id);
 		$criteria->compare('title', $this->title, true);
+		$criteria->compare('description', $this->description, true);
 		$criteria->compare('price_agent_sim', $this->price_agent_sim, true);
 		$criteria->compare('price_license_fee', $this->price_license_fee, true);
 
