@@ -40,7 +40,7 @@ class TicketMainController extends BaseGxController {
         $data['ticket']=$ticket;
 
         if (isset($_POST['Ticket'])) {
-            $ticket->setScenario('responseRequired');
+            //$ticket->setScenario('responseRequired');
             $ticket->setAttributes($_POST['Ticket']);
 
             if ($ticket->validate()) {
