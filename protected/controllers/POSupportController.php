@@ -6,7 +6,7 @@ class POSupportController extends Controller
     public function additionalAccessRules()
     {
         return array(
-            array('allow', 'actions' => array('error', 'login', 'restorePassword','logout','sendRestoreCard','sendChangeTariff','sendBlock','sendOtherQuestion','sendSpecification'), 'users' => array('*')),
+            array('allow', 'actions' => array('error', 'login', 'list', 'restorePassword','logout','sendRestoreCard','sendChangeTariff','sendBlock','sendOtherQuestion','sendSpecification'), 'users' => array('*')),
             array('allow', 'actions' => array('index'), 'users' => array('@')),
         );
     }
@@ -32,8 +32,20 @@ class POSupportController extends Controller
         $this->render('index',$data);
     }
 
+    public function actionList() {
+        $criteria = new CDbCriteria();
+        $criteria->addCondition("number_id=:number_id");
+        $criteria->params = array(':number_id'=>loggedNumberId());
 
-    private function sendEMail($message) {
+        $dataProvider = new CActiveDataProvider('Ticket', array('criteria' => $criteria));
+
+        $this->render('list', array(
+            'dataProvider' => $dataProvider
+        ));
+    }
+
+
+   /* private function sendEMail($message) {
         $number=Number::model()->findByPk(loggedNumberId());
 
         $report = array();
@@ -60,28 +72,48 @@ class POSupportController extends Controller
             Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$report['report_number'])));
         else Yii::app()->user->setFlash('error', Yii::t('app', 'Problem sending email'));
     }
+    */
+    private function sendSMS($idTicket) {
+        $number=Number::model()->findByPk(loggedNumberId());
+
+        $message = "Ваше обращение #".$idTicket." принято. Срок рассмотрения 24 часа. Спасибо!";
+        Sms::send($number->number,$message);
+
+        Yii::app()->user->setFlash('success', Yii::t('app', "Problem report sent to support, report has number '%number'",array('%number%'=>$idTicket)));
+    }
 
     public function actionSendRestoreCard() {
-        $this->sendEMail(Yii::t('app','Restore the card'));
+        $message = Yii::t('app','Restore the card');
+
+        $idTicket = Ticket::addMessage(loggedNumberId(), $message);
+        $this->sendSMS($idTicket);
 
         $this->redirect(array('index'));
     }
 
     public function actionSendChangeTariff() {
-        $this->sendEMail(Yii::t('app','Change the tariff plan'));
+        $message = Yii::t('app','Change the tariff plan');
+
+        $idTicket = Ticket::addMessage(loggedNumberId(), $message);
+        $this->sendSMS($idTicket);
 
         $this->redirect(array('index'));
-
     }
 
     public function actionSendBlock() {
-        $this->sendEMail(Yii::t('app','Block'));
+        $message = Yii::t('app','Block');
+
+        $idTicket = Ticket::addMessage(loggedNumberId(), $message);
+        $this->sendSMS($idTicket);
 
         $this->redirect(array('index'));
     }
 
     public function actionSendOtherQuestion() {
-        $this->sendEMail(Yii::t('app','Other question'));
+        $message = Yii::t('app','Other question');
+
+        $idTicket = Ticket::addMessage(loggedNumberId(), $message);
+        $this->sendSMS($idTicket);
 
         $this->redirect(array('index'));
     }
@@ -92,7 +124,12 @@ class POSupportController extends Controller
             $model->setAttributes($_POST['POSSpecification']);
             $this->performAjaxValidation($model,'specification');
 
-            $this->sendEMail(Yii::t('app','Order details')." по датам ".$model->dateRange);
+            if ($model->validate()) {
+                $message = Yii::t('app','Order details')." по датам ".$model->dateRange;
+
+                $idTicket = Ticket::addMessage(loggedNumberId(), $message);
+                $this->sendSMS($idTicket);
+            }
 
             $this->redirect(array('index'));
         }

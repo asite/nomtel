@@ -28,7 +28,7 @@ class UserIdentity extends CUserIdentity
                 if ($supportOperator) {
                     $this->setState('supportOperatorId', $supportOperator->id);
                     $this->setState('agentId', adminAgentId());
-                    $this->setState('role','support');
+                    $this->setState('role',$supportOperator->role);
                     return true;
                 }
             }

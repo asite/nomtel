@@ -9,17 +9,22 @@
  * Columns in table "ticket" available as properties of the model,
  * followed by relations of table "ticket" available as properties of the model.
  *
- * @property integer $id
+ * @property string $id
+ * @property string $number_id
+ * @property string $sim_id
  * @property integer $agent_id
- * @property string $title
+ * @property integer $support_operator_id
  * @property string $dt
- * @property integer $whom
  * @property string $status
- * @property string $price
+ * @property string $text
+ * @property string $internal
+ * @property string $response
  *
+ * @property Number $number
+ * @property Sim $sim
  * @property Agent $agent
- * @property Agent $whom0
- * @property TicketMessage[] $ticketMessages
+ * @property SupportOperator $supportOperator
+ * @property TicketHistory[] $ticketHistories
  */
 abstract class BaseTicket extends BaseGxActiveRecord {
 
@@ -41,22 +46,24 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('agent_id, dt, whom', 'required'),
-			array('agent_id, whom', 'numerical', 'integerOnly'=>true),
-			array('title', 'length', 'max'=>256),
-			array('status', 'length', 'max'=>6),
-			array('price', 'length', 'max'=>14),
-			array('title, status, price', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('number_id, sim_id, agent_id, dt, status, text', 'required'),
+			array('agent_id, support_operator_id', 'numerical', 'integerOnly'=>true),
+			array('number_id, sim_id', 'length', 'max'=>20),
+			array('status', 'length', 'max'=>19),
+			array('internal, response', 'safe'),
+			array('support_operator_id, internal, response', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, agent_id, title, dt, whom, status, price', 'safe', 'on'=>'search'),
+			array('id, number_id, sim_id, agent_id, support_operator_id, dt, status, text, internal, response', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'number' => array(self::BELONGS_TO, 'Number', 'number_id'),
+			'sim' => array(self::BELONGS_TO, 'Sim', 'sim_id'),
 			'agent' => array(self::BELONGS_TO, 'Agent', 'agent_id'),
-			'whom0' => array(self::BELONGS_TO, 'Agent', 'whom'),
-			'ticketMessages' => array(self::HAS_MANY, 'TicketMessage', 'ticket_id'),
+			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
+			'ticketHistories' => array(self::HAS_MANY, 'TicketHistory', 'ticket_id'),
 		);
 	}
 
@@ -68,28 +75,36 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 	public function attributeLabels() {
 		return array(
 			'id' => Yii::t('app', 'ID'),
+			'number_id' => null,
+			'sim_id' => null,
 			'agent_id' => null,
-			'title' => Yii::t('app', 'Title'),
+			'support_operator_id' => null,
 			'dt' => Yii::t('app', 'Dt'),
-			'whom' => null,
 			'status' => Yii::t('app', 'Status'),
-			'price' => Yii::t('app', 'Price'),
+			'text' => Yii::t('app', 'Text'),
+			'internal' => Yii::t('app', 'Internal'),
+			'response' => Yii::t('app', 'Response'),
+			'number' => null,
+			'sim' => null,
 			'agent' => null,
-			'whom0' => null,
-			'ticketMessages' => null,
+			'supportOperator' => null,
+			'ticketHistories' => null,
 		);
 	}
 
 	public function search() {
 		$criteria = new CDbCriteria;
 
-		$criteria->compare('id', $this->id);
+		$criteria->compare('id', $this->id, true);
+		$criteria->compare('number_id', $this->number_id);
+		$criteria->compare('sim_id', $this->sim_id);
 		$criteria->compare('agent_id', $this->agent_id);
-		$criteria->compare('title', $this->title, true);
+		$criteria->compare('support_operator_id', $this->support_operator_id);
 		$criteria->compare('dt', $this->dt, true);
-		$criteria->compare('whom', $this->whom);
 		$criteria->compare('status', $this->status, true);
-		$criteria->compare('price', $this->price, true);
+		$criteria->compare('text', $this->text, true);
+		$criteria->compare('internal', $this->internal, true);
+		$criteria->compare('response', $this->response, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

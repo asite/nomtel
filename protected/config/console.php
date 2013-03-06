@@ -33,7 +33,11 @@ switch (gethostname()) {
    
     case 'www.asiteplace.ru':
         $base_config_name = 'server_web_asite_production.php';
+        
+    if(strpos(dirname(__FILE__), 'dev')) $base_config_name = 'server_web_asite_development.php';
         break;
+        
+    
     default:
         die('unknown hostname');
 }

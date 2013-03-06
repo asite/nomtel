@@ -194,9 +194,9 @@ class POSiteController extends Controller
     public function actionTariff() {
         $data=array();
         $number=Number::model()->findByPk(loggedNumberId());
-        $sim=Sim::model()->findByAttributes(array('parent_id'=>$number->sim_id,'agent_id'=>null));
+        $data=Sim::model()->findByAttributes(array('parent_id'=>$number->sim_id,'agent_id'=>null));
 
-        $this->render('tariff',array('number'=>$number, 'sim'=>$sim));
+        $this->render('tariff',array('number'=>$number, 'sim'=>$data));
     }
 
 }

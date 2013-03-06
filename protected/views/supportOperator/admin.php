@@ -29,16 +29,16 @@ $('.search-form form').submit(function(){
     'filter' => $model,
 	'columns' => array(
 		//'id',
-		/*array(
-				'name'=>'user_id',
-				'value'=>'GxHtml::valueEx($data->user)',
-				'filter'=>GxHtml::listDataEx(User::model()->findAllAttributes(null, true)),
-				),*/
 		'name',
 		'surname',
 		'middle_name',
 		'phone',
         'email',
+        array(
+                'name'=>'role',
+                'value'=>'SupportOperator::getRoleLabel($data->role)',
+                'filter'=>SupportOperator::getRoleDropDownList(array()),
+        ),
 		array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),
