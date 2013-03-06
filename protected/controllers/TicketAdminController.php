@@ -31,9 +31,9 @@ class TicketAdminController extends BaseGxController {
             if ($ticket->validate()) {
                 $ticket->setScenario('');
 
-                $ticket->support_operator_id=null;
-
                 $comment=$ticket->internal;
+
+                $ticket->support_operator_id=null;
 
                 if (isset($_POST['done'])) {
                     $ticket->response=$ticket->internal;

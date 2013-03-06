@@ -6,7 +6,7 @@ class SmsController extends Controller
     public function additionalAccessRules()
     {
         return array(
-            array('allow', 'actions' => array('error', 'send'), 'users' => array('*')),
+            array('allow', 'actions' => array('error', 'send'), 'users' => array('@')),
         );
     }
 
@@ -17,21 +17,20 @@ class SmsController extends Controller
         }
     }
 
-    public function actionError()
-    {
+    public function actionError() {
         $error = Yii::app()->errorHandler->error;
         $this->layout = '/layout/simple';
 
         $this->render('error', $error);
     }
 
-    public function actionSend()
-    {
+    public function actionSend() {
         $model = new SmsLog;
-        if (isset($_REQUEST['SmsLog'])) {
+        if (isset($_POST['SmsLog'])) {
             $this->performAjaxValidation($model,'send-sms');
 
-            $model->setAttributes($_REQUEST['SmsLog']);
+            $model->number = Number::getNumberFromFormatted($_POST['SmsLog']['number']);
+            $model->text = $_POST['SmsLog']['text'];
             $model->dt = new EDateTime();
             $model->user_id = Yii::app()->user->id;
 

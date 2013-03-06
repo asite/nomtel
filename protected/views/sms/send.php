@@ -12,6 +12,6 @@
 <?=$form->maskFieldRow($model,'number','8 (999) 999-99-99');?>
 <?=$form->textareaRow($model,'text',array('class'=>'span4','rows'=>5));?>
 
-<?php echo CHtml::htmlButton(Yii::t('app', 'moveSim'), array('class'=>'btn','style'=>'margin-left: 180px', 'type'=>'submit')); ?>
+<?php echo CHtml::htmlButton(Yii::t('app', 'Send'), array('class'=>'btn','style'=>'margin-left: 180px', 'type'=>'submit')); ?>
 
 <?php $this->endWidget(); ?>

@@ -35,10 +35,12 @@ class TicketMegafonController extends BaseGxController {
                 $comment=$ticket->response;
 
                 if (isset($_POST['accept'])) {
+                    $ticket->support_operator_id=loggedSupportOperatorId();
                     $ticket->status=Ticket::STATUS_FOR_REVIEW;
                 }
 
                 if (isset($_POST['refuse'])) {
+                    $ticket->support_operator_id=loggedSupportOperatorId();
                     $ticket->status=Ticket::STATUS_REFUSED_BY_MEGAFON;
                 }
 

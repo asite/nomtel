@@ -84,7 +84,7 @@ return array (
   'Numbers' => '@@@@',
   'Outbox' => '@@Исходящие@@',
   'Price' => '@@@@',
-  'Send' => '@@Отправить@@',
+  'Send' => 'Отправить',
   'Support Sent Sms Address' => '@@@@',
   'Support Sent Sms Email' => '@@@@',
   'To' => '@@Кому@@',

@@ -46,8 +46,6 @@ class TicketMainController extends BaseGxController {
             if ($ticket->validate()) {
                 $ticket->setScenario('');
 
-                $ticket->support_operator_id=null;
-
                 $comment=$ticket->response;
 
                 if (isset($_POST['accept'])) {
