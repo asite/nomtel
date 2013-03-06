@@ -13,11 +13,11 @@
         'size' => 'medium',
         'url' => $this->createUrl('sendRestoreCard'),
     )); ?>
-    <?php $this->widget('bootstrap.widgets.TbButton',array(
+    <?php /*$this->widget('bootstrap.widgets.TbButton',array(
         'label' => Yii::t('app','Change the tariff plan'),
         'size' => 'medium',
         'url' => $this->createUrl('sendChangeTariff'),
-    )); ?>
+    ));*/ ?>
     <?php $this->widget('bootstrap.widgets.TbButton',array(
         'label' => Yii::t('app','Block'),
         'size' => 'medium',
@@ -28,7 +28,7 @@
         'size' => 'medium',
         'url' => $this->createUrl('sendOtherQuestion'),
     )); ?>
-
+    <?php /*
     <div class="get_specification">
     <?php $form = $this->beginWidget('BaseTbActiveForm', array(
                     'id' => 'specification',
@@ -50,5 +50,6 @@
         <?php echo CHtml::htmlButton(Yii::t('app','Order details'), array('class'=>'btn', 'type'=>'submit')); ?>
     <?php $this->endWidget(); ?>
 </div>
+ */ ?>
 </div>
 <?php $this->endWidget();?>
