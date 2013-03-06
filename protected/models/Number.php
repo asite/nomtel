@@ -199,13 +199,5 @@ class Number extends BaseNumber
     }
 
     public function getSupportStatusArray() {
-        return array(
-            self::SUPPORT_STATUS_UNAVAILABLE=>0,
-            self::SUPPORT_STATUS_CALLBACK=>0,
-            self::SUPPORT_STATUS_REJECT=>0,
-            self::SUPPORT_STATUS_ACTIVE=>0,
-            self::SUPPORT_STATUS_SERVICE_INFO=>0,
-            self::SUPPORT_STATUS_HELP=>0
-        );
     }
 }

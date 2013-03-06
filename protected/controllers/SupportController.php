@@ -341,22 +341,15 @@ class SupportController extends BaseGxController
     }
 
     public function actionStatistic() {
-        $model = Yii::app()->db->createCommand()
-                                ->select('count(support_status) as count, support_status')
-                                ->from('number')
-                                ->where('support_operator_id=:val and support_status is not null and support_passport_need_validation=0', array(':val'=>loggedSupportOperatorId()))
-                                ->group('support_status')
-                                ->queryAll();
-
-        $data = Number::getSupportStatusArray();
         $supportOperator = SupportOperator::model()->findByPk(loggedSupportOperatorId());
-        foreach ($model as $v) {
-            $data[$v['support_status']]=$v['count'];
-        }
+        $data = $supportOperator->getNumbersStats();
+
+        $ticketsStats=$supportOperator->getTicketsStats();
 
         $this->render('statistic',array(
             'data'=>$data,
-            'supportOperator'=>$supportOperator
+            'supportOperator'=>$supportOperator,
+            'ticketsStats'=>$ticketsStats
         ));
     }
 }
