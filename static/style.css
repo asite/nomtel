@@ -361,3 +361,5 @@ table.margin_b0 {
 #filter div.control-group {
     margin-bottom:0px;
 }
+.block_othe_question {}
+.block_othe_question label {display: none;}

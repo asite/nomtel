@@ -28,6 +28,7 @@ class POSupportController extends Controller
 
     public function actionIndex()
     {
+        $data['otherquestion'] = new OtherQuestion;
         $data['model']= new POSSpecification;
         $this->render('index',$data);
     }
@@ -110,11 +111,14 @@ class POSupportController extends Controller
     }
 
     public function actionSendOtherQuestion() {
-        $message = Yii::t('app','Other question');
+        if (isset($_POST['OtherQuestion'])) {
+            $model = new OtherQuestion;
+            $this->performAjaxValidation($model, 'send-other-question');
 
-        $idTicket = Ticket::addMessage(loggedNumberId(), $message);
-        $this->sendSMS($idTicket);
-
+            $message = $_POST['OtherQuestion']['text'];
+            $idTicket = Ticket::addMessage(loggedNumberId(), $message);
+            $this->sendSMS($idTicket);
+        }
         $this->redirect(array('index'));
     }
 

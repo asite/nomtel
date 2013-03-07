@@ -51,5 +51,23 @@
     <?php $this->endWidget(); ?>
 </div>
  */ ?>
+
+    <div class="block_othe_question">
+        <h3><?php echo Yii::t('app', 'Other question'); ?></h3>
+        <?php
+          $form = $this->beginWidget('BaseTbActiveForm', array(
+            'id' => 'send-other-question',
+            'action' => $this->createUrl('SendOtherQuestion'),
+            'enableAjaxValidation' => true,
+            'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
+          ));
+        ?>
+            <?php echo $form->errorSummary($model); ?>
+            <?=$form->textareaRow($otherquestion,'text',array('class'=>'span4','rows'=>3,'errorOptions'=>array('hideErrorMessage'=>true)));?><br/>
+            <?php echo CHtml::htmlButton(Yii::t('app', 'Send'), array('class'=>'btn', 'style'=>'margin-left: 268px;', 'type'=>'submit')); ?>
+            <div class="clear"></div>
+        <?php $this->endWidget(); ?>
+    </div>
+
 </div>
 <?php $this->endWidget();?>
