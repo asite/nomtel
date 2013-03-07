@@ -336,4 +336,5 @@ return array (
   'IN_PROCESSING' => 'В обработке',
   'Response' => 'Ответ',
   'Send Sms' => 'Отправка СМС',
+  'Description' => 'Описание',
 );

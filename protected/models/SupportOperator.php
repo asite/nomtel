@@ -73,6 +73,56 @@ class SupportOperator extends BaseSupportOperator
         return $dataProvider;
     }
 
+    public function getNumbersStats() {
+        $data=array(
+            Number::SUPPORT_STATUS_UNAVAILABLE=>0,
+            Number::SUPPORT_STATUS_CALLBACK=>0,
+            Number::SUPPORT_STATUS_REJECT=>0,
+            Number::SUPPORT_STATUS_ACTIVE=>0,
+            Number::SUPPORT_STATUS_SERVICE_INFO=>0,
+            Number::SUPPORT_STATUS_HELP=>0
+        );
+
+        $model = Yii::app()->db->createCommand()
+            ->select('count(support_status) as count, support_status')
+            ->from('number')
+            ->where('support_operator_id=:val and support_status is not null and support_passport_need_validation=0', array(':val'=>$this->id))
+            ->group('support_status')
+            ->queryAll();
+
+        foreach ($model as $v) {
+            $data[$v['support_status']]=$v['count'];
+        }
+
+        return $data;
+    }
+
+    public function getTicketsStats() {
+        $stats=array();
+
+        $criteria=new CDbCriteria();
+        if (Yii::app()->user->role=='supportMegafon') {
+            $criteria->AddInCondition('status',array(Ticket::STATUS_IN_WORK_MEGAFON));
+        } else {
+            $criteria->compare('support_operator_id',$this->id);
+            $criteria->AddInCondition('status',array(Ticket::STATUS_IN_WORK_OPERATOR));
+        }
+
+        $stats['Обращений в работе у оператора']=Ticket::model()->count($criteria);
+
+        $criteria=new CDbCriteria();
+        $criteria->compare('support_operator_id',$this->id);
+        if (Yii::app()->user->role=='supportMegafon') {
+            $criteria->AddNotInCondition('status',array(Ticket::STATUS_IN_WORK_MEGAFON));
+        } else {
+            $criteria->AddNotInCondition('status',array(Ticket::STATUS_IN_WORK_OPERATOR));
+        }
+
+        $stats['Обращений обработано оператором']=Ticket::model()->count($criteria);
+
+        return $stats;
+    }
+
     public function __toString()
     {
         return $this->surname . ' ' . $this->name . ' ' . $this->middle_name;

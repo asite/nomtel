@@ -63,13 +63,21 @@ class SupportOperatorController extends BaseGxController
             $model->setAttributes($_GET['Number']);
         }
 
+        $supportOperator = SupportOperator::model()->findByPk($_GET['id']);
+        $data = $supportOperator->getNumbersStats();
+
+        $ticketsStats=$supportOperator->getTicketsStats();
+
         $dataProvider = $model->search();
         $dataProvider->criteria->compare('support_operator_id',$_GET['id']);
         $dataProvider->criteria->order = 'support_operator_got_dt DESC';
 
         $this->render('view',array(
             'model'=>$model,
-            'dataProvider'=>$dataProvider
+            'dataProvider'=>$dataProvider,
+            'data'=>$data,
+            'supportOperator'=>$supportOperator,
+            'ticketsStats'=>$ticketsStats
         ));
     }
 
