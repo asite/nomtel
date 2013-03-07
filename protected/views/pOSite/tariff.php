@@ -8,6 +8,7 @@
                 array(
                     'label'=>Yii::t('app','Description'),
                     'name' => 'tariff_id',
+                    'type' => 'html',
                     'value' => $sim->tariff->description,
                     )
             ),

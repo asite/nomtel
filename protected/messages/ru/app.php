@@ -337,4 +337,7 @@ return array (
   'Response' => 'Ответ',
   'Send Sms' => 'Отправка СМС',
   'Description' => 'Описание',
+  'news' => 'Новости и советы',
+  'commands' => 'Полезные команды',
+  'internet' => 'Интернет',
 );
