@@ -99,11 +99,26 @@ if ($number->status!=Number::STATUS_FREE) {
                 )
             ),
         )); ?>
-        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+        <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
-            'data'=>$number,
+            'data'=>$sim,
             'attributes'=>array(
-                'sim.icc'
+                array(
+                    'label'=>Yii::t('app','ICC'),
+                    'name' => 'icc',
+                    'value' => $sim->icc,
+                    'editable' => array(
+                        'type'   => 'text',
+                        'url' => $this->createUrl('number/saveICC',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
+                        'source' => $sim->icc,
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
+                    )
+                )
             ),
         )); ?>
         </div>

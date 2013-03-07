@@ -143,7 +143,7 @@ class NumberController extends BaseGxController
                 else
                     NumberHistory::addHistoryNumber($number->id,'Установлена компания {Company:'.$_POST['value'].'}');
             } catch (CDbException $e) {
-                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+                $this->ajaxError(Yii::t("app", "Error"));
             }
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
@@ -158,7 +158,7 @@ class NumberController extends BaseGxController
                 $number->save();
                 NumberHistory::addHistoryNumber($number->id,'Кодовое слово сменено с "'.$codeword.'"" на "'.$_POST['value'].'"');
             } catch (CDbException $e) {
-                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+                $this->ajaxError(Yii::t("app", "Error"));
             }
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
@@ -171,9 +171,17 @@ class NumberController extends BaseGxController
                 $service_password = $number->service_password;
                 $number->service_password = $_POST['value'];
                 $number->save();
-                NumberHistory::addHistoryNumber($number->id,'Кодовое слово сменено с "'.$service_password.'" на "'.$_POST['value'].'"');
+
+                $message = 'Прошу сделать восстановление сервис гид "'.$_POST['value'].'" и внести его в карточку номера';
+                Ticket::addMessage($number->id,$message);
+
+                if ($company_id->company_id)
+                    NumberHistory::addHistoryNumber($number->id,'Пароль сервис гид сменен с "'.$service_password.'" на "'.$_POST['value'].'"');
+                else
+                    NumberHistory::addHistoryNumber($number->id,'Установлен новый пароль сервис гид: "'.$_POST['value'].'"');
+
             } catch (CDbException $e) {
-                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+                $this->ajaxError(Yii::t("app", "Error"));
             }
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
@@ -188,7 +196,7 @@ class NumberController extends BaseGxController
                 $number->save();
                 NumberHistory::addHistoryNumber($number->id,'Вариант получения паспорта сменен с "'.$object.'" на "'.$_POST['value'].'"');
             } catch (CDbException $e) {
-                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+                $this->ajaxError(Yii::t("app", "Error"));
             }
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
@@ -203,7 +211,33 @@ class NumberController extends BaseGxController
                 $number->save();
                 NumberHistory::addHistoryNumber($number->id,'Регион использования номера сменен с "'.$object.'" на "'.$_POST['value'].'"');
             } catch (CDbException $e) {
-                $this->ajaxError(Yii::t("app", "Can't delete this object because it is used by another object(s)"));
+                $this->ajaxError(Yii::t("app", "Error"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+    public function actionSaveICC($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+
+                $number = Number::model()->findByPk($id);
+
+                $criteria = new CDbCriteria();
+                $criteria->addCondition('parent_id=:sim_id');
+                $criteria->params = array(
+                    ':sim_id' => $number->sim_id
+                );
+
+                Sim::model()->updateAll(array('icc' => $_POST['value']), $criteria);
+
+                $message = "Заменить у номера ".$number->number." ICC на ".$_POST['value'];
+                Ticket::addMessage($number->id,$message);
+
+                NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');
+            try {
+
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Error"));
             }
         } else
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));

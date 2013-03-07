@@ -6,8 +6,8 @@ class POSupportController extends Controller
     public function additionalAccessRules()
     {
         return array(
-            array('allow', 'actions' => array('error', 'login', 'list', 'restorePassword','logout','sendRestoreCard','sendChangeTariff','sendBlock','sendOtherQuestion','sendSpecification'), 'users' => array('*')),
-            array('allow', 'actions' => array('index'), 'users' => array('@')),
+            array('allow', 'actions' => array('error', 'login', 'list', 'restorePassword','logout'), 'users' => array('*')),
+            array('allow', 'actions' => array('index','sendRestoreCard','sendChangeTariff','sendBlock','sendOtherQuestion','sendSpecification'), 'users' => array('@')),
         );
     }
 
