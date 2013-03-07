@@ -41,6 +41,7 @@ abstract class BaseOperator extends BaseGxActiveRecord {
 			array('title', 'required'),
 			array('title', 'length', 'max'=>200),
 			array('id, title', 'safe', 'on'=>'search'),
+			array('html_commands, html_news, html_internet', 'safe'),
 		);
 	}
 

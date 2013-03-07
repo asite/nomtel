@@ -7,7 +7,7 @@ class POSiteController extends Controller
     {
         return array(
             array('allow', 'actions' => array('error', 'login', 'restorePassword','logout'), 'users' => array('*')),
-            array('allow', 'actions' => array('index','tariff'), 'users' => array('@')),
+            array('allow', 'actions' => array('index','tariff', 'static'), 'users' => array('@')),
         );
     }
 
@@ -198,5 +198,15 @@ class POSiteController extends Controller
 
         $this->render('tariff',array('number'=>$number, 'sim'=>$data));
     }
+    
+    
+     public function actionStatic($page) {
+        
+        $data=array();
+        $number=Number::model()->findByPk(loggedNumberId());
+        $data=Sim::model()->findByAttributes(array('parent_id'=>$number->sim_id,'agent_id'=>null));
+       
+        $this->render('static',array('number'=>$number, 'sim'=>$data, 'page'=>$page));
+     }
 
 }

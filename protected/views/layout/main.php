@@ -118,10 +118,17 @@
     if (Yii::app()->user->role == 'number') {
         $menuLeft = array(
             array('label' => Yii::t('app', 'Subscriber data'), 'url' => $this->createUrl('pOSite/index'), 'active' => $this->route == 'pOSite/index'),
+            '',
             array('label' => Yii::t('app', 'Your Tariff'), 'url' => $this->createUrl('pOSite/tariff'), 'active' => $this->route == 'pOSite/tariff'),
+            
+            array('label' => Yii::t('app', 'news'), 'url' => $this->createUrl('pOSite/static', array('page'=>'news')), 'active' => $_GET['page'] == 'news'),
+            array('label' => Yii::t('app', 'commands'), 'url' => $this->createUrl('pOSite/static', array('page'=>'commands')), 'active' => $_GET['page'] == 'commands'),
+            array('label' => Yii::t('app', 'internet'), 'url' => $this->createUrl('pOSite/static', array('page'=>'internet')), 'active' => $_GET['page'] == 'internet'),
+  
+            '',
             array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('pOSupport/index'), 'active' => $this->route == 'pOSupport/index'),
             array('label' => Yii::t('app', 'Support List'), 'url' => $this->createUrl('pOSupport/list'), 'active' => $this->route == 'pOSupport/list'),
-            '',
+            
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('pOSite/logout')),
         );
     }
