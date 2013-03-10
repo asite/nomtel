@@ -22,6 +22,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
             $csv = '';
             for ($i=0;$i<$pageCount;$i++) {
                 $this->dataProvider->pagination->setCurrentPage($i);
+                $this->dataProvider->getData(true);
                 ob_start();
                 parent::renderContent();
                 $export = ob_get_contents();
