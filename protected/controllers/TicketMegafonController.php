@@ -23,13 +23,17 @@ class TicketMegafonController extends BaseGxController {
         $data=array();
 
         $ticket=$this->loadModel($id,'Ticket');
+        if (isset($_POST['refuse']))
+            $ticket->setScenario('responseRequired');
+
+        $this->performAjaxValidation($ticket);
+
         $data['ticket']=$ticket;
 
         if (isset($_POST['Ticket'])) {
-            $ticket->setScenario('responseRequired');
             $ticket->setAttributes($_POST['Ticket']);
 
-            if ($ticket->validate() || true) {
+            if ($ticket->validate()) {
                 $ticket->setScenario('');
 
                 $comment=$ticket->response;

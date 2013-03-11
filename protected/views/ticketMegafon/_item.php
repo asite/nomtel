@@ -9,7 +9,8 @@
     </table>
     <div class="comment"><?=CHtml::encode($data["internal"])?></div>
 <?php $ticket=$this->loadModel($data['id'],'Ticket');
-$form=$this->beginWidget('BaseTbActiveForm',array('htmlOptions'=>array('class'=>'hide-labels'),'action'=>$this->createUrl('detail',array('id'=>$data['id'])))); ?>
+$form=$this->beginWidget('BaseTbActiveForm',array('type'=>'horizontal','htmlOptions'=>array('class'=>'hide-labels'),'action'=>$this->createUrl('detail',array('id'=>$data['id'])),'enableAjaxValidation' => true,
+    'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false))); ?>
 
     <?=$form->textareaRow($ticket,'response',array('rows'=>5));?>
     <div class="button-row">

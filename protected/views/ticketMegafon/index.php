@@ -1,3 +1,8 @@
+<style>
+    .form-horizontal .controls {
+        margin-left:0px;
+    }
+</style>
 <h1>Список обращений</h1>
 
 <?php $form=$this->beginWidget('BaseTbActiveForm',array(
