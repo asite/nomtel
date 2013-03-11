@@ -15,6 +15,17 @@ $config = CMap::mergeArray(
             'numberHelpEmail' => 'alegudmail@gmail.com',
             'supportEmail' => array('alegudmail@gmail.com', '1@500099.ru'),
             'supportEmailFrom' => 'info@asiteapp.ru',
+            'megafonBalanceEmails' => array(
+                'host'=>'mail.asiteplace.ru',
+                'port'=>'143',
+                'type'=>'imap',
+                'ssl'=>true,
+                'inBOX'=>'INBOX',
+                'processedBOX'=>'INBOX.processed',
+                'skippedBOX'=>'INBOX.skipped',
+                'login'=>'robot@asiteplace.ru',
+                'password'=>'XWfVmXW4'
+            )
         )
     )
 );
