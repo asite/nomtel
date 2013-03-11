@@ -23,6 +23,7 @@ class EMailProcessor {
     }
 
     public function __destruct() {
+        if (!imap_expunge($this->imap)) throw new CException("mail_expunge() returned false");
         if (!imap_close($this->imap)) throw new Exception('failed to disconnect from mail server');
     }
 
