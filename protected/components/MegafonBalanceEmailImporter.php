@@ -22,7 +22,7 @@ class MegafonBalanceEmailImporter
         $data=array();
 
         if (!preg_match('%Л/С: (\d{8})%',$mail,$m)) return $this->parseError($mail,__LINE__);
-        $data['phone']=$m[1];
+        $data['personal_account']=$m[1];
         if (!preg_match('%Номер: (\d{10})%',$mail,$m)) return $this->parseError($mail,__LINE__);
         $data['number']=$m[1];
         if (!preg_match('%Время: (\d\d.\d\d.\d\d\d\d \d\d:\d\d)%',$mail,$m)) return $this->parseError($mail,__LINE__);
@@ -44,11 +44,11 @@ class MegafonBalanceEmailImporter
     private function recalcNumberBalanceStatus($number) {
         $data=Yii::app()->db->createCommand("
             select brn.balance
-            left outer join balance_report_number brn on (brn.number_id=:number_id and brn.balance_report_id=br.id)
             from balance_report br
+            left outer join balance_report_number brn on (brn.number_id=:number_id and brn.balance_report_id=br.id)
             order by br.dt desc
             limit 0,".self::STATUS_ANALYZE_PERIODS."
-        ")->queryAll(array(':number_id'=>$number->id));
+        ")->queryAll(true,array(':number_id'=>$number->id));
 
         $allPositive=true;
         $allNegative=true;
@@ -88,10 +88,23 @@ class MegafonBalanceEmailImporter
             return;
         }
 
+        $saveNumber=false;
+
         if ($data['personal_account'] && $number->personal_account!=$data['personal_account']) {
             $number->personal_account=$data['personal_account'];
-            $number->save();
+            $saveNumber=true;
         }
+
+        $tariff=Tariff::model()->findByAttributes(array('operator_id'=>Operator::OPERATOR_MEGAFON_ID,'title'=>$data['tariff']));
+        if (!$tariff) {
+            Yii::log("Неизвестный тариф ".$data['tariff'],CLogger::LEVEL_WARNING,'mail_parser');
+        }
+
+        if ($tariff->id)
+
+        if ($saveNumber) $number->save();
+
+
 
         $dt=date('Y-m-d 00:00:00',strtotime($data['dt']));
         $balanceReport=BalanceReport::model()->findByAttributes(array('dt'=>$dt));
@@ -116,7 +129,7 @@ class MegafonBalanceEmailImporter
 
         $balanceReportNumber->balance=$data['balance'];
 
-        $balanceReport->save();
+        $balanceReportNumber->save();
 
         $this->recalcNumberBalanceStatus($number);
 
