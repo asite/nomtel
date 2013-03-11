@@ -2,9 +2,16 @@
 
 class CronController extends Controller
 {
-    const MAX_WORKING_TIME=30;
+    const MAX_WORKING_TIME=50;
 
     private $endTime;
+
+    public function additionalAccessRules()
+    {
+        return array(
+            array('allow', 'users' => array('*')),
+        );
+    }
 
     protected function beforeAction(CAction $action) {
         $this->endTime=time()+self::MAX_WORKING_TIME;

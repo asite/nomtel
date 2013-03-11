@@ -55,10 +55,10 @@ class MegafonBalanceEmailImporter
         $allStatic=true;
 
         for($i=count($data)-1;$i>=0;$i--) {
-            $curVal=floatval($data[$i]);
+            $curVal=floatval($data[$i]['balance']);
 
             if ($curVal>=0) $allNegative=false; else $allPositive=false;
-            if ($i>0 && abs($curVal-$data[$i-1])>1e-4) $allStatic=false;
+            if ($i>0 && abs($curVal-floatval($data[$i-1]['balance']))>1e-4) $allStatic=false;
         }
 
         $newBalanceStatus=Number::BALANCE_STATUS_NORMAL;
@@ -66,14 +66,15 @@ class MegafonBalanceEmailImporter
         if ($allStatic) {
             $newBalanceStatus=$allPositive ? Number::BALANCE_STATUS_POSITIVE_STATIC:Number::BALANCE_STATUS_NEGATIVE_STATIC;
         } else {
-            if ($allPositive) $newBalanceStatus=Number::BALANCE_STATUS_POSITIVE_DYNAMIC;
             if ($allNegative) $newBalanceStatus=Number::BALANCE_STATUS_NEGATIVE_DYNAMIC;
+            if ($allPositive) $newBalanceStatus=Number::BALANCE_STATUS_POSITIVE_DYNAMIC;
         }
 
         if (count($data)==1) $newBalanceStatus=Number::BALANCE_STATUS_NEW;
 
         if ($newBalanceStatus!=$number->balance_status) {
             $number->balance_status=$newBalanceStatus;
+            $number->balance_status_changed_dt=new EDateTime();
             $number->save();
         }
     }
@@ -84,7 +85,7 @@ class MegafonBalanceEmailImporter
         $number=Number::model()->findByAttributes(array('number'=>$data['number']));
 
         if (!$number) {
-            Yii::log("number '{$data['number']}' not found in database",CLogger::LEVEL_WARNING,'mail_parser');
+            Yii::log("Номер '{$data['number']}' не найден в базе",CLogger::LEVEL_WARNING,'mail_parser');
             return;
         }
 
@@ -92,19 +93,25 @@ class MegafonBalanceEmailImporter
 
         if ($data['personal_account'] && $number->personal_account!=$data['personal_account']) {
             $number->personal_account=$data['personal_account'];
+            Sim::model()->updateAll(array('personal_account'=>$data['personal_account']),'parent_id=:sim_id',array(':sim_id'=>$number->sim_id));
+            NumberHistory::addHistoryNumber($number->id,'Личный счет обновлен при импорте e-mail с балансами','База');
             $saveNumber=true;
         }
+
+        if ($saveNumber) $number->save();
 
         $tariff=Tariff::model()->findByAttributes(array('operator_id'=>Operator::OPERATOR_MEGAFON_ID,'title'=>$data['tariff']));
         if (!$tariff) {
             Yii::log("Неизвестный тариф ".$data['tariff'],CLogger::LEVEL_WARNING,'mail_parser');
         }
 
-        if ($tariff->id)
-
-        if ($saveNumber) $number->save();
-
-
+        if ($tariff) {
+            $sim=Sim::model()->findByPk($number->sim_id);
+            if ($sim->tariff_id!=$tariff->id) {
+                Sim::model()->updateAll(array('tariff_id'=>$tariff->id),'parent_id=:sim_id',array(':sim_id'=>$number->sim_id));
+                NumberHistory::addHistoryNumber($number->id,'Тариф обновлен при импорте e-mail с балансами','База');
+            }
+        }
 
         $dt=date('Y-m-d 00:00:00',strtotime($data['dt']));
         $balanceReport=BalanceReport::model()->findByAttributes(array('dt'=>$dt));

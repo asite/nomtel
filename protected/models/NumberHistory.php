@@ -15,7 +15,7 @@ class NumberHistory extends BaseNumberHistory
 		return parent::model($className);
 	}
 
-    public function addHistoryNumber($number_id,$comment,$who=null) {
+    public static function addHistoryNumber($number_id,$comment,$who=null) {
         if (!isset($who)) {
             switch (Yii::app()->user->role) {
                 case 'admin':
