@@ -76,11 +76,20 @@ return array(
                 array(
                     'class' => 'CFileLogRoute',
                     'levels' => 'error, warning',
+                    'except' => 'mail_parser',
                 ),
-    		array(
-        	    'class' => 'CProfileLogRoute',
-        	    'showInFireBug' => true,
-    		)
+                array(
+                    'class' => 'CFileLogRoute',
+                    'levels' => 'info, error, warning',
+                    'categories' => 'mail_parser',
+                    'logFile' => 'mail_parser.log',
+                    'maxFileSize' => 102400,
+                    'maxLogFiles' => 10
+                ),
+                array(
+                    'class' => 'CProfileLogRoute',
+                    'showInFireBug' => true,
+                )
             ),
         ),
         'viewRenderer' => array(

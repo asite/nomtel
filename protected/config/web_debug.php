@@ -25,6 +25,7 @@ $config['components']['log'] = array(
         array(
             'class' => 'CFileLogRoute',
             'levels' => 'info, error, warning',
+            'except' => 'mail_parser',
         ),
         array(
             'class' => 'CWebLogRoute',
@@ -33,7 +34,15 @@ $config['components']['log'] = array(
         array(
             'class' => 'CProfileLogRoute',
             'showInFireBug' => true,
-        )
+        ),
+        array(
+            'class' => 'CFileLogRoute',
+            'levels' => 'info, error, warning',
+            'categories' => 'mail_parser',
+            'logFile' => 'mail_parser.log',
+            'maxFileSize' => 102400,
+            'maxLogFiles' => 10
+        ),
     ),
 );
 

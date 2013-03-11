@@ -9,9 +9,32 @@ class MegafonBalanceEmailImporter
         $this->emailProcessor=new EMailProcessor(Yii::app()->params['megafonBalanceEmails']);
     }
 
+    private function parseError($mail,$message) {
+        Yii::log("parse error:".$message,CLogger::LEVEL_ERROR,'mail_parser');
+        return false;
+    }
+
     private function parse($mail) {
-        var_dump($mail);
-        return true;
+        $mail=mb_convert_encoding($mail,'UTF-8','WINDOWS-1251');
+
+        Yii::log("parse mail\n".$mail,CLogger::LEVEL_INFO,'mail_parser');
+
+        $data=array();
+
+        if (!preg_match('%Л/С: (\d{8})%',$mail,$m)) return $this->parseError($mail,__LINE__);
+        $data['phone']=$m[1];
+        if (!preg_match('%Номер: (\d{10})%',$mail,$m)) return $this->parseError($mail,__LINE__);
+        $data['number']=$m[1];
+        if (!preg_match('%Время: (\d\d.\d\d.\d\d\d\d \d\d:\d\d)%',$mail,$m)) return $this->parseError($mail,__LINE__);
+        $data['dt']=$m[1];
+        if (!preg_match('%На счете ([-.0-9]+) руб\.%',$mail,$m)) return $this->parseError($mail,__LINE__);
+        $data['balance']=$m[1];
+        if (!preg_match('%Тарифный план: (.*?) с \d\d\.\d\d\.\d\d\d\d\.%',$mail,$m)) return $this->parseError($mail,__LINE__);
+        $data['tariff']=$m[1];
+
+        Yii::log("parsed data\n".json_encode($data),CLogger::LEVEL_INFO,'mail_parser');
+
+        return $data;
     }
 
     private function log($msg,$level=CLogger::LEVEL_INFO) {
@@ -56,13 +79,12 @@ class MegafonBalanceEmailImporter
     }
 
     private function process($data) {
-        return true;
         $trx=Yii::app()->db->beginTransaction();
 
         $number=Number::model()->findByAttributes(array('number'=>$data['number']));
 
         if (!$number) {
-            Yii::log("number '{$data['number']}' not found in database",CLogger::LEVEL_WARNING);
+            Yii::log("number '{$data['number']}' not found in database",CLogger::LEVEL_WARNING,'mail_parser');
             return;
         }
 
@@ -92,6 +114,8 @@ class MegafonBalanceEmailImporter
             $balanceReportNumber->number_id=$number->id;
         }
 
+        $balanceReportNumber->balance=$data['balance'];
+
         $balanceReport->save();
 
         $this->recalcNumberBalanceStatus($number);
@@ -106,6 +130,8 @@ class MegafonBalanceEmailImporter
         if ($mail===false) return false;
 
         $data=$this->parse($mail);
+        Yii::getLogger()->flush(true);
+
         if ($data!==false) {
             if ($this->process($data)) {
                 $this->emailProcessor->emailProcessed();

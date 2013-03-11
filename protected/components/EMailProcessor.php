@@ -4,6 +4,8 @@ class EMailProcessor {
     private $imap;
     private $processedBOX;
     private $skippedBOX;
+    private $uids;
+    private $uid;
 
     public function __construct($config) {
         $ssl=$config['ssl'] ? "/novalidate-cert":"";
@@ -15,6 +17,9 @@ class EMailProcessor {
 
         $this->processedBOX=$config['processedBOX'];
         $this->skippedBOX=$config['skippedBOX'];
+
+        $this->uids=imap_search($this->imap,'UNDELETED', SE_UID);
+        if ($this->uids===false) $this->uids=array();
     }
 
     public function __destruct() {
@@ -22,8 +27,9 @@ class EMailProcessor {
     }
 
     public function fetchMail() {
-        if (imap_num_msg($this->imap)==0) return false;
-        $res=imap_body($this->imap,1);
+        if (empty($this->uids)) return false;
+        $this->uid=array_pop($this->uids);
+        $res=imap_body($this->imap,$this->uid,FT_UID);
 
         if ($res==false) throw new CException("can't get email from server");
 
@@ -31,15 +37,15 @@ class EMailProcessor {
     }
 
     private function moveEmail($box) {
-        $res=imap_mail_move($this->imap,1,$box);
+        $res=imap_mail_move($this->imap,$this->uid,$box,CP_UID);
         if ($res===false) throw new CException("can't move message to $box folder");
-        if (!imap_expunge($this->imap)) throw new CException("mail_expunge() returned false");
+        //if (!imap_expunge($this->imap)) throw new CException("mail_expunge() returned false");
     }
 
     private function deleteMail() {
-        $res=imap_delete($this->imap,1);
+        $res=imap_delete($this->imap,$this->uid,FT_UID);
         if ($res===false) throw new CException("can't move message to $box folder");
-        if (!imap_expunge($this->imap)) throw new CException("mail_expunge() returned false");
+        //if (!imap_expunge($this->imap)) throw new CException("mail_expunge() returned false");
     }
 
     public function EmailProcessed() {
