@@ -21,7 +21,7 @@ class MegafonBalanceEmailImporter
 
         $data=array();
 
-        if (!preg_match('%Л/С: (\d{8})%',$mail,$m)) return $this->parseError($mail,__LINE__);
+        if (!preg_match('%Л/С: (\d{7,8})%',$mail,$m)) return $this->parseError($mail,__LINE__);
         $data['personal_account']=$m[1];
         if (!preg_match('%Номер: (\d{10})%',$mail,$m)) return $this->parseError($mail,__LINE__);
         $data['number']=$m[1];
@@ -80,14 +80,14 @@ class MegafonBalanceEmailImporter
     }
 
     private function process($data) {
-        $trx=Yii::app()->db->beginTransaction();
-
         $number=Number::model()->findByAttributes(array('number'=>$data['number']));
 
         if (!$number) {
             Yii::log("Номер '{$data['number']}' не найден в базе",CLogger::LEVEL_WARNING,'mail_parser');
-            return;
+            return true;
         }
+
+        $trx=Yii::app()->db->beginTransaction();
 
         $saveNumber=false;
 
