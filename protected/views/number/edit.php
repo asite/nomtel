@@ -16,6 +16,20 @@ if (isSupport()) {
 
 <h1><?=$number->adminLabel(Number::label(1))?></h1>
 
+<div>
+
+    <div style="float:right;">
+        <?php
+        if ($number->status!=Number::STATUS_FREE) {
+            $this->widget('bootstrap.widgets.TbButton',array(
+                'url'=>$this->createUrl('number/free',array('id'=>$number->id)),
+                'label'=>"Освободить номер",
+                'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
+            ));
+        }
+        ?>
+    </div>
+
 <?php
 if ($number->status!=Number::STATUS_FREE) {
     $this->widget('bootstrap.widgets.TbButton',array(
@@ -23,7 +37,11 @@ if ($number->status!=Number::STATUS_FREE) {
         'label'=>SubscriptionAgreement::label()
     ));
 }
-?>  <br/><br/>
+?>
+
+</div>
+
+<br/>
 
 <div class="number_info">
     <div class="w80 cfix">

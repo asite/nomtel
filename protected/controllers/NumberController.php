@@ -243,5 +243,54 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
+    public function actionFree($id) {
+        $trx=Yii::app()->db->beginTransaction();
+
+        $number=$this->loadModel($id,'Number');
+
+        if ($number->status==Number::STATUS_FREE) {
+            Yii::app()->user->setFlash('error','У освобождаемого номера статус не должен быть равен "'.Number::getStatusLabel(Number::STATUS_FREE).'"');
+            $this->redirect(Yii::app()->request->urlReferrer);
+        }
+
+        $sim=Sim::model()->findByAttributes(array(
+            'parent_id'=>$number->sim_id,
+            'agent_id'=>null
+        ));
+
+        if (!$sim) {
+            Yii::app()->user->setFlash('error','ошибка '.__LINE__);
+            $this->refresh();
+        }
+
+        // specify agent_id, this will forbid create subscription agreement for old sim
+        $sim->agent_id=$sim->parent_agent_id;
+        $sim->save();
+
+        // create new sim with same data, binded to base
+        $sim->unsetAttributes(array('id','parent_act_id','agent_id','parent_id'));
+        $sim->parent_agent_id=adminAgentId();
+        $sim->isNewRecord=true;
+        $sim->save();
+        $sim->parent_id=$sim->id;
+        $sim->save();
+
+        $number->sim_id=$sim->id;
+        $number->status=Number::STATUS_FREE;
+        $number->save();
+
+        // delete subscription agreements
+        $sas=SubscriptionAgreement::model()->findAllByAttributes(array('number_id'=>$number->id));
+        foreach($sas as $sa) {
+            SubscriptionAgreementFile::model()->deleteAllByAttributes(array('subscription_agreement_id'=>$sa->id));
+            $sa->delete();
+        }
+
+        Yii::app()->user->setFlash('success','Номер освобожден');
+
+        $trx->commit();
+
+        $this->redirect(Yii::app()->request->urlReferrer);
+    }
 }
 
