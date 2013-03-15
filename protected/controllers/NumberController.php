@@ -248,11 +248,6 @@ class NumberController extends BaseGxController
 
         $number=$this->loadModel($id,'Number');
 
-        if ($number->status==Number::STATUS_FREE) {
-            Yii::app()->user->setFlash('error','У освобождаемого номера статус не должен быть равен "'.Number::getStatusLabel(Number::STATUS_FREE).'"');
-            $this->redirect(Yii::app()->request->urlReferrer);
-        }
-
         $sim=Sim::model()->findByAttributes(array(
             'parent_id'=>$number->sim_id,
             'agent_id'=>null
@@ -263,9 +258,7 @@ class NumberController extends BaseGxController
             $this->refresh();
         }
 
-        // specify agent_id, this will forbid create subscription agreement for old sim
-        $sim->agent_id=$sim->parent_agent_id;
-        $sim->save();
+        $parent_id=$sim->parent_id;
 
         // create new sim with same data, binded to base
         $sim->unsetAttributes(array('id','parent_act_id','agent_id','parent_id'));
@@ -278,6 +271,8 @@ class NumberController extends BaseGxController
         $number->sim_id=$sim->id;
         $number->status=Number::STATUS_FREE;
         $number->save();
+
+        Sim::model()->updateAll(array('is_active'=>0),'parent_id=:parent_id',array(':parent_id'=>$parent_id));
 
         // delete subscription agreements
         $sas=SubscriptionAgreement::model()->findAllByAttributes(array('number_id'=>$number->id));

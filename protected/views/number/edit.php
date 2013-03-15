@@ -20,13 +20,11 @@ if (isSupport()) {
 
     <div style="float:right;">
         <?php
-        if ($number->status!=Number::STATUS_FREE) {
             $this->widget('bootstrap.widgets.TbButton',array(
                 'url'=>$this->createUrl('number/free',array('id'=>$number->id)),
                 'label'=>"Освободить номер",
                 'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
             ));
-        }
         ?>
     </div>
 
@@ -40,7 +38,7 @@ if ($number->status!=Number::STATUS_FREE) {
 ?>
 
 </div>
-
+<div style="clear:both;"></div>
 <br/>
 
 <div class="number_info">

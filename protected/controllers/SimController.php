@@ -596,6 +596,7 @@ class SimController extends BaseGxController {
             $model->setAttributes($_REQUEST['SimSearch']);
 
         $criteria = new CDbCriteria();
+        $criteria->compare('s.is_active',1);
         $criteria->compare('s.parent_agent_id',loggedAgentId());
 
         if ($model->agent_id !== '0')
