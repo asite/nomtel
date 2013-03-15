@@ -2,18 +2,18 @@
 
 class m130315_140458_add_sim_active_field extends CDbMigration
 {
-	public function up()
-	{
+    public function up()
+    {
         $this->execute("
             ALTER TABLE `sim`
-            ADD `is_active` tinyint NULL DEFAULT '1' COMMENT '0 - симка не активна (была восстановлена на другую)',
-            COMMENT='Хранит информацию о симках и их передаче между агентами. Если симка прошла через N агентов (включая базу), то в таблице будет N записей для этой симки';
+            ADD `is_active` tinyint NULL DEFAULT '1' COMMENT '0 - СЃРёРјРєР° РЅРµ Р°РєС‚РёРІРЅР° (Р±С‹Р»Р° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅР° РЅР° РґСЂСѓРіСѓСЋ)',
+            COMMENT='РҐСЂР°РЅРёС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ СЃРёРјРєР°С… Рё РёС… РїРµСЂРµРґР°С‡Рµ РјРµР¶РґСѓ Р°РіРµРЅС‚Р°РјРё. Р•СЃР»Рё СЃРёРјРєР° РїСЂРѕС€Р»Р° С‡РµСЂРµР· N Р°РіРµРЅС‚РѕРІ (РІРєР»СЋС‡Р°СЏ Р±Р°Р·Сѓ), С‚Рѕ РІ С‚Р°Р±Р»РёС†Рµ Р±СѓРґРµС‚ N Р·Р°РїРёСЃРµР№ РґР»СЏ СЌС‚РѕР№ СЃРёРјРєРё';
         ");
     }
 
-	public function down()
-	{
-		echo "m130315_140458_add_sim_active_field does not support migration down.\n";
-		return false;
-	}
+    public function down()
+    {
+        echo "m130315_140458_add_sim_active_field does not support migration down.\n";
+        return false;
+    }
 }
