@@ -46,6 +46,12 @@ class POSiteController extends Controller
                         Yii::app()->user->setFlash('error','Пароль можно восстанавливать не чаще одного раза в 5 минут');
                         $this->redirect(array('login'));
                     } else {
+                        if (!$number->user_id) {
+                            $user=User::model()->findByAttributes(array('username'=>$number->number));
+                            if ($user) $number->user_id=$user->id;
+                            $number->save();
+                            $number->refresh();
+                        }
                         $number->restorePassword();
                         Yii::app()->user->setFlash('success','Новый пароль выслан вам по SMS');
                         $this->redirect(array('login'));
