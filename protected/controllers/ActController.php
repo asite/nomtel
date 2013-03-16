@@ -70,9 +70,9 @@ class ActController extends BaseGxController
 
                     $connectedSims=Yii::app()->db->createCommand("
                         select count(*) from sim
-                        join number on (number.number=sim.number and number.status!=:STATUS_FREE)
+                        join number on (number.number=sim.number and number.status!=:STATUS_FREE  and number.status!=:STATUS_UNKNOWN)
                         where sim.act_id=:act_id
-                        ")->queryScalar(array(':act_id'=>$act->id,'STATUS_FREE'=>Number::STATUS_FREE));
+                        ")->queryScalar(array(':act_id'=>$act->id,'STATUS_FREE'=>Number::STATUS_FREE,'STATUS_UNKNOWN'=>Number::STATUS_UNKNOWN));
 
                     if ($connectedSims>0) $this->ajaxError(Yii::t("app", "Can't revert this act: Some of numbers are non free"));
 
