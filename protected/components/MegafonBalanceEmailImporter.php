@@ -1,7 +1,7 @@
 <?php
 class MegafonBalanceEmailImporter
 {
-    const STATUS_ANALYZE_PERIODS=14;
+    const STATUS_ANALYZE_PERIODS=6;
 
     private $emailProcessor;
 
@@ -41,7 +41,7 @@ class MegafonBalanceEmailImporter
         Yii::log($msg,$level,__CLASS__);
     }
 
-    private function recalcNumberBalanceStatus($number) {
+    public static function recalcNumberBalanceStatus($number) {
         $data=Yii::app()->db->createCommand("
             select brn.balance
             from balance_report br
@@ -54,10 +54,12 @@ class MegafonBalanceEmailImporter
         $allNegative=true;
         $allStatic=true;
 
+        $validVals=0;
         for($i=count($data)-1;$i>=0;$i--) {
+            if ($data[$i]['balance']!==NULL) $validVals++;
             $curVal=floatval($data[$i]['balance']);
 
-            if ($curVal>=0) $allNegative=false; else $allPositive=false;
+            if ($curVal<1e-4) $allPositive=false; else $allNegative=false;
             if ($i>0 && abs($curVal-floatval($data[$i-1]['balance']))>1e-4) $allStatic=false;
         }
 
@@ -66,11 +68,13 @@ class MegafonBalanceEmailImporter
         if ($allStatic) {
             $newBalanceStatus=$allPositive ? Number::BALANCE_STATUS_POSITIVE_STATIC:Number::BALANCE_STATUS_NEGATIVE_STATIC;
         } else {
-            if ($allNegative) $newBalanceStatus=Number::BALANCE_STATUS_NEGATIVE_DYNAMIC;
+            //$newBalanceStatus=$allPositive ? Number::BALANCE_STATUS_POSITIVE_DYNAMIC:Number::BALANCE_STATUS_NEGATIVE_DYNAMIC;
             if ($allPositive) $newBalanceStatus=Number::BALANCE_STATUS_POSITIVE_DYNAMIC;
+            if ($allNegative) $newBalanceStatus=Number::BALANCE_STATUS_NEGATIVE_DYNAMIC;
         }
 
-        if (count($data)==1) $newBalanceStatus=Number::BALANCE_STATUS_NEW;
+        if ($validVals==0) $newBalanceStatus=Number::BALANCE_STATUS_MISSING;
+        if ($validVals==1 && $data[count($data)-1]['balance']!==NULL) $newBalanceStatus=Number::BALANCE_STATUS_NEW;
 
         if ($newBalanceStatus!=$number->balance_status) {
             $number->balance_status=$newBalanceStatus;
