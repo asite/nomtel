@@ -281,6 +281,8 @@ class NumberController extends BaseGxController
             $sa->delete();
         }
 
+        NumberHistory::addHistoryNumber($number->id,'Номер освобожден');
+
         Yii::app()->user->setFlash('success','Номер освобожден');
 
         $trx->commit();
