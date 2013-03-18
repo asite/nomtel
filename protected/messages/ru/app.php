@@ -342,4 +342,6 @@ return array (
   'internet' => 'Интернет',
   'Set Number Region' => 'Актуализировать регионы номеров',
   'Set Region' => 'Актуализировать регионы',
+  'Order sim' => 'Подключить еще',
+  'Taking Orders' => 'Принимать заказы',
 );

@@ -27,6 +27,7 @@
 </fieldset>
     <fieldset><legend><?php echo Yii::t('app','Agent');?></legend>
 <div class="form-container-horizontal">
+                <div class="taking-orders"><?php echo $form->checkboxRow($model, 'taking_orders'); ?></div>
 <div class="form-container-item form-label-width-140">
                 <?php echo $form->textFieldRow($model,'surname',array('class'=>'span2','maxlength'=>100,'errorOptions'=>array('hideErrorMessage'=>true))); ?>
 

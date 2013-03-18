@@ -11,6 +11,7 @@ $config = CMap::mergeArray(
         ),
         'params' => array(
             'adminEmail' => 'pavimus@gmail.com',
+            'adminPhone' => '9292000003',
             'adminEmailFrom' => 'info@nomtel.com',
             'numberHelpEmail' => 'yurka.god@gmail.com',
             'supportEmail' => array('pavimus@gmail.com','pavimus@gmail.com'),

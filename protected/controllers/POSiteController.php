@@ -7,7 +7,7 @@ class POSiteController extends Controller
     {
         return array(
             array('allow', 'actions' => array('error', 'login', 'restorePassword','logout'), 'users' => array('*')),
-            array('allow', 'actions' => array('index','tariff', 'static'), 'users' => array('@')),
+            array('allow', 'actions' => array('index','tariff', 'static', 'orderSim'), 'users' => array('@')),
         );
     }
 
@@ -204,15 +204,46 @@ class POSiteController extends Controller
 
         $this->render('tariff',array('number'=>$number, 'sim'=>$data));
     }
-    
-    
-     public function actionStatic($page) {
-        
+
+
+    public function actionStatic($page) {
+
         $data=array();
         $number=Number::model()->findByPk(loggedNumberId());
         $data=Sim::model()->findByAttributes(array('parent_id'=>$number->sim_id,'agent_id'=>null));
-       
+
         $this->render('static',array('number'=>$number, 'sim'=>$data, 'page'=>$page));
-     }
+    }
+
+    public function actionOrderSim() {
+        $number = Number::model()->findByPk(loggedNumberId());
+        $sim = Sim::model()->findByAttributes(array('number'=>$number->number, 'agent_id'=>NULL, 'is_active'=>1));
+
+        $tk = time();
+
+        if ($sim->parentAgent->taking_orders) {
+            $sendNumber = $sim->parentAgent->phone_1;
+            $sendMessage = "#$number->number хочет подключить ещё";
+            $sendEmail = array($sim->parentAgent->email?$sim->parentAgent->email:Yii::app()->params['numberHelpEmail']);
+        } else {
+            $sendNumber = Yii::app()->params['adminPhone'];
+            $sendMessage = "#$number->number хочет подключить ещё";
+            $sendEmail = array(Yii::app()->params['numberHelpEmail']);
+        }
+
+        $mail = new YiiMailMessage();
+        $mail->setSubject('Заказ симкарт');
+        $mail->setFrom(Yii::app()->params['supportEmailFrom']);
+        $mail->setTo($sendEmail);
+        $mail->setBody($sendMessage);
+
+        Sms::send($sendNumber,$sendMessage);
+
+        if (Yii::app()->mail->send($mail))
+            Yii::app()->user->setFlash('success', 'Номер Вашего обращения #'.$tk.'. Наш менеджер свяжется в ближайшее время.');
+        else Yii::app()->user->setFlash('error', 'Произошла ошибка. Пожалуйста сообщите о ней администратору!');
+
+        $this->redirect('index');
+    }
 
 }

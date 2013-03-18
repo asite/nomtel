@@ -130,7 +130,9 @@
             '',
             array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('pOSupport/index'), 'active' => $this->route == 'pOSupport/index'),
             array('label' => Yii::t('app', 'Support List'), 'url' => $this->createUrl('pOSupport/list'), 'active' => $this->route == 'pOSupport/list'),
-
+            '',
+            array('label' => Yii::t('app', 'Order sim'), 'url' => $this->createUrl('pOSite/orderSim'), 'active' => $this->route == 'pOSite/orderSim', 'itemOptions'=>array('class'=>'btn btn-warning user_class')),
+            '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('pOSite/logout')),
         );
     }

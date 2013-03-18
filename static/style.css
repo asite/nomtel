@@ -363,3 +363,17 @@ table.margin_b0 {
 }
 .block_othe_question {}
 .block_othe_question label {display: none;}
+
+.btn.btn-warning.user_class {
+  width: 125px;
+}
+.btn.btn-warning.user_class a {
+  color: white;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.btn.btn-warning.user_class a:hover {
+  background: none;
+}
+
+.taking-orders {}
+.taking-orders .controls {margin-left: 160px;}

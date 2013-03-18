@@ -353,13 +353,15 @@ class NumberController extends BaseGxController
                 $trx=Yii::app()->db->beginTransaction();
 
                 $command = Yii::app()->db->createCommand("UPDATE sim SET operator_region_id=:operator_region_id WHERE number=:number");
+                $count = 0;
                 foreach ($simList as $sim) {
                     if ($sim['number'] && $sim['new_region_id']) {
                         $command->execute(array(':operator_region_id'=>$sim['new_region_id'],'number'=>$sim['number']));
+                        $count++;
                     }
                 }
                 $trx->commit();
-                Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
+                Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены. Обновлено '.$count.' записей');
             }
         }
         $this->render('numberRegion');
