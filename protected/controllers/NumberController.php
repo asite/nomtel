@@ -343,21 +343,20 @@ class NumberController extends BaseGxController
                 Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют следующие регионы: <br/>'.$strRegions);
             } else {
                 $simList = Yii::app()->db->createCommand("
-                    SELECT s.number, s.operator_id, s.operator_region_id
+                    SELECT s.number, s.operator_region_id old_region_id, t.region_id new_region_id
                     FROM
                         (SELECT DISTINCT number, operator_id, operator_region_id  FROM sim) s
                         JOIN tmp_number_region t ON (s.number>=t.start AND s.number<=t.end)
                         WHERE t.operator_id!=s.operator_id OR s.operator_region_id!=t.region_id OR s.operator_region_id is NULL
                 ")->queryAll();
 
-                print_r($simList); exit;
-                /*foreach ($simList as $sim) {
-                    if($j++==10000) exit;
-                    if ($sim['number']) {
-                        $str = Yii::app()->db->createCommand("SELECT operator_id, region_id FROM tmp_number_region WHERE start>=".$sim['number']." and end<=".$sim['number'])->queryAll();
-                        if (count($str)) print_r($str);
+                $trx=Yii::app()->db->beginTransaction();
+                foreach ($simList as $sim) {
+                    if ($sim['number'] && $sim['new_region_id']) {
+                        Yii::app()->db->createCommand("UPDATE sim SET operator_region_id=".$sim['new_region_id']." WHERE number=".$sim['number'])->execute();
                     }
-                }*/
+                }
+                $trx->commit();
             }
         }
         $this->render('numberRegion');

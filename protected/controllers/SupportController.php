@@ -128,7 +128,7 @@ class SupportController extends BaseGxController
             $numberObj=Number::model()->findByAttributes(array('number'=>$number->number));
             $data['numberObj']=$numberObj;
 
-            if ($numberObj && $numberObj->status!=Number::STATUS_FREE) {
+            if ($numberObj && !in_array($numberObj->status,array(Number::STATUS_FREE,Number::STATUS_UNKNOWN))) {
                 $agreement=SubscriptionAgreement::model()->find(array(
                     'condition'=>'number_id=:number_id',
                     'order'=>'id desc',
