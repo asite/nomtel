@@ -289,5 +289,78 @@ class NumberController extends BaseGxController
 
         $this->redirect(Yii::app()->request->urlReferrer);
     }
+
+    public function actionSetNumberRegion() {
+        if (isset($_REQUEST['setNumberRegion'])) {
+            $content = file_get_contents('http://rossvyaz.ru/docs/articles/DEF-9x.html');
+            $content = iconv('windows-1251', 'utf-8', $content);
+
+            preg_match_all('%<tr[^>]*>.*?</tr>%i',$content,$m);
+
+            Yii::app()->db->createCommand("TRUNCATE TABLE tmp_number_region")->execute();
+
+            $regions = OperatorRegion::model()->findAll();
+
+            $balanceReportNumberBulkInsert = new BulkInsert('tmp_number_region', array('start', 'end', 'operator_id', 'region_id', 'region'));
+            foreach($m[0] as $v) {
+                preg_match_all('%<td[^>]*>.*?</td>%i',$v,$mm);
+                $operator = mb_strtolower(trim(strip_tags(html_entity_decode($mm[0][4]))),'UTF-8');
+                if ($operator=='мегафон' || $operator=='билайн') {
+                    if ($operator=='мегафон') $operator_id = Operator::OPERATOR_MEGAFON_ID;
+                    else $operator_id = Operator::OPERATOR_BEELINE_ID;
+
+                    $code = trim(strip_tags(html_entity_decode($mm[0][0])));
+                    $first = trim(strip_tags(html_entity_decode($mm[0][1])));
+                    $last = trim(strip_tags(html_entity_decode($mm[0][2])));
+                    $region = trim(strip_tags(html_entity_decode($mm[0][5])));
+
+                    $region_id = 0;
+                    foreach ($regions as $rv) {
+                        if ($rv->title==$region && $rv->operator_id==$operator_id) $region_id=$rv->id;
+                    }
+
+                    $balanceReportNumberBulkInsert->insert(array(
+                        'start' => $code.$first,
+                        'end' => $code.$last,
+                        'operator_id' => $operator_id,
+                        'region_id' => $region_id,
+                        'region' => $region
+                    ));
+                }
+            }
+            $balanceReportNumberBulkInsert->finish();
+
+            $incorrectRegion = Yii::app()->db->createCommand("SELECT DISTINCT region, operator_id FROM tmp_number_region WHERE region_id=0")->queryAll();
+            if (count($incorrectRegion)<0) {
+                $operator = '';
+                $strRegions = '<ul>';
+                foreach ($incorrectRegion as $value) {
+                    if ($value['operator_id']==Operator::OPERATOR_MEGAFON_ID) $operator = "Мегафон";
+                    elseif ($value->$operator_id==Operator::OPERATOR_BEELINE_ID) $operator = "Билайн";
+                    $strRegions .= '<li>'.$operator.' - "'.$value['region'].'"</li>';
+                }
+                $strRegions .= '</ul>';
+                Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют следующие регионы: <br/>'.$strRegions);
+            } else {
+                $simList = Yii::app()->db->createCommand("
+                    SELECT s.number, s.operator_id, s.operator_region_id
+                    FROM
+                        (SELECT DISTINCT number, operator_id, operator_region_id  FROM sim) s
+                        JOIN tmp_number_region t ON (s.number>=t.start AND s.number<=t.end)
+                        WHERE t.operator_id!=s.operator_id OR s.operator_region_id!=t.region_id OR s.operator_region_id is NULL
+                ")->queryAll();
+
+                print_r($simList); exit;
+                /*foreach ($simList as $sim) {
+                    if($j++==10000) exit;
+                    if ($sim['number']) {
+                        $str = Yii::app()->db->createCommand("SELECT operator_id, region_id FROM tmp_number_region WHERE start>=".$sim['number']." and end<=".$sim['number'])->queryAll();
+                        if (count($str)) print_r($str);
+                    }
+                }*/
+            }
+        }
+        $this->render('numberRegion');
+    }
 }
 

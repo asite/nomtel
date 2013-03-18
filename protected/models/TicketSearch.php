@@ -43,8 +43,8 @@ class TicketSearch extends CFormModel
         $sql="from ticket t
                 join number n on (n.id=t.number_id)
                 join sim s on (s.id=t.sim_id)
-                join operator o on (o.id=s.operator_id)
-                join tariff ta on (ta.id=s.tariff_id)";
+                left outer join operator o on (o.id=s.operator_id)
+                left outer join tariff ta on (ta.id=s.tariff_id)";
 
         $condition=$criteria->condition;
 
