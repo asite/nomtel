@@ -331,7 +331,7 @@ class NumberController extends BaseGxController
             $balanceReportNumberBulkInsert->finish();
 
             $incorrectRegion = Yii::app()->db->createCommand("SELECT DISTINCT region, operator_id FROM tmp_number_region WHERE region_id=0")->queryAll();
-            if (count($incorrectRegion)<0) {
+            if (count($incorrectRegion)>0) {
                 $operator = '';
                 $strRegions = '<ul>';
                 foreach ($incorrectRegion as $value) {
@@ -351,12 +351,15 @@ class NumberController extends BaseGxController
                 ")->queryAll();
 
                 $trx=Yii::app()->db->beginTransaction();
+
+                $command = Yii::app()->db->createCommand("UPDATE sim SET operator_region_id=:operator_region_id WHERE number=:number");
                 foreach ($simList as $sim) {
                     if ($sim['number'] && $sim['new_region_id']) {
-                        Yii::app()->db->createCommand("UPDATE sim SET operator_region_id=".$sim['new_region_id']." WHERE number=".$sim['number'])->execute();
+                        $command->execute(array(':operator_region_id'=>$sim['new_region_id'],'number'=>$sim['number']));
                     }
                 }
                 $trx->commit();
+                Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
             }
         }
         $this->render('numberRegion');
