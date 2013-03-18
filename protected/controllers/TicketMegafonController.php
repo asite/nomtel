@@ -4,6 +4,7 @@ class TicketMegafonController extends BaseGxController {
 
     public function additionalAccessRules() {
         return array(
+            array('disallow', 'actions'=>array('indexAdmin','detailAdmin'),'roles' => array('supportMegafon')),
             array('allow', 'roles' => array('supportMegafon')),
         );
     }
@@ -17,6 +18,31 @@ class TicketMegafonController extends BaseGxController {
         list($data['dataProvider'],$data['model'])=TicketSearch::getSqlDataProvider($criteria);
 
         $this->render('index',$data);
+    }
+
+    public function actionIndexAdmin() {
+        $data=array();
+
+        $criteria=new CDbCriteria();
+        $criteria->addCondition('t.status=:in_work_megafon or t.megafon_status is not null');
+        $criteria->params[':in_work_megafon']=Ticket::STATUS_IN_WORK_MEGAFON;
+
+        list($data['dataProvider'],$data['model'])=TicketSearch::getSqlDataProvider($criteria);
+
+        $this->render('indexAdmin',$data);
+    }
+
+    public function actionDetailAdmin($id) {
+        $data=array();
+
+        $ticket=$this->loadModel($id,'Ticket');
+        $data['ticket']=$ticket;
+
+        $ticketHistory=new TicketHistory();
+        $ticketHistory->ticket_id=$ticket->id;
+        $data['ticketHistory']=$ticketHistory;
+
+        $this->render('detailAdmin',$data);
     }
 
     public function actionDetail($id) {
@@ -41,11 +67,13 @@ class TicketMegafonController extends BaseGxController {
                 if (isset($_POST['accept'])) {
                     $ticket->support_operator_id=loggedSupportOperatorId();
                     $ticket->status=Ticket::STATUS_FOR_REVIEW;
+                    $ticket->megafon_status=Ticket::MEGAFON_STATUS_DONE;
                 }
 
                 if (isset($_POST['refuse'])) {
                     $ticket->support_operator_id=loggedSupportOperatorId();
                     $ticket->status=Ticket::STATUS_REFUSED_BY_MEGAFON;
+                    $ticket->megafon_status=Ticket::MEGAFON_STATUS_REFUSED;
                 }
 
                 $trx=Yii::app()->db->beginTransaction();

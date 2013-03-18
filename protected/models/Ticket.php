@@ -16,6 +16,9 @@ class Ticket extends BaseTicket
     const STATUS_DONE='DONE';
     const STATUS_REFUSED='REFUSED';
 
+    const MEGAFON_STATUS_DONE='DONE';
+    const MEGAFON_STATUS_REFUSED='REFUSED';
+    
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}
@@ -50,6 +53,29 @@ class Ticket extends BaseTicket
         return $labels[$status];
     }
 
+    public static function getMegafonStatusDropDownList($items=array()) {
+        $labels=self::getMegafonStatusLabels();
+        return array_merge($items,$labels);
+    }
+
+    public static function getMegafonStatusLabels() {
+        static $labels;
+
+        if (!$labels) {
+            $labels=array(
+                self::MEGAFON_STATUS_DONE=>Yii::t('app','DONE'),
+                self::MEGAFON_STATUS_REFUSED=>Yii::t('app','REFUSED')
+            );
+        }
+
+        return $labels;
+    }
+
+    public static function getMegafonStatusLabel($status) {
+        $labels=self::getMegafonStatusLabels();
+        return $labels[$status];
+    }
+    
     public static function getStatusPOLabel($status) {
         switch ($status) {
             case self::STATUS_DONE:

@@ -5,10 +5,11 @@ class TicketSearch extends CFormModel
     public $number;
     public $dt;
     public $status;
+    public $megafon_status;
 
     public function rules() {
         return array(
-            array('number,date,status','safe'),
+            array('number,date,status,megafon_status','safe'),
             array('dt','date','format'=>'dd.MM.yyyy')
         );
     }
@@ -17,7 +18,8 @@ class TicketSearch extends CFormModel
         return array(
             'number'=>Yii::t('app','Number'),
             'dt'=>Yii::t('app','Dt'),
-            'status'=>Yii::t('app','Status')
+            'status'=>Yii::t('app','Status'),
+            'megafon_status'=>'Статус Мегафона'
         );
     }
 
@@ -39,6 +41,7 @@ class TicketSearch extends CFormModel
         }
 
         $criteria->compare('t.status',$model->status);
+        $criteria->compare('t.megafon_status',$model->megafon_status);
 
         $sql="from ticket t
                 join number n on (n.id=t.number_id)
