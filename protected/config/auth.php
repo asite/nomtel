@@ -77,12 +77,12 @@ return array(
 
     'createSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
-        'bizRule' => 'return $params["number_status"]==Number::STATUS_FREE;'
+        'bizRule' => 'return in_array($params["number_status"],array(Number::STATUS_FREE,Number::STATUS_UNKNOWN));'
     ),
 
     'updateSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
-        'bizRule' => 'return $params["number_status"]!=Number::STATUS_FREE;'
+        'bizRule' => 'return !in_array($params["number_status"],array(Number::STATUS_FREE,Number::STATUS_UNKNOWN));'
     ),
 
     'deleteAct'=>array(
