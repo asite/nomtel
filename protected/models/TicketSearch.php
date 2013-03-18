@@ -56,6 +56,7 @@ class TicketSearch extends CFormModel
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
+                'defaultOrder'=>'t.dt'
             ),
             'pagination' => array(
                 'pageSize' => Ticket::ITEMS_PER_PAGE
