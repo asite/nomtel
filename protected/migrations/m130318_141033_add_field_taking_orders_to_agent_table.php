@@ -5,9 +5,9 @@ class m130318_141033_add_field_taking_orders_to_agent_table extends CDbMigration
 	public function safeUp()
 	{
 		$this->execute("
-            ALTER TABLE `tmp_number_region`
-			ADD INDEX `start` (`start`),
-			ADD INDEX `end` (`end`);
+            ALTER TABLE `agent`
+			ADD `taking_orders` tinyint(1) NOT NULL DEFAULT '0',
+			COMMENT='Хранит данные агентов. База (админ) имеет запись с id 1';
         ");
 	}
 
