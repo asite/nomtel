@@ -5,12 +5,12 @@
             'data'=>$sim,
             'attributes'=>array(
                 'tariff',
-                array(
-                    'label'=>Yii::t('app','Description'),
-                    'name' => 'tariff_id',
-                    'type' => 'html',
-                    'value' => $sim->tariff->description,
-                    )
+                
             ),
         )); ?>
+        
+        <p>
+        <?=$sim->tariff->description;?>
+        
+        </p>
 </div>
