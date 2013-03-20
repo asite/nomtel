@@ -235,7 +235,31 @@ class NumberController extends BaseGxController
     public function actionSaveICC($id) {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
 
+                $trx=Yii::app()->db->beginTransaction();
+
                 $number = Number::model()->findByPk($id);
+
+                $sim=Sim::model()->findByPk($number->sim_id);
+
+                $blankSim=BlankSim::model()->findByAttributes(array('icc'=>$_POST['value']));
+                if (!$blankSim) {
+                    $this->ajaxError('Пустышки с указанным icc нет в базе');
+                }
+                if ($blankSim->used_dt) {
+                    $this->ajaxError('Пустышка с указанным icc уже использована для восстановления');
+                }
+                if ($blankSim->operator_id!=$sim->operator_id) {
+                    $this->ajaxError('Пустышка с указанным icc относится к другому оператору');
+                }
+                if ($blankSim->operator_region_id!=$sim->operator_region_id) {
+                    $this->ajaxError('Пустышка с указанным icc относится к другому региону');
+                }
+
+                $blankSim->used_dt=new EDateTime();
+                $blankSim->used_support_operator_id=loggedSupportOperatorId();
+                $blankSim->used_number_id=$number->id;
+                $blankSim->save();
+
 
                 $criteria = new CDbCriteria();
                 $criteria->addCondition('parent_id=:sim_id');
@@ -249,6 +273,8 @@ class NumberController extends BaseGxController
                 Ticket::addMessage($number->id,$message);
 
                 NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');
+
+                $trx->commit();
             try {
 
             } catch (CDbException $e) {

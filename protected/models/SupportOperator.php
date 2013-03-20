@@ -5,6 +5,7 @@ Yii::import('application.models._base.BaseSupportOperator');
 class SupportOperator extends BaseSupportOperator
 {
     const OPERATOR_DEFAULT_ID=4;
+    const OPERATOR_ADMIN_ID=15;
 
     const ROLE_SUPPORT='support';
     const ROLE_SUPPORT_MAIN='supportMain';
