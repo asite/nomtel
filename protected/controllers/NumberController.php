@@ -156,7 +156,7 @@ class NumberController extends BaseGxController
                 $codeword = $number->codeword;
                 $number->codeword = $_POST['value'];
                 $number->save();
-                NumberHistory::addHistoryNumber($number->id,'Кодовое слово сменено с "'.$codeword.'"" на "'.$_POST['value'].'"');
+                NumberHistory::addHistoryNumber($number->id,'Кодовое слово сменено с "'.$codeword.'" на "'.$_POST['value'].'"');
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Error"));
             }
@@ -171,7 +171,7 @@ class NumberController extends BaseGxController
                 $shortNumber = $number->short_number;
                 $number->short_number = $_POST['value'];
                 $number->save();
-                NumberHistory::addHistoryNumber($number->id,'Короткий номер сменен с "'.$codeword.'"" на "'.$_POST['value'].'"');
+                NumberHistory::addHistoryNumber($number->id,'Короткий номер сменен с "'.$codeword.'" на "'.$_POST['value'].'"');
             } catch (CDbException $e) {
                 $this->ajaxError(Yii::t("app", "Error"));
             }
