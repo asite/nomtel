@@ -72,6 +72,7 @@ return array (
   'sim_price' => '',
   'turnover_sim' => '',
   'Договор' => '',
+  'Short Number' => 'Короткий номер',
   'Abonent Number' => '@@Номер абонента@@',
   'Answer' => '@@Ответить@@',
   'CLOSED' => '@@Закрыт@@',

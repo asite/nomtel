@@ -162,7 +162,7 @@ if ($number->status!=Number::STATUS_FREE) {
 
     <br/>
     <div class="cfix">
-        <div style="float:left;width:40%;">
+        <div style="float:left;width:35%;">
         <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table margin_b0 table-striped table-condensed'),
             'data'=>$sim,
@@ -225,7 +225,7 @@ if ($number->status!=Number::STATUS_FREE) {
             ),
         )); ?>
         </div>
-        <div style="float:left;width:30%;">
+        <div style="float:left;width:35%;">
         <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
             'data'=>$number,
@@ -247,8 +247,19 @@ if ($number->status!=Number::STATUS_FREE) {
                     )
                 ),
                 array(
-                    'label'=>'&nbsp;',
-                    'value'=>''
+                    'name' => 'short_number',
+                    'value' => $number->short_number,
+                    'editable' => array(
+                        'type'   => 'text',
+                        'url' => $this->createUrl('number/saveShortNumber',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
+                        'source' => $number->short_number,
+                        'success'   => 'js: function(data) {
+                                        $.fn.yiiGridView.update("number-grid");
+                                    }'
+                    )
                 ),
             ),
         )); ?>

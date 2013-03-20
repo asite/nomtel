@@ -164,6 +164,21 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
+    public function actionSaveShortNumber($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $shortNumber = $number->short_number;
+                $number->short_number = $_POST['value'];
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Короткий номер сменен с "'.$codeword.'"" на "'.$_POST['value'].'"');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Error"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
     public function actionSaveServicePassword($id) {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
