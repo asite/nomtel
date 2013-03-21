@@ -69,7 +69,7 @@ if ($number->status!=Number::STATUS_FREE) {
         )); ?>
         </div>
     </div>
-    <?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support'): ?>
+    <?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='supportSuper' || Yii::app()->user->role=='support'): ?>
     <br/>
     <div class="cfix">
         <div style="float:left;width:50%;">
@@ -102,7 +102,7 @@ if ($number->status!=Number::STATUS_FREE) {
         </div>
     </div>
     <?php endif; ?>
-    <?php if (Yii::app()->user->role=='admin'): ?>
+    <?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='supportSuper'): ?>
     <br/>
     <div class="table_margin0 cfix">
         <div style="float:left;width:40%;">
@@ -167,7 +167,7 @@ if ($number->status!=Number::STATUS_FREE) {
     <?php endif; ?>
 </div>
 
-<?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support'): ?>
+<?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support' || Yii::app()->user->role=='supportSuper'): ?>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'number-grid',
     'dataProvider' => $numberHistory->search(),

@@ -11,41 +11,6 @@
 <div class="inner_container cfix">
 <div class="menuLeft well">
     <?php
-    if (Yii::app()->user->role == 'admin') {
-        $menuLeft = array(
-            array('label' => Yii::app()->name, 'url' => $this->createUrl('site/index'), 'active' => $this->route == 'site/index'),
-            '',
-            array('label' => Yii::t('app', 'My Profile'), 'url' => $this->createUrl('agent/update', array('id' => loggedAgentId())), 'active' => Yii::app()->request->url == $this->createUrl('agent/update', array('id' => loggedAgentId()))),
-            array('label' => Yii::t('app', 'MenuSim'), 'itemOptions' => array('class' => 'nav-header')),
-            array('label' => Yii::t('app', 'addAct'), 'url' => $this->createUrl('sim/delivery'), 'active' => $this->route == 'sim/delivery'),
-            array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
-            array('label' => BlankSim::label(2), 'url' => $this->createUrl('blankSim/admin',array('BlankSimSearch[used_support_operator_id]'=>Yii::t('app','NOT RESTORED'))), 'active' => $this->id=='blankSim'),
-            array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
-            array('label' => Yii::t('app', 'Mass select'), 'url' => $this->createUrl('sim/massselect'), 'active' => $this->route == 'sim/massselect'),
-            '',
-            array('label' => SupportOperator::label(2), 'url' => $this->createUrl('supportOperator/admin'), 'active' => $this->id == 'supportOperator'),
-            array('label' => Yii::t('app', 'Agents'), 'url' => $this->createUrl('agent/admin'), 'active' => ($this->id == 'agent' && $this->route != 'agent/update')),
-            //array('label' => Yii::t('app', 'Load Bonuses'), 'url' => $this->createUrl('bonusReport/load'), 'active' => $this->route == 'bonusReport/load'),
-            array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list'),
-            //array('label' => Yii::t('app', 'Load Balance Report'), 'url' => $this->createUrl('balanceReport/load'), 'active' => $this->route == 'balanceReport/load'),
-            array('label' => BalanceReport::model()->label(2), 'url' => $this->createUrl('balanceReport/list'), 'active' => $this->route == 'balanceReport/list'),
-            //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
-            array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
-            array('label' => Yii::t('app', 'Operators'), 'url' => $this->createUrl('operator/admin'), 'active' => $this->id == 'operator'),
-            '',
-            array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
-            '',
-            array('label' => 'Список обращений (Админ)', 'url' => $this->createUrl('ticketAdmin/index'),'active'=>Yii::app()->controller->id=='ticketAdmin'),
-            array('label' => 'Список обращений (Главный)', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
-            array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
-            '',
-            array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
-            '',
-            array('label' => Yii::t('app', 'Set Number Region'), 'url' => $this->createUrl('number/setNumberRegion'), 'active' => $this->route == 'number/setNumberRegion'),
-            '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
-        );
-    }
 
     if (Yii::app()->user->role == 'agent') {
         $menuLeft = array(
@@ -136,6 +101,42 @@
             array('label' => Yii::t('app', 'Order sim'), 'url' => $this->createUrl('pOSite/orderSim'), 'active' => $this->route == 'pOSite/orderSim', 'itemOptions'=>array('class'=>'btn btn-warning user_class')),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('pOSite/logout')),
+        );
+    }
+
+    if (Yii::app()->user->role == 'admin' || Yii::app()->user->role == 'supportSuper') {
+        $menuLeft = array(
+            array('label' => Yii::app()->name, 'url' => $this->createUrl('site/index'), 'active' => $this->route == 'site/index'),
+            '',
+            array('label' => Yii::t('app', 'My Profile'), 'url' => $this->createUrl('agent/update', array('id' => loggedAgentId())), 'active' => Yii::app()->request->url == $this->createUrl('agent/update', array('id' => loggedAgentId()))),
+            array('label' => Yii::t('app', 'MenuSim'), 'itemOptions' => array('class' => 'nav-header')),
+            array('label' => Yii::t('app', 'addAct'), 'url' => $this->createUrl('sim/delivery'), 'active' => $this->route == 'sim/delivery'),
+            array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
+            array('label' => BlankSim::label(2), 'url' => $this->createUrl('blankSim/admin',array('BlankSimSearch[used_support_operator_id]'=>Yii::t('app','NOT RESTORED'))), 'active' => $this->id=='blankSim'),
+            array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
+            array('label' => Yii::t('app', 'Mass select'), 'url' => $this->createUrl('sim/massselect'), 'active' => $this->route == 'sim/massselect'),
+            '',
+            array('label' => SupportOperator::label(2), 'url' => $this->createUrl('supportOperator/admin'), 'active' => $this->id == 'supportOperator'),
+            array('label' => Yii::t('app', 'Agents'), 'url' => $this->createUrl('agent/admin'), 'active' => ($this->id == 'agent' && $this->route != 'agent/update')),
+            //array('label' => Yii::t('app', 'Load Bonuses'), 'url' => $this->createUrl('bonusReport/load'), 'active' => $this->route == 'bonusReport/load'),
+            array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list'),
+            //array('label' => Yii::t('app', 'Load Balance Report'), 'url' => $this->createUrl('balanceReport/load'), 'active' => $this->route == 'balanceReport/load'),
+            array('label' => BalanceReport::model()->label(2), 'url' => $this->createUrl('balanceReport/list'), 'active' => $this->route == 'balanceReport/list'),
+            //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
+            array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
+            array('label' => Yii::t('app', 'Operators'), 'url' => $this->createUrl('operator/admin'), 'active' => $this->id == 'operator'),
+            '',
+            array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
+            '',
+            array('label' => 'Список обращений (Админ)', 'url' => $this->createUrl('ticketAdmin/index'),'active'=>Yii::app()->controller->id=='ticketAdmin'),
+            array('label' => 'Список обращений (Главный)', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
+            array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
+            '',
+            array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
+            '',
+            array('label' => Yii::t('app', 'Set Number Region'), 'url' => $this->createUrl('number/setNumberRegion'), 'active' => $this->route == 'number/setNumberRegion'),
+            '',
+            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
     }
 

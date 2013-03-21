@@ -43,6 +43,13 @@ return array(
         )
     ),
 
+    'supportSuper' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+            'admin'
+        )
+    ),
+
     'number' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(

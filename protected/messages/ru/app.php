@@ -364,6 +364,7 @@ return array (
   'supportAdmin' => 'Администратор',
   'supportMain' => 'Главный оператор',
   'supportMegafon' => 'Оператор Мегафон',
+  'supportSuper' => 'Оператор Базы',
   'the Agent' => 'У агента',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
