@@ -39,6 +39,8 @@ return array (
   'Can\'t resize and/or save file' => '',
   'City' => '',
   'Defined' => '',
+
+  'NOT RESTORED'=>'НЕ ВОССТАНОВЛЕННЫЕ',
   'Email' => '',
   'End' => '',
   'Error' => '',

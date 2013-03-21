@@ -19,7 +19,7 @@
             array('label' => Yii::t('app', 'MenuSim'), 'itemOptions' => array('class' => 'nav-header')),
             array('label' => Yii::t('app', 'addAct'), 'url' => $this->createUrl('sim/delivery'), 'active' => $this->route == 'sim/delivery'),
             array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
-            array('label' => BlankSim::label(2), 'url' => $this->createUrl('blankSim/admin'), 'active' => $this->id=='blankSim'),
+            array('label' => BlankSim::label(2), 'url' => $this->createUrl('blankSim/admin',array('BlankSimSearch[used_support_operator_id]'=>Yii::t('app','NOT RESTORED'))), 'active' => $this->id=='blankSim'),
             array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
             array('label' => Yii::t('app', 'Mass select'), 'url' => $this->createUrl('sim/massselect'), 'active' => $this->route == 'sim/massselect'),
             '',

@@ -206,4 +206,38 @@ class BlankSimController extends BaseGxController
 
         $this->render('balance',array('dataProvider'=>new CArrayDataProvider($res)));
     }
+
+    public function actionRestoreStats() {
+        $model=new BlankSimRestoreStatistic();
+
+        if (isset($_REQUEST['BlankSimRestoreStatistic'])) {
+            $model->setAttributes($_REQUEST['BlankSimRestoreStatistic']);
+        } else {
+            $model->date_to=strval(new EDateTime(""));
+            $model->date_from=strval(new EDateTime("-7 Day"));
+        }
+
+        $date_from=new EDateTime($model->date_from);
+        $date_to=new EDateTime($model->date_to);
+
+        $rows=Yii::app()->db->createCommand("
+            select so.surname,so.name,tmp.cnt
+            from (
+              select used_support_operator_id,count(*) as cnt
+              from blank_sim
+              where used_dt>=:date_from and used_dt<DATE_ADD(:date_to,INTERVAL 1 DAY)
+              group by used_support_operator_id
+            ) as tmp
+            join support_operator so on (so.id=tmp.used_support_operator_id)
+            order by surname,name
+        ")->queryAll(true,array(
+            ':date_from'=>$date_from->toMysqlDate(),
+            ':date_to'=>$date_to->toMysqlDate()
+        ));
+
+        $this->render('restoreStats',array(
+            'dataProvider'=>new CArrayDataProvider($rows),
+            'model'=>$model
+        ));
+    }
 }
