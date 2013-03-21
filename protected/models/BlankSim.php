@@ -35,5 +35,8 @@ class BlankSim extends BaseBlankSim
         $labels=self::getTypeLabels();
         return $labels[$status];
     }
-    
+
+    public function __toString() {
+        return $this->icc;
+    }
 }

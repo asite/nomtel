@@ -8,6 +8,7 @@ $form = $this->beginWidget('BaseTbActiveForm', array(
 ));
 ?>
 
+
 <?php echo $form->errorSummary($model); ?>
 
 <br/>

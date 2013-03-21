@@ -17,4 +17,21 @@ class OperatorRegion extends BaseOperatorRegion
       }
       return $result;
     }
+
+    public static function getGroupedDropDownList() {
+        $data = Yii::app()->db->createCommand("select id,title,operator_id from " .self::model()->tableName() . " order by title")->queryAll();
+        $result = array(Operator::OPERATOR_BEELINE_ID => array(), Operator::OPERATOR_MEGAFON_ID => array());
+        foreach ($data as $v) {
+            $result[$v['operator_id']][$v['id']] = $v['title'];
+        }
+
+        $result2=array();
+        foreach($result as $operator_id=>$regions) {
+            $operator=Operator::model()->findByPk($operator_id);
+            foreach($regions as $region_id=>$region)
+                $result2[$region_id]=$operator->title.' - '.$region;
+        }
+
+        return $result2;
+    }
 }
