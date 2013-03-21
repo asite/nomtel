@@ -350,4 +350,6 @@ return array (
   'Set Region' => 'Актуализировать регионы',
   'Order sim' => 'Подключить еще',
   'Taking Orders' => 'Принимать заказы',
+  'enable internet' => 'Подключить Интернет',
+  'disable internet' => 'Отключить Интернет',
 );

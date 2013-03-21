@@ -7,7 +7,7 @@ class POSiteController extends Controller
     {
         return array(
             array('allow', 'actions' => array('error', 'login', 'restorePassword','logout'), 'users' => array('*')),
-            array('allow', 'actions' => array('index','tariff', 'static', 'orderSim'), 'users' => array('@')),
+            array('allow', 'actions' => array('index','tariff', 'static', 'orderSim','internet'), 'users' => array('@')),
         );
     }
 
@@ -213,6 +213,19 @@ class POSiteController extends Controller
         $data=Sim::model()->findByAttributes(array('parent_id'=>$number->sim_id,'agent_id'=>null));
 
         $this->render('static',array('number'=>$number, 'sim'=>$data, 'page'=>$page));
+    }
+
+    public function actionInternet($type) {
+        $number=Number::model()->findByPk(loggedNumberId());
+
+        if ($type=='connect') $message = "Абонент ".$number->number." желает подключить услугу Интернет";
+        else $message = $message = "Абонент ".$number->number." желает отключить услугу Интернет";
+        $idTicket = Ticket::addMessage(loggedNumberId(), $message);
+        $num = time();
+        Yii::app()->user->setFlash('success','Ваше обращение'.$num.' принято');
+        Sms::send($number->number,'Ваше обращение'.$num.' принято');
+
+        $this->redirect($this->createUrl('static',array('page'=>'internet')));
     }
 
     public function actionOrderSim() {
