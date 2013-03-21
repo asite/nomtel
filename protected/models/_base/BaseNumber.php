@@ -18,6 +18,8 @@
  * @property string $balance_status_changed_dt
  * @property string $codeword
  * @property string $service_password
+ * @property string $sim_price
+ * @property string $number_price
  * @property string $short_number
  * @property integer $support_operator_id
  * @property string $support_operator_got_dt
@@ -32,6 +34,7 @@
  * @property integer $support_passport_need_validation
  *
  * @property BalanceReportNumber[] $balanceReportNumbers
+ * @property BlankSim[] $blankSims
  * @property BonusReportNumber[] $bonusReportNumbers
  * @property Sim $sim
  * @property SupportOperator $supportOperator
@@ -66,22 +69,24 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			array('number, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>7),
 			array('balance_status', 'length', 'max'=>16),
+			array('sim_price, number_price', 'length', 'max'=>14),
 			array('support_status', 'length', 'max'=>12),
 			array('support_callback_name, support_getting_passport_variant, support_number_region_usage', 'length', 'max'=>200),
 			array('support_sent_sms_status', 'length', 'max'=>6),
 			array('balance_status_changed_dt, support_operator_got_dt, support_dt, support_callback_dt', 'safe'),
-			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation', 'default', 'setOnEmpty' => true, 'value' => null),
             array('balance_status_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_operator_got_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_callback_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation', 'safe', 'on'=>'search'),
+			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
 			'balanceReportNumbers' => array(self::HAS_MANY, 'BalanceReportNumber', 'number_id'),
+			'blankSims' => array(self::HAS_MANY, 'BlankSim', 'used_number_id'),
 			'bonusReportNumbers' => array(self::HAS_MANY, 'BonusReportNumber', 'number_id'),
 			'sim' => array(self::BELONGS_TO, 'Sim', 'sim_id'),
 			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
@@ -108,6 +113,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'balance_status_changed_dt' => Yii::t('app', 'Balance Status Changed Dt'),
 			'codeword' => Yii::t('app', 'Codeword'),
 			'service_password' => Yii::t('app', 'Service Password'),
+			'sim_price' => Yii::t('app', 'Sim Price'),
+			'number_price' => Yii::t('app', 'Number Price'),
 			'short_number' => Yii::t('app', 'Short Number'),
 			'support_operator_id' => null,
 			'support_operator_got_dt' => Yii::t('app', 'Support Operator Got Dt'),
@@ -121,6 +128,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'user_id' => null,
 			'support_passport_need_validation' => Yii::t('app', 'Support Passport Need Validation'),
 			'balanceReportNumbers' => null,
+			'blankSims' => null,
 			'bonusReportNumbers' => null,
 			'sim' => null,
 			'supportOperator' => null,
@@ -143,6 +151,8 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('balance_status_changed_dt', $this->balance_status_changed_dt, true);
 		$criteria->compare('codeword', $this->codeword, true);
 		$criteria->compare('service_password', $this->service_password, true);
+		$criteria->compare('sim_price', $this->sim_price, true);
+		$criteria->compare('number_price', $this->number_price, true);
 		$criteria->compare('short_number', $this->short_number, true);
 		$criteria->compare('support_operator_id', $this->support_operator_id);
 		$criteria->compare('support_operator_got_dt', $this->support_operator_got_dt, true);

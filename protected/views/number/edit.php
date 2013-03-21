@@ -282,30 +282,55 @@ if ($number->status!=Number::STATUS_FREE) {
         )); ?>
         </div>
         <div style="float:left;width:30%;">
-        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+        <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
             'data'=>$number,
             'attributes'=>array(
                 array(
                     'label'=>Yii::t('app','Sim Price'),
-                    'value'=>$sim->sim_price
-                    ),
+                    'name' => 'sim_price',
+                    'value'=>$number->sim_price,
+                    'editable' => array(
+                        'type'   => 'text',
+                        'url' => $this->createUrl('number/saveSimPrice',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
+                        'source' => $number->sim_price,
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
+                    )
+                ),
                 array(
                     'label'=>Yii::t('app','Balance'),
                     'value'=>Number::getBalanceStatusLabel($number->balance_status)
-                    )
+                )
             ),
+
         )); ?>
         </div>
         <div style="float:left;width:30%;">
-        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+        <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
             'data'=>$number,
             'attributes'=>array(
                 array(
                     'label'=>Yii::t('app','Number Price'),
-                    'value'=>$sim->number_price
-                    ),
+                    'name' => 'number_price',
+                    'value'=>$number->number_price,
+                    'editable' => array(
+                        'type'   => 'text',
+                        'url' => $this->createUrl('number/saveNumberPrice',array('id'=>$number->id)),
+                        'options' => array(
+                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
+                        ),
+                        'source' => $number->number_price,
+                        'success'   => 'js: function(data) {
+                            $.fn.yiiGridView.update("number-grid");
+                        }'
+                    )
+                ),
                 array(
                     'label'=>'&nbsp;',
                     'value'=>''

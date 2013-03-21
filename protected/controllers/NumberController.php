@@ -164,6 +164,36 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
+    public function actionSaveSimPrice($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $price = $number->sim_price;
+                $number->sim_price = $_POST['value'];
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Цена изменена с "'.$price.'" на "'.$_POST['value'].'"');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Error"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
+    public function actionSaveNumberPrice($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $number = Number::model()->findByPk($id);
+                $price = $number->number_price;
+                $number->number_price = $_POST['value'];
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Цена изменена с "'.$price.'" на "'.$_POST['value'].'"');
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app", "Error"));
+            }
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
+
     public function actionSaveShortNumber($id) {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
