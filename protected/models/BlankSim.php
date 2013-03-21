@@ -31,7 +31,7 @@ class BlankSim extends BaseBlankSim
         return $labels;
     }
 
-    public function getTypeLabel($status) {
+    public static function getTypeLabel($status) {
         $labels=self::getTypeLabels();
         return $labels[$status];
     }

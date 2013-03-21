@@ -22,6 +22,8 @@ $('.search-form form').submit(function(){
 <h1><?php echo GxHtml::encode(BlankSim::label(2)); ?></h1>
 
 <a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('blankSim/add') ?>"><?php echo Yii::t('app', 'Create') ?></a>
+<a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('blankSim/balance') ?>">Складские остатки</a>
+
 <?php $this->widget('bootstrap.widgets.TbExtendedGridView', array(
 	'id' => 'blank-sim-grid',
 	'dataProvider' => $dataProvider,
