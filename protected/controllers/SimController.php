@@ -22,6 +22,7 @@ class SimController extends BaseGxController {
         $companyListArray = Company::getDropDownList();
         $regionListArray = OperatorRegion::getDropDownList();
         $tariffListArray = Tariff::getDropDownList();
+        $agentListArray = array('0'=>'БАЗА')+Agent::getComboList();
 
         if (isset($_POST['Sim'])) {
             $model->setAttributes($_POST['Sim']);
@@ -91,21 +92,26 @@ class SimController extends BaseGxController {
                         $highestColumn = $objWorksheet->getHighestColumn();
                         $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
 
-                        $sim = array();
+                        $sim = $ids = array();
                         $sim_count = 0;
-                        for ($row = 2; $row <= $highestRow; ++$row) {
-                            for ($col = 0; $col <= $highestColumnIndex; ++$col) {
+                        for ($row = 1; $row <= $highestRow; $row++) {
+                            /*for ($col = 0; $col <= $highestColumnIndex; ++$col) {
                                 $info = $objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
                                 if ($col == 0 && $info != '') $sim[0] = $info;
                                 if (preg_match('%- (\d{10})$%', $info, $matches)) $sim[1] = $matches[1];
-                            }
+                            }*/
+                            $sim[0] = $objWorksheet->getCellByColumnAndRow(0, $row)->getValue();
+                            $sim[1] = $objWorksheet->getCellByColumnAndRow(1, $row)->getValue();
+                            $sim[2] = $objWorksheet->getCellByColumnAndRow(2, $row)->getValue();
                             if ($sim[0] && $sim[1]) {
                                 $model = new Sim;
                                 $model->setAttributes($data);
+                                $model->agent_id = NULL;
                                 $model->parent_agent_id = adminAgentId();
                                 $model->number_price = 0;
                                 $model->personal_account = $sim[0];
                                 $model->number = $sim[1];
+                                $model->icc = $sim[2];
                                 //try {
 
                                 if ($model->countByAttributes(array('number' => $sim[1])) == 0) {
@@ -119,9 +125,20 @@ class SimController extends BaseGxController {
                                     $sims[$i]['id'] = $model->id;
                                     $sims[$i]['personal_account'] = $sim[0];
                                     $sims[$i++]['number'] = $sim[1];
+                                    $ids[$model->id]=$model->id;
                                     //} catch(Exception $e) { }
                                 }
                             }
+                        }
+
+                        if ($data['agent_id']) {
+
+                            $transaction->commit();
+
+                            $sessionData=new SessionData(__CLASS__);
+                            $key=$sessionData->add($ids);
+
+                            $this->redirect(array('move', 'key' => $key));
                         }
                         Agent::deltaSimCount(adminAgentId(), $sim_count);
                     }
@@ -134,7 +151,14 @@ class SimController extends BaseGxController {
             exit;
         }
         $activeTabs['tab1'] = true;
-        $this->render('delivery', array('model' => $model, 'activeTabs' => $activeTabs, 'company' => $companyListArray, 'regionList' => $regionListArray, 'tariffList' => $tariffListArray));
+        $this->render('delivery', array(
+            'model' => $model,
+            'activeTabs' => $activeTabs,
+            'company' => $companyListArray,
+            'regionList' => $regionListArray,
+            'tariffList' => $tariffListArray,
+            'agentList' => $agentListArray,
+        ));
     }
 
     private function validate(&$model, $data)

@@ -145,6 +145,19 @@ $this->breadcrumbs = array(
 <div>
   <?php echo $form->dropDownListRow($model, 'tariff_id', $tariffList[2]); ?>
 </div>
+<div>
+  <div>
+    <div class="control-group ">
+      <label class="control-label" for="Sim_agent_id">Куда передать карты ?</label>
+      <div class="controls">
+        <select name="Sim[agent_id]" id="Sim_agent_id">
+          <option value="0">БАЗА</option>
+          <option value="1">АГЕНТ</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
 <br/><br/>
 
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'AddDelivery'), array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
