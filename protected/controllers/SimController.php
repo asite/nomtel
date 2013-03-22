@@ -103,7 +103,7 @@ class SimController extends BaseGxController {
                             $sim[0] = $objWorksheet->getCellByColumnAndRow(0, $row)->getValue();
                             $sim[1] = $objWorksheet->getCellByColumnAndRow(1, $row)->getValue();
                             $sim[2] = $objWorksheet->getCellByColumnAndRow(2, $row)->getValue();
-                            if ($sim[0] && $sim[1]) {
+                            if ($sim[1]) {
                                 $model = new Sim;
                                 $model->setAttributes($data);
                                 $model->agent_id = NULL;
@@ -124,6 +124,7 @@ class SimController extends BaseGxController {
 
                                     $sims[$i]['id'] = $model->id;
                                     $sims[$i]['personal_account'] = $sim[0];
+                                    $sims[$i]['icc'] = $sim[2];
                                     $sims[$i++]['number'] = $sim[1];
                                     $ids[$model->id]=$model->id;
                                     //} catch(Exception $e) { }
