@@ -37,7 +37,7 @@ $this->breadcrumbs = array(
             'template'=>'{view}',
             'buttons'=>array(
                 'view'=>array(
-                    'url'=>'Yii::app()->createUrl("number/".((Yii::app()->user->role=="admin")?"edit":"view"),array("id"=>$data->id))',
+                    'url'=>'Yii::app()->createUrl("number/".((Yii::app()->user->role=="admin" || Yii::app()->user->role=="supportSuper")?"edit":"view"),array("id"=>$data->id))',
                 ),
             ),
         ),

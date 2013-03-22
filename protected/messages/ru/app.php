@@ -39,6 +39,8 @@ return array (
   'Can\'t resize and/or save file' => '',
   'City' => '',
   'Defined' => '',
+
+  'NOT RESTORED'=>'НЕ ВОССТАНОВЛЕННЫЕ',
   'Email' => '',
   'End' => '',
   'Error' => '',
@@ -362,6 +364,7 @@ return array (
   'supportAdmin' => 'Администратор',
   'supportMain' => 'Главный оператор',
   'supportMegafon' => 'Оператор Мегафон',
+  'supportSuper' => 'Оператор Базы',
   'the Agent' => 'У агента',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',

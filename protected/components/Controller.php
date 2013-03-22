@@ -23,7 +23,7 @@ class Controller extends CController
     {
         return array_merge(
             array(
-                array('allow', 'roles' => array('admin'))
+                array('allow', 'roles' => array('admin','supportSuper'))
             ),
             $this->additionalAccessRules(),
             array(

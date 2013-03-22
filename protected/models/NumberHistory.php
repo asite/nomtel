@@ -29,6 +29,8 @@ class NumberHistory extends BaseNumberHistory
                     break;
                 case 'support':
                     $who='Техподдержка {SupportOperator:'.loggedSupportOperatorId().'}';
+                case 'supportSuper':
+                    $who='Оператор базы {SupportOperator:'.loggedSupportOperatorId().'}';
             }
         }
         $model = new NumberHistory;

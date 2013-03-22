@@ -175,4 +175,69 @@ class BlankSimController extends BaseGxController
         ));
     }
 
+    public function actionBalance() {
+        $data=Yii::app()->db->createCommand("
+        select o.title as operator,opr.title as operator_region,tmp.type,tmp.cnt
+        from (
+          select operator_id,operator_region_id,type,count(*) as cnt
+          from blank_sim
+          where used_number_id is null
+          group by operator_id,operator_region_id,type
+        ) as tmp
+        join operator o on (o.id=tmp.operator_id)
+        join operator_region opr on (opr.id=tmp.operator_region_id)
+        order by o.title,opr.title
+        ")->queryAll();
+
+        $data2=array();
+        foreach($data as $row)
+            $data2[$row['operator']][$row['operator_region']][$row['type']]=$row['cnt'];
+
+        $res=array();
+        foreach($data2 as $operatorName=>$operatorData)
+            foreach($operatorData as $regionName=>$regionData)
+                $res[]=array(
+                    'operator'=>$operatorName,
+                    'region'=>$regionName,
+                    BlankSim::TYPE_NORMAL=>intval($regionData[BlankSim::TYPE_NORMAL]),
+                    BlankSim::TYPE_MICRO=>intval($regionData[BlankSim::TYPE_MICRO]),
+                    BlankSim::TYPE_NANO=>intval($regionData[BlankSim::TYPE_NANO]),
+                );
+
+        $this->render('balance',array('dataProvider'=>new CArrayDataProvider($res)));
+    }
+
+    public function actionRestoreStats() {
+        $model=new BlankSimRestoreStatistic();
+
+        if (isset($_REQUEST['BlankSimRestoreStatistic'])) {
+            $model->setAttributes($_REQUEST['BlankSimRestoreStatistic']);
+        } else {
+            $model->date_to=strval(new EDateTime(""));
+            $model->date_from=strval(new EDateTime("-7 Day"));
+        }
+
+        $date_from=new EDateTime($model->date_from);
+        $date_to=new EDateTime($model->date_to);
+
+        $rows=Yii::app()->db->createCommand("
+            select so.surname,so.name,tmp.cnt
+            from (
+              select used_support_operator_id,count(*) as cnt
+              from blank_sim
+              where used_dt>=:date_from and used_dt<DATE_ADD(:date_to,INTERVAL 1 DAY)
+              group by used_support_operator_id
+            ) as tmp
+            join support_operator so on (so.id=tmp.used_support_operator_id)
+            order by surname,name
+        ")->queryAll(true,array(
+            ':date_from'=>$date_from->toMysqlDate(),
+            ':date_to'=>$date_to->toMysqlDate()
+        ));
+
+        $this->render('restoreStats',array(
+            'dataProvider'=>new CArrayDataProvider($rows),
+            'model'=>$model
+        ));
+    }
 }
