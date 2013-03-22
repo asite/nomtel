@@ -110,7 +110,7 @@ $this->breadcrumbs = array(
 <?php $tab1 = ob_get_contents();  ob_end_clean(); ?>
 
 <?php ob_start(); ?>
-<div class="delivery_help">Симкарты добавляются в базу</div>
+<div class="delivery_help">Формат ввода: 1 столбец - личный номер; 2 столбец - номер телефона; 3 столбец - ICC</div>
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
   'id' => 'add-megafon',
     'type' => 'horizontal',
