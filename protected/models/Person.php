@@ -34,4 +34,9 @@ class Person extends BasePerson
 		return parent::model($className);
 	}
 
+    public function rules() {
+        return array_merge(parent::rules(),array(
+            array('sex,name,surname,middle_name,passport_series,passport_number,passport_issue_date,passport_issuer,birth_date,birth_place,registration_address','required','on'=>'activating')
+        ));
+    }
 }

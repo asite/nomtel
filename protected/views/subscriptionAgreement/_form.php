@@ -173,7 +173,7 @@
     $this->endWidget();
     ?>
 
-    <h3>Сканы паспорта</h3>
+    <h3>Изображения документа</h3>
     <?php
     $this->widget('bootstrap.widgets.TbFileUpload', array(
         'url' => $this->createUrl("file/upload",array('name'=>'File')),
@@ -193,7 +193,7 @@
             'limitConcurrentUploads' => 2,
         )));
     ?>
-    <h3>Сканы договора</h3>
+    <h3>Изображения договора</h3>
     <?php
     $this->widget('bootstrap.widgets.TbFileUpload', array(
         'url' => $this->createUrl("file/upload",array('name'=>'File2')),

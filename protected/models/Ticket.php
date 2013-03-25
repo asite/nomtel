@@ -112,7 +112,7 @@ class Ticket extends BaseTicket
         $history->save();
     }
 
-    public function addMessage($idNumber, $message) {
+    public static function addMessage($idNumber, $message) {
         $number=Number::model()->findByPk($idNumber);
 
         $criteria = new CDbCriteria();
