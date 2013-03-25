@@ -199,6 +199,7 @@ class POSiteController extends Controller
         $ticket=Ticket::model()->findByPk($ticketId);
         $ticket->internal=$ticket->text;
         $ticket->status=Ticket::STATUS_IN_WORK_OPERATOR;
+        $ticket->type=Ticket::TYPE_OCR_DOCS;
         $ticket->save();
 
         $trx->commit();

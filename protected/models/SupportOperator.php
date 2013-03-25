@@ -123,6 +123,9 @@ class SupportOperator extends BaseSupportOperator
 
         $stats['Обращений обработано оператором']=Ticket::model()->count($criteria);
 
+        $criteria->compare('type',Ticket::TYPE_OCR_DOCS);
+        $stats['Из них на "оцифровку"']=Ticket::model()->count($criteria);
+
         return $stats;
     }
 
