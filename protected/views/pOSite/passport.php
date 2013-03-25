@@ -129,7 +129,7 @@
 <div id="scans_shadow" style="clear:both;"></div>
 
 <div class="form-actions">
-    <?php $d=$this->widget('bootstrap.widgets.TbButton',array('label'=>Yii::t('app','Save'),'buttonType'=>'submit','type'=>'primary','icon'=>'ok white')); ?>
+    <?php $d=$this->widget('bootstrap.widgets.TbButton',array('label'=>'Оформить','buttonType'=>'submit','type'=>'primary','icon'=>'ok white')); ?>
 </div>
 
 <?php
