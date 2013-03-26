@@ -209,6 +209,30 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
+    public function actionSetServicePassword($id) {
+        try {
+            $number = Number::model()->findByPk($id);
+            $service_password = $number->service_password;
+            $number->service_password = rand(100000,999999);
+            $number->save();
+
+            $message = 'Прошу на номер присвоить сервис гид "'.$number->service_password;
+            $id = Ticket::addMessage($number->id,$message);
+            $ticket = Ticket::model()->findByPk($id);
+            $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
+            $ticket->save();
+
+            if ($service_password)
+                NumberHistory::addHistoryNumber($number->id,'Пароль сервис гид сменен с "'.$service_password.'" на "'.$number->service_password.'"');
+            else
+                NumberHistory::addHistoryNumber($number->id,'Установлен новый пароль сервис гид: "'.$number->service_password.'"');
+
+        } catch (CDbException $e) {
+            $this->ajaxError(Yii::t("app", "Error"));
+        }
+        $this->redirect(Yii::app()->request->urlReferrer);
+    }
+
     public function actionSaveServicePassword($id) {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {
@@ -217,10 +241,7 @@ class NumberController extends BaseGxController
                 $number->service_password = $_POST['value'];
                 $number->save();
 
-                $message = 'Прошу сделать восстановление сервис гид "'.$_POST['value'].'" и внести его в карточку номера';
-                Ticket::addMessage($number->id,$message);
-
-                if ($company_id->company_id)
+                if ($service_password)
                     NumberHistory::addHistoryNumber($number->id,'Пароль сервис гид сменен с "'.$service_password.'" на "'.$_POST['value'].'"');
                 else
                     NumberHistory::addHistoryNumber($number->id,'Установлен новый пароль сервис гид: "'.$_POST['value'].'"');
@@ -314,7 +335,7 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
-    public function actionFree($id) {
+    public function actionFree($id, $icc=false) {
         $trx=Yii::app()->db->beginTransaction();
 
         $number=$this->loadModel($id,'Number');
@@ -335,9 +356,11 @@ class NumberController extends BaseGxController
         $sim->unsetAttributes(array('id','parent_act_id','agent_id','parent_id'));
         $sim->parent_agent_id=adminAgentId();
         $sim->isNewRecord=true;
+        if ($icc) $sim->icc="999";
         $sim->save();
         $sim->parent_id=$sim->id;
         $sim->save();
+
 
         $number->sim_id=$sim->id;
         $number->status=Number::STATUS_FREE;
@@ -354,7 +377,8 @@ class NumberController extends BaseGxController
 
         NumberHistory::addHistoryNumber($number->id,'Номер освобожден');
 
-        Yii::app()->user->setFlash('success','Номер освобожден');
+        if ($icc) Yii::app()->user->setFlash('success','Сим отложена');
+        else Yii::app()->user->setFlash('success','Номер освобожден');
 
         $trx->commit();
 

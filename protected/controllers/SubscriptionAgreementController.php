@@ -111,12 +111,28 @@ class SubscriptionAgreementController extends BaseGxController {
             'order'=>'id desc',
             'params'=>array(':number_id'=>$number->id)
         ));
+
         $sim=Sim::model()->find(array(
             'condition'=>'parent_id=:sim_id',
             'order'=>'id desc',
             'params'=>array(':sim_id'=>$number->sim_id)
         ));
         $person=$agreement->person;
+
+        if (!$agreement) {
+            $person=new Person();
+            $person->save();
+
+            $agreement=new SubscriptionAgreement();
+            $agreement->save();
+            $agreement->dt=new EDateTime();
+            $agreement->fillDefinedId();
+            $agreement->person_id=$person->id;
+            $agreement->number_id=$number_id;
+            $agreement->save();
+
+            $this->refresh();
+        }
 
         $this->checkPermissions('updateSubscriptionAgreement',array(
             'number_status'=>$number->status,
@@ -178,12 +194,12 @@ class SubscriptionAgreementController extends BaseGxController {
         }
 
         $person_files=array();
-        foreach($person->files as $file)
-            $person_files[]=$file->getUploaderInfo();
+        if (isset($person->files))
+            foreach($person->files as $file) $person_files[]=$file->getUploaderInfo();
 
         $agreement_files=array();
-        foreach($agreement->files as $file)
-            $agreement_files[]=$file->getUploaderInfo();
+        if (isset($agreement->files))
+            foreach($agreement->files as $file) $agreement_files[]=$file->getUploaderInfo();
 
         $this->render('update',array(
             'sim'=>$sim,

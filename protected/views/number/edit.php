@@ -21,8 +21,22 @@ if (isSupport()) {
     <div style="float:right;">
         <?php
             $this->widget('bootstrap.widgets.TbButton',array(
+                'url'=>$this->createUrl('number/setServicePassword',array('id'=>$number->id)),
+                'label'=>Yii::t('app','get Service Gid'),
+                'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
+            ));
+        ?>
+        <?php
+            $this->widget('bootstrap.widgets.TbButton',array(
                 'url'=>$this->createUrl('number/free',array('id'=>$number->id)),
                 'label'=>"Освободить номер",
+                'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
+            ));
+        ?>
+        <?php
+            $this->widget('bootstrap.widgets.TbButton',array(
+                'url'=>$this->createUrl('number/free',array('id'=>$number->id,'icc'=>true)),
+                'label'=>"Отложенная сим",
                 'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
             ));
         ?>

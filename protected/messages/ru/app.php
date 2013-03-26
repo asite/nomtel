@@ -368,4 +368,5 @@ return array (
   'the Agent' => 'У агента',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
+  'get Service Gid' => 'Получить СГ',
 );

@@ -240,4 +240,49 @@ class BlankSimController extends BaseGxController
             'model'=>$model
         ));
     }
+
+    public function actionPrefixRegionList() {
+        $model = new IccPrefixRegion;
+        $model->unsetAttributes();
+
+        if (isset($_GET['IccPrefixRegion']))
+            $model->setAttributes($_GET['IccPrefixRegion']);
+
+        $this->render('prefixRegionList', array(
+            'model' => $model,
+            'dataProvider' => $model->search()
+        ));
+    }
+
+    public function actionUpdatePrefix($id) {
+        $model = $this->loadModel($id, 'IccPrefixRegion');
+
+
+        if (isset($_POST['IccPrefixRegion'])) {
+            $model->setAttributes($_POST['IccPrefixRegion']);
+
+            if ($model->validate()) {
+                $model->save();
+                $this->redirect(array('prefixRegionList'));
+            }
+        }
+
+        $this->render('updatePrefix', array(
+            'model' => $model,
+        ));
+    }
+
+    public function actionDeletePrefix($id) {
+        if (Yii::app()->getRequest()->getIsPostRequest()) {
+            try {
+                $this->loadModel($id, 'IccPrefixRegion')->delete();
+            } catch (CDbException $e) {
+                $this->ajaxError(Yii::t("app","Can't delete this object because it is used by another object(s)"));
+            }
+
+            if (!Yii::app()->getRequest()->getIsAjaxRequest())
+                $this->redirect(array('admin'));
+        } else
+            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
+    }
 }
