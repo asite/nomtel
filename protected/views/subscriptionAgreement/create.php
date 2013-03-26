@@ -13,6 +13,7 @@ $this->renderPartial('_form', array(
     'sim'=>$sim,
     'agreement'=>$agreement,
     'person'=>$person,
-    'checkPassport'=>true
+    'checkPassport'=>true,
+    'fullForm'=>$fullForm,
 ));
 ?>
