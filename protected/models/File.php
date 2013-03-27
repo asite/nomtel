@@ -39,7 +39,7 @@ class File extends BaseFile
             'id' => self::getProtectedId($this->id),
             'name' => $name,
             'type' => $type,
-            'size' => filesize($path),
+            'size' => @filesize($path),
             'url' => $this->url,
             'thumbnail_url' => Thumb::createUrl($this->url, 'uploader'),
         );
