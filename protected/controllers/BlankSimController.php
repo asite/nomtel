@@ -127,6 +127,9 @@ class BlankSimController extends BaseGxController
         if (isset($_REQUEST['BlankSimSearch']))
             $model->setAttributes($_REQUEST['BlankSimSearch']);
 
+        if (!isset($model->used_support_operator_id))
+            $model->used_support_operator_id=Yii::t('app', 'NOT RESTORED');
+
         $criteria = new CDbCriteria();
         $criteria->addCondition("1=1");
 
