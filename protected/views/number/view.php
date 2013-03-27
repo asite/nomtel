@@ -10,12 +10,13 @@ $this->breadcrumbs = array(
 <h1><?=$number->adminLabel(Number::label(1))?></h1>
 
 <?php
-if ($number->status!=Number::STATUS_FREE) {
-    $this->widget('bootstrap.widgets.TbButton',array(
-        'url'=>$this->createUrl('subscriptionAgreement/update',array('number_id'=>$number->id)),
-        'label'=>SubscriptionAgreement::label()
-    ));
-}
+$this->widget('bootstrap.widgets.TbButton',array(
+    'url'=>Yii::app()->user->checkAccess("updateSubscriptionAgreement",array("parent_agent_id"=>$sim->parent_agent_id,"number_status"=>$number->status)) ?
+        $this->createUrl('subscriptionAgreement/update',array('number_id'=>$number->id))
+        :
+        $this->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$number->sim_id)),
+    'label'=>SubscriptionAgreement::label()
+));
 ?>  <br/><br/>
 
 <div class="number_info">
