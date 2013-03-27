@@ -216,7 +216,7 @@ class NumberController extends BaseGxController
             $number->service_password = rand(100000,999999);
             $number->save();
 
-            $message = 'Прошу на номер присвоить сервис гид "'.$number->service_password;
+            $message = 'Прошу на номер "'.$number->number.'" присвоить сервис гид "'.$number->service_password.'"';
             $id = Ticket::addMessage($number->id,$message);
             $ticket = Ticket::model()->findByPk($id);
             $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
