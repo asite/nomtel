@@ -65,6 +65,11 @@
         }
     </script>
 
+    <?php $this->widget('bootstrap.widgets.TbButton',array(
+        'url'=>$this->createUrl('',array('id'=>$agreement->id,'sim_id'=>$sim->id,'fullForm'=>1)),
+        'label'=>'Полная форма'
+    ));?>
+
     <?php $form = $this->beginWidget('BaseTbActiveForm', array(
     'id' => 'subscriptionagreement-form',
     'type' => 'horizontal',
@@ -74,6 +79,7 @@
 ));
     ?>
 
+    <?php if ($fullForm) { ?>
     <p class="note">
         <?php echo Yii::t('app', 'Fields with'); ?> <span class="required">*</span> <?php echo Yii::t('app', 'are required'); ?>.
     </p>
@@ -166,6 +172,16 @@
     <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'link', 'url'=>$this->createUrl('getBlank',array('id'=>$agreement->id)),'label'=>Yii::t('app','Download agreement blank'))); ?>
 
     <?php $this->widget('bootstrap.widgets.TbButton', array('buttonType'=>'button', 'htmlOptions'=>array('onclick'=>'download()'),'label'=>Yii::t('app','Download agreement'))); ?>
+    <?php } else { ?>
+
+    <div class="pOS_load_passport cfix" style="padding-bottom:10px;margin-top:10px;">
+        <a href="/static/passport.jpg" target="_blank"><img style="margin-left: 30px;" src="/static/passport.jpg" width="130" align="right" alt=""></a>
+        Для упрощения процедуры регистрации, вы можете загрузить изображения паспорта и
+        договора абонента самостоятельно здесь. После проверки данных Абоненту поступит СМС
+        сообщение об успешной регистрации.
+    </div>
+
+    <?php } ?>
 
     <input type="hidden" name="person_files" id="File-form-field" value=""/>
     <input type="hidden" name="agreement_files" id="File2-form-field" value=""/>
@@ -173,7 +189,7 @@
     $this->endWidget();
     ?>
 
-    <h3>Сканы паспорта</h3>
+    <h3>Изображения документа</h3>
     <?php
     $this->widget('bootstrap.widgets.TbFileUpload', array(
         'url' => $this->createUrl("file/upload",array('name'=>'File')),
@@ -193,7 +209,7 @@
             'limitConcurrentUploads' => 2,
         )));
     ?>
-    <h3>Сканы договора</h3>
+    <h3>Изображения договора</h3>
     <?php
     $this->widget('bootstrap.widgets.TbFileUpload', array(
         'url' => $this->createUrl("file/upload",array('name'=>'File2')),

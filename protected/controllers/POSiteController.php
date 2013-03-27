@@ -125,6 +125,8 @@ class POSiteController extends Controller
 
         $data['person_files']=json_encode($person_files);
 
+        if (!isset($_POST['person_files'])) return;
+
         if (isset($_POST['person_files'])) {
             $person_files=array();
             foreach(explode(',',$_POST['person_files']) as $file_id)
@@ -138,7 +140,7 @@ class POSiteController extends Controller
             $data['person_files']=json_encode($person_files_json);
         }
 
-        if (!isset($_POST['Person'])) return;
+        //if (!isset($_POST['Person'])) return;
 
         $person->setAttributes($_POST['Person']);
         if (!$person->validate()) return;
@@ -171,7 +173,8 @@ class POSiteController extends Controller
             $agreement->number_id=$number->id;
             $agreement->save();
 
-            NumberHistory::addHistoryNumber($number->id,'Оформлен договор {SubscriptionAgreement:'.$agreement->id.'}');
+            NumberHistory::addHistoryNumber($number->id,'Загружены изображения документа');
+            //NumberHistory::addHistoryNumber($number->id,'Оформлен договор {SubscriptionAgreement:'.$agreement->id.'}');
         } else {
             $number->save();
 
@@ -188,8 +191,16 @@ class POSiteController extends Controller
             }
 
             $person->save();
-            NumberHistory::addHistoryNumber($number->id,'Отредактирован договор {SubscriptionAgreement:'.$agreement->id.'}');
+            NumberHistory::addHistoryNumber($number->id,'Обновлены изображения документа');
+            //NumberHistory::addHistoryNumber($number->id,'Отредактирован договор {SubscriptionAgreement:'.$agreement->id.'}');
         }
+
+        $ticketId=Ticket::addMessage($number->id,'Оформить номер '.$number->number);
+        $ticket=Ticket::model()->findByPk($ticketId);
+        $ticket->internal=$ticket->text;
+        $ticket->status=Ticket::STATUS_IN_WORK_OPERATOR;
+        $ticket->type=Ticket::TYPE_OCR_DOCS;
+        $ticket->save();
 
         $trx->commit();
 

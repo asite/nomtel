@@ -48,13 +48,13 @@ abstract class BasePerson extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('sex, name, surname, middle_name, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
 			array('sex', 'length', 'max'=>1),
 			array('name, surname, middle_name, phone, email, passport_issuer_subdivision_code', 'length', 'max'=>200),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_number', 'length', 'max'=>20),
 			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>500),
-			array('phone, email, passport_issuer_subdivision_code', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('passport_issue_date, birth_date', 'safe'),
+			array('sex, name, surname, middle_name, phone, email, passport_series, passport_number, passport_issue_date, passport_issuer, passport_issuer_subdivision_code, birth_date, birth_place, registration_address', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birth_date','date','format'=>'dd.MM.yyyy'),
 			array('id, sex, name, surname, middle_name, phone, email, passport_series, passport_number, passport_issue_date, passport_issuer, passport_issuer_subdivision_code, birth_date, birth_place, registration_address', 'safe', 'on'=>'search'),

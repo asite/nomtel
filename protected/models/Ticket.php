@@ -16,6 +16,9 @@ class Ticket extends BaseTicket
     const STATUS_DONE='DONE';
     const STATUS_REFUSED='REFUSED';
 
+    const TYPE_NORMAL='NORMAL';
+    const TYPE_OCR_DOCS='OCR_DOCS';
+
     const MEGAFON_STATUS_DONE='DONE';
     const MEGAFON_STATUS_REFUSED='REFUSED';
     
@@ -112,7 +115,7 @@ class Ticket extends BaseTicket
         $history->save();
     }
 
-    public function addMessage($idNumber, $message) {
+    public static function addMessage($idNumber, $message) {
         $number=Number::model()->findByPk($idNumber);
 
         $criteria = new CDbCriteria();

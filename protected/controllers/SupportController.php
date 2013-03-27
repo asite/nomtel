@@ -200,12 +200,14 @@ class SupportController extends BaseGxController
                                 $this->redirect(array('numberStatus'));
                                 break;
                             case Number::SUPPORT_STATUS_PREACTIVE:
+                                $person->setScenario('activating');
                                 if (!$person->validate()) break;
 
                                 $trx=Yii::app()->db->beginTransaction();
 
                                 if (count($person_files)>0) $number->support_status=Number::SUPPORT_STATUS_ACTIVE;
 
+                                $force_send_sms=$number->support_passport_need_validation==1;
                                 $number->support_passport_need_validation=0;
 
                                 if (!$agreement) {
@@ -255,6 +257,11 @@ class SupportController extends BaseGxController
 
                                     $person->save();
                                     NumberHistory::addHistoryNumber($number->id,'Отредактирован договор {SubscriptionAgreement:'.$agreement->id.'}');
+
+                                    if ($force_send_sms) {
+                                        $message = "Компания Номтел благодарит Вас за регистрацию.";
+                                        Sms::send($number->number,$message);
+                                    }
                                 }
 
                                 $trx->commit();
@@ -272,6 +279,7 @@ class SupportController extends BaseGxController
             }
         }
 
+        $data['person']->setScenario('activating');
         $this->render('numberStatus', $data);
     }
 

@@ -23,7 +23,7 @@ class SubscriptionAgreementController extends BaseGxController {
         $agreement->fillDefinedId();
         $agreement->save();
 
-        $this->redirect(array('create','id'=>$agreement->id,'sim_id'=>$sim_id));
+        $this->redirect(array('create','id'=>$agreement->id,'sim_id'=>$sim_id,'fullForm'=>0));
     }
 
     public function actionPassportSuggest() {
@@ -145,6 +145,7 @@ class SubscriptionAgreementController extends BaseGxController {
             Yii::app()->end();
         }
 
+        /*
         if (isset($_POST['Person'])) {
             $errors=$this->validate($agreement,$sim,$person);
 
@@ -192,6 +193,7 @@ class SubscriptionAgreementController extends BaseGxController {
                 }
             }
         }
+        */
 
         $person_files=array();
         if (isset($person->files))
@@ -206,12 +208,14 @@ class SubscriptionAgreementController extends BaseGxController {
             'agreement'=>$agreement,
             'person'=>$person,
             'person_files'=>json_encode($person_files),
-            'agreement_files'=>json_encode($agreement_files)
+            'agreement_files'=>json_encode($agreement_files),
         ));
     }
 
-    public function actionCreate($id,$sim_id)
+    public function actionCreate($id,$sim_id,$fullForm)
     {
+        $fullForm=$fullForm==1;
+
         $agreement=$this->loadModel($id,'SubscriptionAgreement');
         $sim=$this->loadModel($sim_id,'Sim');
         $number=Number::model()->findByAttributes(array('number'=>$sim->number));
@@ -219,6 +223,7 @@ class SubscriptionAgreementController extends BaseGxController {
         $this->checkPermissions('createSubscriptionAgreement',array('parent_agent_id'=>$sim->parent_agent_id,'number_status'=>$number->status));
 
         $person=new Person();
+        if ($fullForm) $person->setScenario('activating');
 
         if (Yii::app()->getRequest()->getIsAjaxRequest()) {
             $result = $this->validate($agreement, $sim, $person);
@@ -226,7 +231,7 @@ class SubscriptionAgreementController extends BaseGxController {
             Yii::app()->end();
         }
 
-        if (isset($_POST['Person'])) {
+        if (isset($_POST['person_files'])) {
             $errors=$this->validate($agreement,$sim,$person);
 
             $person_files=array();
@@ -244,9 +249,6 @@ class SubscriptionAgreementController extends BaseGxController {
 
                 $number->status=Number::STATUS_ACTIVE;
                 $number->save();
-
-                $message = "Компания Номтел благодарит Вас за регистрацию.";
-                Sms::send($number->number,$message);
 
                 $agreement->setScenario('create');
                 $agreement->person_id=$person->id;
@@ -270,6 +272,20 @@ class SubscriptionAgreementController extends BaseGxController {
                 }
 
                 NumberHistory::addHistoryNumber($number->id,'Оформлен договор {SubscriptionAgreement:'.$agreement->id.'}');
+
+                if ($fullForm) {
+                    $message = "Компания Номтел благодарит Вас за регистрацию.";
+                    Sms::send($number->number,$message);
+                } else {
+                    $number->support_passport_need_validation=1;
+                    $ticketId=Ticket::addMessage($number->id,'Оформить номер '.$number->number);
+                    $ticket=Ticket::model()->findByPk($ticketId);
+                    $ticket->internal=$ticket->text;
+                    $ticket->status=Ticket::STATUS_IN_WORK_OPERATOR;
+                    $ticket->type=Ticket::TYPE_OCR_DOCS;
+                    $ticket->save();
+                }
+
                 $trx->commit();
                 $this->redirect(array('sim/list'));
             }
@@ -278,7 +294,8 @@ class SubscriptionAgreementController extends BaseGxController {
         $this->render('create',array(
             'sim'=>$sim,
             'agreement'=>$agreement,
-            'person'=>$person
+            'person'=>$person,
+            'fullForm'=>$fullForm
         ));
     }
 }
