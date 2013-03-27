@@ -220,6 +220,7 @@ class NumberController extends BaseGxController
             $id = Ticket::addMessage($number->id,$message);
             $ticket = Ticket::model()->findByPk($id);
             $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
+            $ticket->internal=$ticket->text;
             $ticket->save();
 
             if ($service_password)
