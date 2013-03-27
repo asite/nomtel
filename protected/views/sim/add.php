@@ -155,7 +155,7 @@ $this->breadcrumbs = array(
   <?php $count=count($_POST['AddNewSim']['ICCBeginFew']); for($k=1;$k<=$count;$k++): ?>
     <div class="cfix" style="position: relative;">
       <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[ICCPersonalAccount]" type="text"></div>-->
-      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[<?php echo $k ?>][ICCBeginFew]" type="text" maxlength="15" value="<?php echo $_POST['AddNewSim'][$k]['ICCBeginFew'] ?>"></div>
+      <div style="float: left; margin-right: 5px;"><input name="AddNewSim[<?php echo $k ?>][ICCBeginFew]" type="text" maxlength="20" value="<?php echo $_POST['AddNewSim'][$k]['ICCBeginFew'] ?>"></div>
       <div style="float: left; margin-right: 5px;"><input name="AddNewSim[<?php echo $k ?>][ICCEndFew]" type="text" maxlength="3" value="<?php echo $_POST['AddNewSim'][$k]['ICCEndFew'] ?>"></div>
       <!--<div style="float: left; margin-right: 5px;"><input name="AddNewSim[phone]" type="text"></div>-->
       <?php if ($k==$count): ?><a href="#" class="iconplussim"><i class="icon-plus"></i></a><?php endif; ?>
@@ -283,7 +283,7 @@ $this->widget('bootstrap.widgets.TbTabs', array(
 
 <div class="cfix" id="addFewSims" style="display: none; position: relative;">
   <div style="float: left; margin-right: 5px;"><input class="span2" name="AddSim[index][ICCPersonalAccount]" type="text"></div>
-  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddSim[index][ICCBeginFew]" type="text" maxlength="15"></div>
+  <div style="float: left; margin-right: 5px;"><input class="span2" name="AddSim[index][ICCBeginFew]" type="text" maxlength="20"></div>
   <div style="float: left; margin-right: 5px;"><input class="span1" name="AddSim[index][ICCEndFew]" type="text" maxlength="3"></div>
   <div style="float: left; margin-right: 5px;"><input class="span2" name="AddSim[index][phone]" type="text"></div>
   <a href="#" class="iconplussim"><i class="icon-plus"></i></a>

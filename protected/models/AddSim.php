@@ -24,7 +24,7 @@ class AddSim extends CFormModel
             array('ICCFirst, ICCBegin, ICCEnd, ICCPersonalAccount, ICCBeginFew, ICCEndFew', 'numerical'),
             array('ICCFirst', 'length'),
             array('ICCBegin, ICCEnd', 'length'),
-            array('ICCBeginFew', 'length', 'max' => 15),
+            array('ICCBeginFew', 'length', 'max' => 20),
             array('ICCEndFew', 'length', 'max' => 3),
             array('region,company','safe')
         );
