@@ -23,7 +23,7 @@
         <td class="cancel">{% if (!i) { %}
             <button class="btn btn-warning">
                 <i class="icon-ban-circle icon-white"></i>
-                <span>Отмена</span>
+                <span>{%=locale.fileupload.cancel%}</span>
             </button>
         {% } %}</td>
     </tr>

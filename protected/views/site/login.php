@@ -1,6 +1,6 @@
 <form action="?" method="post">
 	<input type="hidden" name="YII_CSRF_TOKEN" value="<?php echo Yii::app()->request->csrfToken;?>">
-    <div class="modal" style="margin-top:-150px;   ">
+    <div class="modal" style="top:50%;margin-top:-150px;">
         <div class="modal-header" xmlns="http://www.w3.org/1999/html">
             <h3><?php echo Yii::t('app','Please login');?></h3>
         </div>
