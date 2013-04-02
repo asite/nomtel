@@ -41,25 +41,25 @@ $('.search-form form').submit(function(){
         array(
             'name'=>'icc',
             'header'=>'Icc'
-        ),
-        array(
-            'name'=>'operator_id',
-            'header'=>'Оператор',
-            'value'=>'$data["operator"]',
-            'filter'=>Operator::getComboList(array(''=>'')),
-        ),
-        array(
-            'name'=>'operator_region_id',
-            'header'=>'Регион',
-            'value'=>'$data["operator_region"]',
-            'filter'=>OperatorRegion::getGroupedDropDownList(array(''=>'')),
-        ),
-        array(
-            'name'=>'used_dt',
-            'header'=>'Дата восстановления',
-            'value'=>'$data["used_dt"]=="" ? "":new EDateTime($data["used_dt"])',
-            'filter'=>false
-        ),
+		),
+		array(
+				'name'=>'operator_id',
+                'header'=>'Оператор',
+				'value'=>'$data["operator"]',
+				'filter'=>Operator::getComboList(array(''=>'')),
+				),
+		array(
+				'name'=>'operator_region_id',
+                'header'=>'Регион',
+				'value'=>'$data["operator_region"]',
+				'filter'=>OperatorRegion::getGroupedDropDownList(array(''=>'')),
+				),
+		array(
+                'name'=>'used_dt',
+                'header'=>'Дата восстановления',
+                'value'=>'$data["used_dt"]=="" ? "":new EDateTime($data["used_dt"])',
+                'filter'=>false
+                ),
         array(
             'name'=>'used_support_operator_id',
             'header'=>'Восстановивший оператор',

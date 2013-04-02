@@ -39,13 +39,13 @@ class EMailProcessor {
 
     private function moveEmail($box) {
         $res=imap_mail_move($this->imap,$this->uid,$box,CP_UID);
-        if ($res===false) throw new CException("can't move message to $box folder");
+        if ($res===false) throw new CException("can't move message {$this->uid} to $box folder");
         //if (!imap_expunge($this->imap)) throw new CException("mail_expunge() returned false");
     }
 
     private function deleteMail() {
         $res=imap_delete($this->imap,$this->uid,FT_UID);
-        if ($res===false) throw new CException("can't move message to $box folder");
+        if ($res===false) throw new CException("can't delete messageto {$this->uid}");
         //if (!imap_expunge($this->imap)) throw new CException("mail_expunge() returned false");
     }
 

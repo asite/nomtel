@@ -6,7 +6,9 @@ $this->breadcrumbs = array(
 
 ?>
 
-<h1><?=Number::label(2)?></h1>
+<h1>Редактирование префиксов регионов</h1>
+
+<a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('blankSim/addPrefix') ?>">Добавить префикс</a>
 
 <?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'number-grid',
