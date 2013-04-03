@@ -51,8 +51,24 @@ class BaseTbActiveForm extends TbActiveForm
 
         $lang = Yii::app()->language;
         if ($lang != 'en') $cs->registerScriptFile($assets . "/localization/jquery-ui-timepicker-$lang.js", CClientScript::POS_END);
+
+        if (isset($options['minYearDelta'])) {
+            $minYearDelta=$options['minYearDelta'];
+            unset($options['minYearDelta']);
+        } else {
+            $minYearDelta=100;
+        }
+
+        if (isset($options['maxYearDelta'])) {
+            $maxYearDelta=$options['maxYearDelta'];
+            unset($options['maxYearDelta']);
+        } else {
+            $maxYearDelta=20;
+        }
+
         $encodedOptions = CJavaScript::encode($options);
-        $yearRange=date('Y',time()-365*24*3600*100).':'.date('Y',time()+365*24*3600*20);
+
+        $yearRange=(date('Y')-$minYearDelta).':'.(date('Y')+$maxYearDelta);
         $js = "jQuery('#{$id}').{$mode}picker(jQuery.extend(jQuery.datepicker.regional['$lang'],{changeMonth:true,changeYear:true,dateFormat:'dd.mm.yy',timeFormat:'hh:mm:ss',yearRange:'$yearRange'},  $encodedOptions));";
         $cs->registerScript(__CLASS__ . '#' . $id, $js);
     }

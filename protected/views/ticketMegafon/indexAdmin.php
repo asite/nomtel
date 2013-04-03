@@ -14,7 +14,7 @@
 <div class="form-container-horizontal">
     <div class="form-container-item form-label-width-100">
         <?=$form->textFieldRow($model,'number',array('class'=>'span2'))?>
-        <?=$form->maskFieldRow($model,'dt','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+        <?php echo $form->PickerDateRow($model,'dt',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true)),array('minYearDelta'=>5,'maxYearDelta'=>0,'onSelect'=>'js:function(){$(this).closest("form").submit();}'))?>
     </div>
     <div class="form-container-item form-label-width-140">
         <?=$form->dropDownListRow($model,'status',Ticket::getStatusDropDownList(array(''=>'')),array('class'=>'span2'))?>
