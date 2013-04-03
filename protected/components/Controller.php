@@ -93,9 +93,9 @@ class Controller extends CController
         }
 
         $m=array();
-        preg_match_all('%<tr[^>]*>.*?</tr>%i',$array,$m);
+        preg_match_all('%<tr[^>]*>.*?</tr>%is',$array,$m);
         foreach($m[0] as $v) {
-            preg_match_all('%<td[^>]*>.*?</td>%i',$v,$mm);
+            preg_match_all('%<td[^>]*>(.*?)</td>%is',$v,$mm);
             $tmp = '';
             foreach($mm[0] as $vv) {
                $tmp .= "$col_sep$qut".strip_tags(str_replace('"','""',html_entity_decode($vv))).$qut;

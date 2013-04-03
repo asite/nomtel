@@ -186,6 +186,7 @@ return array (
   'Enter number price' => 'Введите стоимость номера',
   'FOR_REVIEW' => 'на проверку',
   'FREE' => 'Свободен',
+  'Free' => 'Свободен',
   'Fields with' => 'Поля, отмеченные',
   'File' => 'Файл',
   'File has invalid format (%msg%)' => 'Файл имеет неправильный формат (%msg%)',

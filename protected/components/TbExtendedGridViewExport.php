@@ -25,6 +25,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
                 $this->dataProvider->getData(true);
                 ob_start();
                 parent::renderContent();
+
                 $export = ob_get_contents();
                 ob_end_clean();
                 $csv.=Controller::export($export,$i);

@@ -336,7 +336,7 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
-    public function actionFree($id, $icc=false) {
+    private function freeNumber($id, $icc=null) {
         $trx=Yii::app()->db->beginTransaction();
 
         $number=$this->loadModel($id,'Number');
@@ -382,6 +382,10 @@ class NumberController extends BaseGxController
         else Yii::app()->user->setFlash('success','Номер освобожден');
 
         $trx->commit();
+    }
+
+    public function actionFree($id, $icc=false) {
+        $this->freeNumber($id, $icc);
 
         $this->redirect(Yii::app()->request->urlReferrer);
     }
@@ -501,6 +505,19 @@ class NumberController extends BaseGxController
         Yii::app()->end();
     }
 
+    private function massFree($csv, $data) {
+        foreach ($csv as $v) {
+            if ($data['Action']=='ICC') {
+                $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
+                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
+            } else $model = Number::model()->findByAttributes(array('number'=>$v[0]));
+
+            $this->freeNumber($model->id);
+        }
+
+        Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
+    }
+
     private static function readCSV($filename) {
         $csv=array();
         if (($handle = fopen($filename, "r")) !== FALSE) {
@@ -513,7 +530,6 @@ class NumberController extends BaseGxController
     }
 
     public function actionMassChange() {
-
         if (isset($_FILES['fileField']['tmp_name'])) {
             $csv=$this->readCSV($_FILES['fileField']['tmp_name']);
             if (strlen($csv[0][0])>11) $head = 'ICC'; else $head = 'Number';
@@ -531,6 +547,12 @@ class NumberController extends BaseGxController
             }
             $csv = $_POST['Csv'];
 
+            if ($_POST['massFree']) {
+                $this->massFree($csv,$data);
+
+                $this->redirect(Yii::app()->request->urlReferrer);
+            }
+
             $message = '';
             switch ($data['type']) {
                 case 'setPass':
@@ -538,7 +560,7 @@ class NumberController extends BaseGxController
                         foreach ($csv as $value) {
                             $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить пароль сервис гид $value[1]\n";
                             if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]));
+                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
                                 $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
 
                             } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
@@ -562,7 +584,7 @@ class NumberController extends BaseGxController
                         foreach ($csv as $value) {
 
                             if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]));
+                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
                                 $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
                             } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
 
@@ -592,7 +614,7 @@ class NumberController extends BaseGxController
                         foreach ($csv as $value) {
                             $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить личный счёт $value[1]<br/>";
                             if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]));
+                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
                                 $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
 
                             } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
@@ -614,7 +636,7 @@ class NumberController extends BaseGxController
                         foreach ($csv as $value) {
                             $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить цену $value[1]<br/>";
                             if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]));
+                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
                                 $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
 
                             } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
@@ -631,7 +653,7 @@ class NumberController extends BaseGxController
                         foreach ($csv as $value) {
                             $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить короткий номер $value[1]<br/>";
                             if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]));
+                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
                                 $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
 
                             } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
