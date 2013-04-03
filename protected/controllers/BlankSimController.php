@@ -275,6 +275,24 @@ class BlankSimController extends BaseGxController
         ));
     }
 
+    public function actionAddPrefix() {
+        $model = new IccPrefixRegion;
+
+
+        if (isset($_POST['IccPrefixRegion'])) {
+            $model->setAttributes($_POST['IccPrefixRegion']);
+
+            if ($model->validate()) {
+                $model->save();
+                $this->redirect(array('prefixRegionList'));
+            }
+        }
+
+        $this->render('addPrefix', array(
+            'model' => $model,
+        ));
+    }
+
     public function actionDeletePrefix($id) {
         if (Yii::app()->getRequest()->getIsPostRequest()) {
             try {

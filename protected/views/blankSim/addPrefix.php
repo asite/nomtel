@@ -2,12 +2,12 @@
 
 $this->breadcrumbs = array(
     Yii::t('app', 'Prefix Region') => array('admin'),
-    $model->adminLabel(Yii::t('app', 'Updating Prefix Icc Region')),
+    Yii::t('app', 'Add Prefix Icc Region')
 );
 
 ?>
 
-<h1><?php echo $model->adminLabel(Yii::t('app', 'Updating Prefix Icc Region')); ?></h1>
+<h1><?php echo Yii::t('app', 'Add Prefix Icc Region'); ?></h1>
 
 <div class="form">
 
@@ -40,9 +40,9 @@ $this->breadcrumbs = array(
 
                 <?php echo $form->textFieldRow($model,'icc_prefix',array('class'=>'span3','maxlength'=>50)); ?>
 
-                <?php echo $form->dropDownListRow($model,'operator_id',Operator::getComboList(),array('onchange'=>'changeOperator(this);','class'=>'span3')); ?>
+                <?php $operators = Operator::getComboList(); echo $form->dropDownListRow($model,'operator_id',$operators,array('onchange'=>'changeOperator(this);','class'=>'span3')); ?>
 
-                <?php $regions=OperatorRegion::getDropDownList(); echo $form->dropDownListRow($model,'operator_region_id',$regions[$model->operator_id],array('class'=>'span3')); ?>
+                <?php $regions=OperatorRegion::getDropDownList(); echo $form->dropDownListRow($model,'operator_region_id',$regions[key($operators)],array('class'=>'span3')); ?>
 
 
 <?php
