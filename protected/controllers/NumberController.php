@@ -505,14 +505,28 @@ class NumberController extends BaseGxController
         Yii::app()->end();
     }
 
-    private function massFree($csv, $data) {
+    private function setStatus($csv, $data, $status) {
+        foreach ($csv as $v) {
+            if ($data['Action']=='ICC') {
+                $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
+                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
+            } else $model = Number::model()->findByAttributes(array('number'=>$v[0]));
+            $model->status = $status;
+            $model->save();
+        }
+        Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
+    }
+
+    private function getModel($csv, $data) {}
+
+    private function massFree($csv, $data, $icc=null) {
         foreach ($csv as $v) {
             if ($data['Action']=='ICC') {
                 $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
                 $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
             } else $model = Number::model()->findByAttributes(array('number'=>$v[0]));
 
-            $this->freeNumber($model->id);
+            $this->freeNumber($model->id, $icc);
         }
 
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
@@ -549,7 +563,14 @@ class NumberController extends BaseGxController
 
             if ($_POST['massFree']) {
                 $this->massFree($csv,$data);
-
+                $this->redirect(Yii::app()->request->urlReferrer);
+            }
+            if ($_POST['massFreeWait']) {
+                $this->massFree($csv,$data,1);
+                $this->redirect(Yii::app()->request->urlReferrer);
+            }
+            if ($_POST['massStatusUnknown']) {
+                $this->setStatus($csv,$data,Number::STATUS_UNKNOWN);
                 $this->redirect(Yii::app()->request->urlReferrer);
             }
 
