@@ -337,7 +337,6 @@ class NumberController extends BaseGxController
     }
 
     private function freeNumber($id, $icc=null) {
-        $trx=Yii::app()->db->beginTransaction();
 
         $number=$this->loadModel($id,'Number');
 
@@ -381,11 +380,13 @@ class NumberController extends BaseGxController
         if ($icc) Yii::app()->user->setFlash('success','Сим отложена');
         else Yii::app()->user->setFlash('success','Номер освобожден');
 
-        $trx->commit();
+
     }
 
     public function actionFree($id, $icc=false) {
-        $this->freeNumber($id, $icc);
+        $trx=Yii::app()->db->beginTransaction();
+            $this->freeNumber($id, $icc);
+        $trx->commit();
 
         $this->redirect(Yii::app()->request->urlReferrer);
     }
@@ -506,29 +507,38 @@ class NumberController extends BaseGxController
     }
 
     private function setStatus($csv, $data, $status) {
+        $trx = Yii::app()->db->beginTransaction();
+        $wrongObjects = '';
         foreach ($csv as $v) {
-            if ($data['Action']=='ICC') {
-                $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
-                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
-            } else $model = Number::model()->findByAttributes(array('number'=>$v[0]));
-            $model->status = $status;
-            $model->save();
+            $model = $this->getModel($v, $data);
+            if ($model) {
+                $model->status = $status;
+                $model->save();
+            } else $wrongObjects .= $v[0].'; ';
         }
+        $trx->commit();
+        if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
     }
 
-    private function getModel($csv, $data) {}
+    private function getModel($v, $data) {
+        if ($data['Action']=='ICC') {
+            $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
+            $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
+        } else $model = Number::model()->findByAttributes(array('number'=>$v[0]));
+        return $model;
+    }
 
     private function massFree($csv, $data, $icc=null) {
+        $trx = Yii::app()->db->beginTransaction();
         foreach ($csv as $v) {
-            if ($data['Action']=='ICC') {
-                $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
-                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
-            } else $model = Number::model()->findByAttributes(array('number'=>$v[0]));
-
-            $this->freeNumber($model->id, $icc);
+            $model = $this->getModel($v, $data);
+            if ($model) {
+                $this->freeNumber($model->id, $icc);
+            } else $wrongObjects .= $v[0].'; ';
         }
-
+        $trx->commit();
+        if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
     }
 
@@ -561,62 +571,30 @@ class NumberController extends BaseGxController
             }
             $csv = $_POST['Csv'];
 
-            if ($_POST['massFree']) {
-                $this->massFree($csv,$data);
-                $this->redirect(Yii::app()->request->urlReferrer);
-            }
-            if ($_POST['massFreeWait']) {
-                $this->massFree($csv,$data,1);
-                $this->redirect(Yii::app()->request->urlReferrer);
-            }
-            if ($_POST['massStatusUnknown']) {
-                $this->setStatus($csv,$data,Number::STATUS_UNKNOWN);
-                $this->redirect(Yii::app()->request->urlReferrer);
-            }
+                if ($_POST['massFree']) {
+                    $this->massFree($csv,$data);
+                    $this->redirect(Yii::app()->request->urlReferrer);
+                }
+                if ($_POST['massFreeWait']) {
+                    $this->massFree($csv,$data,1);
+                    $this->redirect(Yii::app()->request->urlReferrer);
+                }
+                if ($_POST['massStatusUnknown']) {
+                    $this->setStatus($csv,$data,Number::STATUS_UNKNOWN);
+                    $this->redirect(Yii::app()->request->urlReferrer);
+                }
 
             $message = '';
             switch ($data['type']) {
                 case 'setPass':
                     $trx = Yii::app()->db->beginTransaction();
                         foreach ($csv as $value) {
-                            $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить пароль сервис гид $value[1]\n";
-                            if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
-                                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
-
-                            } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
-                            $model->service_password = $value[1];
-                            $model->save();
-                        }
-                        $id = Ticket::addMessage($model->id,$message);
-                        if (isset($data['operator'])) {
-                            $ticket = Ticket::model()->findByPk($id);
-                            $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
-                            $ticket->internal=$ticket->text;
-                            $ticket->save();
-                        }
-                    $trx->commit();
-                    Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
-                    $this->refresh();
-                    break;
-                case 'tariffPlan':
-                    $trx = Yii::app()->db->beginTransaction();
-                        $wrongTariff='';
-                        foreach ($csv as $value) {
-
-                            if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
-                                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
-                            } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
-
-                            $tariffs = Tariff::model()->findByAttributes(array('operator_id'=>Operator::OPERATOR_MEGAFON_ID,'title'=>$value[1]));
-                            if ($tariffs) {
-                                $criteria = new CDbCriteria();
-                                $criteria->addColumnCondition(array('parent_id'=>$model->sim_id));
-
-                                $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить тарифный план $value[1]<br/>";
-                                Sim::model()->updateAll(array('tariff_id' => $tariffs->id), $criteria);
-                            } else $wrongTariff .= $value[1]."; ";
+                            $model = $this->getModel($value, $data);
+                            if ($model) {
+                                $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить пароль сервис гид $value[1]\n";
+                                $model->service_password = $value[1];
+                                $model->save();
+                            } else $wrongObjects .= $value[0].'; ';
                         }
                         if ($message) $id = Ticket::addMessage($model->id,$message);
                         if (isset($data['operator']) && $message) {
@@ -626,6 +604,39 @@ class NumberController extends BaseGxController
                             $ticket->save();
                         }
                     $trx->commit();
+                    if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
+                    Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
+                    $this->refresh();
+                    break;
+                case 'tariffPlan':
+                    $trx = Yii::app()->db->beginTransaction();
+                        $wrongTariff='';
+                        foreach ($csv as $value) {
+
+                            $model = $this->getModel($value, $data);
+                            if ($model) {
+                                $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить короткий номер $value[1]<br/>";
+
+                                $tariffs = Tariff::model()->findByAttributes(array('operator_id'=>Operator::OPERATOR_MEGAFON_ID,'title'=>$value[1]));
+                                if ($tariffs) {
+                                    $criteria = new CDbCriteria();
+                                    $criteria->addColumnCondition(array('parent_id'=>$model->sim_id));
+
+                                    $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить тарифный план $value[1]<br/>";
+                                    Sim::model()->updateAll(array('tariff_id' => $tariffs->id), $criteria);
+                                } else $wrongTariff .= $value[1]."; ";
+                            } else $wrongObjects .= $value[0].'; ';
+
+                        }
+                        if ($message) $id = Ticket::addMessage($model->id,$message);
+                        if (isset($data['operator']) && $message) {
+                            $ticket = Ticket::model()->findByPk($id);
+                            $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
+                            $ticket->internal=$ticket->text;
+                            $ticket->save();
+                        }
+                    $trx->commit();
+                    if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
                     if ($wrongTariff) Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Данные тарифы не найдены: '.$wrongTariff);
                     if ($message) Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
                     $this->refresh();
@@ -633,62 +644,68 @@ class NumberController extends BaseGxController
                 case 'setPA':
                     $trx = Yii::app()->db->beginTransaction();
                         foreach ($csv as $value) {
-                            $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить личный счёт $value[1]<br/>";
-                            if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
-                                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
+                            $model = $this->getModel($value, $data);
+                            if ($model) {
+                                $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить личный счёт $value[1]<br/>";
 
-                            } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
-                            $model->personal_account = $value[1];
-                            $model->save();
+                                $model->personal_account = $value[1];
+                                $model->save();
 
-                            $criteria = new CDbCriteria();
-                            $criteria->addColumnCondition(array('parent_id'=>$model->sim_id));
+                                $criteria = new CDbCriteria();
+                                $criteria->addColumnCondition(array('parent_id'=>$model->sim_id));
 
-                            Sim::model()->updateAll(array('personal_account' => $value[1]), $criteria);
+                                Sim::model()->updateAll(array('personal_account' => $value[1]), $criteria);
+                            } else $wrongObjects .= $value[0].'; ';
+
                         }
-                        $id = Ticket::addMessage($model->id,$message);
+                        if ($message) $id = Ticket::addMessage($model->id,$message);
                     $trx->commit();
+
+                    if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
                     Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
                     $this->refresh();
                     break;
                 case 'numberPrice':
                     $trx = Yii::app()->db->beginTransaction();
                         foreach ($csv as $value) {
-                            $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить цену $value[1]<br/>";
-                            if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
-                                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
 
-                            } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
-                            $model->number_price = $value[1];
-                            $model->save();
+                            $model = $this->getModel($value, $data);
+                            if ($model) {
+                                $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить цену $value[1]<br/>";
+
+                                $model->number_price = $value[1];
+                                $model->save();
+                            } else $wrongObjects .= $value[0].'; ';
+
                         }
-                        $id = Ticket::addMessage($model->id,$message);
+                        if ($message) $id = Ticket::addMessage($model->id,$message);
                     $trx->commit();
+                    if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
                     Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
                     $this->refresh();
                     break;
                 case 'shortNumber':
                     $trx = Yii::app()->db->beginTransaction();
                         foreach ($csv as $value) {
-                            $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить короткий номер $value[1]<br/>";
-                            if ($data['Action']=='ICC') {
-                                $sim = Sim::model()->findByAttributes(array('icc'=>$value[0]),array('order'=>'id DESC'));
-                                $model = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
 
-                            } else $model = Number::model()->findByAttributes(array('number'=>$value[0]));
-                            $model->short_number = $value[1];
-                            $model->save();
+                            $model = $this->getModel($value, $data);
+                            if ($model) {
+                                $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить короткий номер $value[1]<br/>";
+
+                                $model->short_number = $value[1];
+                                $model->save();
+                            } else $wrongObjects .= $value[0].'; ';
+
                         }
-                        $id = Ticket::addMessage($model->id,$message);
-                        if (isset($data['operator'])) {
+                        if ($message) $id = Ticket::addMessage($model->id,$message);
+                        if (isset($data['operator']) && $message) {
                             $ticket = Ticket::model()->findByPk($id);
                             $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
                             $ticket->internal=$ticket->text;
                             $ticket->save();
                         }
                     $trx->commit();
+                    if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
                     Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
                     $this->refresh();
                     break;
