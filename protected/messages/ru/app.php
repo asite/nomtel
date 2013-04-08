@@ -386,5 +386,5 @@ return array (
   'Prefix Region' => 'Префикс региона',
   'Icc Prefix' => 'Icc Префикс',
   'Add Prefix Icc Region' => 'Добавление префикса региона',
-  'Mass move' => 'Массовоя передача',
+  'Mass move' => 'Массовая передача',
 );
