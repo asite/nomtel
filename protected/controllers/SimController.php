@@ -428,17 +428,22 @@ class SimController extends BaseGxController {
     public function actionMassSelect() {
 
         if ($_POST['ICCtoSelect'] != '') {
-            $icc_arr = explode("\n", $_POST['ICCtoSelect']);
+            $id_arr = explode("\n", $_POST['ICCtoSelect']);
 
-            foreach ($icc_arr as $icc) {
-                if ($icc != '') {
-                    if ($sim = Sim::model()->find('(icc = "' . trim($icc) . '" or number = "' . trim($icc) . '") and parent_agent_id="'.loggedAgentId() .'"')) {
-                        $ids[$sim->id] = $sim->id;
-                    }
-                }
+            if (!empty($id_arr)) {
+                $quotedIds=array();
+                foreach($id_arr as $id) $quotedIds[]=Yii::app()->db->quoteValue(trim($id));
+                $in='('.implode(',',$quotedIds).')';
+                $sql = "select id from sim where (number in $in or icc in $in) and agent_id is NULL and parent_agent_id='".loggedAgentId()."' and is_active=1";
+                $sims=Yii::app()->db->createCommand($sql)->queryAll();
+            } else {
+                $sims=array();
             }
 
-
+            $ids = array();
+            foreach ($sims as $value) {
+                $ids[$value['id']]=$value['id'];
+            }
 
             if (count($ids) > 0) {
                 $sessionData=new SessionData(__CLASS__);
