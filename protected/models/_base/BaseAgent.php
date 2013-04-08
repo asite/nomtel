@@ -36,8 +36,9 @@
  * @property integer $taking_orders
  *
  * @property Act[] $acts
+ * @property Agent $parent
+ * @property Agent[] $agents
  * @property User $user
- * @property User $parent
  * @property AgentReferralRate[] $agentReferralRates
  * @property BonusReportAgent[] $bonusReportAgents
  * @property BonusReportNumber[] $bonusReportNumbers
@@ -48,7 +49,7 @@
  * @property Ticket[] $tickets
  * @property TicketHistory[] $ticketHistories
  */
-abstract class BaseAgent extends BaseGxActiveRecord {
+abstract class BaseAgent extends GxActiveRecord {
 
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
@@ -77,8 +78,6 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>200),
 			array('balance, stat_acts_sum, stat_payments_sum', 'length', 'max'=>14),
 			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders', 'default', 'setOnEmpty' => true, 'value' => null),
-            array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
-            array('birth_date','date','format'=>'dd.MM.yyyy'),
 			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders', 'safe', 'on'=>'search'),
 		);
 	}
@@ -86,8 +85,9 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 	public function relations() {
 		return array(
 			'acts' => array(self::HAS_MANY, 'Act', 'agent_id'),
+			'parent' => array(self::BELONGS_TO, 'Agent', 'parent_id'),
+			'agents' => array(self::HAS_MANY, 'Agent', 'parent_id'),
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
-			'parent' => array(self::BELONGS_TO, 'User', 'parent_id'),
 			'agentReferralRates' => array(self::HAS_MANY, 'AgentReferralRate', 'agent_id'),
 			'bonusReportAgents' => array(self::HAS_MANY, 'BonusReportAgent', 'agent_id'),
 			'bonusReportNumbers' => array(self::HAS_MANY, 'BonusReportNumber', 'agent_id'),
@@ -133,8 +133,9 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'stat_sim_count' => Yii::t('app', 'Stat Sim Count'),
 			'taking_orders' => Yii::t('app', 'Taking Orders'),
 			'acts' => null,
-			'user' => null,
 			'parent' => null,
+			'agents' => null,
+			'user' => null,
 			'agentReferralRates' => null,
 			'bonusReportAgents' => null,
 			'bonusReportNumbers' => null,
@@ -176,53 +177,8 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('stat_sim_count', $this->stat_sim_count);
 		$criteria->compare('taking_orders', $this->taking_orders);
 
-		$dataProvider=new CActiveDataProvider($this, array(
+		return new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
-
-        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
-        return $dataProvider;
 	}
-
-    public function convertDateTimeFieldsToEDateTime() {
-        // rest of work will do setAttribute() routine
-        $this->setAttribute('passport_issue_date',strval($this->passport_issue_date));
-        $this->setAttribute('birth_date',strval($this->birth_date));
-    }
-
-    public function convertDateTimeFieldsToString() {
-        if (is_object($this->passport_issue_date) && get_class($this->passport_issue_date)=='EDateTime') $this->passport_issue_date=new EString($this->passport_issue_date->format(self::$mySqlDateFormat));
-        if (is_object($this->birth_date) && get_class($this->birth_date)=='EDateTime') $this->birth_date=new EString($this->birth_date->format(self::$mySqlDateFormat));
-    }
-
-    public function afterFind() {
-        $this->convertDateTimeFieldsToEDateTime();
-    }
-
-    private function convertStringToEDateTime($val,$type) {
-        if (!$val) return null;
-        try {
-            $val=new EDateTime($val,null,$type);
-        } catch (Exception $e) {
-        }
-        return $val;
-    }
-
-    public function setAttribute($name,$value) {
-        if (is_string($value)) {
-            if ($name=='passport_issue_date') $value=$this->convertStringToEDateTime($value,'date');
-            if ($name=='birth_date') $value=$this->convertStringToEDateTime($value,'date');
-        }
-        return parent::setAttribute($name,$value);
-    }
-
-    public function beforeSave() {
-        $this->convertDateTimeFieldsToString();
-
-        return true;
-    }
-
-    public function afterSave() {
-        $this->convertDateTimeFieldsToEDateTime();
-    }
 }
