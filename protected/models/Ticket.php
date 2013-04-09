@@ -141,6 +141,11 @@ class Ticket extends BaseTicket
         return 'Обращение #'.$this->id.' от '.$this->dt->format('d.m.Y');
     }
 
+    public function beforeValidate() {
+        if (!$this->created_by) $this->created_by=NumberHistory::getDefaultWho();
+        return parent::beforeValidate();
+    }
+
     public function rules() {
         return array_merge(parent::rules(),array(
             array('internal','required','on'=>'internalRequired','message'=>'Заполните пожалуйста это поле'),
