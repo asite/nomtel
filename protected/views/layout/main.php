@@ -117,6 +117,7 @@
             //array('label' => 'Массовое восстановление', 'url' => $this->createUrl('number/bulkRestore'), 'active' => $this->route=='number/bulkRestore'),
             array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
             array('label' => Yii::t('app', 'Mass select'), 'url' => $this->createUrl('sim/massselect'), 'active' => $this->route == 'sim/massselect'),
+            array('label' => Yii::t('app', 'Mass move'), 'url' => $this->createUrl('sim/massMove'), 'active' => $this->route == 'sim/massmove'),
             '',
             array('label' => SupportOperator::label(2), 'url' => $this->createUrl('supportOperator/admin'), 'active' => $this->id == 'supportOperator'),
             array('label' => Yii::t('app', 'Agents'), 'url' => $this->createUrl('agent/admin'), 'active' => ($this->id == 'agent' && $this->route != 'agent/update')),

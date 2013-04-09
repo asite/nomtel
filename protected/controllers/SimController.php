@@ -4,6 +4,7 @@ class SimController extends BaseGxController {
 
     public function additionalAccessRules() {
         return array(
+            array('disallow', 'actions' => array('massMove'), 'roles' => array('agent')),
             array('allow', 'actions' => array(), 'roles' => array('agent')),
         );
     }
@@ -705,6 +706,111 @@ class SimController extends BaseGxController {
             'model' => $list['model'],
             'dataProvider' => $list['dataProvider']
         ));
+    }
+
+    public function actionMassMove() {
+        if ($_POST['ICCtoMove'] != '') {
+            $id_arr = explode("\n", $_POST['ICCtoMove']);
+
+            $trx=Yii::app()->db->beginTransaction();
+
+            $recursiveInfo=array();
+            $destAgent=Agent::model()->findByPk($_POST['agent_id']);
+            if (!$destAgent) {
+                Yii::app()->user->setFlash('error','Выберите агента для передачи SIM');
+                $this->refresh();
+            }
+
+            $agent=$destAgent;
+            while($agent) {
+                if ($agent->id==adminAgentId()) break;
+                $act=new Act;
+                $act->agent_id=$agent->id;
+                $act->type=Act::TYPE_SIM;
+                $act->sum=0;
+                $act->comment='Массовая передача симкарт агенту "'.$destAgent.'"';
+                $act->dt=new EDateTime();
+                $act->save();
+                $recursiveInfo[]=array('agent'=>$agent,'act'=>$act);
+                $agent=$agent->parent;
+            }
+            $recursiveInfo=array_reverse($recursiveInfo);
+            $recursiveInfo[]=array('agent'=>new Agent,'act'=>new Act);
+
+            $resOK=array();
+            $resNotFound=array();
+
+            foreach($id_arr as $id) {
+                $id=trim($id);
+
+                if (strlen($id)<15) {
+                    $number=Number::model()->findByAttributes(array('number'=>$id));
+                } else {
+                    $number=Number::model()->findBySql("select n.* from number n join sim s on (s.parent_id=n.sim_id and s.icc=:icc)",array(':icc'=>$id));
+                }
+
+                if (!$number) {
+                    $resNotFound[]=$id;
+                    continue;
+                }
+
+                $sim=Sim::model()->findByPk($number->sim_id);
+
+                Sim::model()->updateAll(array('is_active'=>0),'parent_id=:parent_id',array(':parent_id'=>$sim->id));
+
+                $parentAgentId=adminAgentId();
+                $parentActId=null;
+                $parentSimId=null;
+                foreach($recursiveInfo as $rInfo) {
+                    $sim->isNewRecord=true;
+                    $sim->id=null;
+
+                    $sim->parent_agent_id=$parentAgentId;
+                    $sim->parent_act_id=$parentActId;
+
+                    $sim->agent_id=$rInfo['agent']->id;
+                    $sim->act_id=$rInfo['act']->id;
+
+                    $sim->save();
+
+                    if (!$parentSimId) {
+                        $sim->parent_id=$sim->id;
+                        $parentSimId=$sim->parent_id;
+                        $sim->save();
+                        $number->sim_id=$parentSimId;
+                    }
+
+                    $parentAgentId=$rInfo['agent']->id;
+                    $parentActId=$rInfo['act']->id;
+                }
+
+                $number->save();
+
+                NumberHistory::addHistoryNumber($number->id,"Массовая передача сим агенту {Agent:{$destAgent->id}}");
+
+                $resOK[]=$id;
+            }
+
+            $trx->commit();
+
+            $res='';
+
+            if (!empty($resNotFound)) {
+                $res.='<b>следующие ICC/Номера не найдены:</b> '.implode(',',$resNotFound).'<br/><br/>';
+            }
+
+            if (!empty($resOK)) {
+                $res.='<b>SIM со следующими ICC/Номерами успешно переданы:</b> '.implode(',',$resOK);
+            }
+
+            Yii::app()->user->setFlash('success',$res);
+            $this->refresh();
+        }
+
+        $agent = Agent::model()->getFullComboList();
+        $agent = array('0'=>Yii::t('app', 'Select Agent')) + $agent;
+
+        $this->render('massmove',array('agent'=>$agent));
     }
 
 }
