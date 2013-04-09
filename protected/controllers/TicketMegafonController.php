@@ -28,6 +28,7 @@ class TicketMegafonController extends BaseGxController {
         $criteria->params[':in_work_megafon']=Ticket::STATUS_IN_WORK_MEGAFON;
 
         list($data['dataProvider'],$data['model'])=TicketSearch::getSqlDataProvider($criteria);
+        $data['dataProvider']->sort->defaultOrder='t.dt DESC';
 
         $this->render('indexAdmin',$data);
     }
