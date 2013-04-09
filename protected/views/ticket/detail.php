@@ -42,6 +42,11 @@
 <?=$form->textareaRow($ticket,'response',array('class'=>'span8','rows'=>5));?>
 
 <div style="text-align:right;">
+    <?php $this->widget('bootstrap.widgets.TbButton',array(
+    'buttonType'=>'submit',
+    'htmlOptions'=>array('name'=>'save'),
+    'label'=>'Сохранить'
+));?> &nbsp;
 <?php $this->widget('bootstrap.widgets.TbButton',array(
     'buttonType'=>'submit',
     'htmlOptions'=>array('name'=>'refuse'),

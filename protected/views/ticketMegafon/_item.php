@@ -16,6 +16,11 @@ $form=$this->beginWidget('BaseTbActiveForm',array('type'=>'horizontal','htmlOpti
     <div class="button-row">
         <?php $this->widget('bootstrap.widgets.TbButton',array(
         'buttonType'=>'submit',
+        'htmlOptions'=>array('name'=>'save'),
+        'label'=>'Сохранить'
+    ));?> &nbsp;
+        <?php $this->widget('bootstrap.widgets.TbButton',array(
+        'buttonType'=>'submit',
         'htmlOptions'=>array('name'=>'download'),
         'label'=>'Скачать заявление'
     ));?> &nbsp;
