@@ -49,7 +49,7 @@
  * @property Ticket[] $tickets
  * @property TicketHistory[] $ticketHistories
  */
-abstract class BaseAgent extends GxActiveRecord {
+abstract class BaseAgent extends BaseGxActiveRecord {
 
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
