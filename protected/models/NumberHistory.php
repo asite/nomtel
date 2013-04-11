@@ -15,24 +15,33 @@ class NumberHistory extends BaseNumberHistory
 		return parent::model($className);
 	}
 
+    public static function getDefaultWho() {
+        $who='';
+        switch (Yii::app()->user->role) {
+            case 'admin':
+                $who='База';
+                break;
+            case 'agent':
+                $who='Агент {Agent:'.loggedAgentId().'}';
+                break;
+            case 'number':
+                $who='Номер {Number:'.loggedNumberId().'}';
+                break;
+            case 'support':
+                $who='Техподдержка {SupportOperator:'.loggedSupportOperatorId().'}';
+                break;
+            case 'supportSuper':
+                $who='Оператор базы {SupportOperator:'.loggedSupportOperatorId().'}';
+                break;
+        }
+        return $who;
+    }
+
     public static function addHistoryNumber($number_id,$comment,$who=null) {
         if (!isset($who)) {
-            switch (Yii::app()->user->role) {
-                case 'admin':
-                    $who='База';
-                    break;
-                case 'agent':
-                    $who='Агент {Agent:'.loggedAgentId().'}';
-                    break;
-                case 'number':
-                    $who='Номер {Number:'.loggedNumberId().'}';
-                    break;
-                case 'support':
-                    $who='Техподдержка {SupportOperator:'.loggedSupportOperatorId().'}';
-                case 'supportSuper':
-                    $who='Оператор базы {SupportOperator:'.loggedSupportOperatorId().'}';
-            }
+            $who=self::getDefaultWho();
         }
+
         $model = new NumberHistory;
         $model->number_id = $number_id;
         $model->dt = new EDateTime();

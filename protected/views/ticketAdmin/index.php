@@ -13,7 +13,7 @@
 
 <div class="form-container-horizontal">
     <div class="form-container-item form-label-width-60">
-        <?php echo $form->PickerDateRow($model,'dt',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true)),array('minYearDelta'=>5,'maxYearDelta'=>0,'onSelect'=>'js:function(){$(this).closest("form").submit();}'))?>
+        <?php echo $form->PickerDateRow($model,'dt',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true)),array('minYearDelta'=>5,'maxYearDelta'=>0,'onSelect'=>'js:function(){$("#TicketSearch_status :first").attr("selected","selected");}'))?>
     </div>
 </div>
 
@@ -44,6 +44,10 @@
 
     $('#filter').on('keydown',function(event){
         if (event.type === 'keydown' && event.keyCode == 13) $('#filter').submit();
+    });
+
+    $('#TicketSearch_number, #TicketSearch_dt').on('keydown',function(event){
+        $('#TicketSearch_status :first').attr('selected','selected');
     });
 
     $('#filter select').on('change',function(event){

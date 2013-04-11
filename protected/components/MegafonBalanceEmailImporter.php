@@ -1,7 +1,7 @@
 <?php
 class MegafonBalanceEmailImporter
 {
-    const STATUS_ANALYZE_PERIODS=6;
+    const STATUS_ANALYZE_PERIODS=30;
 
     private $emailProcessor;
 

@@ -8,7 +8,7 @@
 $(document).ready(function(){$('#ICCtoSelect').focus();});
 </script>
 
-<h1><?php echo Yii::t('app','Mass move') ?> SIM</h1>
+<h1>Массовая форсированная передача SIM со сменой ветки агентов</h1>
 
 
 <?php
@@ -19,7 +19,7 @@ $(document).ready(function(){$('#ICCtoSelect').focus();});
   ));
 ?>
 
-<label>Введите список ICC:</label>
+<label>Введите список ICC/Номеров:</label>
 <textarea name="ICCtoMove" id="ICCtoMove" rows="20" style="width:100%"></textarea>
 
     <?php

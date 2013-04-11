@@ -11,11 +11,14 @@
  *
  * @property string $id
  * @property string $number_id
+ * @property string $created_by
+ * @property string $type
  * @property string $sim_id
  * @property integer $agent_id
  * @property integer $support_operator_id
  * @property string $dt
  * @property string $status
+ * @property string $megafon_status
  * @property string $text
  * @property string $internal
  * @property string $response
@@ -41,19 +44,22 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 	}
 
 	public static function representingColumn() {
-		return 'dt';
+		return 'created_by';
 	}
 
 	public function rules() {
 		return array(
-			array('number_id, sim_id, agent_id, dt, status, text', 'required'),
+			array('number_id, created_by, sim_id, agent_id, dt, status, text', 'required'),
 			array('agent_id, support_operator_id', 'numerical', 'integerOnly'=>true),
 			array('number_id, sim_id', 'length', 'max'=>20),
+			array('created_by', 'length', 'max'=>200),
+			array('type', 'length', 'max'=>8),
 			array('status', 'length', 'max'=>19),
+			array('megafon_status', 'length', 'max'=>7),
 			array('internal, response', 'safe'),
-			array('support_operator_id, internal, response', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('type, support_operator_id, megafon_status, internal, response', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, number_id, sim_id, agent_id, support_operator_id, dt, status, text, internal, response', 'safe', 'on'=>'search'),
+			array('id, number_id, created_by, type, sim_id, agent_id, support_operator_id, dt, status, megafon_status, text, internal, response', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -76,11 +82,14 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'number_id' => null,
+			'created_by' => Yii::t('app', 'Created By'),
+			'type' => Yii::t('app', 'Type'),
 			'sim_id' => null,
 			'agent_id' => null,
 			'support_operator_id' => null,
 			'dt' => Yii::t('app', 'Dt'),
 			'status' => Yii::t('app', 'Status'),
+			'megafon_status' => Yii::t('app', 'Megafon Status'),
 			'text' => Yii::t('app', 'Text'),
 			'internal' => Yii::t('app', 'Internal'),
 			'response' => Yii::t('app', 'Response'),
@@ -97,11 +106,14 @@ abstract class BaseTicket extends BaseGxActiveRecord {
 
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('number_id', $this->number_id);
+		$criteria->compare('created_by', $this->created_by, true);
+		$criteria->compare('type', $this->type, true);
 		$criteria->compare('sim_id', $this->sim_id);
 		$criteria->compare('agent_id', $this->agent_id);
 		$criteria->compare('support_operator_id', $this->support_operator_id);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('status', $this->status, true);
+		$criteria->compare('megafon_status', $this->megafon_status, true);
 		$criteria->compare('text', $this->text, true);
 		$criteria->compare('internal', $this->internal, true);
 		$criteria->compare('response', $this->response, true);

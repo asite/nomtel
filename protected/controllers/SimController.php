@@ -9,6 +9,13 @@ class SimController extends BaseGxController {
         );
     }
 
+    public function filters()
+    {
+        return array_merge(parent::filters(), array(
+            array('LoggingFilter +massMove')
+        ));
+    }
+
     protected function performAjaxValidation($model, $id = '') {
         if (isset($_POST['ajax']) && $_POST['ajax'] === $id) {
             echo CActiveForm::validate($model);
@@ -421,17 +428,22 @@ class SimController extends BaseGxController {
     public function actionMassSelect() {
 
         if ($_POST['ICCtoSelect'] != '') {
-            $icc_arr = explode("\n", $_POST['ICCtoSelect']);
+            $id_arr = explode("\n", $_POST['ICCtoSelect']);
 
-            foreach ($icc_arr as $icc) {
-                if ($icc != '') {
-                    if ($sim = Sim::model()->find('(icc = "' . trim($icc) . '" or number = "' . trim($icc) . '") and parent_agent_id="'.loggedAgentId() .'"')) {
-                        $ids[$sim->id] = $sim->id;
-                    }
-                }
+            if (!empty($id_arr)) {
+                $quotedIds=array();
+                foreach($id_arr as $id) $quotedIds[]=Yii::app()->db->quoteValue(trim($id));
+                $in='('.implode(',',$quotedIds).')';
+                $sql = "select id from sim where (number in $in or icc in $in) and agent_id is NULL and parent_agent_id='".loggedAgentId()."' and is_active=1";
+                $sims=Yii::app()->db->createCommand($sql)->queryAll();
+            } else {
+                $sims=array();
             }
 
-
+            $ids = array();
+            foreach ($sims as $value) {
+                $ids[$value['id']]=$value['id'];
+            }
 
             if (count($ids) > 0) {
                 $sessionData=new SessionData(__CLASS__);
@@ -714,6 +726,8 @@ class SimController extends BaseGxController {
 
             $trx=Yii::app()->db->beginTransaction();
 
+            $st=microtime(true);
+
             $recursiveInfo=array();
             $destAgent=Agent::model()->findByPk($_POST['agent_id']);
             if (!$destAgent) {
@@ -738,25 +752,44 @@ class SimController extends BaseGxController {
             $recursiveInfo[]=array('agent'=>new Agent,'act'=>new Act);
 
             $resOK=array();
-            $resNotFound=array();
+
+            $simIdsToUpdateParentId=array();
+            $simParentIdsToSetInactive=array();
+
+            $simAttrs=Sim::model()->attributes;
+            unset($simAttrs['id']);
+            $simBulkInsert=new BulkInsert('sim',array_keys($simAttrs));
+
+            $updateSimInNumberCommand=Yii::app()->db->createCommand('update number set sim_id=:new_sim_id where sim_id=:old_sim_id');
+
+            $numberSimIds=array();
 
             foreach($id_arr as $id) {
                 $id=trim($id);
+                if ($id!='') $resNotFound[trim($id)]=true;
+            }
 
-                if (strlen($id)<15) {
-                    $number=Number::model()->findByAttributes(array('number'=>$id));
-                } else {
-                    $number=Number::model()->findBySql("select n.* from number n join sim s on (s.parent_id=n.sim_id and s.icc=:icc)",array(':icc'=>$id));
-                }
+            if (!empty($id_arr)) {
+                $quotedIds=array();
+                foreach($id_arr as $id) $quotedIds[]=Yii::app()->db->quoteValue(trim($id));
+                $in='('.implode(',',$quotedIds).')';
+                $sims=Sim::model()->findAllBySql("select * from sim where (number in $in or icc in $in) and id=parent_id and is_active=1");
+            } else {
+                $sims=array();
+            }
 
-                if (!$number) {
+            foreach($sims as $sim) {
+                unset($resNotFound[$sim->number]);
+                unset($resNotFound[$sim->icc]);
+
+                $numberSimId=$sim->parent_id;
+
+                if (!$sim) {
                     $resNotFound[]=$id;
                     continue;
                 }
 
-                $sim=Sim::model()->findByPk($number->sim_id);
-
-                Sim::model()->updateAll(array('is_active'=>0),'parent_id=:parent_id',array(':parent_id'=>$sim->id));
+                $simParentIdsToSetInactive[]=$sim->id;
 
                 $parentAgentId=adminAgentId();
                 $parentActId=null;
@@ -771,36 +804,54 @@ class SimController extends BaseGxController {
                     $sim->agent_id=$rInfo['agent']->id;
                     $sim->act_id=$rInfo['act']->id;
 
-                    $sim->save();
 
                     if (!$parentSimId) {
-                        $sim->parent_id=$sim->id;
-                        $parentSimId=$sim->parent_id;
                         $sim->save();
-                        $number->sim_id=$parentSimId;
+                        $sim->parent_id=$sim->id;
+                        $parentSimId=$sim->id;
+
+                        $simIdsToUpdateParentId[]=$sim->id;
+                    } else {
+                        $simBulkInsert->insert($sim->attributes);
                     }
 
                     $parentAgentId=$rInfo['agent']->id;
                     $parentActId=$rInfo['act']->id;
                 }
 
-                $number->save();
-
-                NumberHistory::addHistoryNumber($number->id,"Массовая передача сим агенту {Agent:{$destAgent->id}}");
+                $updateSimInNumberCommand->execute(array(':new_sim_id'=>$parentSimId,':old_sim_id'=>$numberSimId));
+                $numberSimIds[]=$parentSimId;
 
                 $resOK[]=$id;
             }
 
-            $trx->commit();
+            $simBulkInsert->finish();
 
-            $res='';
+            $numberHistoryBulkInsert=new BulkInsert('number_history',array('number_id','who','comment'));
+            $numberHistory=array('who'=>NumberHistory::getDefaultWho(),'comment'=>"Массовая передача сим агенту {Agent:{$destAgent->id}}");
 
-            if (!empty($resNotFound)) {
-                $res.='<b>следующие ICC/Номера не найдены:</b> '.implode(',',$resNotFound).'<br/><br/>';
+            if (!empty($numberSimIds)) {
+                $ids=Yii::app()->db->createCommand("select id from number where sim_id in (".implode(',',$numberSimIds).')')->queryColumn();
+                foreach($ids as $id) {
+                    $numberHistory['number_id']=$id;
+                    $numberHistoryBulkInsert->insert($numberHistory);
+                }
             }
 
-            if (!empty($resOK)) {
-                $res.='<b>SIM со следующими ICC/Номерами успешно переданы:</b> '.implode(',',$resOK);
+            $numberHistoryBulkInsert->finish();
+
+            if (!empty($simIdsToUpdateParentId))
+                Yii::app()->db->createCommand("update sim set parent_id=id where id in (".implode(',',$simIdsToUpdateParentId).')')->execute();
+
+            if (!empty($simParentIdsToSetInactive))
+                Yii::app()->db->createCommand("update sim set is_active=0 where parent_id in (".implode(',',$simParentIdsToSetInactive).')')->execute();
+
+            $trx->commit();
+
+            if (!empty($resNotFound)) {
+                $res='<b>следующие ICC/Номера не найдены:</b> '.implode(',',array_keys($resNotFound));
+            } else {
+                $res='Все SIM успешно переданы';
             }
 
             Yii::app()->user->setFlash('success',$res);
