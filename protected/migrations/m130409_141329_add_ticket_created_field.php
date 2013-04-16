@@ -4,7 +4,7 @@ class m130409_141329_add_ticket_created_field extends CDbMigration
 {
 	public function up()
 	{
-        $this->db->execute("
+        $this->execute("
             ALTER TABLE `ticket`
             ADD `created_by` varchar(200) NOT NULL COMMENT 'кто создал тикет' AFTER `number_id`,
             COMMENT='Хранит тикеты';
