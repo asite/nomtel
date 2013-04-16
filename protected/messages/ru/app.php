@@ -74,7 +74,7 @@ return array (
   'Support Passport Need Validation' => '',
   'Support Sent Sms Status' => '',
   'Technical Support list' => '',
-  'Text' => '',
+  'Text' => 'Текст',
   'TicketHistory|TicketHistories' => '',
   'Ticket|Tickets' => '',
   'TmpNumberRegion|TmpNumberRegions' => '',

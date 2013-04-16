@@ -169,22 +169,65 @@ $this->widget('bootstrap.widgets.TbButton',array(
 </div>
 
 <?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support' || Yii::app()->user->role=='supportSuper'): ?>
+<h2>История номера</h2>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
-    'id' => 'number-grid',
-    'dataProvider' => $numberHistory->search(),
-    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'columns' => array(
-        'dt',
-        array(
-            'name'=>'who',
-            'type'=>'html',
-            'value'=>'NumberHistory::replaceShortcutsByLinks($data->who)',
+        'id' => 'number-grid',
+        'dataProvider' => $numberHistory->search(),
+        'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+        'columns' => array(
+            'dt',
+            array(
+                'name'=>'who',
+                'type'=>'html',
+                'value'=>'NumberHistory::replaceShortcutsByLinks($data->who)',
+            ),
+            array(
+                'name'=>'comment',
+                'type'=>'html',
+                'value'=>'NumberHistory::replaceShortcutsByLinks($data->comment)',
+            ),
         ),
-        array(
-            'name'=>'comment',
-            'type'=>'html',
-            'value'=>'NumberHistory::replaceShortcutsByLinks($data->comment)',
+    )); ?>
+<h2>История баланса</h2>
+<?php $this->widget('bootstrap.widgets.TbGridView', array(
+        'id' => 'balances-grid',
+        'dataProvider' => $balancesDataProvider,
+        'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+        'columns' => array(
+            array(
+                'header'=>'Дата',
+                'value'=>'new EDateTime($data["dt"],null,"date")'
+            ),
+            array(
+                'name'=>'balance',
+                'header'=>'Баланс',
+            ),
         ),
-    ),
-)); ?>
+    )); ?>
+<?php if ($numberLastInfo) { ?>
+    <h2>Актуальная информация</h2>
+    <div>
+        <?php
+        $p = new CHtmlPurifier();
+        echo $p->purify($numberLastInfo->text);
+        ?>
+    </div>
+    <?php } ?>
+<h2>Тикеты</h2>
+<?php $this->widget('ootstrap.widgets.TbGridView', array(
+        'id' => 'ticket-grid',
+        'dataProvider' => $ticketsDataProvider,
+        'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+        'columns' => array(
+            'id',
+            'dt',
+            'text',
+            'response',
+            array(
+                'name'=>'status',
+                'value'=>'Ticket::getStatusPOLabel($data->status)',
+                'htmlOptions'=>array('style'=>'width:120px;'),
+            )
+        ),
+    )); ?>
 <?php endif; ?>
