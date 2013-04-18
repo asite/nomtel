@@ -104,6 +104,8 @@ class TicketMegafonController extends BaseGxController {
 
                 $this->redirect(array('index'));
             }
+            var_dump($ticket->getErrors());
+            exit;
         }
 
         $ticketHistory=new TicketHistory();

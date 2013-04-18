@@ -660,6 +660,7 @@ class SimController extends BaseGxController {
         $criteria->compare('s.icc',$model->icc);
         $criteria->compare('s.operator_id',$model->operator_id);
         $criteria->compare('s.tariff_id',$model->tariff_id);
+        $criteria->compare('s.operator_region_id',$model->operator_region_id);
         $criteria->compare('n.status',$model->status);
         $criteria->compare('n.balance_status',$model->balance_status);
 
@@ -669,16 +670,17 @@ class SimController extends BaseGxController {
             left outer join operator o on (o.id=s.operator_id)
             left outer join support_operator so on (so.id=n.support_operator_id)
             left outer join tariff t on (t.id=s.tariff_id)
+            left outer join operator_region r on (r.id=s.operator_region_id)
             where " . $criteria->condition;
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider = new CSqlDataProvider('select s.*,n.*,s.number,o.title as operator,t.title as tariff, a.name, a.surname,s.id as sim_id,n.id as number_id,n.status as number_status,so.name as so_name,so.surname as so_surname ' . $sql, array(
+        $dataProvider = new CSqlDataProvider('select s.*,n.*,s.number,o.title as operator,t.title as tariff,r.title as operator_region, a.name, a.surname,s.id as sim_id,n.id as number_id,n.status as number_status,so.name as so_name,so.surname as so_surname ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'agent_id','number','icc','operator_id','tariff_id','status','balance_status','support_status','support_operator_id'
+                    'agent_id','number','icc','operator_id','tariff_id','operator_region_id','status','balance_status','support_status','support_operator_id'
                 ),
             ),
             'pagination' => $pager?array('pageSize' => Sim::ITEMS_PER_PAGE):false

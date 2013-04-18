@@ -15,6 +15,31 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
         }
         parent::init();
     }
+
+    private function export($array, $step, $col_sep=";", $qut='"', $row_sep="\n") {
+        if ($step==0) {
+            $m=array();
+            preg_match_all('%<th[^>]*>.*?</th>%i',$array,$m);
+            foreach($m[0] as $v) {
+                $output .= "$col_sep$qut".strip_tags(html_entity_decode($v)).$qut;
+            }
+            $output = substr($output, 1).$row_sep;
+        }
+
+        $m=array();
+        preg_match_all('%<tr[^>]*>.*?</tr>%is',$array,$m);
+        foreach($m[0] as $v) {
+            preg_match_all('%<td[^>]*>(.*?)</td>%is',$v,$mm);
+            $tmp = '';
+            foreach($mm[0] as $vv) {
+                $tmp .= "$col_sep$qut".strip_tags(str_replace('"','""',html_entity_decode($vv))).$qut;
+            }
+            if ($tmp) $output .= substr($tmp, 1).$row_sep;
+        }
+
+        return $output;
+    }
+
     public function renderContent() {
         if ($_POST['exportGridView']==$this->id) {
             ob_end_clean();
@@ -28,7 +53,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
 
                 $export = ob_get_contents();
                 ob_end_clean();
-                $csv.=Controller::export($export,$i);
+                $csv.=$this->export($export,$i);
             }
             header("Content-type: application/csv");
             header("Content-Disposition: attachment; filename=".str_replace('/','_',Yii::app()->controller->route).".csv");
@@ -55,4 +80,13 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
         echo '</div>';
     }
 
+    public function registerClientScript(){
+
+        //if ajaxUrl not set, default to the current action
+        if(!isset($this->ajaxUrl))
+            $this->ajaxUrl = Yii::app()->controller->createUrl("");
+
+        //call parent function
+        parent::registerClientScript();
+    }
 }

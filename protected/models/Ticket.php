@@ -21,7 +21,10 @@ class Ticket extends BaseTicket
 
     const MEGAFON_STATUS_DONE='DONE';
     const MEGAFON_STATUS_REFUSED='REFUSED';
-    
+
+    const QUEUE_COMMON='COMMON';
+    const QUEUE_AGENTS_RESTORE='AGENTS_RESTORE';
+
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}
@@ -78,7 +81,7 @@ class Ticket extends BaseTicket
         $labels=self::getMegafonStatusLabels();
         return $labels[$status];
     }
-    
+
     public static function getStatusPOLabel($status) {
         switch ($status) {
             case self::STATUS_DONE:
@@ -115,7 +118,7 @@ class Ticket extends BaseTicket
         $history->save();
     }
 
-    public static function addMessage($idNumber, $message) {
+    public static function addMessage($idNumber, $message, $queue=Tiket::QUEUE_COMMON) {
         $number=Number::model()->findByPk($idNumber);
 
         $criteria = new CDbCriteria();
@@ -131,6 +134,7 @@ class Ticket extends BaseTicket
         $ticket->status = self::STATUS_NEW;
         $ticket->dt = new EDateTime();
         $ticket->text = $message;
+        $ticket->queue = $queue;
         $ticket->save();
         $ticket->addHistory($message);
 

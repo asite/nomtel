@@ -4,7 +4,7 @@ class NumberController extends BaseGxController
 {
     public function additionalAccessRules() {
         return array(
-            array('allow', 'actions' => array('list','view'), 'roles' => array('agent')),
+            array('allow', 'actions' => array('list','view','agentChangeIcc'), 'roles' => array('agent')),
             array('allow', 'roles' => array('editNumberCard')),
             array('allow', 'roles' => array('support')),
         );
@@ -723,6 +723,15 @@ class NumberController extends BaseGxController
         }
 
         $this->render('massChange');
+    }
+
+    public function actionAgentChangeIcc($sim_id) {
+        $sim = Sim::model()->findByPk($sim_id);
+        $number = Number::model()->findByAttributes(array('sim_id'=>$sim->parent_id));
+        $message = 'Восстановление '.$number->number.' на icc '.$sim->icc;
+        Ticket::addMessage($number->id,$message,Ticket::QUEUE_AGENTS_RESTORE);
+        Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Ваш запрос успешно отправлен.');
+        $this->redirect(Yii::app()->request->urlReferrer);
     }
 }
 

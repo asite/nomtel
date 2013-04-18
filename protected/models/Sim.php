@@ -46,6 +46,7 @@ class Sim extends BaseSim
         $criteria->compare('t.icc', $this->icc, true);
         $criteria->compare('t.operator_id', $this->operator_id);
         $criteria->compare('t.tariff_id', $this->tariff_id);
+        $criteria->compare('t.operator_region_id', $this->operator_region_id);
 
         $dataProvider = new CActiveDataProvider($this, array(
             'criteria' => $criteria,

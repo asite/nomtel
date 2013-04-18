@@ -9,6 +9,18 @@ class OperatorRegion extends BaseOperatorRegion
         return parent::model($className);
     }
 
+    public static function getComboList($data = array())
+    {
+        $regions = Yii::app()->db->createCommand("select id,title from " .
+            self::model()->tableName() . " order by title")->queryAll();
+
+        foreach ($regions as $v) {
+            $data[$v['id']] = $v['title'];
+        }
+
+        return $data;
+    }
+
     public static function getDropDownList() {
       $data = Yii::app()->db->createCommand("select id,title,operator_id from " .self::model()->tableName() . " order by title")->queryAll();
       $result = array(Operator::OPERATOR_BEELINE_ID => array('' => 'Выбор региона'), Operator::OPERATOR_MEGAFON_ID => array('' => 'Выбор региона'));
