@@ -118,7 +118,7 @@ class Ticket extends BaseTicket
         $history->save();
     }
 
-    public static function addMessage($idNumber, $message, $queue=Tiket::QUEUE_COMMON) {
+    public static function addMessage($idNumber, $message, $queue=Ticket::QUEUE_COMMON) {
         $number=Number::model()->findByPk($idNumber);
 
         $criteria = new CDbCriteria();
