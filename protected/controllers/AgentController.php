@@ -11,7 +11,7 @@ class AgentController extends BaseGxController
 
     public function checkAgentPermissions($agent)
     {
-        if (!isAdmin() && loggedAgentId() != $agent->parent_id) $this->redirect(array('list'));
+        if (!isAdmin() && loggedAgentId() != $agent->parent_id) $this->redirect(array('admin'));
     }
 
     private function save($model, $user, $referralRates)

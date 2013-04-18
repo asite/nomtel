@@ -1,4 +1,5 @@
 <?php
+
 // this is entry script for web servers
 
 error_reporting(E_ALL & ~E_NOTICE);
@@ -25,6 +26,7 @@ switch ($_SERVER['SERVER_NAME']) {
         break;
 
     case 'nomtel.asiteplace.ru':
+    case 'nomtel.asiteplace.ru:81':
         define('LANGUAGE', 'ru');
         define('TIMEZONE', 'Asia/Yeakaterinburg');
         define('YII_DEBUG', false);

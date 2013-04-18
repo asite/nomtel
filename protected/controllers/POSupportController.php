@@ -38,7 +38,7 @@ class POSupportController extends Controller
         $criteria->addCondition("number_id=:number_id");
         $criteria->params = array(':number_id'=>loggedNumberId());
 
-        $dataProvider = new CActiveDataProvider('Ticket', array('criteria' => $criteria));
+        $dataProvider = new CActiveDataProvider('Ticket', array('criteria' => $criteria,'sort'=>array('defaultOrder'=>'id desc')));
 
         $this->render('list', array(
             'dataProvider' => $dataProvider

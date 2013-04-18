@@ -31,6 +31,7 @@ class MegafonBalanceEmailImporter
         $data['balance']=$m[1];
         if (!preg_match('%Тарифный план: (.*?) с \d\d\.\d\d\.\d\d\d\d\.%',$mail,$m)) return $this->parseError($mail,__LINE__);
         $data['tariff']=$m[1];
+        $data['text']=$mail;
 
         Yii::log("parsed data\n".json_encode($data),CLogger::LEVEL_INFO,'mail_parser');
 
@@ -141,6 +142,18 @@ class MegafonBalanceEmailImporter
         $balanceReportNumber->balance=$data['balance'];
 
         $balanceReportNumber->save();
+
+        // save last email info
+        $numberLastInfo=NumberLastInfo::model()->findByPk($number->id);
+        if (!$numberLastInfo) {
+            $numberLastInfo=new NumberLastInfo;
+            $numberLastInfo->number_id=$number->id;
+        }
+
+        $numberLastInfo->dt=new EDateTime();
+        $numberLastInfo->text=$data['text'];
+
+        $numberLastInfo->save();
 
         $this->recalcNumberBalanceStatus($number);
 

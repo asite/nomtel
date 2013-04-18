@@ -426,6 +426,7 @@ if (isSupport()) {
             )); ?>
         </div>
 </div>
+<h2>История номера</h2>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'number-grid',
     'dataProvider' => $numberHistory->search(),
@@ -442,5 +443,47 @@ if (isSupport()) {
             'type'=>'html',
             'value'=>'NumberHistory::replaceShortcutsByLinks($data->comment)',
         ),
+    ),
+)); ?>
+<h2>История баланса</h2>
+<?php $this->widget('bootstrap.widgets.TbGridView', array(
+    'id' => 'balances-grid',
+    'dataProvider' => $balancesDataProvider,
+    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+    'columns' => array(
+        array(
+            'header'=>'Дата',
+            'value'=>'new EDateTime($data["dt"],null,"date")'
+        ),
+        array(
+            'name'=>'balance',
+            'header'=>'Баланс',
+        ),
+    ),
+)); ?>
+<?php if ($numberLastInfo) { ?>
+<h2>Актуальная информация</h2>
+<div>
+    <?php
+    $p = new CHtmlPurifier();
+    echo $p->purify($numberLastInfo->text);
+    ?>
+</div>
+<?php } ?>
+<h2>Тикеты</h2>
+<?php $this->widget('ootstrap.widgets.TbGridView', array(
+    'id' => 'ticket-grid',
+    'dataProvider' => $ticketsDataProvider,
+    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+    'columns' => array(
+        'id',
+        'dt',
+        'text',
+        'response',
+        array(
+            'name'=>'status',
+            'value'=>'Ticket::getStatusPOLabel($data->status)',
+            'htmlOptions'=>array('style'=>'width:120px;'),
+        )
     ),
 )); ?>

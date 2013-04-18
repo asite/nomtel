@@ -53,6 +53,26 @@ class NumberController extends BaseGxController
         $params['numberHistory'] = new NumberHistory('search');
         $params['numberHistory']->number_id = $params['number']->id;
 
+        $params['numberLastInfo']=NumberLastInfo::model()->findByPk($params['number']->id);
+
+        $sql="from balance_report_number brn
+              join balance_report br on (br.id=brn.balance_report_id)
+              where brn.number_id=:number_id";
+        $sqlParams=array(':number_id'=>$params['number']->id);
+        $totalItemCount=Yii::app()->db->createCommand("select count(*) $sql")->queryScalar($sqlParams);
+
+        $params['balancesDataProvider'] = new CSqlDataProvider("select br.dt,brn.balance $sql order by dt desc", array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $sqlParams,
+            'pagination' => array('pageSize' => 10)
+        ));
+
+        $criteria = new CDbCriteria();
+        $criteria->addCondition("number_id=:number_id");
+        $criteria->params = array(':number_id'=>$params['number']->id);
+
+        $params['ticketsDataProvider'] = new CActiveDataProvider('Ticket', array('criteria' => $criteria,'sort'=>array('defaultOrder'=>'id desc')));
+
         return $params;
     }
 
@@ -60,27 +80,14 @@ class NumberController extends BaseGxController
     {
         $params = $this->getNumberInfo($id);
 
-        $this->render('view',array(
-            'number'=>$params['number'],
-            'sim'=>$params['sim'],
-            'SubscriptionAgreement'=>$params['SubscriptionAgreement'],
-            'BonusReportNumber'=>$params['BonusReportNumber'],
-            'numberHistory'=>$params['numberHistory']
-        ));
+        $this->render('view',$params);
     }
 
     public function actionEdit($id)
     {
         $params = $this->getNumberInfo($id);
-        $numberInfoEdit = new NumberInfoEdit;
 
-        $this->render('edit',array(
-            'number'=>$params['number'],
-            'sim'=>$params['sim'],
-            'SubscriptionAgreement'=>$params['SubscriptionAgreement'],
-            'BalanceReportNumber'=>$params['BalanceReportNumber'],
-            'numberHistory'=>$params['numberHistory'],
-        ));
+        $this->render('edit',$params);
     }
 
     public function actionSaveTariff($id) {
