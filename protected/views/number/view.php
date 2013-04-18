@@ -47,7 +47,7 @@ $this->widget('bootstrap.widgets.TbButton',array(
                     'value'=>$sim->operatorRegion
                     ),
                 array(
-                    'label'=>'<a href="'.$this->createUrl('agentChangeIcc',array('sim_id'=>$sim->id)).'" class="btn btn-primary" style="padding: 0 5px;">icc</a> '.Yii::t('app','ICC'),
+                    'label'=>Yii::t('app','ICC'),
                     'value'=>$sim->icc
                     ),
             ),
