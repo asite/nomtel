@@ -84,7 +84,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
 
         //if ajaxUrl not set, default to the current action
         if(!isset($this->ajaxUrl))
-            $this->ajaxUrl = Yii::app()->controller->createUrl("");
+            $this->ajaxUrl = '/'.Yii::app()->request->getPathInfo();
 
         //call parent function
         parent::registerClientScript();

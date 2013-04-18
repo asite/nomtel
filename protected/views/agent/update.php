@@ -9,11 +9,13 @@ $this->breadcrumbs = array(
 
 <h1><?php echo $model->adminLabel(Yii::t('app', 'Updating Agent')); ?></h1>
 
+<?php /*
 <h5>
     Кол-во SIM: <?php echo $model->stat_sim_count; ?>
     <br/>
     Кол-во активных SIM: <?php echo $model->stat_sim_count; ?>
 </h5>
+*/?>
 
 <?php
 $this->renderPartial('_form', array(
