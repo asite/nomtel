@@ -23,7 +23,7 @@ return array (
   'Are you sure to delete this BlankSim?' => '',
   'Are you sure to delete this Technical Support User?' => '',
   'BalanceReportNumber|BalanceReportNumbers' => '',
-  'BlankSim|BlankSims' => 'Пустышка|Пустышки',
+  'BlankSim|BlankSims' => 'Пустышка|Замены',
   'BonusReportAgent|BonusReportAgents' => '',
   'BonusReportNumber|BonusReportNumbers' => '',
   'Can\'t acquire semaphore \':name\'' => '',

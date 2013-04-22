@@ -74,7 +74,8 @@
         if (Yii::app()->user->role=='supportMegafon') {
             $menuLeft=array(
                 '',
-                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMegafon/index'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
+                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMegafon/index'),'active'=>$this->route == 'ticketMegafon/index'),
+                array('label' => 'История обращений', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>$this->route == 'ticketMegafon/indexAdmin'),
             );
         }
 

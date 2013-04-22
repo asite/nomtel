@@ -28,6 +28,21 @@ $form=$this->beginWidget('BaseTbActiveForm',array('type'=>'horizontal','htmlOpti
         'url'=>$this->createUrl('detailAdmin',array('id'=>$data['id'])),
         'label'=>'Посмотреть'
     ));?>
+    <?php $this->endWidget() ?>
+   <?php $ticket=$this->loadModel($data['id'],'Ticket');
+?></div><?
+$form=$this->beginWidget('BaseTbActiveForm',array('type'=>'horizontal','htmlOptions'=>array('class'=>'hide-labels'),'action'=>$this->createUrl('detail',array('id'=>$data['id'])),'enableAjaxValidation' => true,
+    'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false))); ?>
+
+   
+    <div class="button-row">
+        <input type="hidden" name="Ticket[response]" value="">
+        <?php $this->widget('bootstrap.widgets.TbButton',array(
+        'buttonType'=>'submit',
+        'htmlOptions'=>array('name'=>'download'),
+        'label'=>'Скачать заявление'
+    ));?>
+     
     </div>
 
 <?php $this->endWidget() ?>
