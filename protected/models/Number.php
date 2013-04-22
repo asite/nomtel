@@ -23,6 +23,7 @@ class Number extends BaseNumber
     const BALANCE_STATUS_ACTIVE = 'ACTIVE';
     const BALANCE_STATUS_AWAIT_FIRST_RECHARGE = 'AWAIT_FIRST_RECHARGE';
     const BALANCE_STATUS_SUSPENDED = 'SUSPENDED';
+    const BALANCE_STATUS_UNKNOWN = 'UNKNOWN';
 
     const SUPPORT_STATUS_UNAVAILABLE='UNAVAILABLE';
     const SUPPORT_STATUS_CALLBACK='CALLBACK';
@@ -161,7 +162,8 @@ class Number extends BaseNumber
                 self::BALANCE_STATUS_MISSING => Yii::t('app','BALANCE_STATUS_MISSING'),
                 self::BALANCE_STATUS_ACTIVE => Yii::t('app','BALANCE_STATUS_ACTIVE'),
                 self::BALANCE_STATUS_AWAIT_FIRST_RECHARGE => Yii::t('app','BALANCE_STATUS_AWAIT_FIRST_RECHARGE'),
-                self::BALANCE_STATUS_SUSPENDED => Yii::t('app','BALANCE_STATUS_SUSPENDED')
+                self::BALANCE_STATUS_SUSPENDED => Yii::t('app','BALANCE_STATUS_SUSPENDED'),
+                self::BALANCE_STATUS_UNKNOWN => Yii::t('app','BALANCE_STATUS_UNKNOWN'),
             );
         }
 
@@ -186,6 +188,7 @@ class Number extends BaseNumber
            WHEN '".self::BALANCE_STATUS_ACTIVE."' THEN 8
            WHEN '".self::BALANCE_STATUS_AWAIT_FIRST_RECHARGE."' THEN 9
            WHEN '".self::BALANCE_STATUS_SUSPENDED."' THEN 10
+           WHEN '".self::BALANCE_STATUS_UNKNOWN."' THEN 11
         END)";
     }
 

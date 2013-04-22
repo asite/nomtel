@@ -128,6 +128,7 @@ return array (
   'BAD' => 'БАД',
   'BALANCE_STATUS_ACTIVE'=>'Активно',
   'BALANCE_STATUS_SUSPENDED'=>'Терминирован',
+  'BALANCE_STATUS_UNKNOWN'=>'Неизвестный',
   'BALANCE_STATUS_AWAIT_FIRST_RECHARGE'=>'Ждет активации ',
   'BALANCE_STATUS_MISSING' => 'Отсутствует в отчете',
   'BALANCE_STATUS_NEGATIVE_DYNAMIC' => 'Негативная динамика',
