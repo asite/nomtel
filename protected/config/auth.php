@@ -40,6 +40,7 @@ return array(
     'supportMegafon' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
+            'updateSubscriptionAgreementForMegafonNumber'
         )
     ),
 
@@ -77,6 +78,14 @@ return array(
     'updateSubscriptionAgreementForOwnSim' => array (
         'type' => CAuthItem::TYPE_TASK,
         'bizRule' => 'return $params["parent_agent_id"]==loggedAgentId();',
+        'children' => array(
+            'updateSubscriptionAgreement'
+        )
+    ),
+
+    'updateSubscriptionAgreementForMegafonNumber' => array (
+        'type' => CAuthItem::TYPE_TASK,
+        'bizRule' => 'return $params["number"]->sim->operator_id==Operator::OPERATOR_MEGAFON_ID;',
         'children' => array(
             'updateSubscriptionAgreement'
         )

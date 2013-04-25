@@ -7,6 +7,7 @@ class SubscriptionAgreementController extends BaseGxController {
         return array(
             array('allow', 'roles' => array('agent')),
             array('allow', 'actions'=>array('update','create'), 'roles'=>array('support')),
+            array('allow', 'actions'=>array('update'),'roles' => array('supportMegafon')),
         );
     }
 
@@ -137,6 +138,7 @@ class SubscriptionAgreementController extends BaseGxController {
         $this->checkPermissions('updateSubscriptionAgreement',array(
             'number_status'=>$number->status,
             'parent_agent_id'=>$sim->parent_agent_id,
+            'number'=>$number
         ));
 
         if (Yii::app()->getRequest()->getIsAjaxRequest()) {
