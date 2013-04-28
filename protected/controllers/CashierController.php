@@ -174,7 +174,13 @@ class CashierController extends BaseGxController
                 Sim::model()->updateAll(array('icc' => $model->icc), $criteria);
 
                 $message = "Заменить у номера ".$number->number." ICC на ".$model->icc;
+
                 $ticketId=Ticket::addMessage($number->id,$message);
+
+                $ticket = Ticket::model()->findByPk($ticketId);
+                $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
+                $ticket->internal=$ticket->text;
+                $ticket->save();
 
                 NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');
 
