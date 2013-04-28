@@ -88,8 +88,8 @@
 
     if (Yii::app()->user->role=='cashier') {
         $menuLeft=array(
-            array('label' => Yii::t('app', 'Sell'), 'url' => $this->createUrl('cashier/sell'),'active'=>$this->route=='cashier/sell'),
-            array('label' => Yii::t('app', 'Restore'), 'url' => $this->createUrl('cashier/restore'),'active'=>$this->route=='cashier/restore'),
+            array('label' => Yii::t('app', 'Sell'), 'url' => $this->createUrl('cashier/sellList'),'active'=>preg_match('%^cashier/sell%',$this->route)),
+            array('label' => Yii::t('app', 'Restore'), 'url' => $this->createUrl('cashier/restoreList'),'active'=>preg_match('%^cashier/restore%',$this->route)),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );

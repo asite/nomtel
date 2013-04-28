@@ -33,6 +33,9 @@ class NumberHistory extends BaseNumberHistory
             case 'supportSuper':
                 $who='Оператор базы {SupportOperator:'.loggedSupportOperatorId().'}';
                 break;
+            case 'cashier':
+                $who='Кассир {SupportOperator:'.loggedSupportOperatorId().'}';
+                break;
         }
         return $who;
     }

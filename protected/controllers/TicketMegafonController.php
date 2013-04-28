@@ -69,6 +69,12 @@ class TicketMegafonController extends BaseGxController {
                     $ticket->support_operator_id=loggedSupportOperatorId();
                     $ticket->status=Ticket::STATUS_FOR_REVIEW;
                     $ticket->megafon_status=Ticket::MEGAFON_STATUS_DONE;
+
+                    $cashierNumber=CashierNumber::model()->findByAttributes(array('ticket_id'=>$ticket->id));
+                    if ($cashierNumber) {
+                        $cashierNumber->confirmed=1;
+                        $cashierNumber->save();
+                    }
                 }
 
                 if (isset($_POST['refuse'])) {

@@ -491,28 +491,6 @@ class NumberController extends BaseGxController
         $this->render('bulkRestore',array('model'=>$model));
     }
 
-    public function actionTest() {
-        $st=microtime(true);
-        $sm=memory_get_usage();
-        $models=BalanceReportNumber::model()->findAll('id<80000');
-
-        echo "AR ".(microtime(true)-$st)." ".intval();
-        echo " ".count($models);
-
-        unset($models);
-        $pdo=Yii::app()->db->pdoInstance;
-        $st=microtime(true);
-        $models2=array();
-
-        $stat=$pdo->query("select * from balance_report_number where id<80000",PDO::FETCH_CLASS,'Brn');
-        foreach($stat as $obj) $models2[]=$obj;
-
-        echo " FAR ".(microtime(true)-$st);
-        echo " ".count($models2);
-
-        Yii::app()->end();
-    }
-
     private function setStatus($csv, $data, $status) {
         $trx = Yii::app()->db->beginTransaction();
         $wrongObjects = '';
