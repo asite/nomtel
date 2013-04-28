@@ -370,6 +370,7 @@ return array (
   'supportMain' => 'Главный оператор',
   'supportMegafon' => 'Оператор Мегафон',
   'supportSuper' => 'Оператор Базы',
+  'cashier' => 'Кассир',
   'the Agent' => 'У агента',
   'to Agent' => 'АГЕНТУ:',
   'total cost simcard' => 'Общая стоимость симкарт:',
@@ -391,4 +392,6 @@ return array (
   'Icc Prefix' => 'Icc Префикс',
   'Add Prefix Icc Region' => 'Добавление префикса региона',
   'Mass move' => 'Массовая передача',
+  'Sell' => 'Продажа',
+  'Restore' => 'Восстановление'
 );

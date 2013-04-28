@@ -51,6 +51,12 @@ return array(
         )
     ),
 
+    'cashier' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+        )
+    ),
+
     'number' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(

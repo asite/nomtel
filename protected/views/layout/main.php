@@ -86,6 +86,15 @@
         ));
     }
 
+    if (Yii::app()->user->role=='cashier') {
+        $menuLeft=array(
+            array('label' => Yii::t('app', 'Sell'), 'url' => $this->createUrl('cashier/sell'),'active'=>$this->route=='cashier/sell'),
+            array('label' => Yii::t('app', 'Restore'), 'url' => $this->createUrl('cashier/restore'),'active'=>$this->route=='cashier/restore'),
+            '',
+            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+        );
+    }
+
     if (Yii::app()->user->role == 'number') {
         $menuLeft = array(
             array('label' => Yii::t('app', 'Subscriber data'), 'url' => $this->createUrl('pOSite/index'), 'active' => $this->route == 'pOSite/index'),
