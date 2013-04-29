@@ -192,7 +192,11 @@ class CashierController extends BaseGxController
                 $cashierNumber->type=CashierNumber::TYPE_SELL;
                 $cashierNumber->ticket_id=$ticketId;
                 $cashierNumber->sum=500;
+                $cashierNumber->sum_cashier=0;
                 $cashierNumber->save();
+
+                $number->status=Number::STATUS_SOLD;
+                $number->save();
 
                 $trx->commit();
 
@@ -302,7 +306,8 @@ class CashierController extends BaseGxController
                 $cashierNumber->number_id=$number->id;
                 $cashierNumber->type=CashierNumber::TYPE_RESTORE;
                 $cashierNumber->ticket_id=$ticketId;
-                $cashierNumber->sum=100;
+                $cashierNumber->sum=300;
+                $cashierNumber->sum_cashier=200;
                 $cashierNumber->save();
 
                 $trx->commit();

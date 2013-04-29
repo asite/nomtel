@@ -15,6 +15,7 @@
  * @property string $number_id
  * @property string $type
  * @property string $ticket_id
+ * @property string $sum_cashier
  * @property string $sum
  * @property integer $confirmed
  *
@@ -42,14 +43,14 @@ abstract class BaseCashierNumber extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('dt, support_operator_id, number_id, type, ticket_id, sum', 'required'),
+			array('dt, support_operator_id, number_id, type, ticket_id, sum_cashier, sum', 'required'),
 			array('support_operator_id, confirmed', 'numerical', 'integerOnly'=>true),
 			array('number_id, ticket_id', 'length', 'max'=>20),
 			array('type', 'length', 'max'=>7),
-			array('sum', 'length', 'max'=>14),
+			array('sum_cashier, sum', 'length', 'max'=>14),
 			array('confirmed', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, dt, support_operator_id, number_id, type, ticket_id, sum, confirmed', 'safe', 'on'=>'search'),
+			array('id, dt, support_operator_id, number_id, type, ticket_id, sum_cashier, sum, confirmed', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -74,6 +75,7 @@ abstract class BaseCashierNumber extends BaseGxActiveRecord {
 			'number_id' => null,
 			'type' => Yii::t('app', 'Type'),
 			'ticket_id' => null,
+			'sum_cashier' => Yii::t('app', 'Sum Cashier'),
 			'sum' => Yii::t('app', 'Sum'),
 			'confirmed' => Yii::t('app', 'Confirmed'),
 			'supportOperator' => null,
@@ -91,6 +93,7 @@ abstract class BaseCashierNumber extends BaseGxActiveRecord {
 		$criteria->compare('number_id', $this->number_id);
 		$criteria->compare('type', $this->type, true);
 		$criteria->compare('ticket_id', $this->ticket_id);
+		$criteria->compare('sum_cashier', $this->sum_cashier, true);
 		$criteria->compare('sum', $this->sum, true);
 		$criteria->compare('confirmed', $this->confirmed);
 

@@ -108,6 +108,7 @@ return array (
   'message to agent up' => '@@@@',
   'messages' => '@@Сообщения@@',
   'ACTIVE' => 'Активен',
+  'SOLD' => 'Продан',
   'Abonent' => 'Абонент',
   'Account history' => 'История счета',
   'Act sims move' => 'Акт - Передачи сим карт',

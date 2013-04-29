@@ -8,6 +8,7 @@ class Number extends BaseNumber
     const STATUS_FREE = 'FREE';
     const STATUS_ACTIVE = 'ACTIVE';
     const STATUS_BLOCKED = 'BLOCKED';
+    const STATUS_SOLD = 'SOLD';
 
     const SUPPORT_SMS_STATUS_OFFICE = 'OFFICE';
     const SUPPORT_SMS_STATUS_EMAIL = 'EMAIL';
@@ -79,7 +80,8 @@ class Number extends BaseNumber
                 self::STATUS_UNKNOWN=>Yii::t('app','UNKNOWN'),
                 self::STATUS_FREE=>Yii::t('app','FREE'),
                 self::STATUS_ACTIVE=>Yii::t('app','ACTIVE'),
-                self::STATUS_BLOCKED=>Yii::t('app','BLOCKED')
+                self::STATUS_BLOCKED=>Yii::t('app','BLOCKED'),
+                self::STATUS_SOLD=>Yii::t('app','SOLD')
             );
         }
 
