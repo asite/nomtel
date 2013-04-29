@@ -337,13 +337,21 @@ class CashierController extends BaseGxController
     }
 
     public function actionStats() {
-        $model=new BlankSimRestoreStatistic();
+        $model=new CashierStatistic();
 
-        if (isset($_REQUEST['BlankSimRestoreStatistic'])) {
-            $model->setAttributes($_REQUEST['BlankSimRestoreStatistic']);
+        if (isset($_POST['CashierStatistic'])) {
+            $this->redirect(array('stats',
+                'CashierStatistic[date_from]'=>$_POST['CashierStatistic']['date_from'],
+                'CashierStatistic[date_to]'=>$_POST['CashierStatistic']['date_to']
+            ));
+        }
+        if (isset($_REQUEST['CashierStatistic'])) {
+            $model->setAttributes($_REQUEST['CashierStatistic']);
         } else {
-            $model->date_to=strval(new EDateTime(""));
-            $model->date_from=strval(new EDateTime("-7 Day"));
+            $this->redirect(array('stats',
+                'CashierStatistic[date_from]'=>strval(new EDateTime("-7 Day")),
+                'CashierStatistic[date_to]'=>new EDateTime("")
+            ));
         }
 
         $date_from=new EDateTime($model->date_from);
@@ -371,9 +379,43 @@ class CashierController extends BaseGxController
             order by surname,name
         ")->queryAll(true,$params);
 
+
+        $cashierNumber=new CashierNumber;
+        $cashierNumber->confirmed=null;
+        $cashierNumber->support_operator_id=null;
+
+        if (isset($_REQUEST['CashierNumber'])) {
+            $cashierNumber->setAttributes($_REQUEST['CashierNumber']);
+        }
+
+        $cashierNumberSellDataProvider=$cashierNumber->search();
+        $criteria=$cashierNumberSellDataProvider->criteria;
+
+        if (Yii::app()->user->role=='cashier') {
+            $criteria->compare('support_operator_id',loggedSupportOperatorId());
+        }
+        $criteria->addCondition('dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
+        $criteria->compare('type','SELL');
+        $criteria->params[':date_from']=$date_from->toMysqlDate();
+        $criteria->params[':date_to']=$date_to->toMysqlDate();
+
+        $cashierNumberRestoreDataProvider=$cashierNumber->search();
+        $criteria=$cashierNumberRestoreDataProvider->criteria;
+
+        if (Yii::app()->user->role=='cashier') {
+            $criteria->compare('support_operator_id',loggedSupportOperatorId());
+        }
+        $criteria->addCondition('dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
+        $criteria->compare('type','RESTORE');
+        $criteria->params[':date_from']=$date_from->toMysqlDate();
+        $criteria->params[':date_to']=$date_to->toMysqlDate();
+
         $this->render('stats',array(
             'dataProvider'=>new CArrayDataProvider($rows),
-            'model'=>$model
+            'model'=>$model,
+            'cashierNumberSellDataProvider'=>$cashierNumberSellDataProvider,
+            'cashierNumberRestoreDataProvider'=>$cashierNumberRestoreDataProvider,
+            'cashierNumberModel'=>$cashierNumber
         ));
     }
 

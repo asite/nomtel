@@ -21,14 +21,6 @@
 </div>
 
 <script>
-    $('#filter').submit(function(){
-        var data=$(this).serialize().replace(/YII_CSRF_TOKEN[^&]*/,'');
-        $.fn.yiiGridView.update('stats-grid', {
-            data:data
-        });
-        return false;
-    });
-
     $('#filter').on('keydown',function(event){
         if (event.type === 'keydown' && event.keyCode == 13) $('#filter').submit();
     });
@@ -38,8 +30,9 @@
     });
 </script>
 
+<h2>Итоги</h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
-    'id' => 'stats-grid',
+    'id' => 'summary-stats-grid',
     'dataProvider' => $dataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'columns' => array(
@@ -67,6 +60,60 @@
             'name'=>'sum_cashier',
             'header'=>'Вознаграждение',
             'htmlOptions'=>array('style'=>'text-align:center;')
+        ),
+    ),
+)); ?>
+
+<h2>Продажи</h2>
+<?php $this->widget('TbExtendedGridViewExport', array(
+    'id' => 'stats-grid',
+    'dataProvider' => $cashierNumberSellDataProvider,
+    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+    'filter'=>$cashierNumberSellModel,
+    'columns' => array(
+        array(
+            'header'=>'Кассир',
+            'value'=>'$data->supportOperator'
+        ),
+        array(
+            'header'=>'Номер',
+            'value'=>'$data->number->number'
+        ),
+        array(
+            'name'=>'confirmed',
+        ),
+        array(
+            'name'=>'sum',
+        ),
+        array(
+            'name'=>'sum_cashier',
+        ),
+    ),
+)); ?>
+
+<h2>Восстановления</h2>
+<?php $this->widget('TbExtendedGridViewExport', array(
+    'id' => 'stats-grid',
+    'dataProvider' => $cashierNumberRestoreDataProvider,
+    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+    'filter'=>$cashierNumberRestoreModel,
+    'columns' => array(
+        array(
+            'header'=>'Кассир',
+            'value'=>'$data->supportOperator'
+        ),
+        array(
+            'header'=>'Номер',
+            'value'=>'$data->number->number'
+        ),
+        array(
+            'name'=>'confirmed',
+        ),
+        array(
+            'name'=>'sum',
+        ),
+        array(
+            'name'=>'sum_cashier',
         ),
     ),
 )); ?>
