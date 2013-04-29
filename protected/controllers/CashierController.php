@@ -336,4 +336,45 @@ class CashierController extends BaseGxController
         ));
     }
 
+    public function actionStats() {
+        $model=new BlankSimRestoreStatistic();
+
+        if (isset($_REQUEST['BlankSimRestoreStatistic'])) {
+            $model->setAttributes($_REQUEST['BlankSimRestoreStatistic']);
+        } else {
+            $model->date_to=strval(new EDateTime(""));
+            $model->date_from=strval(new EDateTime("-7 Day"));
+        }
+
+        $date_from=new EDateTime($model->date_from);
+        $date_to=new EDateTime($model->date_to);
+
+        $params=array(
+            ':date_from'=>$date_from->toMysqlDate(),
+            ':date_to'=>$date_to->toMysqlDate(),
+        );
+
+        $where='';
+        if (Yii::app()->user->role=='cashier') {
+            $where=' and support_operator_id=:support_operator_id';
+            $params[':support_operator_id']=loggedSupportOperatorId();
+        }
+
+        $rows=Yii::app()->db->createCommand("
+            select so.surname,so.name,cnt_sell,cnt_restore,sum,sum_cashier from (
+                select support_operator_id,sum(if(type='SELL',1,0)) as cnt_sell,sum(if(type='RESTORE',1,0)) as cnt_restore,sum(`sum`) as `sum`,sum(sum_cashier) as sum_cashier
+                from cashier_number
+                where confirmed=1 and dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY) $where
+                group by support_operator_id
+            ) as tmp
+            join support_operator so on (so.id=tmp.support_operator_id)
+            order by surname,name
+        ")->queryAll(true,$params);
+
+        $this->render('stats',array(
+            'dataProvider'=>new CArrayDataProvider($rows),
+            'model'=>$model
+        ));
+    }
+
 }

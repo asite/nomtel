@@ -90,6 +90,7 @@
         $menuLeft=array(
             array('label' => Yii::t('app', 'Sell'), 'url' => $this->createUrl('cashier/sellList'),'active'=>preg_match('%^cashier/sell%',$this->route)),
             array('label' => Yii::t('app', 'Restore'), 'url' => $this->createUrl('cashier/restoreList'),'active'=>preg_match('%^cashier/restore%',$this->route)),
+            array('label' => 'Статистика', 'url' => $this->createUrl('cashier/stats'), 'active' => $this->id=='cashier/stats'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
@@ -124,6 +125,7 @@
             array('label' => Yii::t('app', 'addAct'), 'url' => $this->createUrl('sim/delivery'), 'active' => $this->route == 'sim/delivery'),
             array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
             array('label' => BlankSim::label(2), 'url' => $this->createUrl('blankSim/admin'), 'active' => $this->id=='blankSim'),
+            array('label' => 'Статистика по кассирам', 'url' => $this->createUrl('cashier/stats'), 'active' => $this->id=='cashier/stats'),
             array('label' => Yii::t('app','Mass change'), 'url' => $this->createUrl('number/massChange'), 'active' => $this->route=='number/massChange'),
             //array('label' => 'Массовое восстановление', 'url' => $this->createUrl('number/bulkRestore'), 'active' => $this->route=='number/bulkRestore'),
             array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
