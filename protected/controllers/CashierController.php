@@ -434,12 +434,20 @@ class CashierController extends BaseGxController
         ));
 
 
+        // total statistic
+        $total=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number cn where cn.dt>=:date_from and cn.dt<DATE_ADD(:date_to,INTERVAL 1 DAY)")->queryScalar(array(
+            ':date_from'=>$date_from->toMysqlDate(),
+            ':date_to'=>$date_to->toMysqlDate()
+        ));
+
+
         $this->render('stats',array(
             'dataProvider'=>new CArrayDataProvider($rows),
             'model'=>$model,
             'cashierNumberSellDataProvider'=>$cashierNumberSellDataProvider,
             'cashierNumberRestoreDataProvider'=>$cashierNumberRestoreDataProvider,
-            'cashierNumberModel'=>$cashierNumber
+            'cashierNumberModel'=>$cashierNumber,
+            'total'=>$total
         ));
     }
 

@@ -44,12 +44,12 @@
         ),
         array(
             'name'=>'cnt_sell',
-            'header'=>'Кол-во продаж',
+            'header'=>'Кол-во подтвержденных продаж',
             'htmlOptions'=>array('style'=>'text-align:center;')
         ),
         array(
             'name'=>'cnt_restore',
-            'header'=>'Кол-во восстановлений',
+            'header'=>'Кол-во подтвержденных восстановлений',
             'htmlOptions'=>array('style'=>'text-align:center;')
         ),
         array(
@@ -64,6 +64,9 @@
         ),
     ),
 )); ?>
+<?php if (Yii::app()->user->role!='cashier') { ?>
+<b>Сумма в кассу, включая неподтвержденные операции:</b> <?=$total?>
+<?php } ?>
 
 <h2>Продажи</h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
