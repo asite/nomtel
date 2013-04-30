@@ -39,7 +39,8 @@
         array(
             'name'=>'support_operator',
             'header'=>'Кассир',
-            'value'=>'$data["surname"]." ".$data["name"]'
+            'value'=>'$data["surname"]." ".$data["name"]',
+            'visible'=>Yii::app()->user->role!='cashier'
         ),
         array(
             'name'=>'cnt_sell',
@@ -66,54 +67,76 @@
 
 <h2>Продажи</h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
-    'id' => 'stats-grid',
+    'id' => 'sell-grid',
     'dataProvider' => $cashierNumberSellDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'filter'=>$cashierNumberSellModel,
+    'filter'=>$cashierNumberModel,
     'columns' => array(
         array(
+            'name'=>'support_operator_id',
             'header'=>'Кассир',
-            'value'=>'$data->supportOperator'
+            'value'=>'$data["surname"]." ".$data["name"]',
+            'filter'=>SupportOperator::getCashierComboList(),
+            'visible'=>Yii::app()->user->role!='cashier'
         ),
         array(
+            'name'=>'number',
             'header'=>'Номер',
-            'value'=>'$data->number->number'
+            'htmlOptions'=>array('style'=>'text-align:center'),
         ),
         array(
             'name'=>'confirmed',
+            'header'=>'Подтверждено',
+            'value'=>'$data["confirmed"] ? "Да":"Нет"',
+            'htmlOptions'=>array('style'=>'text-align:center'),
+            'filter'=>array('0'=>'Нет','1'=>'Да')
         ),
         array(
             'name'=>'sum',
-        ),
-        array(
-            'name'=>'sum_cashier',
+            'header'=>'Сумма в кассу',
+            'filter'=>false,
+            'htmlOptions'=>array('style'=>'text-align:center'),
         ),
     ),
 )); ?>
 
 <h2>Восстановления</h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
-    'id' => 'stats-grid',
+    'id' => 'sell-grid',
     'dataProvider' => $cashierNumberRestoreDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'filter'=>$cashierNumberRestoreModel,
+    'filter'=>$cashierNumberModel,
     'columns' => array(
         array(
+            'name'=>'support_operator_id',
             'header'=>'Кассир',
-            'value'=>'$data->supportOperator'
+            'value'=>'$data["surname"]." ".$data["name"]',
+            'filter'=>SupportOperator::getCashierComboList(),
+            'visible'=>Yii::app()->user->role!='cashier'
         ),
         array(
+            'name'=>'number',
             'header'=>'Номер',
-            'value'=>'$data->number->number'
+            'htmlOptions'=>array('style'=>'text-align:center'),
         ),
         array(
             'name'=>'confirmed',
+            'header'=>'Подтверждено',
+            'value'=>'$data["confirmed"] ? "Да":"Нет"',
+            'htmlOptions'=>array('style'=>'text-align:center'),
+            'filter'=>array('0'=>'Нет','1'=>'Да')
         ),
         array(
             'name'=>'sum',
+            'header'=>'Сумма в кассу',
+            'filter'=>false,
+            'htmlOptions'=>array('style'=>'text-align:center'),
         ),
         array(
             'name'=>'sum_cashier',
+            'header'=>'Вознаграждение кассира',
+            'filter'=>false,
+            'htmlOptions'=>array('style'=>'text-align:center'),
         ),
     ),
 )); ?>

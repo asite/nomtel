@@ -380,35 +380,59 @@ class CashierController extends BaseGxController
         ")->queryAll(true,$params);
 
 
-        $cashierNumber=new CashierNumber;
-        $cashierNumber->confirmed=null;
-        $cashierNumber->support_operator_id=null;
+        $cashierNumber=new CashierNumberSearch2;
+        if (isset($_REQUEST['CashierNumberSearch2']))
+            $cashierNumber->setAttributes($_REQUEST['CashierNumberSearch2']);
 
-        if (isset($_REQUEST['CashierNumber'])) {
-            $cashierNumber->setAttributes($_REQUEST['CashierNumber']);
-        }
-
-        $cashierNumberSellDataProvider=$cashierNumber->search();
-        $criteria=$cashierNumberSellDataProvider->criteria;
-
+        $criteria=new CDbCriteria;
         if (Yii::app()->user->role=='cashier') {
-            $criteria->compare('support_operator_id',loggedSupportOperatorId());
+            $criteria->compare('cn.support_operator_id',loggedSupportOperatorId());
         }
-        $criteria->addCondition('dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
-        $criteria->compare('type','SELL');
+        $criteria->addCondition('type=:type');
+        $criteria->params[':type']=CashierNumber::TYPE_SELL;
+
+        $criteria->compare('cn.support_operator_id',$cashierNumber->support_operator_id);
+        $criteria->compare('n.number',$cashierNumber->number,true);
+        $criteria->addCondition('cn.dt>=:date_from and cn.dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
         $criteria->params[':date_from']=$date_from->toMysqlDate();
         $criteria->params[':date_to']=$date_to->toMysqlDate();
+        $criteria->compare('cn.confirmed',$cashierNumber->confirmed);
 
-        $cashierNumberRestoreDataProvider=$cashierNumber->search();
-        $criteria=$cashierNumberRestoreDataProvider->criteria;
+        $sql = "from cashier_number cn
+            join number n on (n.id=cn.number_id)
+            left outer join support_operator so on (so.id=cn.support_operator_id)
+            where " . $criteria->condition;
 
-        if (Yii::app()->user->role=='cashier') {
-            $criteria->compare('support_operator_id',loggedSupportOperatorId());
-        }
-        $criteria->addCondition('dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
-        $criteria->compare('type','RESTORE');
-        $criteria->params[':date_from']=$date_from->toMysqlDate();
-        $criteria->params[':date_to']=$date_to->toMysqlDate();
+
+        $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
+
+        $cashierNumberSellDataProvider = new CSqlDataProvider('select cn.support_operator_id,so.name,so.surname,n.number,cn.confirmed,cn.sum,cn.sum_cashier ' . $sql, array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $criteria->params,
+            'sort' => array(
+                'attributes' => array(
+                    'support_operator_id','number','confirmed','sum','sum_cashier'
+                ),
+            ),
+            'pagination' => array('pageSize' => CashierNumber::ITEMS_PER_PAGE)
+        ));
+
+
+        $criteria->params[':type']=CashierNumber::TYPE_RESTORE;
+
+        $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
+
+        $cashierNumberRestoreDataProvider = new CSqlDataProvider('select cn.support_operator_id,so.name,so.surname,n.number,cn.confirmed,cn.sum,cn.sum_cashier ' . $sql, array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $criteria->params,
+            'sort' => array(
+                'attributes' => array(
+                    'support_operator_id','number','confirmed','sum','sum_cashier'
+                ),
+            ),
+            'pagination' => array('pageSize' => CashierNumber::ITEMS_PER_PAGE)
+        ));
+
 
         $this->render('stats',array(
             'dataProvider'=>new CArrayDataProvider($rows),
