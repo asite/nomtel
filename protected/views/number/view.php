@@ -14,10 +14,13 @@ $this->widget('bootstrap.widgets.TbButton',array(
     'url'=>Yii::app()->user->checkAccess("updateSubscriptionAgreement",array("parent_agent_id"=>$sim->parent_agent_id,"number_status"=>$number->status)) ?
         $this->createUrl('subscriptionAgreement/update',array('number_id'=>$number->id))
         :
-        $this->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$number->sim_id)),
+        $this->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$sim->id)),
     'label'=>SubscriptionAgreement::label()
 ));
 ?>  <br/><br/>
+
+
+
 
 <div class="number_info">
     <div class="w80 cfix">
@@ -47,7 +50,7 @@ $this->widget('bootstrap.widgets.TbButton',array(
                     'value'=>$sim->operatorRegion
                     ),
                 array(
-                    'label'=>'<a href="'.$this->createUrl('agentChangeIcc',array('sim_id'=>$sim->id)).'" class="btn btn-primary" style="padding: 0 5px;">icc</a> '.Yii::t('app','ICC'),
+                    'label'=>Yii::t('app','ICC'),
                     'value'=>$sim->icc
                     ),
             ),
