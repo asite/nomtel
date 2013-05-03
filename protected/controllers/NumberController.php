@@ -541,6 +541,7 @@ class NumberController extends BaseGxController
     public function actionMassChange() {
         if (isset($_FILES['fileField']['tmp_name'])) {
             $csv=$this->readCSV($_FILES['fileField']['tmp_name']);
+            $csv[0][0] = preg_replace('~\D+~','',$csv[0][0]);
             if (strlen($csv[0][0])>11) $head = 'ICC'; else $head = 'Number';
 
             $this->render('massChange',array('file'=>$csv,'head'=>$head));
@@ -596,19 +597,20 @@ class NumberController extends BaseGxController
                 case 'tariffPlan':
                     $trx = Yii::app()->db->beginTransaction();
                         $wrongTariff='';
+
                         foreach ($csv as $value) {
 
                             $model = $this->getModel($value, $data);
                             if ($model) {
-                                $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить короткий номер $value[1]<br/>";
+                                //$message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить короткий номер $value[1]<br/>";
 
-                                $tariffs = Tariff::model()->findByAttributes(array('operator_id'=>Operator::OPERATOR_MEGAFON_ID,'title'=>$value[1]));
+                                $tariffs = Tariff::model()->findByAttributes(array('title'=>$value[1]));
                                 if ($tariffs) {
                                     $criteria = new CDbCriteria();
                                     $criteria->addColumnCondition(array('parent_id'=>$model->sim_id));
 
                                     $message.= "Прошу для номера ".($data['Action']=='ICC'?'с ICC =':'')." $value[0] назначить тарифный план $value[1]<br/>";
-                                    Sim::model()->updateAll(array('tariff_id' => $tariffs->id), $criteria);
+                                    Sim::model()->updateAll(array('tariff_id' => $tariffs->id, 'operator_id'=>$tariffs->operator_id), $criteria);
                                 } else $wrongTariff .= $value[1]."; ";
                             } else $wrongObjects .= $value[0].'; ';
 
