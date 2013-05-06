@@ -79,7 +79,7 @@ $this->breadcrumbs = array(
 
   <?php echo $form->dropDownListRow($model, 'tariff', $tariffListArray); ?>
 
-  <?php echo $form->dropDownListRow($model, 'where', $whereListArray); ?>
+  <?php if (!isKrylow()) echo $form->dropDownListRow($model, 'where', $whereListArray); ?>
 </div>
 
 <?php echo CHtml::htmlButton(Yii::t('app', 'buttonAddSim'), array('class'=>'btn btn-primary', 'name'=>'buttonAddSim', 'type'=>'submit')); ?>
@@ -178,7 +178,7 @@ $this->breadcrumbs = array(
 
   <?php echo $form->dropDownListRow($model, '[0]tariff', $tariffListArray); ?>
 
-  <?php echo $form->dropDownListRow($model, '[0]where', $whereListArray); ?>
+  <?php if (!isKrylow()) echo $form->dropDownListRow($model, '[0]where', $whereListArray); ?>
 </div>
 
 <?php echo CHtml::htmlButton(Yii::t('app', 'buttonAddSim'), array('class'=>'btn btn-primary', 'name'=>'buttonAddSim', 'type'=>'submit')); ?>
@@ -254,7 +254,8 @@ $form = $this->beginWidget('BaseTbActiveForm', array(
 
     <?php echo $form->dropDownListRow($addSimByNumbers, 'tariff', $tariffListArray); ?>
 
-    <?php echo $form->dropDownListRow($addSimByNumbers, 'where', $whereListArray); ?>
+
+    <?php if (!isKrylow()) echo $form->dropDownListRow($addSimByNumbers, 'where', $whereListArray); ?>
 </div>
 
 <?php echo CHtml::htmlButton(Yii::t('app', 'buttonAddSim'), array('class'=>'btn btn-primary', 'name'=>'buttonAddSim', 'type'=>'submit')); ?>

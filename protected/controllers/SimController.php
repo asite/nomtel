@@ -24,6 +24,8 @@ class SimController extends BaseGxController {
     }
 
     public function actionDelivery() {
+        if (Yii::app()->user->role=='agent' && !isKrylow()) $this->throw403();
+
         $activeTabs = array('tab1' => false, 'tab2' => false,'tab3' => false);
         $model = new Sim;
 
@@ -192,18 +194,25 @@ class SimController extends BaseGxController {
     }
 
     public function actionAdd() {
+        if (Yii::app()->user->role=='agent' && !isKrylow()) $this->throw403();
+
         $model = new AddSim;
         $addSimByNumbers=new AddSimByNumbers();
 
         $opListArray = Operator::getComboList();
+        if (isKrylow()) {
+            foreach($opListArray as $k=>$v)
+                if ($k!=Operator::OPERATOR_BEELINE_ID) unset($opListArray[$k]);
+        }
 
         if (isset($_POST['AddSim']['operator'])) $operator_id = $_POST['AddSim']['operator']; else $operator_id = key($opListArray);
+        if (isKrylow() && $operator_id!=Operator::OPERATOR_BEELINE_ID) $this->throw403();
+
         $tariffList = Tariff::model()->findAllByAttributes(array('operator_id' => $operator_id));
         $tariffListArray = array();
         foreach ($tariffList as $v) {
             $tariffListArray[$v['id']] = $v['title'];
         }
-
         $whereListArray = array(0 => 'БАЗА', 1 => 'АГЕНТ');
 
         if ($_POST['AddSim'] || $_POST['AddSimByNumbers']) {
@@ -249,12 +258,13 @@ class SimController extends BaseGxController {
                     if (empty($result)) {
                         Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления!');
                         $activeTabs['tab1'] = true;
-                        $this->render('add', array('model' => $model, 'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'actMany' => $result, 'activeTabs' => $activeTabs));
+                        $this->render('add', array('model' => $model, 'addSimByNumbers'=>$addSimByNumbers,'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'activeTabs' => $activeTabs));
+                        //$this->render('add', array('model' => $model, 'tariffListArray' => $tariffListArray, 'opListArray' => $opListArray, 'whereListArray' => $whereListArray, 'actMany' => $result, 'activeTabs' => $activeTabs));
                         exit;
                     }
 
                     //if simcard move to agent
-                    if ($_POST['AddSim']['where']) {
+                    if ($_POST['AddSim']['where'] && !isKrylow()) {
 
                         $sessionData=new SessionData(__CLASS__);
                         $key=$sessionData->add($ids);
@@ -264,6 +274,7 @@ class SimController extends BaseGxController {
                         $this->redirect(array('move', 'key' => $key));
                     //if simcard move to base
                     } else {
+                        if (isKrylow()) $this->move($ids,krylowAgentId(),adminAgentId());
                         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
                         $transaction->commit();
                         $this->refresh();
@@ -332,7 +343,7 @@ class SimController extends BaseGxController {
                 }
 
                 //if simcard move to agent
-                if ($_POST['AddSim'][0]['where']) {
+                if ($_POST['AddSim'][0]['where'] && !isKrylow()) {
                     $sessionData=new SessionData(__CLASS__);
                     $key=$sessionData->add($ids);
 
@@ -396,7 +407,7 @@ class SimController extends BaseGxController {
                         exit;
                     }
 
-                    if ($addSimByNumbers->where==1) {
+                    if ($addSimByNumbers->where==1 && !isKrylow()) {
                         $sessionData=new SessionData(__CLASS__);
                         $key=$sessionData->add($ids);
 
@@ -458,10 +469,64 @@ class SimController extends BaseGxController {
         $this->render('massselect');
     }
 
+    private function move($moveSimCards,$agent_id,$source_agent_id=null) {
+        $countMoveSimCards=count($moveSimCards);
+
+        if (!$source_agent_id) $source_agent_id=loggedAgentId();
+        $criteria = new CDbCriteria();
+        $criteria->addInCondition('id', $moveSimCards);
+        $criteria->addColumnCondition(array('parent_agent_id' => $source_agent_id));
+        $criteria->addCondition('agent_id is null');
+
+        $idsToMove=Yii::app()->db->createCommand("select id from sim where ".$criteria->condition)->queryColumn($criteria->params);
+        $ids_string = implode(",", $idsToMove);
+
+        //$totalNumberPrice = Sim::model()->getTotalNumberPrice($idsToMove);
+        //$totalSimPrice = $countMoveSimCards * $_POST['Move']['PriceForSim'];
+        if ($countMoveSimCards == 0) return false;
+
+        $model = new Act;
+        $model->agent_id = $agent_id;
+        $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
+        $model->sum = 0;//$totalNumberPrice + $totalSimPrice;
+        $model->type = Act::TYPE_SIM;
+        $model->save();
+
+        // update Agent stats
+        Agent::deltaSimCount($agent_id, $countMoveSimCards);
+
+        $criteria = new CDbCriteria();
+        $criteria->addInCondition('id', $idsToMove);
+
+        Sim::model()->updateAll(array('agent_id' => $agent_id, 'act_id' => $model->id, 'sim_price' => $_POST['Move']['PriceForSim']), $criteria);
+
+        $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id)
+              SELECT " . Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']) . ", s.personal_account, s.number,s.number_price, s.icc, s.parent_id ,s.agent_id, " . Yii::app()->db->quoteValue($model->id) . ", NULL, NULL, s.operator_id, s.tariff_id, s.operator_region_id, s.company_id
+              FROM sim as s
+              WHERE id IN ($ids_string)";
+
+        Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>loggedAgentId()));
+
+        $model->agent->recalcBalance();
+        $model->agent->save();
+
+        //add NumberHistory
+        $criteria = new CDbCriteria();
+        $criteria->addInCondition('id', $moveSimCards);
+        $simsId = Sim::model()->findAll($criteria);
+        foreach($simsId as $s) {
+            $number = Number::model()->findByAttributes(array('number'=>$s->number));
+            if (!empty($number)) {
+                NumberHistory::addHistoryNumber($number->id,'SIM передана агенту {Agent:'.$agent_id.'} по акту {Act:'.$model->id.'}');
+            }
+        }
+
+        return true;
+    }
+
     public function actionMove($key) {
         $sessionData=new SessionData(__CLASS__);
         $moveSimCards=$sessionData->get($key);
-        $countMoveSimCards=count($moveSimCards);
 
         if ($_POST['Move']) {
             $agent_id = $_POST['Act']['agent_id'];
@@ -471,57 +536,10 @@ class SimController extends BaseGxController {
 
             $trx = Yii::app()->db->beginTransaction();
 
-            $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $moveSimCards);
-            $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
-            $criteria->addCondition('agent_id is null');
-
-            $idsToMove=Yii::app()->db->createCommand("select id from sim where ".$criteria->condition)->queryColumn($criteria->params);
-            $ids_string = implode(",", $idsToMove);
-
-            $totalNumberPrice = Sim::model()->getTotalNumberPrice($idsToMove);
-            $totalSimPrice = $countMoveSimCards * $_POST['Move']['PriceForSim'];
-            if ($countMoveSimCards == 0) {
-                $trx->rollback();
+            if (!$this->move($moveSimCards,$agent_id)) {
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
                 $this->redirect(Yii::app()->createUrl('sim/add'));
                 exit;
-            }
-
-            $model = new Act;
-            $model->agent_id = $agent_id;
-            $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
-            $model->sum = $totalNumberPrice + $totalSimPrice;
-            $model->type = Act::TYPE_SIM;
-            $model->save();
-
-            // update Agent stats
-            Agent::deltaSimCount($agent_id, $countMoveSimCards);
-
-            $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $idsToMove);
-
-            Sim::model()->updateAll(array('agent_id' => $agent_id, 'act_id' => $model->id, 'sim_price' => $_POST['Move']['PriceForSim']), $criteria);
-
-            $sql = "INSERT INTO sim (sim_price,personal_account, number,number_price, icc, parent_id, parent_agent_id, parent_act_id, agent_id, act_id, operator_id, tariff_id, operator_region_id, company_id)
-              SELECT " . Yii::app()->db->quoteValue($_POST['Move']['PriceForSim']) . ", s.personal_account, s.number,s.number_price, s.icc, s.parent_id ,s.agent_id, " . Yii::app()->db->quoteValue($model->id) . ", NULL, NULL, s.operator_id, s.tariff_id, s.operator_region_id, s.company_id
-              FROM sim as s
-              WHERE id IN ($ids_string)";
-
-            Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>loggedAgentId()));
-
-            $model->agent->recalcBalance();
-            $model->agent->save();
-
-            //add NumberHistory
-            $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $moveSimCards);
-            $simsId = Sim::model()->findAll($criteria);
-            foreach($simsId as $s) {
-                $number = Number::model()->findByAttributes(array('number'=>$s->number));
-                if (!empty($number)) {
-                    NumberHistory::addHistoryNumber($number->id,'SIM передана агенту {Agent:'.$agent_id.'} по акту {Act:'.$model->id.'}');
-                }
             }
 
             $trx->commit();

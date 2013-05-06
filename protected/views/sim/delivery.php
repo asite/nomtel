@@ -198,12 +198,14 @@ $this->breadcrumbs = array(
 
 <?php
 
+  $tabs=array(array('label'=>Yii::t('app', 'Bilain'), 'content'=>$tab1, 'active'=>$activeTabs['tab1']));
+  if (!isKrylow()) {
+    $tabs[]=array('label'=>Yii::t('app', 'Megafon'), 'content'=>$tab2, 'active'=>$activeTabs['tab2']);
+  }
+
   $this->widget('bootstrap.widgets.TbTabs', array(
     'type'=>'tabs', // 'tabs' or 'pills'
-    'tabs'=>array(
-      array('label'=>Yii::t('app', 'Bilain'), 'content'=>$tab1, 'active'=>$activeTabs['tab1']),
-      array('label'=>Yii::t('app', 'Megafon'), 'content'=>$tab2, 'active'=>$activeTabs['tab2']),
-     )
+    'tabs'=>$tabs
   ));
 
 ?>

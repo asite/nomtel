@@ -375,5 +375,5 @@ table.margin_b0 {
   background: none;
 }
 
-.taking-orders {}
+.taking-orders .control-group {margin: 0;}
 .taking-orders .controls {margin-left: 160px;}

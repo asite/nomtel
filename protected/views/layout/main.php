@@ -17,18 +17,26 @@
             array('label' => Yii::app()->name, 'url' => $this->createUrl('site/index'), 'active' => $this->route == 'site/index'),
             '',
             array('label' => Yii::t('app', 'My Profile'), 'url' => $this->createUrl('agent/view', array('id' => loggedAgentId())), 'active' => $this->route == 'agent/view'),
-            array('label' => Yii::t('app', 'Agents'), 'url' => $this->createUrl('agent/admin'), 'active' => ($this->id == 'agent' && $this->route != 'agent/view')),
+            array('label' => Yii::t('app', 'Agents'), 'url' => $this->createUrl('agent/admin'), 'active' => ($this->id == 'agent' && $this->route != 'agent/view'), 'visible'=>isFlag()),
+        );
+        if (isKrylow()) {
+            $menuLeft=array_merge($menuLeft,array(
+                array('label' => Yii::t('app', 'addAct'), 'url' => $this->createUrl('sim/delivery'), 'active' => $this->route == 'sim/delivery'),
+                array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
+            ));
+        }
+        $menuLeft=array_merge($menuLeft,array(
             array('label' => Yii::t('app', 'Sim List'), 'url' => $this->createUrl('sim/list'), 'active' => $this->route == 'sim/list'),
-            array('label' => Yii::t('app', 'Mass select'), 'url' => $this->createUrl('sim/massselect'), 'active' => $this->route == 'sim/massselect'),
+            array('label' => Yii::t('app', 'Mass select'), 'url' => $this->createUrl('sim/massselect'), 'active' => $this->route == 'sim/massselect', 'visible'=>isFlag()),
             array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
-            array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list'),
+            array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list', 'visible'=>isFlag('is_bonus')),
             //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
-            array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list'),
+            array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list', 'visible'=>isFlag()),
             '',
             array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
-        );
+        ));
     }
 
     if (preg_match('/^support/',Yii::app()->user->role)) {
