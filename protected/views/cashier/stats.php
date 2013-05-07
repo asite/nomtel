@@ -8,14 +8,41 @@
 
     <div class="form-container-horizontal">
         <div class="form-container-item form-label-width-60">
-            <?php echo $form->maskFieldRow($model,'date_from','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+            <?php echo $form->maskFieldRow($model,'date_from','99.99.9999',array('style'=>'width:80px;','errorOptions'=>array('hideErrorMessage'=>true))); ?>
         </div>
     </div>
 
     <div class="form-container-horizontal">
         <div class="form-container-item form-label-width-60">
-            <?php echo $form->maskFieldRow($model,'date_to','99.99.9999',array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+            <?php echo $form->maskFieldRow($model,'date_to','99.99.9999',array('style'=>'width:80px;','errorOptions'=>array('hideErrorMessage'=>true))); ?>
         </div>
+    </div>
+    <div class="form-container-horizontal">&nbsp;
+        <?php $this->widget("bootstrap.widgets.TbButton",array(
+            'url'=>$this->createUrl('',array('CashierStatistic[date_from]'=>new EDateTime(),'CashierStatistic[date_to]'=>new EDateTime())),
+            'label'=>'Сегодня'
+        ));?>
+        <?php
+        $date_from=new EDateTime();
+        $date_from->modify("-1 DAY");
+        $this->widget("bootstrap.widgets.TbButton",array(
+            'url'=>$this->createUrl('',array('CashierStatistic[date_from]'=>$date_from,'CashierStatistic[date_to]'=>$date_from)),
+            'label'=>'Вчера'
+        ));?>
+        <?php
+        $date_from=new EDateTime();
+        $date_from->modify("-7 DAY");
+        $this->widget("bootstrap.widgets.TbButton",array(
+        'url'=>$this->createUrl('',array('CashierStatistic[date_from]'=>$date_from,'CashierStatistic[date_to]'=>new EDateTime())),
+        'label'=>'Неделя'
+        ));?>
+        <?php
+        $date_from=new EDateTime();
+        $date_from->modify("-1 MONTH");
+        $this->widget("bootstrap.widgets.TbButton",array(
+            'url'=>$this->createUrl('',array('CashierStatistic[date_from]'=>$date_from,'CashierStatistic[date_to]'=>new EDateTime())),
+            'label'=>'Месяц'
+        ));?>
     </div>
     <?php $this->endWidget(); ?>
 </div>
@@ -29,6 +56,10 @@
         $('#filter').submit();
     });
 </script>
+
+<?php if (Yii::app()->user->role=='cashier') { ?>
+<h2>Баланс кассы: <?=$balance?></h2>
+<?php } ?>
 
 <h2>Итоги</h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
@@ -143,3 +174,35 @@
         ),
     ),
 )); ?>
+
+<?php if (Yii::app()->user->role=='cashier') { ?>
+<h2>Инкассации
+    <?php $this->widget("bootstrap.widgets.TbButton",array(
+        'url'=>$this->createUrl('collectionStep1',array('cashier_support_operator_id'=>loggedSupportOperatorId())),
+        'label'=>'Инкассация'
+    ));?>
+</h2>
+<?php $this->widget('TbExtendedGridViewExport', array(
+        'id' => 'collection-grid',
+        'dataProvider' => $collectionDataProvider,
+        'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+        'columns' => array(
+            array(
+                'name'=>'dt',
+                'header'=>'Дата',
+                'value'=>'date("d.m.Y H:i:s",strtotime($data->dt))',
+            ),
+            array(
+                'name'=>'collector_support_operator_id',
+                'header'=>'Инкассатор',
+                'value'=>'$data->collectorSupportOperator',
+            ),
+            array(
+                'name'=>'sum',
+                'header'=>'Сумма',
+                'htmlOptions'=>array('style'=>'text-align:center'),
+            ),
+        ),
+    )); ?>
+
+<?php } ?>

@@ -367,15 +367,19 @@ class CashierController extends BaseGxController
             $where=' and support_operator_id=:support_operator_id';
             $params[':support_operator_id']=loggedSupportOperatorId();
         }
+        $params[':role']='cashier';
 
         $rows=Yii::app()->db->createCommand("
-            select so.surname,so.name,cnt_sell,cnt_restore,sum,sum_cashier from (
+            select so.surname,so.name,cnt_sell,cnt_restore,sum,sum_cashier
+            from support_operator so
+            left outer join
+            (
                 select support_operator_id,sum(if(type='SELL',1,0)) as cnt_sell,sum(if(type='RESTORE',1,0)) as cnt_restore,sum(`sum`) as `sum`,sum(sum_cashier) as sum_cashier
                 from cashier_number
                 where confirmed=1 and dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY) $where
                 group by support_operator_id
-            ) as tmp
-            join support_operator so on (so.id=tmp.support_operator_id)
+            ) tmp on (so.id=tmp.support_operator_id)
+            where so.role=:role
             order by surname,name
         ")->queryAll(true,$params);
 
@@ -440,6 +444,13 @@ class CashierController extends BaseGxController
             ':date_to'=>$date_to->toMysqlDate()
         ));
 
+        if (Yii::app()->user->role=='cashier') {
+            $balance=$this->getBalance(loggedSupportOperatorId());
+
+            $collection=new CashierCollection;
+            $collection->cashier_support_operator_id=loggedSupportOperatorId();
+            $collectionDataProvider=$collection->search();
+        }
 
         $this->render('stats',array(
             'dataProvider'=>new CArrayDataProvider($rows),
@@ -447,8 +458,74 @@ class CashierController extends BaseGxController
             'cashierNumberSellDataProvider'=>$cashierNumberSellDataProvider,
             'cashierNumberRestoreDataProvider'=>$cashierNumberRestoreDataProvider,
             'cashierNumberModel'=>$cashierNumber,
-            'total'=>$total
+            'total'=>$total,
+            'balance'=>$balance,
+            'collectionDataProvider'=>$collectionDataProvider
         ));
     }
 
+    private function getBalance($support_operator_id) {
+        $total_in=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number where support_operator_id=:support_operator_id")->queryScalar(array(
+            ':support_operator_id'=>loggedSupportOperatorId()
+        ));
+        $total_out=Yii::app()->db->createCommand("select sum(`sum`) from cashier_collection where cashier_support_operator_id=:support_operator_id")->queryScalar(array(
+            ':support_operator_id'=>loggedSupportOperatorId()
+        ));
+
+        $balance=$total_in-$total_out;
+
+        return $balance;
+    }
+
+    public function actionCollectionStep1($cashier_support_operator_id) {
+        $collection=new CashierCollection();
+        $collection->dt=new EDateTime;
+        $collection->cashier_support_operator_id=$cashier_support_operator_id;
+
+        if (isset($_POST['CashierCollection'])) {
+            $collection->setAttributes($_POST['CashierCollection']);
+            if ($collection->validate()) {
+                $sd=new SessionData('collection');
+                $data=array('collection'=>$collection->attributes,'code'=>rand(100000,999999));
+                $key=$sd->add($data);
+
+                $msg="Код подтверждения инкассации {$data['code']} (сумма {$collection->sum}, кассир {$collection->cashierSupportOperator})";
+                Sms::send($collection->collectorSupportOperator->phone,$msg);
+
+                $this->redirect(array('collectionStep2','key'=>$key));
+            }
+        }
+        $this->render('collection_step1',array(
+            'collection'=>$collection,
+            'cashier'=>SupportOperator::model()->findByPk($collection->cashier_support_operator_id),
+            'balance'=>$this->getBalance($collection->cashier_support_operator_id)
+        ));
+    }
+
+    public function actionCollectionStep2($key) {
+        $sd=new SessionData('collection');
+        $data=$sd->get($key);
+        $collection=new CashierCollection();
+        $collection->attributes=$data['collection'];
+        if (!$data) $this->redirect(array('stats'));
+
+        if (isset($_REQUEST['code'])) {
+            if ($_REQUEST['code']==$data['code']) {
+
+                $collection->save();
+                $sd->delete($key);
+
+                $this->redirect(array('stats'));
+            } else {
+                Yii::app()->user->setFlash('error','Код подтверждения неверен');
+                $this->refresh();
+            }
+        }
+
+        $this->render('collection_step2',array(
+            'cashier'=>SupportOperator::model()->findByPk($collection->cashier_support_operator_id),
+            'balance'=>$this->getBalance($collection->cashier_support_operator_id),
+            'collection'=>$collection
+        ));
+    }
 }
