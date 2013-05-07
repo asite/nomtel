@@ -372,7 +372,7 @@ class CashierController extends BaseGxController
         $rows=Yii::app()->db->createCommand("
             select so.surname,so.name,cnt_sell,cnt_restore,sum,sum_cashier
             from support_operator so
-            left outer join
+            join
             (
                 select support_operator_id,sum(if(type='SELL',1,0)) as cnt_sell,sum(if(type='RESTORE',1,0)) as cnt_restore,sum(`sum`) as `sum`,sum(sum_cashier) as sum_cashier
                 from cashier_number
