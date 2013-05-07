@@ -17,7 +17,7 @@
 
     <?php echo $form->errorSummary($collection); ?>
 
-    <?php echo $form->dropDownListRow($collection,'collector_support_operator_id',SupportOperator::getComboList(array(''=>'')),array('class'=>'span2')); ?>
+    <?php echo $form->dropDownListRow($collection,'collector_support_operator_id',SupportOperator::getComboListSuper(array(''=>'')),array('class'=>'span2')); ?>
     <?php echo $form->textFieldRow($collection,'sum',array('class'=>'span2','maxlength'=>200)); ?>
 
     <?php
