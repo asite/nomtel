@@ -481,10 +481,16 @@ class CashierController extends BaseGxController
         $collection=new CashierCollection();
         $collection->dt=new EDateTime;
         $collection->cashier_support_operator_id=$cashier_support_operator_id;
+        $balance=$this->getBalance($collection->cashier_support_operator_id);
 
         if (isset($_POST['CashierCollection'])) {
             $collection->setAttributes($_POST['CashierCollection']);
-            if ($collection->validate()) {
+
+            $collection->validate();
+
+            if (!$collection->hasErrors() && $collection->sum>$balance+1e-6)
+                $collection->addError('sum','Сумма инкассации не должна превышать баланс кассы');
+            if (!$collection->hasErrors()) {
                 $sd=new SessionData('collection');
                 $data=array('collection'=>$collection->attributes,'code'=>rand(100000,999999));
                 $key=$sd->add($data);
@@ -498,7 +504,7 @@ class CashierController extends BaseGxController
         $this->render('collection_step1',array(
             'collection'=>$collection,
             'cashier'=>SupportOperator::model()->findByPk($collection->cashier_support_operator_id),
-            'balance'=>$this->getBalance($collection->cashier_support_operator_id)
+            'balance'=>$balance
         ));
     }
 
