@@ -17,6 +17,7 @@
  * NOTE, this file must be saved in UTF-8 encoding.
  */
 return array (
+  'STATUS_NO_PAYOUT'=>'Выплата не положена',
   'AgentReferralRate|AgentReferralRates' => '',
   'All' => '',
   'Are you sure to delete this Balance Report?' => '',

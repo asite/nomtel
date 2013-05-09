@@ -292,11 +292,11 @@ class BonusReportController extends BaseGxController
         // insert numbers, that missing in report
         $db->createCommand("
             insert into bonus_report_number (parent_agent_id,agent_id,number_id,bonus_report_id,turnover,sum,rate,status) (
-                select s.parent_agent_id,s.agent_id,n.id as number_id,:bonus_report_id as bonus_report_id,NULL as turnover,NULL as sum,NULL as rate,'NUMBER_MISSING' as status
+                select s.parent_agent_id,s.agent_id,n.id as number_id,:bonus_report_id as bonus_report_id,NULL as turnover,NULL as sum,NULL as rate,IF(s.parent_agent_id!=1 && s.tariff_id=".Tariff::TARIFF_TERRITORY_ID.",'NO_PAYOUT','NUMBER_MISSING') as status
                 from sim s
                 join number n on (n.sim_id=s.parent_id)
                 left outer join bonus_report_number brn on (brn.bonus_report_id=:bonus_report_id and brn.parent_agent_id=s.parent_agent_id and brn.number_id=n.id)
-                where s.parent_agent_id is not null and s.operator_id=:operator_id and brn.id is null and (s.parent_agent_id=1 or s.tariff_id!=".Tariff::TARIFF_TERRITORY_ID.")
+                where s.parent_agent_id is not null and s.operator_id=:operator_id and brn.id is null
             )
             ")->execute(array(
                 ':operator_id'=>$operator_id,
