@@ -4,7 +4,8 @@ class MegafonBonusReportReadFilter implements PHPExcel_Reader_IReadFilter
 {
     public function readCell($column, $row, $worksheetName = '')
     {
-        return $column == 'A' || $column == 'I';
+        if ($worksheetName!='Форма Новая') return false;
+        return $column == 'B' || $column == 'J';
     }
 }
 
