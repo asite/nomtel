@@ -181,6 +181,7 @@ class CashierController extends BaseGxController
                 $ticket = Ticket::model()->findByPk($ticketId);
                 $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
                 $ticket->internal=$ticket->text;
+                $ticket->sendMegafonNotification();
                 $ticket->save();
 
                 NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');
@@ -222,17 +223,17 @@ class CashierController extends BaseGxController
         return $criteria;
     }
 
-    public function actionRestoreList() {
+    public function actionServiceList() {
 
         $list = $this->getNumberListDataProvider($this->restoreBaseCriteria());
 
-        $this->render('restoreList', array(
+        $this->render('serviceList', array(
             'model' => $list['model'],
             'dataProvider' => $list['dataProvider']
         ));
     }
 
-    public function actionRestore($id) {
+    public function actionService($id) {
         $criteria=$this->restoreBaseCriteria();
         $criteria->compare('n.id',$id);
 
@@ -296,6 +297,7 @@ class CashierController extends BaseGxController
                 $ticket = Ticket::model()->findByPk($ticketId);
                 $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
                 $ticket->internal=$ticket->text;
+                $ticket->sendMegafonNotification();
                 $ticket->save();
 
                 NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');

@@ -51,6 +51,7 @@ class TicketAdminController extends BaseGxController {
 
                 if (isset($_POST['toMegafon'])) {
                     $ticket->status=Ticket::STATUS_IN_WORK_MEGAFON;
+                    $ticket->sendMegafonNotification();
                 }
 
                 $trx=Yii::app()->db->beginTransaction();

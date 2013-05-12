@@ -39,9 +39,9 @@
             'template'=>'{sell}',
             'buttons'=>array(
                 'sell'=>array(
-                    'label'=>'Восстановить',
+                    'label'=>'Карточка номера',
                     //'icon'=>'envelope',
-                    'url'=>'Yii::app()->controller->createUrl("cashier/restore",array("id"=>$data["id"]))',
+                    'url'=>'Yii::app()->controller->createUrl("number/view",array("id"=>$data["id"]))',
                 ),
             )
         ),
