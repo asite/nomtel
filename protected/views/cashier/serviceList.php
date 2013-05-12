@@ -1,4 +1,4 @@
-<h1>Восстановление</h1>
+<h1>Обслуживание</h1>
 
 <?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'number-grid',
