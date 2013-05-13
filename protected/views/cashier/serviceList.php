@@ -36,9 +36,14 @@
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:40px;text-align:center;vertical-align:middle'),
-            'template'=>'{sell}',
+            'template'=>'{restore} {service}',
             'buttons'=>array(
-                'sell'=>array(
+                'restore'=>array(
+                    'label'=>'Восстановить',
+                    //'icon'=>'envelope',
+                    'url'=>'Yii::app()->controller->createUrl("cashier/restore",array("id"=>$data["id"]))',
+                ),
+                'service'=>array(
                     'label'=>'Карточка номера',
                     //'icon'=>'envelope',
                     'url'=>'Yii::app()->controller->createUrl("number/view",array("id"=>$data["id"]))',
