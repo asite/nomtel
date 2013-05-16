@@ -233,7 +233,7 @@ class CashierController extends BaseGxController
         ));
     }
 
-    public function actionService($id) {
+    public function actionRestore($id) {
         $criteria=$this->restoreBaseCriteria();
         $criteria->compare('n.id',$id);
 
@@ -243,7 +243,7 @@ class CashierController extends BaseGxController
 
         if ($numbersCount!=1) {
             Yii::app()->user->setFlash('error','Восстановление данного номера невозможно');
-            $this->redirect(array('restoreList'));
+            $this->redirect(array('serviceList'));
         }
 
         $number=Number::model()->findByPk($id);
@@ -315,7 +315,7 @@ class CashierController extends BaseGxController
                 $trx->commit();
 
                 Yii::app()->user->setFlash('success','Номер успешно восстановлен');
-                $this->redirect(array('cashier/restoreList'));
+                $this->redirect(array('cashier/serviceList'));
             }
         }
 

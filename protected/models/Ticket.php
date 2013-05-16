@@ -129,6 +129,8 @@ class Ticket extends BaseTicket
 
         $megafonEmail=$supportOperator->email;
 
+        $megafonEmail='alegudmail@gmail.com';
+
         if (!$megafonEmail) return;
 
         $mail = new YiiMailMessage();
