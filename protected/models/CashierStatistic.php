@@ -14,7 +14,7 @@ class CashierStatistic extends CFormModel
 
     public function attributeLabels() {
         return array(
-            'date_from'=>'С',
+            'date_from'=>'Дата',
             'date_to'=>'По',
         );
     }
