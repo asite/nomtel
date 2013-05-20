@@ -30,6 +30,18 @@ class SupportOperator extends BaseSupportOperator
         return $data;
     }
 
+    public static function getComboListSuper($data = array())
+    {
+        $agents = Yii::app()->db->createCommand("select id,name,surname,middle_name from " .
+            self::model()->tableName()." where role=:role")->queryAll(true,array(':role'=>self::ROLE_SUPPORT_SUPER));
+
+        foreach ($agents as $v) {
+            $data[$v['id']] = $v['surname'] . ' ' . $v['name'];
+        }
+
+        return $data;
+    }
+
     public static function getCashierComboList($data = array())
     {
         $agents = Yii::app()->db->createCommand("select id,name,surname,middle_name from " .

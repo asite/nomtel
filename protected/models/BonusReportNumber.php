@@ -7,6 +7,7 @@ class BonusReportNumber extends BaseBonusReportNumber
     const STATUS_OK='OK';
     const STATUS_TURNOVER_ZERO='TURNOVER_ZERO';
     const STATUS_NUMBER_MISSING='NUMBER_MISSING';
+    const STATUS_NO_PAYOUT='NO_PAYOUT';
 
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
@@ -25,6 +26,7 @@ class BonusReportNumber extends BaseBonusReportNumber
                 self::STATUS_OK=>Yii::t('app','STATUS_OK'),
                 self::STATUS_TURNOVER_ZERO=>Yii::t('app','STATUS_TURNOVER_ZERO'),
                 self::STATUS_NUMBER_MISSING=>Yii::t('app','STATUS_NUMBER_MISSING'),
+                self::STATUS_NO_PAYOUT=>Yii::t('app','STATUS_NO_PAYOUT'),
             );
         }
 

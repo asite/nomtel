@@ -17,6 +17,7 @@
  * NOTE, this file must be saved in UTF-8 encoding.
  */
 return array (
+  'STATUS_NO_PAYOUT'=>'Выплата не положена',
   'AgentReferralRate|AgentReferralRates' => '',
   'All' => '',
   'Are you sure to delete this Balance Report?' => '',
@@ -394,7 +395,7 @@ return array (
   'Add Prefix Icc Region' => 'Добавление префикса региона',
   'Mass move' => 'Массовая передача',
   'Sell' => 'Продажа',
-  'Restore' => 'Восстановление',
+  'Service' => 'Обслуживание',
   'Is Agent' => 'Показать/Скрыть агентов',
   'Is Bonus' => 'Показать/Скрыть бонусы',
 );

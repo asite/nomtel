@@ -6,7 +6,7 @@ class NumberController extends BaseGxController
         return array(
             array('allow', 'actions' => array('list','view','agentChangeIcc'), 'roles' => array('agent')),
             array('allow', 'roles' => array('editNumberCard')),
-            array('allow', 'roles' => array('support')),
+            array('allow', 'roles' => array('support','cashier')),
         );
     }
 
@@ -76,9 +76,33 @@ class NumberController extends BaseGxController
         return $params;
     }
 
+    public function addTicket($id) {
+        $form=new AddTicketForm();
+        $this->performAjaxValidation($form);
+        if (isset($_POST['AddTicketForm'])) {
+            $form->setAttributes($_POST['AddTicketForm']);
+            if ($form->validate()) {
+                $trx=Yii::app()->db->beginTransaction();
+
+                $tid=Ticket::addMessage($id,$form->text);
+                $ticket = Ticket::model()->findByPk($tid);
+                $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
+                $ticket->internal=$ticket->text;
+                $ticket->sendMegafonNotification();
+                $ticket->save();
+
+                $trx->commit();
+                Yii::app()->user->setFlash('success','Тикет успешно отправлен в мегафон');
+                $this->refresh();
+            }
+        }
+        return $form;
+    }
+
     public function actionView($id)
     {
         $params = $this->getNumberInfo($id);
+        $params['addTicket']=$this->addTicket($id);
 
         $this->render('view',$params);
     }
@@ -86,6 +110,7 @@ class NumberController extends BaseGxController
     public function actionEdit($id)
     {
         $params = $this->getNumberInfo($id);
+        $params['addTicket']=$this->addTicket($id);
 
         $this->render('edit',$params);
     }
@@ -228,6 +253,7 @@ class NumberController extends BaseGxController
             $ticket = Ticket::model()->findByPk($id);
             $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
             $ticket->internal=$ticket->text;
+            $ticket->sendMegafonNotification();
             $ticket->save();
 
             if ($service_password)
@@ -587,6 +613,7 @@ class NumberController extends BaseGxController
                             $ticket = Ticket::model()->findByPk($id);
                             $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
                             $ticket->internal=$ticket->text;
+                            $ticket->sendMegafonNotification();
                             $ticket->save();
                         }
                     $trx->commit();
@@ -620,6 +647,7 @@ class NumberController extends BaseGxController
                             $ticket = Ticket::model()->findByPk($id);
                             $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
                             $ticket->internal=$ticket->text;
+                            $ticket->sendMegafonNotification();
                             $ticket->save();
                         }
                     $trx->commit();
@@ -689,6 +717,7 @@ class NumberController extends BaseGxController
                             $ticket = Ticket::model()->findByPk($id);
                             $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
                             $ticket->internal=$ticket->text;
+                            $ticket->sendMegafonNotification();
                             $ticket->save();
                         }
                     $trx->commit();

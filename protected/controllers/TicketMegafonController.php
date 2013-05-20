@@ -6,7 +6,31 @@ class TicketMegafonController extends BaseGxController {
         return array(
            // array('disallow', 'actions'=>array('indexAdmin','detailAdmin'),'roles' => array('supportMegafon')),
             array('allow', 'roles' => array('supportMegafon')),
+            array('allow', 'actions'=>array('successfullConfirm'),'users' => array('*')),
         );
+    }
+
+    public function actionSuccessfullConfirm($id,$code) {
+        $ticket=Ticket::model()->FindByPk($id);
+        if ($ticket) {
+            if ($ticket->getProtectionCode()==$code) {
+                $ticket->status=Ticket::STATUS_FOR_REVIEW;
+                $ticket->megafon_status=Ticket::MEGAFON_STATUS_DONE;
+
+                $cashierNumber=CashierNumber::model()->findByAttributes(array('ticket_id'=>$ticket->id));
+                if ($cashierNumber) {
+                    $cashierNumber->confirmed=1;
+                    $cashierNumber->save();
+                }
+                $ticket->addHistory("Выполнено");
+
+                $ticket->save();
+                echo "Заявка {$ticket->id} помечена как успешно выполненная";
+                Yii::app()->end();
+            }
+        }
+        echo "Неверный номер заявки или код подтверждения";
+        Yii::app()->end();
     }
 
     public function actionIndex() {
@@ -105,13 +129,11 @@ class TicketMegafonController extends BaseGxController {
                     );
 
                     $generator=new DocumentGenerator();
-                    $generator->generate('megafon_statement.docx','megafon_'.$number.'_'.date('Ymd').'.docx',$data);
+                    $generator->generate('megafon_statement.docx','megafon_'.$number.'_'.date('Ymd').'_'.$ticket->id.'.docx',$data);
                 }
 
                 $this->redirect(array('index'));
             }
-            var_dump($ticket->getErrors());
-            exit;
         }
 
         $ticketHistory=new TicketHistory();

@@ -292,7 +292,7 @@ class BonusReportController extends BaseGxController
         // insert numbers, that missing in report
         $db->createCommand("
             insert into bonus_report_number (parent_agent_id,agent_id,number_id,bonus_report_id,turnover,sum,rate,status) (
-                select s.parent_agent_id,s.agent_id,n.id as number_id,:bonus_report_id as bonus_report_id,NULL as turnover,NULL as sum,NULL as rate,'NUMBER_MISSING' as status
+                select s.parent_agent_id,s.agent_id,n.id as number_id,:bonus_report_id as bonus_report_id,NULL as turnover,NULL as sum,NULL as rate,IF(s.parent_agent_id!=1 && s.tariff_id=".Tariff::TARIFF_TERRITORY_ID.",'NO_PAYOUT','NUMBER_MISSING') as status
                 from sim s
                 join number n on (n.sim_id=s.parent_id)
                 left outer join bonus_report_number brn on (brn.bonus_report_id=:bonus_report_id and brn.parent_agent_id=s.parent_agent_id and brn.number_id=n.id)
@@ -383,26 +383,26 @@ class BonusReportController extends BaseGxController
             $this->errorInvalidFormat($e->getMessage());
         }
 
-        $sheet = $book->getActiveSheet();
+        $sheet = $book->getSheet(0);
 
         $rows = $sheet->getHighestRow();
 
-        if ($sheet->getCellByColumnAndRow(0, 11)->getValue() != 'Лицевой счет')
+        if ($sheet->getCellByColumnAndRow(1, 12)->getValue() != 'ACCOUNT')
             $this->errorInvalidFormat(__LINE__);
-        if ($sheet->getCellByColumnAndRow(8, 11)->getValue() != 'Руб. с НДС')
+        if ($sheet->getCellByColumnAndRow(9, 12)->getValue() != 'Сумма счета, руб. без НДС')
             $this->errorInvalidFormat(__LINE__);
 
         $simBonus = array();
         $sum = 0;
-        for ($row = 12; $row <= $rows; $row++) {
-            $ctn = trim($sheet->getCellByColumnAndRow(0, $row)->getValue());
-            $bonus = $sheet->getCellByColumnAndRow(8, $row)->getValue();
+        for ($row = 13; $row <= $rows; $row++) {
+            $ctn = trim($sheet->getCellByColumnAndRow(1, $row)->getValue());
+            $bonus = $sheet->getCellByColumnAndRow(9, $row)->getValue();
 
             $sum += $bonus;
 
             if ($ctn == '') continue;
             if ($ctn == 'Итого:') break;
-            if (!preg_match('%^\d{8}$%', $ctn)) $this->errorInvalidFormat(__LINE__ . " $row '$ctn'");
+            if (!preg_match('%^\d{7,8}$%', $ctn)) $this->errorInvalidFormat(__LINE__ . " $row '$ctn'");
 
             $simBonus[$ctn] = $bonus;
         }
@@ -418,10 +418,12 @@ class BonusReportController extends BaseGxController
         foreach ($simBonus as $k => $v) $personal_accounts[] = $db->quoteValue($k);
 
         // get agents, to which bonused sims was sent
-        $simAgent = $db->createCommand("select personal_account as sim_id,parent_agent_id as agent_id
+        $simAgent = $db->createCommand("select personal_account as sim_id,IF(tariff_id=".Tariff::TARIFF_TERRITORY_ID.",1,parent_agent_id) as agent_id
             from sim
             where operator_id=" . Operator::OPERATOR_MEGAFON_ID . " and agent_id is null and personal_account in (" .
-            implode(',', $personal_accounts) . ") order by sim.id desc")->queryAll();
+            implode(',', $personal_accounts) . ")".
+            " and tariff_id!=".Tariff::TARIFF_TERRITORY_ID.
+            " order by sim.id desc")->queryAll();
 
         // get personal_id->number_id mapping
         $rawNumbers=Yii::app()->db->createCommand("

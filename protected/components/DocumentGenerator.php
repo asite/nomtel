@@ -2,7 +2,7 @@
 class DocumentGenerator extends PHPWord
 {
 
-    public static function generate($template,$filename,$data) {
+    public static function generate($template,$filename,$data,$storeToDisk=false) {
         // disable web logging
         foreach (Yii::app()->log->routes as $route) {
             if ($route instanceof CWebLogRoute || $route instanceof CProfileLogRoute) {
@@ -32,18 +32,24 @@ class DocumentGenerator extends PHPWord
         foreach($document->getVariables() as $key)
             $document->setValue($key,'');
 
-        $document->save($tempFileName);
+        if (!$storeToDisk) {
+            $document->save($tempFileName);
 
-        $file=file_get_contents($tempFileName);
+            $file=file_get_contents($tempFileName);
 
-        unlink($tempFileName);
+            unlink($tempFileName);
 
-        header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        header('Pragma: private');
-        header('Content-Disposition: attachment; filename="'.$filename.'"');
+            header('Content-type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+            header('Pragma: private');
+            header('Content-Disposition: attachment; filename="'.$filename.'"');
 
-        echo $file;
-        Yii::app()->end();
+            echo $file;
+            Yii::app()->end();
+        } else {
+            $fullFileName=Yii::getPathOfAlias('webroot.var.temp').'/'.$filename;
+            $document->save($fullFileName);
+            return $fullFileName;
+        }
     }
 
 }

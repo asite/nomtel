@@ -174,7 +174,7 @@ $this->widget('bootstrap.widgets.TbButton',array(
     <?php endif; ?>
 </div>
 
-<?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support' || Yii::app()->user->role=='supportSuper'): ?>
+<?php if (Yii::app()->user->role=='admin' || Yii::app()->user->role=='support' || Yii::app()->user->role=='supportSuper' || Yii::app()->user->role=='cashier'): ?>
 <h2>История номера</h2>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
         'id' => 'number-grid',
@@ -220,6 +220,24 @@ $this->widget('bootstrap.widgets.TbButton',array(
     </div>
     <?php } ?>
 <h2>Тикеты</h2>
+
+<style>#addTicket label {display:none;}</style>
+<div id="addTicket">
+    <?php
+    $form = $this->beginWidget('BaseTbActiveForm', array(
+        'id' => 'send-other-question',
+        'enableAjaxValidation' => true,
+        'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
+    ));
+    ?>
+    <?php echo $form->errorSummary($addTicket); ?>
+    <?=$form->textareaRow($addTicket,'text',array('style'=>'width:100%;','rows'=>3,'errorOptions'=>array('hideErrorMessage'=>true)));?><br/>
+    <?php echo CHtml::htmlButton('Написать в мегафон', array('style'=>'float:right','class'=>'btn', 'type'=>'submit')); ?>
+    <div class="clear"></div>
+    <?php $this->endWidget(); ?>
+</div>
+
+
 <?php $this->widget('ootstrap.widgets.TbGridView', array(
         'id' => 'ticket-grid',
         'dataProvider' => $ticketsDataProvider,

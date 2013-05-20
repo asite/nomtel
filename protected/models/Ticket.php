@@ -118,6 +118,56 @@ class Ticket extends BaseTicket
         $history->save();
     }
 
+    public function getProtectionCode() {
+        return sha1($this->id.'bawZdzxx3eqk58nQ');
+    }
+
+    public function sendMegafonNotification() {
+        $supportOperator=SupportOperator::model()->findByAttributes(array(
+            'role'=>'supportMegafon',
+        ));
+
+        $megafonEmail=$supportOperator->email;
+
+        $megafonEmail='alegudmail@gmail.com';
+
+        if (!$megafonEmail) return;
+
+        $mail = new YiiMailMessage();
+        $mail->setCharset('utf-8');
+        $mail->setFrom(Yii::app()->params['adminEmailFrom']);
+        $mail->setTo($megafonEmail);
+
+        $mail->setSubject($this->id.' Заявка от ООО "Интрастпей"');
+
+        $msg=Yii::app()->dateFormatter->formatDateTime(strtotime($this->dt),'long',null);
+        $msg.="<br/>";
+        $msg.="Исх №".$this->id."<br/><br/>".CHtml::encode($this->internal)."<br/><br/>";
+
+        $link=Yii::app()->request->hostInfo.Yii::app()->controller->createUrl("ticketMegafon/successfullConfirm",array('id'=>$this->id,'code'=>$this->getProtectionCode()));
+        $msg.="<b>ПРИ УСПЕШНОМ ВЫПОЛНЕНИИ ПЕРЕЙДИТЕ ПОЖАЛУСТА ПО ССЫЛКЕ</b> <a href='$link'>$link</a><br/>";
+        $msg.="<b>ПРИ ОТКАЗЕ НАПИШИТЕ ПРИЧИНУ В ОТВЕТЕ С СОХРАНЕНИЕМ <span style='color:red;'>ТЕМЫ ПИСЬМА</span>";
+
+        $mail->setBody($msg, 'text/html', 'UTF-8');
+
+        $generator=new DocumentGenerator();
+
+        $data=array(
+            'number'=>$this->id,
+            'text'=>$this->internal,
+            'day'=>$this->dt->format('d'),
+            'month'=>Yii::app()->dateFormatter->format('MMMM',$this->dt->getTimestamp()),
+            'year'=>$this->dt->format('Y'),
+        );
+
+        $fileName=$generator->generate('megafon_statement.docx','megafon_'.$this->number->number.'_'.$this->dt->format('Ymd').'_'.$this->id.'.docx',$data,true);
+
+        $mail->attach(Swift_Attachment::fromPath($fileName));
+        Yii::app()->mail->send($mail);
+
+        unlink($fileName);
+    }
+
     public static function addMessage($idNumber, $message, $queue=Ticket::QUEUE_COMMON) {
         $number=Number::model()->findByPk($idNumber);
 
