@@ -28,8 +28,8 @@
             'header'=>Agent::label(),
         ),
         array(
-            'name'=>'last_balance',
-            'value'=>'$data["last_balance"]',
+            'name'=>'balance',
+            'value'=>'$data["balance"]',
             'filter'=>false,
             'header'=>Yii::t('app','Balance'),
         ),
