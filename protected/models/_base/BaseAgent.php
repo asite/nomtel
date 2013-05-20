@@ -34,11 +34,13 @@
  * @property string $stat_payments_sum
  * @property integer $stat_sim_count
  * @property integer $taking_orders
+ * @property integer $is_agent
+ * @property integer $is_bonus
  *
  * @property Act[] $acts
+ * @property User $user
  * @property Agent $parent
  * @property Agent[] $agents
- * @property User $user
  * @property AgentReferralRate[] $agentReferralRates
  * @property BonusReportAgent[] $bonusReportAgents
  * @property BonusReportNumber[] $bonusReportNumbers
@@ -70,24 +72,26 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
-			array('parent_id, user_id, stat_sim_count, taking_orders', 'numerical', 'integerOnly'=>true),
+			array('parent_id, user_id, stat_sim_count, taking_orders, is_agent, is_bonus', 'numerical', 'integerOnly'=>true),
 			array('name, surname, middle_name, city, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>200),
 			array('balance, stat_acts_sum, stat_payments_sum', 'length', 'max'=>14),
-			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders', 'safe', 'on'=>'search'),
+			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders, is_agent, is_bonus', 'default', 'setOnEmpty' => true, 'value' => null),
+            array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
+            array('birth_date','date','format'=>'dd.MM.yyyy'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders, is_agent, is_bonus', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
 			'acts' => array(self::HAS_MANY, 'Act', 'agent_id'),
+			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'parent' => array(self::BELONGS_TO, 'Agent', 'parent_id'),
 			'agents' => array(self::HAS_MANY, 'Agent', 'parent_id'),
-			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'agentReferralRates' => array(self::HAS_MANY, 'AgentReferralRate', 'agent_id'),
 			'bonusReportAgents' => array(self::HAS_MANY, 'BonusReportAgent', 'agent_id'),
 			'bonusReportNumbers' => array(self::HAS_MANY, 'BonusReportNumber', 'agent_id'),
@@ -132,10 +136,12 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'stat_payments_sum' => Yii::t('app', 'Stat Payments Sum'),
 			'stat_sim_count' => Yii::t('app', 'Stat Sim Count'),
 			'taking_orders' => Yii::t('app', 'Taking Orders'),
+			'is_agent' => Yii::t('app', 'Is Agent'),
+			'is_bonus' => Yii::t('app', 'Is Bonus'),
 			'acts' => null,
+			'user' => null,
 			'parent' => null,
 			'agents' => null,
-			'user' => null,
 			'agentReferralRates' => null,
 			'bonusReportAgents' => null,
 			'bonusReportNumbers' => null,
@@ -176,9 +182,56 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('stat_payments_sum', $this->stat_payments_sum, true);
 		$criteria->compare('stat_sim_count', $this->stat_sim_count);
 		$criteria->compare('taking_orders', $this->taking_orders);
+		$criteria->compare('is_agent', $this->is_agent);
+		$criteria->compare('is_bonus', $this->is_bonus);
 
-		return new CActiveDataProvider($this, array(
+		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
 		));
+
+        $dataProvider->pagination->pageSize=self::ITEMS_PER_PAGE;
+        return $dataProvider;
 	}
+
+    public function convertDateTimeFieldsToEDateTime() {
+        // rest of work will do setAttribute() routine
+        $this->setAttribute('passport_issue_date',strval($this->passport_issue_date));
+        $this->setAttribute('birth_date',strval($this->birth_date));
+    }
+
+    public function convertDateTimeFieldsToString() {
+        if (is_object($this->passport_issue_date) && get_class($this->passport_issue_date)=='EDateTime') $this->passport_issue_date=new EString($this->passport_issue_date->format(self::$mySqlDateFormat));
+        if (is_object($this->birth_date) && get_class($this->birth_date)=='EDateTime') $this->birth_date=new EString($this->birth_date->format(self::$mySqlDateFormat));
+    }
+
+    public function afterFind() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
+
+    private function convertStringToEDateTime($val,$type) {
+        if (!$val) return null;
+        try {
+            $val=new EDateTime($val,null,$type);
+        } catch (Exception $e) {
+        }
+        return $val;
+    }
+
+    public function setAttribute($name,$value) {
+        if (is_string($value)) {
+            if ($name=='passport_issue_date') $value=$this->convertStringToEDateTime($value,'date');
+            if ($name=='birth_date') $value=$this->convertStringToEDateTime($value,'date');
+        }
+        return parent::setAttribute($name,$value);
+    }
+
+    public function beforeSave() {
+        $this->convertDateTimeFieldsToString();
+
+        return true;
+    }
+
+    public function afterSave() {
+        $this->convertDateTimeFieldsToEDateTime();
+    }
 }

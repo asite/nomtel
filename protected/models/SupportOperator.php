@@ -12,6 +12,7 @@ class SupportOperator extends BaseSupportOperator
     const ROLE_SUPPORT_ADMIN='supportAdmin';
     const ROLE_SUPPORT_MEGAFON='supportMegafon';
     const ROLE_SUPPORT_SUPER='supportSuper';
+    const ROLE_CASHIER='cashier';
 
     public static function model($className=__CLASS__) {
 		return parent::model($className);
@@ -28,7 +29,19 @@ class SupportOperator extends BaseSupportOperator
 
         return $data;
     }
-    
+
+    public static function getCashierComboList($data = array())
+    {
+        $agents = Yii::app()->db->createCommand("select id,name,surname,middle_name from " .
+            self::model()->tableName()." where role='cashier'")->queryAll();
+
+        foreach ($agents as $v) {
+            $data[$v['id']] = $v['surname'] . ' ' . $v['name'];
+        }
+
+        return $data;
+    }
+
     public static function getRoleDropDownList($items=array()) {
         $labels=self::getRoleLabels();
         return array_merge($items,$labels);
@@ -43,7 +56,8 @@ class SupportOperator extends BaseSupportOperator
                 self::ROLE_SUPPORT_MAIN=>Yii::t('app','supportMain'),
                 self::ROLE_SUPPORT_ADMIN=>Yii::t('app','supportAdmin'),
                 self::ROLE_SUPPORT_MEGAFON=>Yii::t('app','supportMegafon'),
-                self::ROLE_SUPPORT_SUPER=>Yii::t('app','supportSuper')
+                self::ROLE_SUPPORT_SUPER=>Yii::t('app','supportSuper'),
+                self::ROLE_CASHIER=>Yii::t('app','cashier')
             );
         }
 

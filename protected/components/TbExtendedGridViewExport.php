@@ -6,7 +6,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
 
     public function init()
     {
-        if ($_POST['exportGridView']==$this->id) {
+        if ($_REQUEST['exportGridView']==$this->id) {
             foreach ($this->columns as $k=>$v) {
                 if ($v['class']=='bootstrap.widgets.TbButtonColumn') unset($this->columns[$k]);
             }
@@ -41,7 +41,7 @@ class TbExtendedGridViewExport extends TbExtendedGridView {
     }
 
     public function renderContent() {
-        if ($_POST['exportGridView']==$this->id) {
+        if ($_REQUEST['exportGridView']==$this->id) {
             ob_end_clean();
             $pageCount = floor(round($this->dataProvider->totalItemCount/$this->dataProvider->itemCount));
             $csv = '';

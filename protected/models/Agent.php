@@ -37,7 +37,7 @@ class Agent extends BaseAgent
         return $data;
     }
 
-    public static function getFullComboList($withoutMe = true)
+    public static function getFullComboList($withoutMe = true,$data=array())
     {
         if ($withoutMe) $id = loggedAgentId(); else $id = '';
         $agents = Yii::app()->db->createCommand("select id,name,surname,middle_name from " .
