@@ -79,7 +79,7 @@ class Agent extends BaseAgent
              join number n on (n.sim_id=s.parent_id)
              where s.is_active=1 and s.parent_agent_id=:agent_id and
              (
-              (s.operator_id=1 and n.status='ACTIVE')
+              (s.operator_id=1 and n.balance_status in ('ACTIVE'))
               or
               (s.operator_id=2 and n.balance_status in ('POSITIVE_DYNAMIC','NEGATIVE_DYNAMIC','BALANCE_STATUS_NORMAL'))
              )
