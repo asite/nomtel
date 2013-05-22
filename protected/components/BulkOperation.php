@@ -24,6 +24,7 @@ abstract class BulkOperation
         if ($force || strlen($this->sqlData) > $this->sqlMaxDataSize) {
             $sql=$this->sqlHeader . $this->sqlData . $this->sqlFooter;
             $this->sqlData = '';
+            //print_r($sql); exit;
             Yii::app()->db->createCommand($sql)->execute();
         }
     }

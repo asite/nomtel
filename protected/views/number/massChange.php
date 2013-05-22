@@ -45,19 +45,21 @@ $this->breadcrumbs = array(
     </thead>
     <tbody>
         <?php foreach ($file as $key=>$value): ?>
+            <?php
+                $csv[$value[0]] = $value[1];
+            ?>
             <tr class="odd">
                 <td class="<?php $key%2?'odd':'even'; ?>">
                     <?php echo $value[0] ?>
-                    <input type="hidden" name="Csv[<?php echo $key ?>][0]" value="<?php echo $value[0] ?>">
                 </td>
                 <td>
                     <?php echo $value[1] ?>
-                    <input type="hidden" name="Csv[<?php echo $key ?>][1]" value="<?php echo $value[1] ?>">
                 </td>
             </tr>
         <?php endforeach ?>
     </tbody>
 </table>
+<input type="hidden" name="Csv" value='<?php echo serialize($csv); ?>'>
 <?php endif; ?>
 
 <div class="cfix">
