@@ -168,9 +168,19 @@ $this->breadcrumbs = array(
             'header'=>Yii::t('app','Comment'),
         ),
         array(
-            'name'=>'sum',
+            'name'=>'sum_inc',
             'htmlOptions' => array('style'=>'text-align:center;'),
-            'header'=>Yii::t('app','Sum'),
+            'header'=>'Начисление',
+        ),
+        array(
+            'name'=>'sum_dec',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+            'header'=>'Списание',
+        ),
+        array(
+            'name'=>'balance',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+            'header'=>'Баланс',
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',

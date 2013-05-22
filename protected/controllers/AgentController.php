@@ -201,18 +201,39 @@ class AgentController extends BaseGxController
 
         }
 
-        $sql = "(select id,dt,sum,comment,0 as type from payment where agent_id=:agent_id) union
-         (select id,dt,-sum as sum,'' as comment, 1 as type from act where agent_id=:agent_id) order by dt DESC";
+        $sql = "select  mytab.*,
+                        (select sum(sum) from payment where agent_id=:agent_id and dt<=mytab.dt)-
+                        (select sum(sum) from act where agent_id=:agent_id and dt<=mytab.dt) as balance
+            from (
+                (
+                    select id,dt,sum as sum_inc,null as sum_dec,comment,0 as type
+                    from payment p
+                    where agent_id=:agent_id
+                )
+                union
+                (
+                    select id,dt,null as sum_inc,sum as sum_dec,'' as comment, 1 as type
+                    from act a
+                    where agent_id=:agent_id
+                )
+                order by dt DESC
+            ) as mytab
+            ";
+
         $params = array(':agent_id' => $id, ':agent_id' => $id);
-        $count = Yii::app()->db->createCommand("select count(*) from ($sql) as mytab")->queryScalar($params);
+        $count = Yii::app()->db->createCommand("
+        select count(*) from ((select id from payment where agent_id=:agent_id) union (select id from act where agent_id=:agent_id)) as mytab")->queryScalar($params);
+
         $logDataProvider = new CSqlDataProvider($sql,
             array(
                 'params' => $params,
                 'totalItemCount' => $count,
+                /*
                 'sort' => array(
                     'defaultOrder' => 'dt',
                     'attributes' => array('id', 'dt', 'comment', 'sum')
                 ),
+                */
                 'pagination' => array('pageSize' => BaseGxActiveRecord::ITEMS_PER_PAGE)
             ));
 
