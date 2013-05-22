@@ -55,11 +55,11 @@ class TicketController extends BaseGxController {
                 $comment=$ticket->response;
 
                 if (isset($_POST['accept'])) {
-                    $ticket->status=Ticket::STATUS_FOR_REVIEW;
+                    $ticket->status=Ticket::STATUS_DONE;
                 }
 
                 if (isset($_POST['refuse'])) {
-                    $ticket->status=Ticket::STATUS_REFUSED_BY_OPERATOR;
+                    $ticket->status=Ticket::STATUS_REFUSED;
                 }
 
                 $trx=Yii::app()->db->beginTransaction();
