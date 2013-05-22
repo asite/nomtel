@@ -231,7 +231,7 @@ class BonusReportController extends BaseGxController
                 $sum=$this->roundSum($bonus * $payment['rate']);
                 $agentsBonuses[$payment['agent_id']]['sum'] += $sum;
 
-                // if number_is is not null
+                // if number is not null
                 if ($simIdNumberId[$v['sim_id']]) {
                     $bonusReportNumber->insert(array(
                         'bonus_report_id'=>$bonusReport->id,
@@ -265,20 +265,21 @@ class BonusReportController extends BaseGxController
         foreach ($agentsBonuses as $agent_id => $data) {
             $sum = $this->roundSum($data['sum'] - $data['sum_referrals']);
 
-            if ($sum > 1e-6) {
+            unset($bonusReportAgent->id);
+            $bonusReportAgent->isNewRecord = true;
+
+
+            if ($agents[$agent_id]['parent_id']==adminAgentId()) {
                 Agent::deltaBalance($agent_id, $sum);
 
                 unset($payment->id);
                 $payment->isNewRecord = true;
 
                 $payment->agent_id = $agent_id;
-                $payment->sum = $sum;
+                $payment->sum = $this->roundSum($data['sum']);
                 $payment->save();
                 $bonusReportAgent->payment_id = $payment->id;
             }
-
-            unset($bonusReportAgent->id);
-            $bonusReportAgent->isNewRecord = true;
 
             $bonusReportAgent->sim_count = $data['sim_count'];
             $bonusReportAgent->sum = $this->roundSum($data['sum']);
