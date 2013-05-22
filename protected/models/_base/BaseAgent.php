@@ -29,10 +29,6 @@
  * @property string $birth_date
  * @property string $birth_place
  * @property string $registration_address
- * @property string $balance
- * @property string $stat_acts_sum
- * @property string $stat_payments_sum
- * @property integer $stat_sim_count
  * @property integer $taking_orders
  * @property integer $is_agent
  * @property integer $is_bonus
@@ -72,17 +68,16 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
-			array('parent_id, user_id, stat_sim_count, taking_orders, is_agent, is_bonus', 'numerical', 'integerOnly'=>true),
+			array('parent_id, user_id, taking_orders, is_agent, is_bonus', 'numerical', 'integerOnly'=>true),
 			array('name, surname, middle_name, city, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>200),
-			array('balance, stat_acts_sum, stat_payments_sum', 'length', 'max'=>14),
-			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders, is_agent, is_bonus', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, taking_orders, is_agent, is_bonus', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birth_date','date','format'=>'dd.MM.yyyy'),
-			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, balance, stat_acts_sum, stat_payments_sum, stat_sim_count, taking_orders, is_agent, is_bonus', 'safe', 'on'=>'search'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, taking_orders, is_agent, is_bonus', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -131,10 +126,6 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'birth_date' => Yii::t('app', 'Birth Date'),
 			'birth_place' => Yii::t('app', 'Birth Place'),
 			'registration_address' => Yii::t('app', 'Registration Address'),
-			'balance' => Yii::t('app', 'Balance'),
-			'stat_acts_sum' => Yii::t('app', 'Stat Acts Sum'),
-			'stat_payments_sum' => Yii::t('app', 'Stat Payments Sum'),
-			'stat_sim_count' => Yii::t('app', 'Stat Sim Count'),
 			'taking_orders' => Yii::t('app', 'Taking Orders'),
 			'is_agent' => Yii::t('app', 'Is Agent'),
 			'is_bonus' => Yii::t('app', 'Is Bonus'),
@@ -177,10 +168,6 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('birth_date', $this->birth_date, true);
 		$criteria->compare('birth_place', $this->birth_place, true);
 		$criteria->compare('registration_address', $this->registration_address, true);
-		$criteria->compare('balance', $this->balance, true);
-		$criteria->compare('stat_acts_sum', $this->stat_acts_sum, true);
-		$criteria->compare('stat_payments_sum', $this->stat_payments_sum, true);
-		$criteria->compare('stat_sim_count', $this->stat_sim_count);
 		$criteria->compare('taking_orders', $this->taking_orders);
 		$criteria->compare('is_agent', $this->is_agent);
 		$criteria->compare('is_bonus', $this->is_bonus);

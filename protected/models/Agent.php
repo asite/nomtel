@@ -51,96 +51,41 @@ class Agent extends BaseAgent
         return $data;
     }
 
-    public function rules()
-    {
-        $rules=parent::rules();
-        $this->addRules($rules,array(
-            array('balance', 'numerical', 'integerOnly' => false),
-            array('stat_acts_sum', 'numerical', 'integerOnly' => false),
-            array('stat_payments_sum', 'numerical', 'integerOnly' => false),
-        ));
-        $this->delRules($rules,array(
-            array('balance', 'length'),
-            array('stat_acts_sum', 'length'),
-            array('stat_payments_sum', 'length'),
-        ));
-
-        return $rules;
+    public function getBalance() {
+        return $this->getAllPaymentsSum()-$this->getAllActsSum();
     }
 
-    public function recalcBalance()
-    {
-        $this->recalcStatPaymentsSum();
-        $this->recalcStatActsSum();
-        $this->balance = $this->stat_payments_sum - $this->stat_acts_sum;
-    }
-
-    public function recalcStatPaymentsSum()
-    {
-        $this->stat_payments_sum = floatval(Yii::app()->db->createCommand('select sum(sum) from ' . Payment::model()->tableName() .
+    public function getAllPaymentsSum() {
+        return floatval(Yii::app()->db->createCommand('select sum(sum) from ' . Payment::model()->tableName() .
             ' where agent_id=:agent_id')->queryScalar(array('agent_id' => $this->id)));
     }
 
-    public function recalcStatActsSum()
-    {
-        $this->stat_acts_sum = floatval(Yii::app()->db->createCommand('select sum(sum) from ' . Act::model()->tableName() .
+    public function getAllActsSum() {
+        return floatval(Yii::app()->db->createCommand('select sum(sum) from ' . Act::model()->tableName() .
             ' where agent_id=:agent_id')->queryScalar(array('agent_id' => $this->id)));
     }
 
-    public function recalcStatSimCount()
-    {
-        $this->stat_sim_count = Sim::model()->countByAttributes(array('parent_agent_id' => $this->id));
+    public function getSimCount() {
+        $count=intval($this->dbConnection->createCommand(
+            "select count(*) from ".Sim::model()->tableName()." where is_active=1 and parent_agent_id=:agent_id")->
+            queryScalar(array(':agent_id'=>$this->id)));
+
+        return $count;
     }
 
-    public function recalcAllStats()
-    {
-        $this->recalcBalance();
-        $this->recalcStatSimCount();
-    }
+    public function getActiveSimCount() {
+        $count=intval($this->dbConnection->createCommand(
+            "select count(*) from sim s
+             join number n on (n.sim_id=s.parent_id)
+             where s.is_active=1 and s.parent_agent_id=:agent_id and
+             (
+              (s.operator_id=1 and n.status='ACTIVE')
+              or
+              (s.operator_id=2 and n.balance_status in ('POSITIVE_DYNAMIC','NEGATIVE_DYNAMIC','BALANCE_STATUS_NORMAL'))
+             )
+            ")->queryScalar(array(':agent_id'=>$this->id)));
 
-    /**
-     * Procedure updates balance and acts/payments statistic
-     * @param $agent_id
-     * @param $delta_balance
-     * @param bool $reverse = true, if doing deleting existing act/payment
-     */
-    public static function deltaBalance($agent_id, $delta_balance, $reverse = false)
-    {
-        static $cmdBalance;
-
-        if (!$cmdBalance) $cmdBalance = Yii::app()->db->createCommand("update agent set
-            balance=balance+:delta_balance,
-            stat_acts_sum=stat_acts_sum+:delta_stat_acts_sum,
-            stat_payments_sum=stat_payments_sum+:delta_stat_payments_sum
-        where id=:agent_id");
-
-        $delta_stat_payments_sum = 0;
-        $delta_stat_acts_sum = 0;
-        if ($reverse) {
-            if ($delta_balance < 0) {
-                $delta_stat_payments_sum = $delta_balance;
-            } else {
-                $delta_stat_acts_sum = -$delta_balance;
-            }
-        } else {
-            if ($delta_balance > 0) {
-                $delta_stat_payments_sum = $delta_balance;
-            } else {
-                $delta_stat_acts_sum = -$delta_balance;
-            }
-        }
-
-        $cmdBalance->execute(array(
-            ':agent_id' => $agent_id,
-            ':delta_balance' => $delta_balance,
-            ':delta_stat_acts_sum' => $delta_stat_acts_sum,
-            ':delta_stat_payments_sum' => $delta_stat_payments_sum
-        ));
-    }
-
-    public static function deltaSimCount($agent_id, $delta_sim_count)
-    {
-        Agent::model()->updateCounters(array('stat_sim_count' => $delta_sim_count), 'id=:id', array('id' => $agent_id));
+        return $count;
     }
 
     public function attributeLabels()

@@ -24,9 +24,6 @@ class BonusReportController extends BaseGxController
             $bonusReports = Yii::app()->db->createCommand("select agent_id,sum-sum_referrals from bonus_report_agent where bonus_report_id=:bonus_report_id")->
                 queryAll(true, array(':bonus_report_id' => $id));
 
-            foreach ($bonusReports as $report)
-                Agent::deltaBalance($report['agent_id'], $report['sum']);
-
             // get payment ids for deletion
             $paymentIds = Yii::app()->db->createCommand(
                 "select payment_id from bonus_report_agent
@@ -270,8 +267,6 @@ class BonusReportController extends BaseGxController
 
 
             if ($agents[$agent_id]['parent_id']==adminAgentId()) {
-                Agent::deltaBalance($agent_id, $sum);
-
                 unset($payment->id);
                 $payment->isNewRecord = true;
 
