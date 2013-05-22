@@ -6,6 +6,7 @@ class TicketMegafonController extends BaseGxController {
         return array(
            // array('disallow', 'actions'=>array('indexAdmin','detailAdmin'),'roles' => array('supportMegafon')),
             array('allow', 'roles' => array('supportMegafon')),
+            array('allow', 'roles' => array('cashier'),'actions'=>array('indexAdmin','detailAdmin')),
             array('allow', 'actions'=>array('successfullConfirm'),'users' => array('*')),
         );
     }

@@ -90,6 +90,7 @@
             array('label' => Yii::t('app', 'Sell'), 'url' => $this->createUrl('cashier/sellList'),'active'=>preg_match('%^cashier/sell%',$this->route)),
             array('label' => Yii::t('app', 'Service'), 'url' => $this->createUrl('cashier/serviceList'),'active'=>preg_match('%^cashier/service%',$this->route)),
             array('label' => 'Статистика', 'url' => $this->createUrl('cashier/stats'), 'active' => $this->id=='cashier/stats'),
+            array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
