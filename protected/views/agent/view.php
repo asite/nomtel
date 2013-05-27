@@ -165,7 +165,7 @@ $this->breadcrumbs = array(
         array(
             'name'=>'comment',
             'htmlOptions' => array('style'=>'text-align:center;'),
-            'header'=>Yii::t('app','Comment'),
+            'header'=>Yii::t('app','Comment')
         ),
         array(
             'name'=>'sum_inc',

@@ -212,7 +212,7 @@ class AgentController extends BaseGxController
                 )
                 union
                 (
-                    select id,dt,null as sum_inc,sum as sum_dec,'' as comment, 1 as type
+                    select id,dt,null as sum_inc,sum as sum_dec,comment, 1 as type
                     from act a
                     where agent_id=:agent_id
                 )
