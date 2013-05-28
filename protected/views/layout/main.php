@@ -61,15 +61,6 @@
             ));
         }
 
-        if (Yii::app()->user->role=='supportMain') {
-            $menuLeft=array_merge($menuLeft,array(
-                '',
-                array('label' => 'Список обращений', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
-                '',
-                array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
-            ));
-        }
-
         if (Yii::app()->user->role=='support') {
             $menuLeft=array_merge($menuLeft,array(
                 '',
@@ -99,6 +90,7 @@
             array('label' => Yii::t('app', 'Sell'), 'url' => $this->createUrl('cashier/sellList'),'active'=>preg_match('%^cashier/sell%',$this->route)),
             array('label' => Yii::t('app', 'Service'), 'url' => $this->createUrl('cashier/serviceList'),'active'=>preg_match('%^cashier/service%',$this->route)),
             array('label' => 'Статистика', 'url' => $this->createUrl('cashier/stats'), 'active' => $this->id=='cashier/stats'),
+            array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
         );
@@ -153,7 +145,6 @@
             array('label' => Yii::t('app', 'Support'), 'url' => $this->createUrl('support/number'), 'active' => $this->route == 'support/number'),
             '',
             array('label' => 'Список обращений (Админ)', 'url' => $this->createUrl('ticketAdmin/index'),'active'=>Yii::app()->controller->id=='ticketAdmin'),
-            array('label' => 'Список обращений (Главный)', 'url' => $this->createUrl('ticketMain/index'),'active'=>Yii::app()->controller->id=='ticketMain'),
             array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
             '',
             array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),

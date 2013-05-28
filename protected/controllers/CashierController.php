@@ -31,13 +31,12 @@ class CashierController extends BaseGxController
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
         $dataProvider = new CSqlDataProvider("select n.id,n.number,s.tariff_id,t.title as tariff,s.operator_region_id,
-            opr.title as operator_region, (select balance from balance_report_number where number_id=n.id order by
-            id desc limit 0,1) as last_balance,a.name as agent_name, a.surname as agent_surname $sql", array(
+            opr.title as operator_region, n.balance, n.balance_changed_dt,a.name as agent_name, a.surname as agent_surname $sql", array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'number','tariff_id','operator_region_id'
+                    'number','tariff_id','operator_region_id','balance','balance_changed_dt','operator_region'
                 ),
             ),
             'pagination' => array('pageSize' => Number::ITEMS_PER_PAGE)
@@ -351,13 +350,16 @@ class CashierController extends BaseGxController
             $model->setAttributes($_REQUEST['CashierStatistic']);
         } else {
             $this->redirect(array('stats',
-                'CashierStatistic[date_from]'=>strval(new EDateTime("-7 Day")),
-                'CashierStatistic[date_to]'=>new EDateTime("")
+                //'CashierStatistic[date_from]'=>strval(new EDateTime("-7 Day")),
+                //'CashierStatistic[date_to]'=>new EDateTime("")
+                'CashierStatistic[date_from]'=>new EDateTime("",null,'date'),
+                //'CashierStatistic[date_to]'=>new EDateTime("",null,'date')
             ));
         }
 
         $date_from=new EDateTime($model->date_from);
-        $date_to=new EDateTime($model->date_to);
+        //$date_to=new EDateTime($model->date_to);
+        $date_to=$date_from;
 
         $params=array(
             ':date_from'=>$date_from->toMysqlDate(),

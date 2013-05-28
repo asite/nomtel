@@ -6,6 +6,7 @@ class TicketMegafonController extends BaseGxController {
         return array(
            // array('disallow', 'actions'=>array('indexAdmin','detailAdmin'),'roles' => array('supportMegafon')),
             array('allow', 'roles' => array('supportMegafon')),
+            array('allow', 'roles' => array('cashier'),'actions'=>array('indexAdmin','detailAdmin')),
             array('allow', 'actions'=>array('successfullConfirm'),'users' => array('*')),
         );
     }
@@ -14,7 +15,7 @@ class TicketMegafonController extends BaseGxController {
         $ticket=Ticket::model()->FindByPk($id);
         if ($ticket) {
             if ($ticket->getProtectionCode()==$code) {
-                $ticket->status=Ticket::STATUS_FOR_REVIEW;
+                $ticket->status=Ticket::STATUS_DONE;
                 $ticket->megafon_status=Ticket::MEGAFON_STATUS_DONE;
 
                 $cashierNumber=CashierNumber::model()->findByAttributes(array('ticket_id'=>$ticket->id));
@@ -91,7 +92,7 @@ class TicketMegafonController extends BaseGxController {
 
                 if (isset($_POST['accept'])) {
                     $ticket->support_operator_id=loggedSupportOperatorId();
-                    $ticket->status=Ticket::STATUS_FOR_REVIEW;
+                    $ticket->status=Ticket::STATUS_DONE;
                     $ticket->megafon_status=Ticket::MEGAFON_STATUS_DONE;
 
                     $cashierNumber=CashierNumber::model()->findByAttributes(array('ticket_id'=>$ticket->id));
@@ -103,7 +104,7 @@ class TicketMegafonController extends BaseGxController {
 
                 if (isset($_POST['refuse'])) {
                     $ticket->support_operator_id=loggedSupportOperatorId();
-                    $ticket->status=Ticket::STATUS_REFUSED_BY_MEGAFON;
+                    $ticket->status=Ticket::STATUS_REFUSED;
                     $ticket->megafon_status=Ticket::MEGAFON_STATUS_REFUSED;
                 }
 

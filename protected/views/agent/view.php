@@ -42,11 +42,20 @@ $this->breadcrumbs = array(
 <div class="cfix"></div>
 
 <div style="float:left;width:30%;">
-    <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+    <?php
+    $totalSims=$model->getSimCount();
+    $activeSims=$model->getActiveSimCount();
+    $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'balance',
-        'stat_sim_count',
+            array(
+                'value'=>$model->getBalance(),
+                'label'=>'Баланс'
+            ),
+            array(
+                'value'=>$totalSims.'('.number_format(100*$activeSims/$totalSims,1).'%)',
+                'label'=>'Кол-во сим'
+            ),
     ),
 )); ?>
 </div>
@@ -54,7 +63,10 @@ $this->breadcrumbs = array(
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'stat_payments_sum',
+        array(
+            'value'=>$model->getAllPaymentsSum(),
+            'label'=>'Сумма начислений'
+        ),
     ),
 )); ?>
 </div>
@@ -62,7 +74,10 @@ $this->breadcrumbs = array(
     <?php $this->widget('bootstrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
-        'stat_acts_sum',
+        array(
+            'value'=>$model->getAllActsSum(),
+            'label'=>'Сумма списаний'
+        ),
     ),
 )); ?>
 </div>
@@ -150,12 +165,22 @@ $this->breadcrumbs = array(
         array(
             'name'=>'comment',
             'htmlOptions' => array('style'=>'text-align:center;'),
-            'header'=>Yii::t('app','Comment'),
+            'header'=>Yii::t('app','Comment')
         ),
         array(
-            'name'=>'sum',
+            'name'=>'sum_inc',
             'htmlOptions' => array('style'=>'text-align:center;'),
-            'header'=>Yii::t('app','Sum'),
+            'header'=>'Начисление',
+        ),
+        array(
+            'name'=>'sum_dec',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+            'header'=>'Списание',
+        ),
+        array(
+            'name'=>'balance',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+            'header'=>'Баланс',
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',

@@ -8,10 +8,10 @@
 
     <div class="form-container-horizontal">
         <div class="form-container-item form-label-width-60">
-            <?php echo $form->maskFieldRow($model,'date_from','99.99.9999',array('style'=>'width:80px;','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+            <?php echo $form->PickerDateRow($model,'date_from',array('style'=>'width:80px;','errorOptions'=>array('hideErrorMessage'=>true)),array('minYearDelta'=>5,'maxYearDelta'=>0,'onSelect'=>'js:function(){$(this).closest("form").submit();}')); ?>
         </div>
     </div>
-
+<?php /*
     <div class="form-container-horizontal">
         <div class="form-container-item form-label-width-60">
             <?php echo $form->maskFieldRow($model,'date_to','99.99.9999',array('style'=>'width:80px;','errorOptions'=>array('hideErrorMessage'=>true))); ?>
@@ -44,6 +44,7 @@
             'label'=>'Месяц'
         ));?>
     </div>
+*/ ?>
     <?php $this->endWidget(); ?>
 </div>
 

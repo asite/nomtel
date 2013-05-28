@@ -23,10 +23,16 @@
             'header'=>OperatorRegion::label(1),
         ),
         array(
-            'name'=>'last_balance',
-            'value'=>'$data["last_balance"]',
+            'name'=>'balance',
+            'value'=>'$data["balance"]',
             'filter'=>false,
             'header'=>Yii::t('app','Balance'),
+        ),
+        array(
+            'name'=>'balance_changed_dt',
+            'value'=>'$data["balance_changed_dt"]!="" ? new EDateTime($data["balance_changed_dt"],null,"date"):""',
+            'filter'=>false,
+            'header'=>'Баланс изменился',
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',

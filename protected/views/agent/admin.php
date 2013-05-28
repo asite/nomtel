@@ -31,7 +31,6 @@ $('.search-form form').submit(function(){
         'surname',
 		'name',
 		'middle_name',
-        'balance',
 		array(
 			'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),

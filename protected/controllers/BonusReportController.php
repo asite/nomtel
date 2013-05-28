@@ -24,9 +24,6 @@ class BonusReportController extends BaseGxController
             $bonusReports = Yii::app()->db->createCommand("select agent_id,sum-sum_referrals from bonus_report_agent where bonus_report_id=:bonus_report_id")->
                 queryAll(true, array(':bonus_report_id' => $id));
 
-            foreach ($bonusReports as $report)
-                Agent::deltaBalance($report['agent_id'], $report['sum']);
-
             // get payment ids for deletion
             $paymentIds = Yii::app()->db->createCommand(
                 "select payment_id from bonus_report_agent
@@ -231,7 +228,7 @@ class BonusReportController extends BaseGxController
                 $sum=$this->roundSum($bonus * $payment['rate']);
                 $agentsBonuses[$payment['agent_id']]['sum'] += $sum;
 
-                // if number_is is not null
+                // if number is not null
                 if ($simIdNumberId[$v['sim_id']]) {
                     $bonusReportNumber->insert(array(
                         'bonus_report_id'=>$bonusReport->id,
@@ -265,20 +262,19 @@ class BonusReportController extends BaseGxController
         foreach ($agentsBonuses as $agent_id => $data) {
             $sum = $this->roundSum($data['sum'] - $data['sum_referrals']);
 
-            if ($sum > 1e-6) {
-                Agent::deltaBalance($agent_id, $sum);
+            unset($bonusReportAgent->id);
+            $bonusReportAgent->isNewRecord = true;
 
+
+            if ($agents[$agent_id]['parent_id']==adminAgentId()) {
                 unset($payment->id);
                 $payment->isNewRecord = true;
 
                 $payment->agent_id = $agent_id;
-                $payment->sum = $sum;
+                $payment->sum = $this->roundSum($data['sum']);
                 $payment->save();
                 $bonusReportAgent->payment_id = $payment->id;
             }
-
-            unset($bonusReportAgent->id);
-            $bonusReportAgent->isNewRecord = true;
 
             $bonusReportAgent->sim_count = $data['sim_count'];
             $bonusReportAgent->sum = $this->roundSum($data['sum']);

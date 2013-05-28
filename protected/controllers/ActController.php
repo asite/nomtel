@@ -92,11 +92,6 @@ class ActController extends BaseGxController
 
                 $act->delete();
 
-                // recalc agent statistics
-                $agent=$act->agent;
-                $agent->recalcAllStats();
-                $agent->save();
-
                 NumberHistory::deleteByApproximateDtAndSubstringOrModel($act->dt,$act);
                 $trx->commit();
             } catch (CDbException $e) {

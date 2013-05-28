@@ -151,7 +151,6 @@ class SimController extends BaseGxController {
 
                             $this->redirect(array('move', 'key' => $key));
                         }
-                        Agent::deltaSimCount(adminAgentId(), $sim_count);
                     }
                 }
             }
@@ -253,7 +252,6 @@ class SimController extends BaseGxController {
 
                         $ids[$v->id] = $v->id;
                     }
-                    Agent::deltaSimCount(adminAgentId(), $sim_count);
 
                     if (empty($result)) {
                         Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления!');
@@ -274,7 +272,7 @@ class SimController extends BaseGxController {
                         $this->redirect(array('move', 'key' => $key));
                     //if simcard move to base
                     } else {
-                        if (isKrylow()) $this->move($ids,krylowAgentId(),adminAgentId());
+                        if (isKrylow()) $this->move($ids,krylowAgentId(),adminAgentId(),true);
                         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
                         $transaction->commit();
                         $this->refresh();
@@ -324,8 +322,6 @@ class SimController extends BaseGxController {
                     }
                 }
 
-                Agent::deltaSimCount(adminAgentId(), $sim_count);
-
                 if (empty($ids)) {
                     Yii::app()->user->setFlash('error', '<strong>Ошибка: </strong> Отсутствуют данные для добавления(возможно данные уже есть в базе)!');
                     $activeTabs['tab2'] = true;
@@ -352,6 +348,7 @@ class SimController extends BaseGxController {
                     exit;
                  //if simcard move to base
                 } else {
+                    if (isKrylow()) $this->move($ids,krylowAgentId(),adminAgentId(),true);
                     Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
                     Yii::app()->user->setFlash('tab2', true);
                     $transaction->commit();
@@ -365,6 +362,7 @@ class SimController extends BaseGxController {
 
                 if (isset($_POST['AddSimByNumbers']))
                     $addSimByNumbers->setAttributes($_POST['AddSimByNumbers']);
+                if (isKrylow()) $addSimByNumbers->where=2;
 
                 if ($addSimByNumbers->validate()) {
                     $sim_count = 1;
@@ -396,8 +394,6 @@ class SimController extends BaseGxController {
                         $ids[$sim->id] = $sim->id;
                     }
 
-                    Agent::deltaSimCount(adminAgentId(), $sim_count);
-
                     $transaction->commit();
 
                     if (empty($ids)) {
@@ -413,6 +409,7 @@ class SimController extends BaseGxController {
 
                         $this->redirect(array('move', 'key' => $key));
                     } else {
+                        if (isKrylow()) $this->move($ids,krylowAgentId(),adminAgentId(),true);
                         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно добавлены.');
                         Yii::app()->user->setFlash('tab3', true);
                         $this->refresh();
@@ -469,7 +466,7 @@ class SimController extends BaseGxController {
         $this->render('massselect');
     }
 
-    private function move($moveSimCards,$agent_id,$source_agent_id=null) {
+    private function move($moveSimCards,$agent_id,$source_agent_id=null,$force_zero_sum=false) {
         $countMoveSimCards=count($moveSimCards);
 
         if (!$source_agent_id) $source_agent_id=loggedAgentId();
@@ -481,19 +478,21 @@ class SimController extends BaseGxController {
         $idsToMove=Yii::app()->db->createCommand("select id from sim where ".$criteria->condition)->queryColumn($criteria->params);
         $ids_string = implode(",", $idsToMove);
 
-        //$totalNumberPrice = Sim::model()->getTotalNumberPrice($idsToMove);
-        //$totalSimPrice = $countMoveSimCards * $_POST['Move']['PriceForSim'];
+        $totalNumberPrice = Sim::model()->getTotalNumberPrice($idsToMove);
+        $totalSimPrice = $countMoveSimCards * $_POST['Move']['PriceForSim'];
         if ($countMoveSimCards == 0) return false;
 
         $model = new Act;
         $model->agent_id = $agent_id;
-        $model->dt = date('Y-m-d H:i:s', $_POST['Move']['date']);
-        $model->sum = 0;//$totalNumberPrice + $totalSimPrice;
+        $model->dt = new EDateTime();//date('Y-m-d H:i:s', $_POST['Move']['date']);
+
+        if (!$force_zero_sum)
+            $model->sum = $totalNumberPrice + $totalSimPrice;
+        else
+            $model->sum =0 ;
+
         $model->type = Act::TYPE_SIM;
         $model->save();
-
-        // update Agent stats
-        Agent::deltaSimCount($agent_id, $countMoveSimCards);
 
         $criteria = new CDbCriteria();
         $criteria->addInCondition('id', $idsToMove);
@@ -506,9 +505,6 @@ class SimController extends BaseGxController {
               WHERE id IN ($ids_string)";
 
         Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>loggedAgentId()));
-
-        $model->agent->recalcBalance();
-        $model->agent->save();
 
         //add NumberHistory
         $criteria = new CDbCriteria();

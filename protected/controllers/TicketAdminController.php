@@ -38,7 +38,7 @@ class TicketAdminController extends BaseGxController {
                 if (isset($_POST['done'])) {
                     $ticket->response=$ticket->internal;
                     $ticket->internal=null;
-                    $ticket->status=Ticket::STATUS_FOR_REVIEW;
+                    $ticket->status=Ticket::STATUS_DONE;
                 }
 
                 if (isset($_POST['toOperators'])) {
@@ -46,7 +46,7 @@ class TicketAdminController extends BaseGxController {
                 }
 
                 if (isset($_POST['reject'])) {
-                    $ticket->status=Ticket::STATUS_REFUSED_BY_ADMIN;
+                    $ticket->status=Ticket::STATUS_REFUSED;
                 }
 
                 if (isset($_POST['toMegafon'])) {
