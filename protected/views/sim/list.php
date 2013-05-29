@@ -105,11 +105,15 @@ $this->breadcrumbs = array(
             'filter'=>Number::getStatusDropDownList(),
             'header'=>Yii::t('app','Status'),
         ),
-        array(
+        /*array(
             'name'=>'support_status',
             'value'=>'Number::getSupportStatusLabel($data["support_status"])',
             'filter'=>Number::getSupportStatusDropDownList(array('0'=>'БЕЗ СТАТУСА')),
             'header'=>Yii::t('app','Support Status'),
+        ),*/
+        array(
+            'name'=>'number_city',
+            'header'=>Yii::t('app','City number'),
         ),
         array(
             'name'=>'support_operator_id',
