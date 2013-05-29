@@ -105,6 +105,14 @@ $this->breadcrumbs = array(
                 </label>
             </div>
         </div>
+        <div class="control-group " style="margin-bottom: 0;">
+            <div class="controls" style="margin-left: 10px;">
+                <label class="radio" for="TestForm_radioButton">
+                    <input name="MassChange[type]" value="replaceICC" type="radio">
+                    <?php echo Yii::t('app','Replacement ICC'); ?>
+                </label>
+            </div>
+        </div>
     </div>
     <!--<div style="width: 40%;float: left;">
         <h3><?php echo Yii::t('app','Changes') ?></h3>
@@ -133,8 +141,10 @@ $this->breadcrumbs = array(
     </div>
 </div>
 
+
 <div class="form-actions" style="padding: 20px;">
     <button name="action" value="restoreToBase" class="btn" type="submit" style="float: left;"><?php echo Yii::t('app','Change'); ?></button>
+    <?php /*
     <div class="control-group" style="float: left; margin: 0;">
         <div class="controls" style="margin: 0 0 0 40px;">
             <label class="checkbox">
@@ -143,7 +153,9 @@ $this->breadcrumbs = array(
             </label>
         </div>
     </div>
+    */ ?>
 </div>
+
 
 <?php $this->endWidget(); ?>
 

@@ -222,7 +222,7 @@ $this->widget('bootstrap.widgets.TbButton',array(
 <div id="addTicket">
     <?php
     $form = $this->beginWidget('BaseTbActiveForm', array(
-        'id' => 'send-other-question',
+        'id' => 'add-ticket',
         'enableAjaxValidation' => true,
         'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
     ));

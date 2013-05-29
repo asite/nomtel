@@ -78,7 +78,7 @@ class NumberController extends BaseGxController
 
     public function addTicket($id) {
         $form=new AddTicketForm();
-        $this->performAjaxValidation($form);
+        $this->performAjaxValidation($form,'add-ticket');
         if (isset($_POST['AddTicketForm'])) {
             $form->setAttributes($_POST['AddTicketForm']);
             if ($form->validate()) {
@@ -741,7 +741,25 @@ class NumberController extends BaseGxController
 
                     break;
                 case 'replaceICC':
-                    # code...
+                    $trx = Yii::app()->db->beginTransaction();
+
+                    $number = '';
+                    $dataCsv = $csv;
+
+                    $this->setCsvAndNumber($dataCsv, $number, $data);
+
+                    $sql ='select sim.id, sim.number, number.sim_id from sim join number on (number.sim_id=sim.parent_id) where sim.is_active=1 and sim.number in ('.substr($number,1).')';
+                    $sims = Yii::app()->db->createCommand($sql)->queryAll();
+
+                    foreach ($sims as $key=>$value) {
+                        $criteria = new CDbCriteria();
+                        $criteria->addColumnCondition(array('number'=>$value['number']));
+                        Sim::model()->updateAll(array('icc'=>$dataCsv[$value['number']]), $criteria);
+                    }
+                    $trx->commit();
+
+                    Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
+                    $this->refresh();
                     break;
                 case 'replaceICCWith':
                     # code...
