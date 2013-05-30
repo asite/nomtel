@@ -78,7 +78,7 @@ class NumberController extends BaseGxController
 
     public function addTicket($id) {
         $form=new AddTicketForm();
-        $this->performAjaxValidation($form);
+        $this->performAjaxValidation($form,'add-ticket');
         if (isset($_POST['AddTicketForm'])) {
             $form->setAttributes($_POST['AddTicketForm']);
             if ($form->validate()) {
