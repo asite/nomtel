@@ -471,7 +471,24 @@ if (isSupport()) {
 </div>
 <?php } ?>
 <h2>Тикеты</h2>
-<?php $this->widget('ootstrap.widgets.TbGridView', array(
+
+<style>#addTicket label {display:none;}</style>
+<div id="addTicket">
+    <?php
+    $form = $this->beginWidget('BaseTbActiveForm', array(
+        'id' => 'add-ticket',
+        'enableAjaxValidation' => true,
+        'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false)
+    ));
+    ?>
+    <?php echo $form->errorSummary($addTicket); ?>
+    <?=$form->textareaRow($addTicket,'text',array('style'=>'width:100%;','rows'=>3,'errorOptions'=>array('hideErrorMessage'=>true)));?><br/>
+    <?php echo CHtml::htmlButton('Написать в мегафон', array('style'=>'float:right','class'=>'btn', 'type'=>'submit')); ?>
+    <div class="clear"></div>
+    <?php $this->endWidget(); ?>
+</div>
+
+<?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id' => 'ticket-grid',
     'dataProvider' => $ticketsDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
