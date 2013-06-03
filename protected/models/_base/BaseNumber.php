@@ -12,6 +12,7 @@
  * @property string $id
  * @property string $sim_id
  * @property string $number
+ * @property string $number_city
  * @property string $personal_account
  * @property string $status
  * @property string $balance_status
@@ -70,20 +71,20 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			array('number', 'required'),
 			array('support_operator_id, user_id, support_passport_need_validation', 'numerical', 'integerOnly'=>true),
 			array('sim_id, balance_status, codeword, service_password, short_number', 'length', 'max'=>20),
-			array('number, personal_account', 'length', 'max'=>50),
+			array('number, number_city, personal_account', 'length', 'max'=>50),
 			array('status', 'length', 'max'=>7),
 			array('sim_price, number_price, balance', 'length', 'max'=>14),
 			array('support_status', 'length', 'max'=>12),
 			array('support_callback_name, support_getting_passport_variant, support_number_region_usage', 'length', 'max'=>200),
 			array('support_sent_sms_status', 'length', 'max'=>6),
 			array('balance_status_changed_dt, support_operator_got_dt, support_dt, support_callback_dt, balance_changed_dt', 'safe'),
-			array('sim_id, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation, balance, balance_changed_dt', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('sim_id, number_city, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation, balance, balance_changed_dt', 'default', 'setOnEmpty' => true, 'value' => null),
             array('balance_status_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_operator_got_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_callback_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('balance_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation, balance, balance_changed_dt', 'safe', 'on'=>'search'),
+			array('id, sim_id, number, number_city, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation, balance, balance_changed_dt', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -113,6 +114,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			'id' => Yii::t('app', 'ID'),
 			'sim_id' => null,
 			'number' => Yii::t('app', 'Number'),
+			'number_city' => Yii::t('app', 'Number City'),
 			'personal_account' => Yii::t('app', 'Personal Account'),
 			'status' => Yii::t('app', 'Status'),
 			'balance_status' => Yii::t('app', 'Balance Status'),
@@ -155,6 +157,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('sim_id', $this->sim_id);
 		$criteria->compare('number', $this->number, true);
+		$criteria->compare('number_city', $this->number_city, true);
 		$criteria->compare('personal_account', $this->personal_account, true);
 		$criteria->compare('status', $this->status, true);
 		$criteria->compare('balance_status', $this->balance_status, true);
