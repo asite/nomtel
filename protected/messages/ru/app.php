@@ -371,6 +371,7 @@ return array (
   'supportAdmin' => 'Администратор',
   'supportMain' => 'Главный оператор',
   'supportMegafon' => 'Оператор Мегафон',
+  'supportBeeline' => 'Оператор Билайн',
   'supportSuper' => 'Оператор Базы',
   'cashier' => 'Кассир',
   'the Agent' => 'У агента',

@@ -12,6 +12,7 @@ class SupportOperator extends BaseSupportOperator
     const ROLE_SUPPORT_ADMIN='supportAdmin';
     const ROLE_SUPPORT_MEGAFON='supportMegafon';
     const ROLE_SUPPORT_SUPER='supportSuper';
+    const ROLE_SUPPORT_BEELINE='supportBeeline';
     const ROLE_CASHIER='cashier';
 
     public static function model($className=__CLASS__) {
@@ -68,8 +69,9 @@ class SupportOperator extends BaseSupportOperator
                 self::ROLE_SUPPORT_MAIN=>Yii::t('app','supportMain'),
                 self::ROLE_SUPPORT_ADMIN=>Yii::t('app','supportAdmin'),
                 self::ROLE_SUPPORT_MEGAFON=>Yii::t('app','supportMegafon'),
+                self::ROLE_SUPPORT_BEELINE=>Yii::t('app','supportBeeline'),
                 self::ROLE_SUPPORT_SUPER=>Yii::t('app','supportSuper'),
-                self::ROLE_CASHIER=>Yii::t('app','cashier')
+                self::ROLE_CASHIER=>Yii::t('app','cashier'),
             );
         }
 
