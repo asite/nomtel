@@ -79,6 +79,13 @@
             );
         }
 
+        if (Yii::app()->user->role=='supportBeeline') {
+            $menuLeft=array(
+                '',
+                array('label' => 'Список номеров', 'url' => $this->createUrl('supportBeeline/numberList'),'active'=>in_array($this->route,array('supportBeeline/numberList'))),
+            );
+        }
+
         $menuLeft=array_merge($menuLeft,array(
             '',
             array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),

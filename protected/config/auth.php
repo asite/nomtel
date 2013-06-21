@@ -44,6 +44,13 @@ return array(
         )
     ),
 
+    'supportBeeline' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+            'updateSubscriptionAgreementForBeelineNumber'
+        )
+    ),
+
     'supportSuper' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
