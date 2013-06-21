@@ -78,7 +78,10 @@ $this->breadcrumbs = array(
         ),
         array(
             'name'=>'number',
+            'type'=>'raw',
             'header'=>Yii::t('app','Number'),
+            'value'=>'CHtml::link($data["number"], Yii::app()->createUrl("number/".(Yii::app()->user->checkAccess("editNumberCard") ? "edit":"view"),array("id"=>$data["number_id"])));',
+
         ),
         array(
             'name'=>'icc',
@@ -94,24 +97,30 @@ $this->breadcrumbs = array(
             )
         ),
         array(
+            'name'=>'operator_region_id',
+            'value'=>'$data["operator_region"]',
+            'filter'=>OperatorRegion::getComboList(),
+            'header'=>OperatorRegion::label(1),
+        ),
+        array(
             'name'=>'tariff_id',
             'value'=>'$data["tariff"]',
             'filter'=>Tariff::getComboList(),
             'header'=>Tariff::label(1),
         ),
-        array(
+        /*array(
             'name'=>'status',
             'value'=>'Number::getStatusLabel($data["status"])',
             'filter'=>Number::getStatusDropDownList(),
             'header'=>Yii::t('app','Status'),
-        ),
+        ),*/
         /*array(
             'name'=>'support_status',
             'value'=>'Number::getSupportStatusLabel($data["support_status"])',
             'filter'=>Number::getSupportStatusDropDownList(array('0'=>'БЕЗ СТАТУСА')),
             'header'=>Yii::t('app','Support Status'),
         ),*/
-        array(
+        /*array(
             'name'=>'number_city',
             'header'=>Yii::t('app','City number'),
         ),
@@ -120,7 +129,7 @@ $this->breadcrumbs = array(
             'value'=>'CHtml::encode($data["so_surname"]." ".$data["so_name"])',
             'filter'=>SupportOperator::getComboList(array(0=>'БЕЗ ОПЕРАТОРА')),
             'header'=>SupportOperator::label(),
-        ),
+        ),*/
         array(
             'name'=>'balance_status',
             'value'=>'Number::getBalanceStatusLabel($data["balance_status"])',

@@ -113,6 +113,14 @@ $this->breadcrumbs = array(
                 </label>
             </div>
         </div>
+        <div class="control-group " style="margin-bottom: 0;">
+            <div class="controls" style="margin-left: 10px;">
+                <label class="radio" for="TestForm_radioButton">
+                    <input name="MassChange[type]" value="balanceStatus" type="radio">
+                    <?php echo Yii::t('app','Balance Status'); ?>
+                </label>
+            </div>
+        </div>
     </div>
     <!--<div style="width: 40%;float: left;">
         <h3><?php echo Yii::t('app','Changes') ?></h3>
