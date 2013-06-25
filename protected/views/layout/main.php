@@ -35,7 +35,7 @@
             '',
             array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         ));
     }
 
@@ -88,7 +88,7 @@
 
         $menuLeft=array_merge($menuLeft,array(
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         ));
     }
 
@@ -99,7 +99,7 @@
             array('label' => 'Статистика', 'url' => $this->createUrl('cashier/stats'), 'active' => $this->id=='cashier/stats'),
             array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         );
     }
 
@@ -158,7 +158,7 @@
             '',
             array('label' => Yii::t('app', 'Set Number Region'), 'url' => $this->createUrl('number/setNumberRegion'), 'active' => $this->route == 'number/setNumberRegion'),
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         );
     }
 

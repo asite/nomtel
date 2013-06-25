@@ -22,6 +22,7 @@ class UserIdentity extends CUserIdentity
                 if ($agent) {
                     $this->setState('agentId', $agent->id);
                     $this->setState('role',$agent->id==adminAgentId() ? 'admin':'agent');
+                    $this->setState('username',$agent->user->username);
                     if ($agent->id==adminAgentId())
                         $this->setState('supportOperatorId',SupportOperator::OPERATOR_ADMIN_ID);
                     return true;
@@ -31,6 +32,7 @@ class UserIdentity extends CUserIdentity
                     $this->setState('supportOperatorId', $supportOperator->id);
                     $this->setState('agentId', adminAgentId());
                     $this->setState('role',$supportOperator->role);
+                    $this->setState('username',$supportOperator->user->username);
                     return true;
                 }
             }
