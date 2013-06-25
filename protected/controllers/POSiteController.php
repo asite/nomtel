@@ -139,7 +139,7 @@ class POSiteController extends Controller
         }
 
         if (empty($person_files)) {
-            Yii::app()->user->setFlash('error','загрузите пожалуйства фотографии документов');
+            Yii::app()->user->setFlash('error','загрузите пожалуйста фотографии документов');
             $this->refresh();
         }
 
