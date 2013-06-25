@@ -68,7 +68,7 @@ class BonusReportController extends BaseGxController
 
         $criteria->compare('brn.bonus_report_id',$id);
         $criteria->compare('n.number', $bonusReportNumberSearch->number, true);
-        $criteria->compare('n.personal_account', $bonusReportNumberSearch->personal_account, true);
+        $criteria->compare('s.tariff_id', $bonusReportNumberSearch->tariff_id);
         $criteria->compare('brn.turnover', $bonusReportNumberSearch->turnover, true);
         $criteria->compare('brn.rate', $bonusReportNumberSearch->rate, true);
         $criteria->compare('brn.sum', $bonusReportNumberSearch->sum, true);
@@ -83,12 +83,14 @@ class BonusReportController extends BaseGxController
 
         $sql = "from bonus_report_number brn
             left outer join number n on (brn.number_id=n.id)
+            left outer join sim s on (s.id=n.sim_id)
+            left outer join tariff t on (s.tariff_id=t.id)
             left outer join agent a on (a.id=brn.agent_id)
             where " . $criteria->condition;
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider2 = new CSqlDataProvider('select a.*,n.*,brn.* ' . $sql, array(
+        $dataProvider2 = new CSqlDataProvider('select a.*,n.*,brn.*,s.tariff_id,t.title as tariff ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
