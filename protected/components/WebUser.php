@@ -12,7 +12,7 @@ class WebUser extends CWebUser
 
     function getAvailableRoles() {
         return array(
-            'supportSuper'=>SupportOperator::getRoleLabel('supportSuper'),
+            'supportSuper'=>'Склад',
             'agent'=>Agent::label(),
             'cashier'=>SupportOperator::getRoleLabel('cashier')
         );
