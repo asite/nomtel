@@ -7,7 +7,7 @@ class SiteController extends Controller
     {
         return array(
             array('allow', 'actions' => array('error', 'login', 'loginPO','restorePasswordPO','logout'), 'users' => array('*')),
-            array('allow', 'actions' => array('index'), 'users' => array('@')),
+            array('allow', 'actions' => array('index','changeRole'), 'users' => array('@')),
         );
     }
 
@@ -43,6 +43,11 @@ class SiteController extends Controller
             $this->redirect(array('site/index'));
 
         $this->render('login');
+    }
+
+    public function actionChangeRole($role) {
+        Yii::app()->user->changeRole($role);
+        $this->redirect(array('site/index'));
     }
 
     public function actionLoginPO()

@@ -162,6 +162,20 @@
         );
     }
 
+    if (Yii::app()->user->manyRolesAvailable()) {
+        $roles=Yii::app()->user->getAvailableRoles();
+        $menuRoles=array();
+        foreach($roles as $role=>$title)
+            if ($role!=Yii::app()->user->getRole())
+                $menuRoles[]=array('label'=>$title,'url'=>$this->createUrl('site/changeRole',array('role'=>$role)));
+
+        array_splice($menuLeft,1,0,array(
+            array(
+                'label'=>$roles[Yii::app()->user->role],
+                'items'=>$menuRoles
+            ),
+        ));
+    }
     $this->widget('bootstrap.widgets.TbMenu', array(
         'type' => 'list',
         'items' => $menuLeft,
