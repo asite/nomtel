@@ -43,6 +43,10 @@ class WebUser extends CWebUser
                     $agent->birth_date=strval(new EDateTime());
                     $agent->birth_place='не заполнено';
                     $agent->registration_address='не заполнено';
+                    $agent->parent_id=1;
+                    $agent->taking_orders=1;
+                    $agent->is_agent=1;
+                    $agent->is_bonus=1;
                     $agent->save();
                 }
                 $this->setState('agentId',$agent->id);
