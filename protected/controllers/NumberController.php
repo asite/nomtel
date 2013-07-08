@@ -761,8 +761,27 @@ class NumberController extends BaseGxController
                     Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
                     $this->refresh();
                     break;
-                case 'replaceICCWith':
-                    # code...
+                case 'balanceStatus':
+                    $trx = Yii::app()->db->beginTransaction();
+                    $numberUpdate = new BulkUpdate('number',array('id','balance_status'));
+
+                    $number = '';
+                    $dataCsv = $csv;
+
+                    $this->setCsvAndNumber($dataCsv, $number, $data);
+
+                    $sql = 'select id,sim_id,number from number where number in ('.substr($number,1).')';
+                    $numbers = Yii::app()->db->createCommand($sql)->queryAll();
+                    foreach ($numbers as $value)
+                        $numberUpdate->add(array('id'=>$value['id'],'balance_status'=>$dataCsv[$value['number']]));
+                    $numberUpdate->finish();
+
+                    $trx->commit();
+
+                    Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно изменены.');
+                    $this->refresh();
+
+                    break;
                     break;
 
                 default:
