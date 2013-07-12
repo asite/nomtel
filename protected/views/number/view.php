@@ -238,7 +238,7 @@ $this->widget('bootstrap.widgets.TbButton',array(
 </div>
 
 
-<?php $this->widget('ootstrap.widgets.TbGridView', array(
+<?php $this->widget('bootstrap.widgets.TbGridView', array(
         'id' => 'ticket-grid',
         'dataProvider' => $ticketsDataProvider,
         'itemsCssClass' => 'table table-striped table-bordered table-condensed',

@@ -123,8 +123,6 @@ class POSiteController extends Controller
         foreach($person->files as $file)
             $person_files[]=$file->getUploaderInfo();
 
-        $data['person_files']=json_encode($person_files);
-
         if (!isset($_POST['person_files'])) return;
 
         if (isset($_POST['person_files'])) {
@@ -138,6 +136,11 @@ class POSiteController extends Controller
                 $person_files_json[]=$file->getUploaderInfo();
             }
             $data['person_files']=json_encode($person_files_json);
+        }
+
+        if (empty($person_files)) {
+            Yii::app()->user->setFlash('error','загрузите пожалуйста фотографии документов');
+            $this->refresh();
         }
 
         //if (!isset($_POST['Person'])) return;

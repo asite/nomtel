@@ -7,7 +7,7 @@ class SubscriptionAgreementController extends BaseGxController {
         return array(
             array('allow', 'roles' => array('agent')),
             array('allow', 'actions'=>array('update','create'), 'roles'=>array('support')),
-            array('allow', 'actions'=>array('update'),'roles' => array('supportMegafon')),
+            array('allow', 'actions'=>array('update'),'roles' => array('supportMegafon','supportBeeline')),
         );
     }
 

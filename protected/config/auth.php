@@ -44,6 +44,13 @@ return array(
         )
     ),
 
+    'supportBeeline' => array(
+        'type' => CAuthItem::TYPE_ROLE,
+        'children' => array(
+            'updateSubscriptionAgreementForBeelineNumber'
+        )
+    ),
+
     'supportSuper' => array(
         'type' => CAuthItem::TYPE_ROLE,
         'children' => array(
@@ -92,6 +99,14 @@ return array(
     'updateSubscriptionAgreementForMegafonNumber' => array (
         'type' => CAuthItem::TYPE_TASK,
         'bizRule' => 'return $params["number"]->sim->operator_id==Operator::OPERATOR_MEGAFON_ID;',
+        'children' => array(
+            'updateSubscriptionAgreement'
+        )
+    ),
+
+    'updateSubscriptionAgreementForBeelineNumber' => array (
+        'type' => CAuthItem::TYPE_TASK,
+        //'bizRule' => 'return $params["number"]->sim->operator_id==Operator::OPERATOR_MEGAFON_ID;',
         'children' => array(
             'updateSubscriptionAgreement'
         )

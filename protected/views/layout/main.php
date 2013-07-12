@@ -35,7 +35,7 @@
             '',
             array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         ));
     }
 
@@ -79,9 +79,16 @@
             );
         }
 
+        if (Yii::app()->user->role=='supportBeeline') {
+            $menuLeft=array(
+                '',
+                array('label' => 'Список номеров', 'url' => $this->createUrl('supportBeeline/numberList'),'active'=>in_array($this->route,array('supportBeeline/numberList'))),
+            );
+        }
+
         $menuLeft=array_merge($menuLeft,array(
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         ));
     }
 
@@ -92,7 +99,7 @@
             array('label' => 'Статистика', 'url' => $this->createUrl('cashier/stats'), 'active' => $this->id=='cashier/stats'),
             array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         );
     }
 
@@ -151,10 +158,24 @@
             '',
             array('label' => Yii::t('app', 'Set Number Region'), 'url' => $this->createUrl('number/setNumberRegion'), 'active' => $this->route == 'number/setNumberRegion'),
             '',
-            array('label' => Yii::t('app', 'Logout'), 'url' => $this->createUrl('site/logout')),
+            array('label' => Yii::t('app', 'Logout').' ('.Yii::app()->user->getState('username').')', 'url' => $this->createUrl('site/logout')),
         );
     }
 
+    if (Yii::app()->user->manyRolesAvailable()) {
+        $roles=Yii::app()->user->getAvailableRoles();
+        $menuRoles=array();
+        foreach($roles as $role=>$title)
+            if ($role!=Yii::app()->user->getRole())
+                $menuRoles[]=array('label'=>$title,'url'=>$this->createUrl('site/changeRole',array('role'=>$role)));
+
+        array_splice($menuLeft,1,0,array(
+            array(
+                'label'=>$roles[Yii::app()->user->role],
+                'items'=>$menuRoles
+            ),
+        ));
+    }
     $this->widget('bootstrap.widgets.TbMenu', array(
         'type' => 'list',
         'items' => $menuLeft,

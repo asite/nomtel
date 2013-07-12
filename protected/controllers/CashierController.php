@@ -207,7 +207,8 @@ class CashierController extends BaseGxController
 
         $this->render('sell', array(
             'number' => $number,
-            'model' => $model
+            'model' => $model,
+            'prefixRegionModel'=>new IccPrefixRegion
         ));
     }
 

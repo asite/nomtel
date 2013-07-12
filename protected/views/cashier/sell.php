@@ -18,6 +18,24 @@
 
     <?php echo $form->textFieldRow($model,'icc',array('class'=>'span3','maxlength'=>25,'hint'=>'введите icc с регионом "'.$number->sim->operatorRegion->title.'"')); ?>
 
+    <?php $this->widget('TbExtendedGridViewExport', array(
+        'id' => 'number-grid',
+        'dataProvider' => $prefixRegionModel->search(),
+        'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+        'columns' => array(
+            'icc_prefix',
+            array(
+                'name'=>'operator_id',
+                'header'=>'Оператор',
+                'value'=>'$data["operator"]',
+            ),
+            array(
+                'name'=>'operator_region_id',
+                'header'=>'Регион',
+                'value'=>'$data["operatorRegion"]',
+            ),
+        ),
+    )); ?>
     <?php echo $form->radioButtonListRow($model,'type',CashierSellForm::getTypeList(),array('onchange'=>'toggleAgentId()')); ?>
 
     <div class="control-group" id="agent_id" <?php if($model->type!=CashierSellForm::TYPE_AGENT){ ?>style="display:none;"<?php }?> >

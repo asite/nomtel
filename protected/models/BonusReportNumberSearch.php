@@ -4,7 +4,7 @@
 class BonusReportNumberSearch extends CFormModel
 {
     public $number;
-    public $personal_account;
+    public $tariff_id;
     public $turnover;
     public $rate;
     public $sum;
@@ -13,7 +13,7 @@ class BonusReportNumberSearch extends CFormModel
 
     public function rules() {
         return array(
-            array('number,personal_account,turnover,rate,sum,agent_id,status','safe')
+            array('number,tariff_id,turnover,rate,sum,agent_id,status','safe')
         );
     }
 }

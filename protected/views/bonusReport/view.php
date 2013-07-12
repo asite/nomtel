@@ -5,18 +5,6 @@ $this->breadcrumbs = array(
     $bonusReport->adminLabel($bonusReport->label(1)),
 );
 
-Yii::app()->clientScript->registerScript('search', "
-$('.search-button').click(function(){
-	$('.search-form').toggle();
-	return false;
-});
-$('.search-form form').submit(function(){
-	$.fn.yiiGridView.update('agent-grid', {
-		data: $(this).serialize()
-	});
-	return false;
-});
-");
 ?>
 
 <h1><?php echo $bonusReport->adminLabel($bonusReport->label(1)); ?></h1>
@@ -67,8 +55,10 @@ $('.search-form form').submit(function(){
             'header'=>Yii::t('app','Number'),
         ),
         array(
-            'name'=>'personal_account',
-            'header'=>Yii::t('app','Personal Account'),
+            'name'=>'tariff_id',
+            'header'=>Yii::t('app','Tariff'),
+            'filter'=>Tariff::getComboList(),
+            'value'=>'$data["tariff"]'
         ),
         array(
             'name'=>'turnover',
