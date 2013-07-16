@@ -24,7 +24,7 @@
 
                 <?php echo $form->textFieldRow($model,'price_license_fee',array('class'=>'span1')); ?>
 
-                <?php echo $form->redactorRow($model, 'description', array('class'=>'span4', 'rows'=>5)); ?>
+                <?php echo $form->redactorRow($model, 'description', array()); ?>
   </div>
 
 
