@@ -434,7 +434,6 @@ class SimController extends BaseGxController {
 
 
     public function actionMassSelect() {
-
         if ($_POST['ICCtoSelect'] != '') {
             $id_arr = explode("\n", $_POST['ICCtoSelect']);
 

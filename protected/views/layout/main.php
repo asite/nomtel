@@ -32,6 +32,7 @@
             array('label' => BonusReport::model()->label(2), 'url' => $this->createUrl('bonusReport/list'), 'active' => $this->route == 'bonusReport/list', 'visible'=>isFlag('is_bonus')),
             //array('label' => Number::label(2), 'url' => $this->createUrl('number/list'), 'active' => $this->id == 'number'),
             array('label' => Act::model()->label(2), 'url' => $this->createUrl('act/list'), 'active' => $this->route == 'act/list', 'visible'=>isFlag()),
+            array('label' => 'Сформировать акт', 'url' => $this->createUrl('act/fromParent'), 'active' => $this->route == 'act/fromParent', 'visible'=>isFlag('is_making_parent_invoices')),
             '',
             array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             '',
