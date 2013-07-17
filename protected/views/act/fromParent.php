@@ -8,7 +8,7 @@
 $(document).ready(function(){$('#ICCtoSelect').focus();});
 </script>
 
-<h1>Сформировать акт приема SIM от вышестоящего агента/базы</h1>
+<h1>Сформировать акт приема SIM от вышестоящего агента или базы</h1>
 
 
 <?php
@@ -22,6 +22,6 @@ $(document).ready(function(){$('#ICCtoSelect').focus();});
 <label>ICC номера / Номера телефона:</label>
 <textarea name="ICCtoSelect" id="ICCtoSelect" rows="20" style="width:100%"></textarea>
 
-<?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'moveSim'), array('class'=>'btn btn-primary', 'style'=> 'float: right', 'type'=>'submit')); ?>
+<?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> Принять', array('class'=>'btn btn-primary', 'style'=> 'float: right', 'type'=>'submit')); ?>
 
 <?php $this->endWidget(); ?>
