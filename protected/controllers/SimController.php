@@ -469,6 +469,11 @@ class SimController extends BaseGxController {
         $countMoveSimCards=count($moveSimCards);
 
         if (!$source_agent_id) $source_agent_id=loggedAgentId();
+        if ($agent_id==loggedAgentId()) {
+            $agent=Agent::model()->findByPk(loggedAgentId());
+            $source_agent_id=$agent->parent_id;
+        }
+
         $criteria = new CDbCriteria();
         $criteria->addInCondition('id', $moveSimCards);
         $criteria->addColumnCondition(array('parent_agent_id' => $source_agent_id));
@@ -503,7 +508,7 @@ class SimController extends BaseGxController {
               FROM sim as s
               WHERE id IN ($ids_string)";
 
-        Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>loggedAgentId()));
+        Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>$source_agent_id));
 
         //add NumberHistory
         $criteria = new CDbCriteria();
@@ -523,9 +528,14 @@ class SimController extends BaseGxController {
         $sessionData=new SessionData(__CLASS__);
         $moveSimCards=$sessionData->get($key);
 
+        if (isset($_REQUEST['Act']['agent_id'])) {
+            $_POST['Act']['agent_id']=$_REQUEST['Act']['agent_id'];
+            $force_agent_id=$_REQUEST['Act']['agent_id'];
+        }
+        $agent_id = $_POST['Act']['agent_id'];
+        if ($agent_id == 0) $_POST['Act']['agent_id']='';
+
         if ($_POST['Move']) {
-            $agent_id = $_POST['Act']['agent_id'];
-            if ($agent_id == 0) $_POST['Act']['agent_id']='';
             $model = new Act;
             $this->performAjaxValidation($model, 'move-sim');
 
@@ -543,17 +553,24 @@ class SimController extends BaseGxController {
             $sessionData->delete($key);
             $this->redirect(Yii::app()->createUrl('site/index'));
         } else {
+            if ($agent_id==loggedAgentId()) {
+                $agent=Agent::model()->findByPk(loggedAgentId());
+                $source_agent_id=$agent->parent_id;
+            } else {
+                $source_agent_id=loggedAgentId();
+            }
+
             $criteria = new CDbCriteria();
             $criteria->addInCondition('id', $moveSimCards);
-            $criteria->addColumnCondition(array('parent_agent_id' => loggedAgentId()));
+            $criteria->addColumnCondition(array('parent_agent_id' => $source_agent_id));
             $criteria->addCondition('agent_id is null');
             $dataProvider = new CActiveDataProvider('Sim', array('criteria' => $criteria));
 
             $act = new Act;
             $total = Sim::model()->getTotalNumberPrice($moveSimCards);
-            $agent = Agent::model()->getComboList();
-            $agent = array('0'=>Yii::t('app', 'Select Agent')) + $agent;
-            $this->render('move', array('model' => $model, 'dataProvider' => $dataProvider, 'agent' => $agent, 'totalNumberPrice' => $total, 'act'=>$act));
+            $agents = Agent::model()->getComboList();
+            $agents = array('0'=>Yii::t('app', 'Select Agent')) + $agents;
+            $this->render('move', array('force_agent_id'=>$force_agent_id,'model' => $model, 'dataProvider' => $dataProvider, 'agent' => $agents, 'totalNumberPrice' => $total, 'act'=>$act));
         }
     }
 
@@ -670,7 +687,7 @@ class SimController extends BaseGxController {
         else
             $criteria->addCondition("n.support_operator_id is null");
 
-        $criteria->compare('s.icc',$model->icc);
+        $criteria->compare('s.icc',$model->icc,true);
         $criteria->compare('s.operator_id',$model->operator_id);
         $criteria->compare('s.tariff_id',$model->tariff_id);
         $criteria->compare('s.operator_region_id',$model->operator_region_id);

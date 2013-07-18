@@ -34,13 +34,12 @@ class ActController extends BaseGxController
             }
 
             if (count($ids) > 0) {
-                $sessionData=new SessionData(__CLASS__);
+                $sessionData=new SessionData('SimController');
                 $key=$sessionData->add($ids);
 
-                $this->redirect(array('sim/move', 'key' => $key));
+                $this->redirect(array('sim/move', 'key' => $key,'Act[agent_id]'=>loggedAgentId()));
             } else
-                Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> не найдено сим в базе
-            .');
+                Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> не найдено сим в базе.');
         }
 
         $this->render('fromParent');
