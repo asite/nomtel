@@ -401,4 +401,6 @@ return array (
   'Is Agent' => 'Показать/Скрыть агентов',
   'Is Bonus' => 'Показать/Скрыть бонусы',
   'City number'=>'Городской номер',
+  'Passport data'=>'Паспортные данные',
+  'Registration address'=>'Адрес регистрации',
 );
