@@ -4,6 +4,7 @@
 class SupportBeelineNumberSearch extends CFormModel
 {
     public $personal_account;
+    public $icc;
     public $number;
     public $name;
     public $surname;
@@ -12,7 +13,7 @@ class SupportBeelineNumberSearch extends CFormModel
 
     public function rules() {
         return array(
-            array('personal_account,number,name,surname,middle_name,registration_address','safe')
+            array('personal_account,icc,number,name,surname,middle_name,registration_address','safe')
         );
     }
 }
