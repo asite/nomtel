@@ -104,6 +104,14 @@ return array(
         )
     ),
 
+    'updateSubscriptionAgreementForBeelineNumber' => array (
+        'type' => CAuthItem::TYPE_TASK,
+        //'bizRule' => 'return $params["number"]->sim->operator_id==Operator::OPERATOR_MEGAFON_ID;',
+        'children' => array(
+            'updateSubscriptionAgreement'
+        )
+    ),
+
     'createSubscriptionAgreement' => array(
         'type' => CAuthItem::TYPE_OPERATION,
         'bizRule' => 'return in_array($params["number_status"],array(Number::STATUS_FREE,Number::STATUS_UNKNOWN));'

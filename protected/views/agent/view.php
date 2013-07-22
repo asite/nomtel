@@ -53,7 +53,7 @@ $this->breadcrumbs = array(
                 'label'=>'Баланс'
             ),
             array(
-                'value'=>$totalSims.'('.number_format(100*$activeSims/$totalSims,1).'%)',
+                'value'=>$totalSims.'('.($totalSims>0 ? number_format(100*$activeSims/$totalSims,1):'0').'%)',
                 'label'=>'Кол-во сим'
             ),
     ),

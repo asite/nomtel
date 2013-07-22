@@ -68,7 +68,7 @@ class BonusReportController extends BaseGxController
 
         $criteria->compare('brn.bonus_report_id',$id);
         $criteria->compare('n.number', $bonusReportNumberSearch->number, true);
-        $criteria->compare('n.personal_account', $bonusReportNumberSearch->personal_account, true);
+        $criteria->compare('s.tariff_id', $bonusReportNumberSearch->tariff_id);
         $criteria->compare('brn.turnover', $bonusReportNumberSearch->turnover, true);
         $criteria->compare('brn.rate', $bonusReportNumberSearch->rate, true);
         $criteria->compare('brn.sum', $bonusReportNumberSearch->sum, true);
@@ -83,12 +83,14 @@ class BonusReportController extends BaseGxController
 
         $sql = "from bonus_report_number brn
             left outer join number n on (brn.number_id=n.id)
+            left outer join sim s on (s.id=n.sim_id)
+            left outer join tariff t on (s.tariff_id=t.id)
             left outer join agent a on (a.id=brn.agent_id)
             where " . $criteria->condition;
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider2 = new CSqlDataProvider('select a.*,n.*,brn.* ' . $sql, array(
+        $dataProvider2 = new CSqlDataProvider('select a.*,n.*,brn.*,s.tariff_id,t.title as tariff ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
@@ -318,16 +320,16 @@ class BonusReportController extends BaseGxController
 
         $rows = $sheet->getHighestRow();
 
-        if ($sheet->getCellByColumnAndRow(3, 14)->getValue() != 'CTN')
+        if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
             $this->errorInvalidFormat(__LINE__);
-        if ($sheet->getCellByColumnAndRow(7, 14)->getValue() != 'Выручка без учета НДС, руб.')
+        if ($sheet->getCellByColumnAndRow(30, 5)->getValue() != 'Выручка для расчёта вознаграждения без учёта НДС, руб.')
             $this->errorInvalidFormat(__LINE__);
 
         $simBonus = array();
         $sum = 0;
-        for ($row = 15; $row <= $rows; $row++) {
-            $ctn = trim($sheet->getCellByColumnAndRow(3, $row)->getValue());
-            $bonus = $sheet->getCellByColumnAndRow(7, $row)->getValue();
+        for ($row = 6; $row <= $rows; $row++) {
+            $ctn = trim($sheet->getCellByColumnAndRow(12, $row)->getValue());
+            $bonus = $sheet->getCellByColumnAndRow(30, $row)->getValue();
 
             $sum += $bonus;
 

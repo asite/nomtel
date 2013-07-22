@@ -207,7 +207,8 @@ class CashierController extends BaseGxController
 
         $this->render('sell', array(
             'number' => $number,
-            'model' => $model
+            'model' => $model,
+            'prefixRegionModel'=>new IccPrefixRegion
         ));
     }
 
@@ -343,7 +344,8 @@ class CashierController extends BaseGxController
         if (isset($_POST['CashierStatistic'])) {
             $this->redirect(array('stats',
                 'CashierStatistic[date_from]'=>$_POST['CashierStatistic']['date_from'],
-                'CashierStatistic[date_to]'=>$_POST['CashierStatistic']['date_to']
+                'CashierStatistic[date_to]'=>$_POST['CashierStatistic']['date_to'],
+                'CashierStatistic[support_operator_id]'=>$_POST['CashierStatistic']['support_operator_id'],
             ));
         }
         if (isset($_REQUEST['CashierStatistic'])) {
@@ -366,10 +368,14 @@ class CashierController extends BaseGxController
             ':date_to'=>$date_to->toMysqlDate(),
         );
 
-        $where='';
         if (Yii::app()->user->role=='cashier') {
+            $model->support_operator_id=loggedSupportOperatorId();
+        }
+
+        $where='';
+        if ($model->support_operator_id) {
             $where=' and support_operator_id=:support_operator_id';
-            $params[':support_operator_id']=loggedSupportOperatorId();
+            $params[':support_operator_id']=$model->support_operator_id;
         }
         $params[':role']='cashier';
 
@@ -393,8 +399,8 @@ class CashierController extends BaseGxController
             $cashierNumber->setAttributes($_REQUEST['CashierNumberSearch2']);
 
         $criteria=new CDbCriteria;
-        if (Yii::app()->user->role=='cashier') {
-            $criteria->compare('cn.support_operator_id',loggedSupportOperatorId());
+        if ($model->support_operator_id) {
+            $criteria->compare('cn.support_operator_id',$model->support_operator_id);
         }
         $criteria->addCondition('type=:type');
         $criteria->params[':type']=CashierNumber::TYPE_SELL;
@@ -448,13 +454,19 @@ class CashierController extends BaseGxController
             ':date_to'=>$date_to->toMysqlDate()
         ));
 
-        if (Yii::app()->user->role=='cashier') {
-            $balance=$this->getBalance(loggedSupportOperatorId());
-
+        //if ($model->support_operator_id) {
             $collection=new CashierCollection;
-            $collection->cashier_support_operator_id=loggedSupportOperatorId();
+            $collection->cashier_support_operator_id=$model->support_operator_id;
             $collectionDataProvider=$collection->search();
-        }
+        //}
+
+
+        $curDate=new EDateTime($date_from->toMysqlDate());
+        $tomorrowDate=$curDate->modifiedCopy('+1 DAY');
+
+        $balance=$this->getBalance($model->support_operator_id);
+        $morningBalance=$this->getBalance($model->support_operator_id,$curDate);
+        $eveningBalance=$this->getBalance($model->support_operator_id,$tomorrowDate);
 
         $this->render('stats',array(
             'dataProvider'=>new CArrayDataProvider($rows),
@@ -464,17 +476,32 @@ class CashierController extends BaseGxController
             'cashierNumberModel'=>$cashierNumber,
             'total'=>$total,
             'balance'=>$balance,
-            'collectionDataProvider'=>$collectionDataProvider
+            'collectionDataProvider'=>$collectionDataProvider,
+            'morningBalance'=>$morningBalance,
+            'eveningBalance'=>$eveningBalance,
         ));
     }
 
-    private function getBalance($support_operator_id) {
-        $total_in=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number where support_operator_id=:support_operator_id")->queryScalar(array(
-            ':support_operator_id'=>loggedSupportOperatorId()
-        ));
-        $total_out=Yii::app()->db->createCommand("select sum(`sum`) from cashier_collection where cashier_support_operator_id=:support_operator_id")->queryScalar(array(
-            ':support_operator_id'=>loggedSupportOperatorId()
-        ));
+    private function getBalance($support_operator_id,$dt=null) {
+        if (!$dt) $dt=new EDateTime();
+
+        if ($support_operator_id) {
+            $total_in=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number where support_operator_id=:support_operator_id and dt<:dt")->queryScalar(array(
+                ':support_operator_id'=>$support_operator_id,
+                ':dt'=>$dt->toMysqlDateTime()
+            ));
+            $total_out=Yii::app()->db->createCommand("select sum(`sum`) from cashier_collection where cashier_support_operator_id=:support_operator_id and dt<:dt")->queryScalar(array(
+                ':support_operator_id'=>$support_operator_id,
+                ':dt'=>$dt->toMysqlDateTime()
+            ));
+        } else {
+            $total_in=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number where dt<:dt")->queryScalar(array(
+                ':dt'=>$dt->toMysqlDateTime()
+            ));
+            $total_out=Yii::app()->db->createCommand("select sum(`sum`) from cashier_collection where dt<:dt")->queryScalar(array(
+                ':dt'=>$dt->toMysqlDateTime()
+            ));
+        }
 
         $balance=$total_in-$total_out;
 
