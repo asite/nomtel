@@ -84,6 +84,13 @@ $this->breadcrumbs = array(
 
         ),
         array(
+            'name'=>'number_city',
+            'type'=>'raw',
+            'header'=>Yii::t('app','City Number'),
+            'value'=>'$data["number_city"]',
+
+        ),
+        array(
             'name'=>'icc',
             'header'=>Yii::t('app','Icc'),
         ),

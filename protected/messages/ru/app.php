@@ -403,4 +403,5 @@ return array (
   'City number'=>'Городской номер',
   'Passport data'=>'Паспортные данные',
   'Registration address'=>'Адрес регистрации',
+  'City Number'=>'Городской номер',
 );
