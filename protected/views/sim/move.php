@@ -137,6 +137,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
 </div>
 <?php echo $form->errorSummary($act); ?>
 <div style="display: none;"><?php echo $form->error($act,'agent_id'); ?></div>
+<?php if (!$force_agent_id) { ?>
 <div class="control-group left-label cfix">
   <label for="Act_agent_id" class="required"><?php echo Yii::t('app','to Agent'); ?> <span class="required">*</span></label>
   <div class="controls">
@@ -152,6 +153,7 @@ $this->widget('bootstrap.widgets.TbGridView', array(
     ?>
   </div>
 </div>
+<?php } else { echo CHtml::hiddenField('Act[agent_id]',$force_agent_id); } ?>
 
 
 <div class="total_items_price" >

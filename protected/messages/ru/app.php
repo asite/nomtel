@@ -17,6 +17,7 @@
  * NOTE, this file must be saved in UTF-8 encoding.
  */
 return array (
+  'Is Making Parent Invoices'=>'Формировать акты',
   'STATUS_NO_PAYOUT'=>'Выплата не положена',
   'AgentReferralRate|AgentReferralRates' => '',
   'All' => '',
@@ -400,4 +401,7 @@ return array (
   'Is Agent' => 'Показать/Скрыть агентов',
   'Is Bonus' => 'Показать/Скрыть бонусы',
   'City number'=>'Городской номер',
+  'Passport data'=>'Паспортные данные',
+  'Registration address'=>'Адрес регистрации',
+  'City Number'=>'Городской номер',
 );

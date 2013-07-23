@@ -20,6 +20,7 @@ class SupportBeelineController extends BaseGxController
         $criteria->compare('s.operator_id',Operator::OPERATOR_BEELINE_ID);
         $criteria->compare('n.support_status',Number::SUPPORT_STATUS_ACTIVE);
         $criteria->addCondition('s.id=s.parent_id');
+        $criteria->compare('s.icc',$model->name,true);
         $criteria->compare('p.name',$model->name,true);
         $criteria->compare('p.surname',$model->surname,true);
         $criteria->compare('p.middle_name',$model->middle_name,true);
@@ -35,12 +36,12 @@ class SupportBeelineController extends BaseGxController
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider = new CSqlDataProvider('select n.id,n.personal_account,n.number,p.name,p.surname,p.middle_name,p.passport_series,p.passport_number,p.passport_issue_date,p.passport_issuer,p.registration_address ' . $sql, array(
+        $dataProvider = new CSqlDataProvider('select s.icc, n.id,n.personal_account,n.number,p.name,p.surname,p.middle_name,p.passport_series,p.passport_number,p.passport_issue_date,p.passport_issuer,p.registration_address ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'personal_account','number','name','surname','middle_name','registration_address'
+                    'personal_account','icc','number','name','surname','middle_name','registration_address'
                 ),
             ),
             'pagination' => array('pageSize' => Sim::ITEMS_PER_PAGE)

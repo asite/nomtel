@@ -61,8 +61,13 @@ function isFlagParent($id, $mode) {
 }
 
 function isFlag($mode = 'is_agent') {
+
     if (loggedAgentId()==adminAgentId()) return true;
+
     $agent = Agent::model()->findByPk(loggedAgentId());
+
+    if ($mode=='is_making_parent_invoices') return $agent->$mode;
+
     if (!$agent->$mode) return false;
 
     return isFlagParent($agent->parent_id, $mode);
