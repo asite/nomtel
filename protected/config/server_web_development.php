@@ -6,7 +6,7 @@ $config = CMap::mergeArray(
             'db' => array(
                 'connectionString' => 'mysql:host=localhost;dbname=nomtel',
                 'username' => 'root',
-                'password' => '',
+                'password' => 'root',
             ),
         ),
         'params' => array(

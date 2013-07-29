@@ -20,6 +20,13 @@
     <div class="comment"><?=CHtml::encode($data["text"])?></div>
     <div class="button-row">
         <?php $this->widget('bootstrap.widgets.TbButton',array(
+            'url'=>$this->createUrl('delete',array('id'=>$data["id"])),
+            'label'=>'Удалить',
+            'htmlOptions'=>array(
+                'onclick'=>'return confirm("Вы действительно хотите удалить этот тикет?")'
+            ),
+        ));?>
+        <?php $this->widget('bootstrap.widgets.TbButton',array(
             'url'=>$this->createUrl('detail',array('id'=>$data["id"])),
             'label'=>'Приступить'
         ));?>
