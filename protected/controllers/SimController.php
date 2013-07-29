@@ -733,6 +733,28 @@ class SimController extends BaseGxController {
             $this->redirect(array('sim/move', 'key' => $key));
         }
 
+        if (isset($_REQUEST['activeSIM'])) {
+            $data=array();
+            foreach(explode(',', $_POST['ids']) as $v)  if ($v!='') $data[$v]=$v;
+
+            $trx=Yii::app()->db->beginTransaction();
+
+            $criteria = new CDbCriteria();
+            $criteria->addInCondition('id', $data);
+
+            $simcards = Sim::model()->findAll($criteria);
+
+            foreach ($simcards as $s) {
+                $number = Number::model()->findByAttributes(array('sim_id'=>$s->parent_id));
+                $number->status = Number::STATUS_ACTIVE;
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Номер подключен.');
+
+            }
+            $trx->commit();
+             Yii::app()->user->setFlash('success','Сим карты успешно подключены.');
+        }
+
         $list = self::getSimListDataProvider();
         /*if (isset($_REQUEST['exportExel'])) {
             $columns = array(
