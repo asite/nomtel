@@ -532,6 +532,24 @@ class NumberController extends BaseGxController
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
     }
 
+
+       private function setRecovery($csv, $data) {
+        $trx = Yii::app()->db->beginTransaction();
+        $wrongObjects = '';
+        foreach ($csv as $key=>$v) {
+            $model = Number::model()->findByAttributes(array('number'=>$key));
+            if ($model) {
+                $model->recovery_dt = date('Y-m-d');
+                $model->save();
+            } else $wrongObjects .= $key.'; ';
+        }
+        $trx->commit();
+        if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
+        Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно поставлены в очередь на освобождение.');
+    }
+    
+    
+    
     private function getModel($v, $data) {
         if ($data['Action']=='ICC') {
             $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
@@ -605,6 +623,8 @@ class NumberController extends BaseGxController
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не загружен файл.');
                 $this->refresh();
             }
+            
+           
             $csv = unserialize($_POST['Csv']);
 
                 if ($_POST['massFree']) {
@@ -617,6 +637,11 @@ class NumberController extends BaseGxController
                 }
                 if ($_POST['massStatusUnknown']) {
                     $this->setStatus($csv,$data,Number::STATUS_UNKNOWN);
+                    $this->redirect(Yii::app()->request->urlReferrer);
+                }
+                
+                if ($_POST['massRecovery']) {
+                    $this->setRecovery($csv,$data);
                     $this->redirect(Yii::app()->request->urlReferrer);
                 }
 

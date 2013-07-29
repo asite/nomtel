@@ -84,7 +84,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
             array('support_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('support_callback_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
             array('balance_changed_dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, sim_id, number, number_city, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation, balance, balance_changed_dt', 'safe', 'on'=>'search'),
+			array('id, sim_id, number, number_city, personal_account, status, balance_status, balance_status_changed_dt, codeword, service_password, sim_price, number_price, short_number, support_operator_id, support_operator_got_dt, support_dt, support_status, support_callback_dt, support_callback_name, support_getting_passport_variant, support_number_region_usage, support_sent_sms_status, user_id, support_passport_need_validation, balance, balance_changed_dt, recovery_dt', 'safe', 'on'=>'search'),
 		);
 	}
 
