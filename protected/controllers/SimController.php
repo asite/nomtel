@@ -693,7 +693,7 @@ class SimController extends BaseGxController {
         $criteria->compare('s.operator_region_id',$model->operator_region_id);
         $criteria->compare('n.status',$model->status);
         $criteria->compare('n.balance_status',$model->balance_status);
-        $criteria->compare('n.number_city',$model->number_city);
+        $criteria->compare('n.number_city',$model->number_city, true);
 
         $sql = "from sim s
             left outer join number n on (s.parent_id=n.sim_id)
