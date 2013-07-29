@@ -46,9 +46,18 @@ $this->breadcrumbs = array(
                 'data-id'=>Operator::OPERATOR_MEGAFON_ID,
                 'style'=>"margin-bottom:10px;"
             )
-            ),
+        ),
     ),
 )); ?>
+
+<?php $this->widget('bootstrap.widgets.TbButton', array(
+    'type'=>'button',
+    'label'=>Yii::t('app','Connect sim'),
+    'htmlOptions'=>array(
+        'onclick'=>'activeSIM();return false;',
+        'style'=>"margin-bottom:10px;"
+    )
+)) ?>
 
 <style>
     #sim-grid tfoot {
@@ -115,12 +124,12 @@ $this->breadcrumbs = array(
             'filter'=>Tariff::getComboList(),
             'header'=>Tariff::label(1),
         ),
-        /*array(
+        array(
             'name'=>'status',
             'value'=>'Number::getStatusLabel($data["status"])',
             'filter'=>Number::getStatusDropDownList(),
             'header'=>Yii::t('app','Status'),
-        ),*/
+        ),
         /*array(
             'name'=>'support_status',
             'value'=>'Number::getSupportStatusLabel($data["support_status"])',
@@ -222,5 +231,21 @@ $this->breadcrumbs = array(
         }
         jQuery('#ids-input').val(ids);
         jQuery('#ids-form').submit();
+    }
+</script>
+
+<form method="post" action="?activeSIM" id="active-ids-form">
+    <input type="hidden" name="YII_CSRF_TOKEN" value="<?php echo Yii::app()->request->csrfToken ?>">
+    <input type="hidden" id="active-ids-input" name="ids" value="">
+</form>
+<script>
+    function activeSIM() {
+        var ids='';
+        for(var id in multiPageSel['sim-grid']) {
+            if (ids!='') ids+=',';
+            ids+=id;
+        }
+        jQuery('#active-ids-input').val(ids);
+        jQuery('#active-ids-form').submit();
     }
 </script>
