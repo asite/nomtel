@@ -32,4 +32,8 @@ class CronController extends Controller
             if (!$importer->importNext()) break;
         }
     }
+
+    public function actionCheckNoDataAndClosedBalances() {
+        Number::checkNoDataAndClosedBalances();
+    }
 }

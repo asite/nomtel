@@ -41,7 +41,7 @@ return array (
   'Can\'t resize and/or save file' => '',
   'City' => '',
   'Defined' => '',
-
+  'Balance Status Changed Dt' => 'Срок баланса',
   'NOT RESTORED'=>'НЕ ВОССТАНОВЛЕННЫЕ',
   'Email' => '',
   'End' => '',
@@ -139,7 +139,6 @@ return array (
   'BLOCKED' => 'Заблокирован',
   'Balance' => 'Баланс',
   'Balance Status' => 'Статус баланса',
-  'Balance Status Changed Dt' => 'Статус баланса изменился',
   'Balance/Earnings' => 'Баланс/Выручка',
   'BalanceReport|BalanceReports' => 'Отчет по балансам|Отчеты по балансам',
   'Bilain' => 'Билайн',

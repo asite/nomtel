@@ -66,7 +66,7 @@ $this->widget('bootstrap.widgets.TbButton',array(
                     ),
                 array(
                     'label'=>Yii::t('app','Balance Status'),
-                    'value'=>''
+                    'value'=>Number::getBalanceStatusLabel($number->balance_status)
                     ),
                 array(
                     'label'=>Yii::t('app','Abonent'),
@@ -133,7 +133,7 @@ $this->widget('bootstrap.widgets.TbButton',array(
                     'value'=>$sim->sim_price
                     ),
                 array(
-                    'label'=>Yii::t('app','Balance'),
+                    'label'=>Yii::t('app','Balance Status'),
                     'value'=>Number::getBalanceStatusLabel($number->balance_status)
                     )
             ),
@@ -148,8 +148,8 @@ $this->widget('bootstrap.widgets.TbButton',array(
                     'value'=>$sim->number_price
                     ),
                 array(
-                    'label'=>'&nbsp;',
-                    'value'=>''
+                    'label'=>Yii::t('app','Balance Status Changed Dt'),
+                    'value'=>Helper::formatBalanceStatusChangedDt($number->balance_status_changed_dt),
                     )
             ),
         )); ?>

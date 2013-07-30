@@ -32,6 +32,100 @@ class Number extends BaseNumber
         return parent::model($className);
     }
 
+    public static function recalcNumberBalance($number) {
+        $balances=Yii::app()->db->createCommand("
+            select brn.balance
+            from balance_report br
+            left outer join balance_report_number brn on (br.id=brn.balance_report_id and brn.number_id=:number_id)
+            order by br.dt desc limit 1,14
+        ")->queryColumn(array(':number_id'=>$number->id));
+
+        $missing=0;
+        foreach($balances as $balance)
+            if ($balance==null) $missing++;else break;
+
+        if ($missing>=10) {
+            if ($number->balance_status!=Number::BALANCE_STATUS_CLOSED) {
+                $number->balance_status=Number::BALANCE_STATUS_CLOSED;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+            return;
+        }
+
+        if ($missing>=3) {
+            if ($number->balance_status!=Number::BALANCE_STATUS_NO_DATA) {
+                $number->balance_status=Number::BALANCE_STATUS_NO_DATA;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+            return;
+        }
+
+        $prevBalance=null;
+        $seenBalances=0;
+        $changing=false;
+        foreach($balances as $balance) {
+            if ($balance==null) continue;
+            if ($prevBalance!=null) {
+                if (abs($balance-$prevBalance)>1e-6) $changing=true;
+            }
+            $seenBalances++;
+            $prevBalance=$balance;
+            if ($seenBalances==7) break;
+        }
+
+        if ($changing) {
+            if ($number->balance_status!=Number::BALANCE_STATUS_CHANGING) {
+                $number->balance_status=Number::BALANCE_STATUS_CHANGING;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+        } else {
+            if ($number->balance_status!=Number::BALANCE_STATUS_NOT_CHANGING) {
+                $number->balance_status=Number::BALANCE_STATUS_NOT_CHANGING;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+        }
+    }
+
+    public static function checkNoDataAndClosedBalances() {
+        $trx=Yii::app()->db->beginTransaction();
+        Yii::app()->db->execute("
+            update number
+            set balance_status='CLOSED',balance_status_changed_dt=NOW()
+            where id in (
+                        select number_id
+                from (
+                    select brn.number_id,max(br.dt) as dt
+                    from balance_report br
+                    join balance_report_number brn on (brn.balance_report_id=br.id)
+                    join number n on (n.id=brn.number_id and n.balance_status!='CLOSED')
+                    where br.dt>DATE_SUB(NOW(),INTERVAL 3 MONTH)
+                    group by brn.number_id
+                ) as mytab
+                where dt>DATE_SUB(NOW(),INTERVAL 11 DAY)
+            )
+        ");
+        $trx->commit();
+        $trx=Yii::app()->db->beginTransaction();
+        Yii::app()->db->execute("
+            update number
+            set balance_status='CLOSED',balance_status_changed_dt=NOW()
+            where id in (
+                        select number_id
+                from (
+                    select brn.number_id,max(br.dt) as dt
+                    from balance_report br
+                    join balance_report_number brn on (brn.balance_report_id=br.id)
+                    join number n on (n.id=brn.number_id and n.balance_status!='NO_DATA')
+                    where br.dt>DATE_SUB(NOW(),INTERVAL 3 MONTH)
+                    group by brn.number_id
+                ) as mytab
+                where dt<=DATE_SUB(NOW(),INTERVAL 11 DAY) and dt>DATE_SUB(NOW(),INTERVAL 4 DAY)
+            )
+        ");
+        $trx->commit();
+
+    }
+
     public static function getNumberFromFormatted($formattedNumber) {
         $formattedNumber=preg_replace('%[^0-9]%','',$formattedNumber);
         $formattedNumber=preg_replace('%^8%','',$formattedNumber);
