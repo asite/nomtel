@@ -41,7 +41,7 @@ return array (
   'Can\'t resize and/or save file' => '',
   'City' => '',
   'Defined' => '',
-  'Balance Status Changed Dt' => 'Срок баланса',
+  'Balance Status Changed Dt' => 'Срок статуса баланса',
   'NOT RESTORED'=>'НЕ ВОССТАНОВЛЕННЫЕ',
   'Email' => '',
   'End' => '',

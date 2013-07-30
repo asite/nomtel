@@ -157,6 +157,7 @@ $this->breadcrumbs = array(
             'value'=>'Helper::formatBalanceStatusChangedDt($data["balance_status_changed_dt"])',
             'filter'=>false,
             'header'=>Yii::t('app','Balance Status Changed Dt'),
+            'htmlOptions' => array('style'=>'text-align:center;vertical-align:middle'),
         ),
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',

@@ -88,40 +88,46 @@ class Number extends BaseNumber
 
     public static function checkNoDataAndClosedBalances() {
         $trx=Yii::app()->db->beginTransaction();
-        Yii::app()->db->execute("
-            update number
-            set balance_status='CLOSED',balance_status_changed_dt=NOW()
-            where id in (
-                        select number_id
+        $ids=Yii::app()->db->createCommand("
+                select number_id
                 from (
                     select brn.number_id,max(br.dt) as dt
                     from balance_report br
                     join balance_report_number brn on (brn.balance_report_id=br.id)
                     join number n on (n.id=brn.number_id and n.balance_status!='CLOSED')
-                    where br.dt>DATE_SUB(NOW(),INTERVAL 3 MONTH)
+                    where br.dt>DATE_SUB(NOW(),INTERVAL 1 MONTH)
                     group by brn.number_id
                 ) as mytab
-                where dt>DATE_SUB(NOW(),INTERVAL 11 DAY)
-            )
-        ");
-        $trx->commit();
-        $trx=Yii::app()->db->beginTransaction();
-        Yii::app()->db->execute("
-            update number
-            set balance_status='CLOSED',balance_status_changed_dt=NOW()
-            where id in (
+                where dt<DATE_SUB(NOW(),INTERVAL 11 DAY)
+        ")->queryColumn();
+
+        if (!empty($ids))
+            Yii::app()->db->createCommand("
+                update number
+                set balance_status='CLOSED',balance_status_changed_dt=NOW()
+                where id in (".implode(',',$ids).")
+            ")->execute();
+
+        $ids=Yii::app()->db->createCommand("
                         select number_id
                 from (
                     select brn.number_id,max(br.dt) as dt
                     from balance_report br
                     join balance_report_number brn on (brn.balance_report_id=br.id)
                     join number n on (n.id=brn.number_id and n.balance_status!='NO_DATA')
-                    where br.dt>DATE_SUB(NOW(),INTERVAL 3 MONTH)
+                    where br.dt>DATE_SUB(NOW(),INTERVAL 1 MONTH)
                     group by brn.number_id
                 ) as mytab
-                where dt<=DATE_SUB(NOW(),INTERVAL 11 DAY) and dt>DATE_SUB(NOW(),INTERVAL 4 DAY)
-            )
-        ");
+                where dt>=DATE_SUB(NOW(),INTERVAL 11 DAY) and dt<DATE_SUB(NOW(),INTERVAL 4 DAY)
+        ")->queryColumn();
+
+        if (!empty($ids))
+            Yii::app()->db->createCommand("
+                update number
+                set balance_status='NO_DATA',balance_status_changed_dt=NOW()
+                where id in (".implode(',',$ids).")
+            ")->execute();
+
         $trx->commit();
 
     }
