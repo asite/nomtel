@@ -14,17 +14,10 @@ class Number extends BaseNumber
     const SUPPORT_SMS_STATUS_EMAIL = 'EMAIL';
     const SUPPORT_SMS_STATUS_LK = 'LK';
 
-    const BALANCE_STATUS_NORMAL = 'NORMAL';
-    const BALANCE_STATUS_POSITIVE_STATIC = 'POSITIVE_STATIC';
-    const BALANCE_STATUS_NEGATIVE_STATIC = 'NEGATIVE_STATIC';
-    const BALANCE_STATUS_POSITIVE_DYNAMIC = 'POSITIVE_DYNAMIC';
-    const BALANCE_STATUS_NEGATIVE_DYNAMIC = 'NEGATIVE_DYNAMIC';
-    const BALANCE_STATUS_NEW = 'NEW';
-    const BALANCE_STATUS_MISSING = 'MISSING';
-    const BALANCE_STATUS_ACTIVE = 'ACTIVE';
-    const BALANCE_STATUS_AWAIT_FIRST_RECHARGE = 'AWAIT_FIRST_RECHARGE';
-    const BALANCE_STATUS_SUSPENDED = 'SUSPENDED';
-    const BALANCE_STATUS_UNKNOWN = 'UNKNOWN';
+    const BALANCE_STATUS_CHANGING = 'CHANGING';
+    const BALANCE_STATUS_NOT_CHANGING = 'NOT_CHANGING';
+    const BALANCE_STATUS_NO_DATA = 'NO_DATA';
+    const BALANCE_STATUS_CLOSED = 'CLOSED';
 
     const SUPPORT_STATUS_UNAVAILABLE='UNAVAILABLE';
     const SUPPORT_STATUS_CALLBACK='CALLBACK';
@@ -37,6 +30,106 @@ class Number extends BaseNumber
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
+    }
+
+    public static function recalcNumberBalance($number) {
+        $balances=Yii::app()->db->createCommand("
+            select brn.balance
+            from balance_report br
+            left outer join balance_report_number brn on (br.id=brn.balance_report_id and brn.number_id=:number_id)
+            order by br.dt desc limit 1,14
+        ")->queryColumn(array(':number_id'=>$number->id));
+
+        $missing=0;
+        foreach($balances as $balance)
+            if ($balance==null) $missing++;else break;
+
+        if ($missing>=10) {
+            if ($number->balance_status!=Number::BALANCE_STATUS_CLOSED) {
+                $number->balance_status=Number::BALANCE_STATUS_CLOSED;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+            return;
+        }
+
+        if ($missing>=3) {
+            if ($number->balance_status!=Number::BALANCE_STATUS_NO_DATA) {
+                $number->balance_status=Number::BALANCE_STATUS_NO_DATA;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+            return;
+        }
+
+        $prevBalance=null;
+        $seenBalances=0;
+        $changing=false;
+        foreach($balances as $balance) {
+            if ($balance==null) continue;
+            if ($prevBalance!=null) {
+                if (abs($balance-$prevBalance)>1e-6) $changing=true;
+            }
+            $seenBalances++;
+            $prevBalance=$balance;
+            if ($seenBalances==7) break;
+        }
+
+        if ($changing) {
+            if ($number->balance_status!=Number::BALANCE_STATUS_CHANGING) {
+                $number->balance_status=Number::BALANCE_STATUS_CHANGING;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+        } else {
+            if ($number->balance_status!=Number::BALANCE_STATUS_NOT_CHANGING) {
+                $number->balance_status=Number::BALANCE_STATUS_NOT_CHANGING;
+                $number->balance_status_changed_dt=new EDateTime();
+            }
+        }
+    }
+
+    public static function checkNoDataAndClosedBalances() {
+        $trx=Yii::app()->db->beginTransaction();
+        $ids=Yii::app()->db->createCommand("
+                select number_id
+                from (
+                    select brn.number_id,max(br.dt) as dt
+                    from balance_report br
+                    join balance_report_number brn on (brn.balance_report_id=br.id)
+                    join number n on (n.id=brn.number_id and n.balance_status!='CLOSED')
+                    where br.dt>DATE_SUB(NOW(),INTERVAL 1 MONTH)
+                    group by brn.number_id
+                ) as mytab
+                where dt<DATE_SUB(NOW(),INTERVAL 11 DAY)
+        ")->queryColumn();
+
+        if (!empty($ids))
+            Yii::app()->db->createCommand("
+                update number
+                set balance_status='CLOSED',balance_status_changed_dt=NOW()
+                where id in (".implode(',',$ids).")
+            ")->execute();
+
+        $ids=Yii::app()->db->createCommand("
+                        select number_id
+                from (
+                    select brn.number_id,max(br.dt) as dt
+                    from balance_report br
+                    join balance_report_number brn on (brn.balance_report_id=br.id)
+                    join number n on (n.id=brn.number_id and n.balance_status!='NO_DATA')
+                    where br.dt>DATE_SUB(NOW(),INTERVAL 1 MONTH)
+                    group by brn.number_id
+                ) as mytab
+                where dt>=DATE_SUB(NOW(),INTERVAL 11 DAY) and dt<DATE_SUB(NOW(),INTERVAL 4 DAY)
+        ")->queryColumn();
+
+        if (!empty($ids))
+            Yii::app()->db->createCommand("
+                update number
+                set balance_status='NO_DATA',balance_status_changed_dt=NOW()
+                where id in (".implode(',',$ids).")
+            ")->execute();
+
+        $trx->commit();
+
     }
 
     public static function getNumberFromFormatted($formattedNumber) {
@@ -155,17 +248,10 @@ class Number extends BaseNumber
 
         if (!$labels) {
             $labels=array(
-                self::BALANCE_STATUS_NORMAL => Yii::t('app','BALANCE_STATUS_NORMAL'),
-                self::BALANCE_STATUS_POSITIVE_STATIC => Yii::t('app','BALANCE_STATUS_POSITIVE_STATIC'),
-                self::BALANCE_STATUS_NEGATIVE_STATIC => Yii::t('app','BALANCE_STATUS_NEGATIVE_STATIC'),
-                self::BALANCE_STATUS_POSITIVE_DYNAMIC => Yii::t('app','BALANCE_STATUS_POSITIVE_DYNAMIC'),
-                self::BALANCE_STATUS_NEGATIVE_DYNAMIC => Yii::t('app','BALANCE_STATUS_NEGATIVE_DYNAMIC'),
-                self::BALANCE_STATUS_NEW => Yii::t('app','BALANCE_STATUS_NEW'),
-                self::BALANCE_STATUS_MISSING => Yii::t('app','BALANCE_STATUS_MISSING'),
-                self::BALANCE_STATUS_ACTIVE => Yii::t('app','BALANCE_STATUS_ACTIVE'),
-                self::BALANCE_STATUS_AWAIT_FIRST_RECHARGE => Yii::t('app','BALANCE_STATUS_AWAIT_FIRST_RECHARGE'),
-                self::BALANCE_STATUS_SUSPENDED => Yii::t('app','BALANCE_STATUS_SUSPENDED'),
-                self::BALANCE_STATUS_UNKNOWN => Yii::t('app','BALANCE_STATUS_UNKNOWN'),
+                self::BALANCE_STATUS_CHANGING => Yii::t('app','BALANCE_STATUS_CHANGING'),
+                self::BALANCE_STATUS_NOT_CHANGING => Yii::t('app','BALANCE_STATUS_NOT_CHANGING'),
+                self::BALANCE_STATUS_NO_DATA => Yii::t('app','BALANCE_STATUS_NO_DATA'),
+                self::BALANCE_STATUS_CLOSED => Yii::t('app','BALANCE_STATUS_CLOSED'),
             );
         }
 
@@ -179,18 +265,10 @@ class Number extends BaseNumber
 
     public function getBalanceStatusOrder() {
         return "(CASE balance_status
-           WHEN '".self::BALANCE_STATUS_POSITIVE_DYNAMIC."' THEN 0
-           WHEN '".self::BALANCE_STATUS_POSITIVE_STATIC."' THEN 1
-           WHEN '".self::BALANCE_STATUS_NEGATIVE_DYNAMIC."' THEN 2
-           WHEN '".self::BALANCE_STATUS_NEGATIVE_STATIC."' THEN 3
-           WHEN '".self::BALANCE_STATUS_MISSING."' THEN 4
-           WHEN '".self::BALANCE_STATUS_NORMAL."' THEN 5
-           WHEN '".self::BALANCE_STATUS_NEW."' THEN 6
-           WHEN '".self::BALANCE_STATUS_MISSING."' THEN 7
-           WHEN '".self::BALANCE_STATUS_ACTIVE."' THEN 8
-           WHEN '".self::BALANCE_STATUS_AWAIT_FIRST_RECHARGE."' THEN 9
-           WHEN '".self::BALANCE_STATUS_SUSPENDED."' THEN 10
-           WHEN '".self::BALANCE_STATUS_UNKNOWN."' THEN 11
+           WHEN '".self::BALANCE_STATUS_CHANGING."' THEN 0
+           WHEN '".self::BALANCE_STATUS_NOT_CHANGING."' THEN 1
+           WHEN '".self::BALANCE_STATUS_NO_DATA."' THEN 2
+           WHEN '".self::BALANCE_STATUS_CLOSED."' THEN 3
         END)";
     }
 

@@ -711,7 +711,7 @@ class SimController extends BaseGxController {
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'agent_id','number','icc','operator_id','tariff_id','operator_region_id','status','balance_status','number_city','support_operator_id'
+                    'agent_id','number','icc','operator_id','tariff_id','operator_region_id','status','balance_status','balance_status_changed_dt','number_city','support_operator_id'
                 ),
             ),
             'pagination' => $pager?array('pageSize' => Sim::ITEMS_PER_PAGE):false
