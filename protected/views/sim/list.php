@@ -162,29 +162,45 @@ $this->breadcrumbs = array(
         array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:40px;text-align:center;vertical-align:middle'),
-            'template'=>'{view} {feedback} {createAgreement} {viewAgreement}',
+            'template'=>'{createAgreement} {viewAgreement} {connect}',
             'buttons'=>array(
-                'view'=>array(
+                /*'view'=>array(
                     'url'=>'Yii::app()->createUrl("number/".(Yii::app()->user->checkAccess("editNumberCard") ? "edit":"view"),array("id"=>$data["number_id"]))',
-                ),
+                ),*/
 
-                'feedback'=>array(
+                /*'feedback'=>array(
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
                     'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data["sim_id"]))',
                     'visible'=>'!isAdmin()'
-                ),
+                ),*/
                 'createAgreement'=>array(
-                    'label'=>Yii::t('app','Create subscription agreement'),
-                    'icon'=>'file',
+                    'label'=>Yii::t('app','Оформить'),
+                    //'icon'=>'file',
                     'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$data["sim_id"]))',
                     'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))'
                 ),
                 'viewAgreement'=>array(
                     'label'=>Yii::t('app','Договор'),
-                    'icon'=>'file',
+                    //'icon'=>'file',
                     'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/update",array("number_id"=>$data["number_id"]))',
                     'visible'=>'Yii::app()->user->checkAccess("updateSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))'
+                ),
+                'connect'=>array(
+                    'label'=>Yii::t('app','Подключить'),
+                    //'icon'=>'file',
+                    'url'=>'Yii::app()->controller->createUrl("sim/connectSim",array("number_id"=>$data["number_id"]))',
+                    'visible'=>'!Yii::app()->user->checkAccess("updateSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))',
+                    'options' => array(
+                        'ajax' => array(
+                            'type' => 'post',
+                            'url'=>'js:$(this).attr("href")',
+                            'data'=> array('YII_CSRF_TOKEN'=> Yii::app()->request->csrfToken),
+                            'success' => 'js:function(data) {
+                                jQuery.fn.yiiGridView.update("sim-grid");
+                            }'
+                        )
+                    )
                 ),
             )
         ),

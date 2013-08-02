@@ -656,6 +656,20 @@ class SimController extends BaseGxController {
         Yii::app()->end();
     }
 
+    public function actionConnectSim($number_id) {
+        if (Yii::app()->request->isAjaxRequest && $number_id) {
+
+            $trx=Yii::app()->db->beginTransaction();
+                $number = Number::model()->findByAttributes(array('id'=>$number_id));
+                $number->status = Number::STATUS_ACTIVE;
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Номер подключен.');
+            $trx->commit();
+            //echo CJSON::encode($mass);
+            Yii::app()->end();
+        }
+    }
+
     private static function getSimListDataProvider($pager=true) {
         $model = new SimSearch();
         $model->unsetAttributes();
