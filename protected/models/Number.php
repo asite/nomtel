@@ -16,6 +16,7 @@ class Number extends BaseNumber
 
     const BALANCE_STATUS_CHANGING = 'CHANGING';
     const BALANCE_STATUS_NOT_CHANGING = 'NOT_CHANGING';
+    const BALANCE_STATUS_NOT_CHANGING_PLUS = 'NOT_CHANGING_PLUS';
     const BALANCE_STATUS_NO_DATA = 'NO_DATA';
     const BALANCE_STATUS_CLOSED = 'CLOSED';
 
@@ -79,9 +80,16 @@ class Number extends BaseNumber
                 $number->balance_status_changed_dt=new EDateTime();
             }
         } else {
-            if ($number->balance_status!=Number::BALANCE_STATUS_NOT_CHANGING) {
-                $number->balance_status=Number::BALANCE_STATUS_NOT_CHANGING;
-                $number->balance_status_changed_dt=new EDateTime();
+            if ($prevBalance>1e-6) {
+                if ($number->balance_status!=Number::BALANCE_STATUS_NOT_CHANGING_PLUS) {
+                    $number->balance_status=Number::BALANCE_STATUS_NOT_CHANGING_PLUS;
+                    $number->balance_status_changed_dt=new EDateTime();
+                }
+            } else {
+                if ($number->balance_status!=Number::BALANCE_STATUS_NOT_CHANGING) {
+                    $number->balance_status=Number::BALANCE_STATUS_NOT_CHANGING;
+                    $number->balance_status_changed_dt=new EDateTime();
+                }
             }
         }
     }
@@ -250,6 +258,7 @@ class Number extends BaseNumber
             $labels=array(
                 self::BALANCE_STATUS_CHANGING => Yii::t('app','BALANCE_STATUS_CHANGING'),
                 self::BALANCE_STATUS_NOT_CHANGING => Yii::t('app','BALANCE_STATUS_NOT_CHANGING'),
+                self::BALANCE_STATUS_NOT_CHANGING_PLUS => Yii::t('app','BALANCE_STATUS_NOT_CHANGING_PLUS'),
                 self::BALANCE_STATUS_NO_DATA => Yii::t('app','BALANCE_STATUS_NO_DATA'),
                 self::BALANCE_STATUS_CLOSED => Yii::t('app','BALANCE_STATUS_CLOSED'),
             );

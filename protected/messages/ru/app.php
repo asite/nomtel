@@ -131,6 +131,7 @@ return array (
   'BAD' => 'БАД',
   'BALANCE_STATUS_CHANGING'=>'Есть движение',
   'BALANCE_STATUS_NOT_CHANGING'=>'Нет движения',
+  'BALANCE_STATUS_NOT_CHANGING_PLUS'=>'Нет движения плюс',
   'BALANCE_STATUS_NO_DATA'=>'Нет данных',
   'BALANCE_STATUS_CLOSED'=>'Закрыт',
   'BLANK_SIM_TYPE_MICRO' => 'Микро',
