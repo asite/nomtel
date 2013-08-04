@@ -656,6 +656,20 @@ class SimController extends BaseGxController {
         Yii::app()->end();
     }
 
+    public function actionConnectSim($number_id) {
+        if (Yii::app()->request->isAjaxRequest && $number_id) {
+
+            $trx=Yii::app()->db->beginTransaction();
+                $number = Number::model()->findByAttributes(array('id'=>$number_id));
+                $number->status = Number::STATUS_ACTIVE;
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Номер подключен.');
+            $trx->commit();
+            //echo CJSON::encode($mass);
+            Yii::app()->end();
+        }
+    }
+
     private static function getSimListDataProvider($pager=true) {
         $model = new SimSearch();
         $model->unsetAttributes();
@@ -693,7 +707,7 @@ class SimController extends BaseGxController {
         $criteria->compare('s.operator_region_id',$model->operator_region_id);
         $criteria->compare('n.status',$model->status);
         $criteria->compare('n.balance_status',$model->balance_status);
-        $criteria->compare('n.number_city',$model->number_city);
+        $criteria->compare('n.number_city',$model->number_city,true);
 
         $sql = "from sim s
             left outer join number n on (s.parent_id=n.sim_id)
