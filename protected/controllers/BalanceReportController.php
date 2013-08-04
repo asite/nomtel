@@ -27,9 +27,10 @@ class BalanceReportController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
-
     private function recalcOperatorBalancesStatuses($reportId1, $reportId2, $reportId3, $analyzeBalances)
     {
+        throw new CException('not implemented');
+        /*
         $statuses = array();
 
         $reader = Yii::app()->db->createCommand("
@@ -99,10 +100,14 @@ class BalanceReportController extends BaseGxController
                         ':balance_status_changed_dt'=>$dt
                     ));
         }
+        */
     }
 
     private function recalcBalancesStatuses()
     {
+        throw new CException('not implemented');
+
+        /*
         $operators = Operator::model()->findAll();
 
         foreach ($operators as $operator) {
@@ -122,6 +127,7 @@ class BalanceReportController extends BaseGxController
                 $operator->id=Operator::OPERATOR_MEGAFON_ID
             );
         }
+        */
     }
 
     public function actionRecalcBalancesStatuses() {

@@ -19,6 +19,19 @@ class TicketAdminController extends BaseGxController {
         $this->render('index',$data);
     }
 
+    public function actionDelete($id) {
+        $ticket=$this->loadModel($id,'Ticket');
+
+        $trx=Yii::app()->db->beginTransaction();
+
+        foreach($ticket->ticketHistories as $ticketHistory) $ticketHistory->delete();
+        $ticket->delete();
+
+        $trx->commit();
+
+        $this->redirect(array('index'));
+    }
+
     public function actionDetail($id) {
         $data=array();
 

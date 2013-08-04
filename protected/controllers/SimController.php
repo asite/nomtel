@@ -656,6 +656,20 @@ class SimController extends BaseGxController {
         Yii::app()->end();
     }
 
+    public function actionConnectSim($number_id) {
+        if (Yii::app()->request->isAjaxRequest && $number_id) {
+
+            $trx=Yii::app()->db->beginTransaction();
+                $number = Number::model()->findByAttributes(array('id'=>$number_id));
+                $number->status = Number::STATUS_ACTIVE;
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Номер подключен.');
+            $trx->commit();
+            //echo CJSON::encode($mass);
+            Yii::app()->end();
+        }
+    }
+
     private static function getSimListDataProvider($pager=true) {
         $model = new SimSearch();
         $model->unsetAttributes();
@@ -694,6 +708,7 @@ class SimController extends BaseGxController {
         $criteria->compare('n.status',$model->status);
         $criteria->compare('n.balance_status',$model->balance_status);
         $criteria->compare('n.number_city',$model->number_city, true);
+        $criteria->compare('n.number_city',$model->number_city,true);
 
         $sql = "from sim s
             left outer join number n on (s.parent_id=n.sim_id)
@@ -711,7 +726,7 @@ class SimController extends BaseGxController {
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'agent_id','number','icc','operator_id','tariff_id','operator_region_id','status','balance_status','number_city','support_operator_id'
+                    'agent_id','number','icc','operator_id','tariff_id','operator_region_id','status','balance_status','balance_status_changed_dt','number_city','support_operator_id'
                 ),
             ),
             'pagination' => $pager?array('pageSize' => Sim::ITEMS_PER_PAGE):false
@@ -731,6 +746,28 @@ class SimController extends BaseGxController {
             $key=$sessionData->add($data);
 
             $this->redirect(array('sim/move', 'key' => $key));
+        }
+
+        if (isset($_REQUEST['activeSIM'])) {
+            $data=array();
+            foreach(explode(',', $_POST['ids']) as $v)  if ($v!='') $data[$v]=$v;
+
+            $trx=Yii::app()->db->beginTransaction();
+
+            $criteria = new CDbCriteria();
+            $criteria->addInCondition('id', $data);
+
+            $simcards = Sim::model()->findAll($criteria);
+
+            foreach ($simcards as $s) {
+                $number = Number::model()->findByAttributes(array('sim_id'=>$s->parent_id));
+                $number->status = Number::STATUS_ACTIVE;
+                $number->save();
+                NumberHistory::addHistoryNumber($number->id,'Номер подключен.');
+
+            }
+            $trx->commit();
+             Yii::app()->user->setFlash('success','Сим карты успешно подключены.');
         }
 
         $list = self::getSimListDataProvider();

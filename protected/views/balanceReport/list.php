@@ -41,7 +41,8 @@ $('.search-form form').submit(function(){
             'template'=>'{view} {delete}',
             'buttons'=>array(
                 'delete'=>array(
-                    'visible'=>"isAdmin()"
+                    //'visible'=>"isAdmin()"
+                    'visible'=>'false'
                 )
             ),
             'deleteConfirmation' => Yii::t('app','Are you sure to delete this Balance Report?'),
@@ -49,7 +50,7 @@ $('.search-form form').submit(function(){
     ),
 )); ?>
 
-<?php $this->widget('bootstrap.widgets.TbButton',array(
+<?php /* $this->widget('bootstrap.widgets.TbButton',array(
     'label' => Yii::t('app', 'Load report'),
     'url' => $this->createUrl('balanceReport/load')
-)); ?>
+)); */ ?>

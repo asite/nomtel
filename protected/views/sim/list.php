@@ -46,9 +46,18 @@ $this->breadcrumbs = array(
                 'data-id'=>Operator::OPERATOR_MEGAFON_ID,
                 'style'=>"margin-bottom:10px;"
             )
-            ),
+        ),
     ),
 )); ?>
+
+<?php $this->widget('bootstrap.widgets.TbButton', array(
+    'type'=>'button',
+    'label'=>Yii::t('app','Connect sim'),
+    'htmlOptions'=>array(
+        'onclick'=>'activeSIM();return false;',
+        'style'=>"margin-bottom:10px;"
+    )
+)) ?>
 
 <style>
     #sim-grid tfoot {
@@ -115,12 +124,12 @@ $this->breadcrumbs = array(
             'filter'=>Tariff::getComboList(),
             'header'=>Tariff::label(1),
         ),
-        /*array(
+        array(
             'name'=>'status',
             'value'=>'Number::getStatusLabel($data["status"])',
             'filter'=>Number::getStatusDropDownList(),
             'header'=>Yii::t('app','Status'),
-        ),*/
+        ),
         /*array(
             'name'=>'support_status',
             'value'=>'Number::getSupportStatusLabel($data["support_status"])',
@@ -144,31 +153,54 @@ $this->breadcrumbs = array(
             'header'=>Yii::t('app','Balance Status'),
         ),
         array(
+            'name'=>'balance_status_changed_dt',
+            'value'=>'Helper::formatBalanceStatusChangedDt($data["balance_status_changed_dt"])',
+            'filter'=>false,
+            'header'=>Yii::t('app','Balance Status Changed Dt'),
+            'htmlOptions' => array('style'=>'text-align:center;vertical-align:middle'),
+        ),
+        array(
             'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:40px;text-align:center;vertical-align:middle'),
-            'template'=>'{view} {feedback} {createAgreement} {viewAgreement}',
+            'template'=>'{createAgreement} {viewAgreement} {connect}',
             'buttons'=>array(
-                'view'=>array(
+                /*'view'=>array(
                     'url'=>'Yii::app()->createUrl("number/".(Yii::app()->user->checkAccess("editNumberCard") ? "edit":"view"),array("id"=>$data["number_id"]))',
-                ),
+                ),*/
 
-                'feedback'=>array(
+                /*'feedback'=>array(
                     'label'=>Yii::t('app','Report problem'),
                     'icon'=>'envelope',
                     'url'=>'Yii::app()->controller->createUrl("act/report",array("id"=>$data["sim_id"]))',
                     'visible'=>'!isAdmin()'
-                ),
+                ),*/
                 'createAgreement'=>array(
-                    'label'=>Yii::t('app','Create subscription agreement'),
-                    'icon'=>'file',
+                    'label'=>Yii::t('app','Оформить'),
+                    //'icon'=>'file',
                     'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/startCreate",array("sim_id"=>$data["sim_id"]))',
                     'visible'=>'Yii::app()->user->checkAccess("createSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))'
                 ),
                 'viewAgreement'=>array(
                     'label'=>Yii::t('app','Договор'),
-                    'icon'=>'file',
+                    //'icon'=>'file',
                     'url'=>'Yii::app()->controller->createUrl("subscriptionAgreement/update",array("number_id"=>$data["number_id"]))',
                     'visible'=>'Yii::app()->user->checkAccess("updateSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))'
+                ),
+                'connect'=>array(
+                    'label'=>Yii::t('app','Подключить'),
+                    //'icon'=>'file',
+                    'url'=>'Yii::app()->controller->createUrl("sim/connectSim",array("number_id"=>$data["number_id"]))',
+                    'visible'=>'!Yii::app()->user->checkAccess("updateSubscriptionAgreement",array("parent_agent_id"=>$data["parent_agent_id"],"number_status"=>$data["number_status"]))',
+                    'options' => array(
+                        'ajax' => array(
+                            'type' => 'post',
+                            'url'=>'js:$(this).attr("href")',
+                            'data'=> array('YII_CSRF_TOKEN'=> Yii::app()->request->csrfToken),
+                            'success' => 'js:function(data) {
+                                jQuery.fn.yiiGridView.update("sim-grid");
+                            }'
+                        )
+                    )
                 ),
             )
         ),
@@ -222,5 +254,21 @@ $this->breadcrumbs = array(
         }
         jQuery('#ids-input').val(ids);
         jQuery('#ids-form').submit();
+    }
+</script>
+
+<form method="post" action="?activeSIM" id="active-ids-form">
+    <input type="hidden" name="YII_CSRF_TOKEN" value="<?php echo Yii::app()->request->csrfToken ?>">
+    <input type="hidden" id="active-ids-input" name="ids" value="">
+</form>
+<script>
+    function activeSIM() {
+        var ids='';
+        for(var id in multiPageSel['sim-grid']) {
+            if (ids!='') ids+=',';
+            ids+=id;
+        }
+        jQuery('#active-ids-input').val(ids);
+        jQuery('#active-ids-form').submit();
     }
 </script>

@@ -164,7 +164,7 @@ if (isSupport()) {
                     ),
                 array(
                     'label'=>Yii::t('app','Balance Status'),
-                    'value'=>''
+                    'value'=>Number::getBalanceStatusLabel($number->balance_status)
                     ),
                 array(
                     'label'=>Yii::t('app','Abonent'),
@@ -318,7 +318,7 @@ if (isSupport()) {
                     )
                 ),
                 array(
-                    'label'=>Yii::t('app','Balance'),
+                    'label'=>Yii::t('app','Balance Status'),
                     'value'=>Number::getBalanceStatusLabel($number->balance_status)
                 )
             ),
@@ -347,8 +347,8 @@ if (isSupport()) {
                     )
                 ),
                 array(
-                    'label'=>'&nbsp;',
-                    'value'=>''
+                    'value'=>Helper::formatBalanceStatusChangedDt($number->balance_status_changed_dt),
+                    'label'=>Yii::t('app','Balance Status Changed Dt'),
                     )
             ),
         )); ?>

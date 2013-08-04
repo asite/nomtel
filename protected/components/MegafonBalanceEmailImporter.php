@@ -43,6 +43,9 @@ class MegafonBalanceEmailImporter
     }
 
     public static function recalcNumberBalanceStatus($number) {
+        Number::recalcNumberBalance($number);
+        $number->save();
+        /*
         $data=Yii::app()->db->createCommand("
             select brn.balance
             from balance_report br
@@ -82,6 +85,7 @@ class MegafonBalanceEmailImporter
             $number->balance_status_changed_dt=new EDateTime();
             $number->save();
         }
+        */
     }
 
     private function process($data) {
