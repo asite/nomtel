@@ -37,10 +37,10 @@ class m130730_065301_recalc_balance_status_changed_dt extends CDbMigration
             //echo "processing $id\n ".implode(',',$balances)."\n";
             $eqBalances=1;
             $maxIdx=count($balances)-1;
-            if (!empty($balances));
-            while(abs($balances[0]-$balances[$eqBalances])<1e-6 && $eqBalances<$maxIdx) {
-                $eqBalances++;
-            }
+            if (!empty($balances))
+        	while(abs($balances[0]-$balances[$eqBalances])<1e-6 && $eqBalances<$maxIdx) {
+            	    $eqBalances++;
+        	}
 
             $balance_changed_dt=new EDateTime;
             if ($eqBalances>=6) $balance_changed_dt->modify('- '.($eqBalances-6).' DAY');
