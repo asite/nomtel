@@ -42,7 +42,7 @@ class m130730_065301_recalc_balance_status_changed_dt extends CDbMigration
             }
 
             $balance_changed_dt=new EDateTime;
-            $balance_changed_dt->modify('- '.($eqBalances-6).' DAY');
+            if ($eqBalances>=6) $balance_changed_dt->modify('- '.($eqBalances-6).' DAY');
             $number->balance_status_changed_dt=$balance_changed_dt;
 
             $number->save();

@@ -23,8 +23,6 @@ class m130804_184013_add_not_changing_plus_balance_status extends CDbMigration
         }
 
         $trx->commit();
-
-        exit;
 	}
 
 	public function down()
