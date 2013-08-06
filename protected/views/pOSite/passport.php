@@ -141,7 +141,7 @@ $this->endWidget();
     <a href="/static/passport.jpg" target="_blank"><img style="margin-left: 30px;" src="/static/passport.jpg" width="130" align="right" alt=""></a>
     Ваши данные необходимо подтвердить копиями страниц паспорта с данными и с адресом регистрации.
     <h3>Изображения документа</h3>
-</div>
+</div>3
 <?php
     $this->widget('bootstrap.widgets.TbFileUpload', array(
     'url' => $this->createUrl("file/upload",array('name'=>'File')),
@@ -162,6 +162,6 @@ $this->endWidget();
     )));
     ?>
 </div>
-
+4
 <?php if ($person_files!='') Yii::app()->clientScript->registerScript('File-form',"UploaderAddFiles('File-form',$person_files);",CClientScript::POS_READY); ?>
 <script>setInterval('checkUploadSize()',250);</script>

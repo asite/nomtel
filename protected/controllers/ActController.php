@@ -5,8 +5,44 @@ class ActController extends BaseGxController
     public function additionalAccessRules()
     {
         return array(
-            array('allow', 'actions' => array('list', 'view', 'report','delete'), 'roles' => array('agent')),
+            array('allow', 'actions' => array('list', 'view', 'report','delete','fromParent'), 'roles' => array('agent')),
         );
+    }
+
+    public function actionFromParent()
+    {
+        if (!isFlag('is_making_parent_invoices')) throw new CHttpException(403);
+
+        if ($_POST['ICCtoSelect'] != '') {
+            $id_arr = explode("\n", $_POST['ICCtoSelect']);
+
+            $agent=Agent::model()->findByPk(loggedAgentId());
+
+            if (!empty($id_arr)) {
+                $quotedIds=array();
+                foreach($id_arr as $id) $quotedIds[]=Yii::app()->db->quoteValue(trim($id));
+                $in='('.implode(',',$quotedIds).')';
+                $sql = "select id from sim where (number in $in or icc in $in) and agent_id is NULL and parent_agent_id='".$agent->parent_id."' and is_active=1";
+                $sims=Yii::app()->db->createCommand($sql)->queryAll();
+            } else {
+                $sims=array();
+            }
+
+            $ids = array();
+            foreach ($sims as $value) {
+                $ids[$value['id']]=$value['id'];
+            }
+
+            if (count($ids) > 0) {
+                $sessionData=new SessionData('SimController');
+                $key=$sessionData->add($ids);
+
+                $this->redirect(array('sim/move', 'key' => $key,'Act[agent_id]'=>loggedAgentId()));
+            } else
+                Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> не найдено сим в базе.');
+        }
+
+        $this->render('fromParent');
     }
 
     public function actionList()

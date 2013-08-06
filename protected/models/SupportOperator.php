@@ -46,7 +46,7 @@ class SupportOperator extends BaseSupportOperator
     public static function getCashierComboList($data = array())
     {
         $agents = Yii::app()->db->createCommand("select id,name,surname,middle_name from " .
-            self::model()->tableName()." where role='cashier'")->queryAll();
+            self::model()->tableName()." where role in ('cashier','supportSuper')")->queryAll();
 
         foreach ($agents as $v) {
             $data[$v['id']] = $v['surname'] . ' ' . $v['name'];

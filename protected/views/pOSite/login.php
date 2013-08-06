@@ -6,6 +6,7 @@
     'enableAjaxValidation' => false,
 ));
 ?>
+<style>.modal {top:45%;}</style>
     <div class="modal pOLogin" style="margin-top: -230px;">
         <div class="modal-header cfix">
             <a href="http://nomtel.ru"><img src="/static/logo.png" alt="" align="right"/></a><h3 style="line-height: 54px;">Добро пожаловать!</h3>

@@ -146,6 +146,7 @@ $this->breadcrumbs = array(
         <button name="massFree" value="1" class="btn" type="submit" onclick="return confirm('Вы уверены?');">Освободить номер</button>
         <button name="massFreeWait" value="1" class="btn" type="submit" onclick="return confirm('Вы уверены?');" style="margin-top: 10px;">Отложенная сим</button>
         <button name="massStatusUnknown" value="1" class="btn" type="submit" onclick="return confirm('Вы уверены?');" style="margin-top: 10px;">Неизвестный</button>
+        <button name="massRecovery" value="1" class="btn" type="submit" onclick="return confirm('Вы уверены?');" style="margin-top: 10px;">На восстановление</button>
     </div>
 </div>
 

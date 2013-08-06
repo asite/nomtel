@@ -32,9 +32,9 @@ switch (gethostname()) {
         break;
    
     case 'www.asiteplace.ru':
-        $base_config_name = 'server_web_asite_production.php';
+        $base_config_name = 'server_console_asite_production.php';
         
-    if(strpos(dirname(__FILE__), 'dev')) $base_config_name = 'server_web_asite_development.php';
+    if(strpos(dirname(__FILE__), 'dev')) $base_config_name = 'server_console_asite_development.php';
         break;
         
     

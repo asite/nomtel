@@ -12,6 +12,10 @@
             'header'=>Yii::t('app','Number')
         ),
         array(
+            'name'=>'icc',
+            'header'=>Yii::t('app','ICC')
+        ),
+        array(
             'name'=>'name',
             'header'=>Yii::t('app','Name')
         ),

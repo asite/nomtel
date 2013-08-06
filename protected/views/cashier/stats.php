@@ -10,6 +10,11 @@
         <div class="form-container-item form-label-width-60">
             <?php echo $form->PickerDateRow($model,'date_from',array('style'=>'width:80px;','errorOptions'=>array('hideErrorMessage'=>true)),array('minYearDelta'=>5,'maxYearDelta'=>0,'onSelect'=>'js:function(){$(this).closest("form").submit();}')); ?>
         </div>
+        <?php if (Yii::app()->user->role=='supportSuper') { ?>
+        <div class="form-container-item form-label-width-80">
+            <?php echo $form->dropDownListRow($model,'support_operator_id',SupportOperator::getCashierComboList(array(''=>'Общий баланс')),array('class'=>'span2','errorOptions'=>array('hideErrorMessage'=>true))); ?>
+        </div>
+        <?php } ?>
     </div>
 <?php /*
     <div class="form-container-horizontal">
@@ -58,11 +63,9 @@
     });
 </script>
 
-<?php if (Yii::app()->user->role=='cashier') { ?>
-<h2>Баланс кассы: <?=$balance?></h2>
-<?php } ?>
+<h2>Текущий баланс: <?=$balance?></h2>
 
-<h2>Итоги</h2>
+<h2>Баланс утро: <?=$morningBalance?></h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'summary-stats-grid',
     'dataProvider' => $dataProvider,
@@ -72,7 +75,7 @@
             'name'=>'support_operator',
             'header'=>'Кассир',
             'value'=>'$data["surname"]." ".$data["name"]',
-            'visible'=>Yii::app()->user->role!='cashier'
+            'visible'=>!$model->support_operator_id
         ),
         array(
             'name'=>'cnt_sell',
@@ -96,7 +99,7 @@
         ),
     ),
 )); ?>
-<?php if (Yii::app()->user->role!='cashier') { ?>
+<?php if (!$model->support_operator_id) { ?>
 <b>Сумма в кассу, включая неподтвержденные операции:</b> <?=$total?>
 <?php } ?>
 
@@ -112,7 +115,7 @@
             'header'=>'Кассир',
             'value'=>'$data["surname"]." ".$data["name"]',
             'filter'=>SupportOperator::getCashierComboList(),
-            'visible'=>Yii::app()->user->role!='cashier'
+            'visible'=>!$model->support_operator_id
         ),
         array(
             'name'=>'number',
@@ -137,7 +140,7 @@
 
 <h2>Восстановления</h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
-    'id' => 'sell-grid',
+    'id' => 'restore-grid',
     'dataProvider' => $cashierNumberRestoreDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'filter'=>$cashierNumberModel,
@@ -147,7 +150,7 @@
             'header'=>'Кассир',
             'value'=>'$data["surname"]." ".$data["name"]',
             'filter'=>SupportOperator::getCashierComboList(),
-            'visible'=>Yii::app()->user->role!='cashier'
+            'visible'=>!$model->support_operator_id
         ),
         array(
             'name'=>'number',
@@ -176,18 +179,26 @@
     ),
 )); ?>
 
-<?php if (Yii::app()->user->role=='cashier') { ?>
 <h2>Инкассации
+    <?php if (Yii::app()->user->role=='cashier') { ?>
     <?php $this->widget("bootstrap.widgets.TbButton",array(
         'url'=>$this->createUrl('collectionStep1',array('cashier_support_operator_id'=>loggedSupportOperatorId())),
         'label'=>'Инкассация'
     ));?>
+    <?php } ?>
 </h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
         'id' => 'collection-grid',
         'dataProvider' => $collectionDataProvider,
         'itemsCssClass' => 'table table-striped table-bordered table-condensed',
         'columns' => array(
+            array(
+                'name'=>'cashier_support_operator_id',
+                'header'=>'Кассир',
+                'value'=>'$data["surname"]." ".$data["name"]',
+                'filter'=>SupportOperator::getCashierComboList(),
+                'visible'=>!$model->support_operator_id
+            ),
             array(
                 'name'=>'dt',
                 'header'=>'Дата',
@@ -206,4 +217,4 @@
         ),
     )); ?>
 
-<?php } ?>
+<h2>Баланс вечер: <?=$eveningBalance?></h2>

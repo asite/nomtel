@@ -27,9 +27,10 @@ class BalanceReportController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
-
     private function recalcOperatorBalancesStatuses($reportId1, $reportId2, $reportId3, $analyzeBalances)
     {
+        throw new CException('not implemented');
+        /*
         $statuses = array();
 
         $reader = Yii::app()->db->createCommand("
@@ -99,10 +100,14 @@ class BalanceReportController extends BaseGxController
                         ':balance_status_changed_dt'=>$dt
                     ));
         }
+        */
     }
 
     private function recalcBalancesStatuses()
     {
+        throw new CException('not implemented');
+
+        /*
         $operators = Operator::model()->findAll();
 
         foreach ($operators as $operator) {
@@ -122,6 +127,7 @@ class BalanceReportController extends BaseGxController
                 $operator->id=Operator::OPERATOR_MEGAFON_ID
             );
         }
+        */
     }
 
     public function actionRecalcBalancesStatuses() {
@@ -150,14 +156,14 @@ class BalanceReportController extends BaseGxController
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $dataProvider = new CSqlDataProvider('select * ' . $sql, array(
+        $dataProvider = new CSqlDataProvider('select *,brn.balance ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
                     'personal_account',
                     'number',
-                    'balance',
+                    'balance'=>'brn.balance',
                 ),
             ),
             'pagination' => array(
@@ -292,15 +298,15 @@ class BalanceReportController extends BaseGxController
 
         $rows = $sheet->getHighestRow();
 
-        if ($sheet->getCellByColumnAndRow(3, 14)->getValue() != 'CTN')
+        if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
             $this->errorInvalidFormat(__LINE__);
-        if ($sheet->getCellByColumnAndRow(7, 14)->getValue() != 'Выручка без учета НДС, руб.')
+        if ($sheet->getCellByColumnAndRow(30, 5)->getValue() != 'Выручка для расчёта вознаграждения без учёта НДС, руб.')
             $this->errorInvalidFormat(__LINE__);
 
         $balances = array();
-        for ($row = 15; $row <= $rows; $row++) {
-            $number = trim($sheet->getCellByColumnAndRow(3, $row)->getValue());
-            $balance = $sheet->getCellByColumnAndRow(7, $row)->getValue();
+        for ($row = 6; $row <= $rows; $row++) {
+            $number = trim($sheet->getCellByColumnAndRow(12, $row)->getValue());
+            $balance = $sheet->getCellByColumnAndRow(30, $row)->getValue();
 
             if ($number == '') continue;
 
