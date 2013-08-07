@@ -7,7 +7,7 @@ class SiteController extends Controller
     {
         return array(
             array('allow', 'actions' => array('error', 'login', 'loginPO','restorePasswordPO','logout'), 'users' => array('*')),
-            array('allow', 'actions' => array('index','changeRole'), 'users' => array('@')),
+            array('allow', 'actions' => array('index','changeRole','forcedPasswordChange'), 'users' => array('@')),
         );
     }
 
@@ -105,5 +105,38 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $this->render('index');
+    }
+
+    public function actionForcedPasswordChange() {
+        $this->layout = '/layout/simple';
+
+        $model=new PasswordChange;
+
+        if (isset($_POST['PasswordChange'])) {
+            $model->setAttributes($_POST['PasswordChange']);
+            if ($model->validate()) {
+                if (Yii::app()->user->role=='agent') {
+                    $trx=Yii::app()->db->beginTransaction();
+
+                    $agent=Agent::model()->findByPk(loggedAgentId());
+                    $agent->user->password=$model->password;
+                    $agent->user->sendSmsWithLoginData($agent->phone_1);
+                    $agent->user->encryptPwd();
+                    $agent->require_password_change=0;
+                    $agent->save();
+                    $agent->user->save();
+
+                    $trx->commit();
+
+                    Yii::app()->user->setState('require_password_change',false);
+
+                    $this->redirect(array('site/index'));
+                }
+            } else {
+                $model->unsetAttributes();
+            }
+        }
+
+        $this->render('forced_password_change',array('model'=>$model));
     }
 }
