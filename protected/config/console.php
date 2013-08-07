@@ -19,7 +19,7 @@ $common_config = array(
         'application.extensions.giix-components.*'
     ),
 );
-
+define('TIMEZONE', 'Asia/Ekaterenburg');
 $base_config_name = array();
 
 switch (gethostname()) {
@@ -39,7 +39,7 @@ switch (gethostname()) {
         
     
     default:
-        die('unknown hostname');
+         $base_config_name = 'server_web_asite2_production.php';
 }
 
 return CMap::mergeArray($common_config, include($base_config_name));
