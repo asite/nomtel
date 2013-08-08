@@ -8,7 +8,7 @@ $this->breadcrumbs = array(
 
 <h1><?php echo GxHtml::encode(Sim::label(2)); ?></h1>
 
-<a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#SimSearch_number').val('<?php echo Yii::t('app','WITHOUT NUMBER');?>').trigger(jQuery.Event('change'));"><?php echo Yii::t('app', 'Without number') ?></a>
+<a class="btn" style="margin-bottom:10px;" href="#" onclick="jQuery('#SimSearch_agent_id').val('0').trigger(jQuery.Event('change'));">Без агента</a>
 
 <?php $this->widget('bootstrap.widgets.TbButton', array(
     'type'=>'button',
