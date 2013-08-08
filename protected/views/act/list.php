@@ -45,6 +45,11 @@ $('.search-form form').submit(function(){
                 'filter'=>false,
                 'htmlOptions' => array('style'=>'text-align:center;'),
             ),
+        array(
+            'name'=>'sim_count',
+            'filter'=>false,
+            'htmlOptions' => array('style'=>'text-align:center;'),
+        ),
 		array(
 			'class' => 'bootstrap.widgets.TbButtonColumn',
             'htmlOptions' => array('style'=>'width:80px;text-align:center;vertical-align:middle'),

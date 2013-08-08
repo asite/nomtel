@@ -510,6 +510,9 @@ class SimController extends BaseGxController {
 
         Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>$source_agent_id));
 
+        $model->updateSimCount();
+        $model->save();
+
         //add NumberHistory
         $criteria = new CDbCriteria();
         $criteria->addInCondition('id', $moveSimCards);
@@ -915,6 +918,12 @@ class SimController extends BaseGxController {
 
             if (!empty($simParentIdsToSetInactive))
                 Yii::app()->db->createCommand("update sim set is_active=0 where parent_id in (".implode(',',$simParentIdsToSetInactive).')')->execute();
+
+            foreach($recursiveInfo as $rInfo)
+                if (!$rInfo['act']->isNewRecord) {
+                    $rInfo['act']->updateSimCount();
+                    $rInfo['act']->save();
+                }
 
             $trx->commit();
 
