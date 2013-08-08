@@ -4,7 +4,7 @@
 // Any writable CConsoleApplication properties can be configured here.
 $common_config = array(
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-    'name' => 'Nomtel Console Application',
+    'name' => 'Telecom Agent Console Application',
     // application components
     'components' => array(
         'db' => array(

@@ -12,7 +12,7 @@ Yii::setPathOfAlias('vendors', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' .
 
 return array(
     'basePath' => dirname(__FILE__) . DIRECTORY_SEPARATOR . '..',
-    'name' => 'Nomtel CRM',
+    'name' => 'Telecom Agent',
     'runtimePath' => dirname(__FILE__) . '/../../var/runtime',
     'sourceLanguage' => 'en',
     'language' => 'ru',
