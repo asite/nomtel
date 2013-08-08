@@ -69,14 +69,15 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
+			array('name, surname, middle_name, phone_1', 'required'),
 			array('parent_id, user_id, taking_orders, is_agent, is_bonus, is_making_parent_invoices, require_password_change', 'numerical', 'integerOnly'=>true),
 			array('name, surname, middle_name, city, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>200),
-			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, taking_orders, is_agent, is_bonus, is_making_parent_invoices, require_password_change', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('passport_issue_date, birth_date', 'safe'),
+			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, taking_orders, is_agent, is_bonus, is_making_parent_invoices, require_password_change', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birth_date','date','format'=>'dd.MM.yyyy'),
 			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, taking_orders, is_agent, is_bonus, is_making_parent_invoices, require_password_change', 'safe', 'on'=>'search'),
