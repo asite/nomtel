@@ -155,9 +155,15 @@ class CashierController extends BaseGxController
 
                         $parentAgentId=$rInfo['agent']->id;
                         $parentActId=$rInfo['act']->id;
-
                     }
+
+                    foreach($recursiveInfo as $rInfo)
+                        if (!$rInfo['act']->isNewRecord) {
+                            $rInfo['act']->updateSimCount();
+                            $rInfo['act']->save();
+                        }
                 }
+
 
                 $blankSim->used_dt=new EDateTime();
                 $blankSim->used_support_operator_id=loggedSupportOperatorId();

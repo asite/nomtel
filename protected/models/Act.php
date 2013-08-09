@@ -48,4 +48,8 @@ class Act extends BaseAct
 
         return $rules;
     }
+
+    public function updateSimCount() {
+        $this->sim_count=Sim::model()->countByAttributes(array('act_id'=>$this->id));
+    }
 }

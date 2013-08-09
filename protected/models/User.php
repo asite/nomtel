@@ -53,6 +53,11 @@ class User extends BaseUser
         ));
     }
 
+    public function sendSmsWithLoginData($number) {
+        $msg='Ваш логин: '.$this->username.' пароль '.$this->password.' . Вход в систему по адресу '.Yii::app()->request->hostInfo;
+        Sms::send($number,$msg);
+    }
+
     public function search()
     {
         $data_provider = parent::search();
