@@ -54,6 +54,14 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', true);
         $config = 'server_web_asite_development.php';
         break;
+        
+    case 'valvit.ru':
+        define('LANGUAGE', 'ru');
+
+        define('YII_DEBUG', false);
+        $config = 'server_web_asite2_production.php';
+        break;
+
 
     default:
         die('unknown domain name');
