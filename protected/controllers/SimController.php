@@ -524,7 +524,7 @@ class SimController extends BaseGxController {
             }
         }
 
-        return true;
+        return $model;
     }
 
     public function actionMove($key) {
@@ -544,10 +544,20 @@ class SimController extends BaseGxController {
 
             $trx = Yii::app()->db->beginTransaction();
 
-            if (!$this->move($moveSimCards,$agent_id)) {
+            $act=$this->move($moveSimCards,$agent_id);
+            if (!$act) {
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
                 $this->redirect(Yii::app()->createUrl('sim/add'));
-                exit;
+            }
+
+            if ($_POST['Move']['cashPayment']==1) {
+                $payment=new Payment;
+                $payment->agent_id=$act->agent_id;
+                $payment->dt=$act->dt;
+                $payment->type=Payment::TYPE_NORMAL;
+                $payment->comment='Оплата отгрузки наличными';
+                $payment->sum=$act->sum;
+                $payment->save();
             }
 
             $trx->commit();

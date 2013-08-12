@@ -153,6 +153,15 @@ $this->widget('bootstrap.widgets.TbGridView', array(
     ?>
   </div>
 </div>
+    <div class="control-group">
+        <div class="controls" style="margin-left:195px;">
+            <label class="checkbox" for="Move_cashPayment">
+                <div class="controls"><input name="Move[cashPayment]" id="Move_Move_cashPayment" type="checkbox" value="1"></div>
+                Оплачено наличными
+            </label>
+        </div>
+    </div>
+
 <?php } else { echo CHtml::hiddenField('Act[agent_id]',$force_agent_id); } ?>
 
 
