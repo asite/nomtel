@@ -52,11 +52,11 @@ class CashierController extends BaseGxController
         // look only sim records, that belongs to base
         $criteria->addCondition('s.id=s.parent_id');
         $criteria->compare('s.operator_id',Operator::OPERATOR_MEGAFON_ID);
-        $criteria->compare('s.icc','999');
+        //$criteria->compare('s.icc','999');
         $criteria->compare('n.status',Number::STATUS_FREE);
 
         // sim must be not passed to any agent
-        //$criteria->compare('s2.parent_agent_id',adminAgentId());
+        $criteria->compare('s2.parent_agent_id',adminAgentId());
 
         return $criteria;
     }
