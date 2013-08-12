@@ -26,20 +26,6 @@ if (isSupport()) {
                 'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
             ));
         ?>
-        <?php
-            $this->widget('bootstrap.widgets.TbButton',array(
-                'url'=>$this->createUrl('number/free',array('id'=>$number->id)),
-                'label'=>"Освободить номер",
-                'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
-            ));
-        ?>
-        <?php
-            $this->widget('bootstrap.widgets.TbButton',array(
-                'url'=>$this->createUrl('number/free',array('id'=>$number->id,'icc'=>true)),
-                'label'=>"Отложенная сим",
-                'htmlOptions'=>array('onclick'=>'return confirm("Вы уверены?");'),
-            ));
-        ?>
     </div>
 
 <?php
@@ -130,7 +116,7 @@ if (isSupport()) {
                 )
             ),
         )); ?>
-        <?php $this->widget('bootstrap.widgets.TbEditableDetailView',array(
+        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
             'htmlOptions' => array('class'=> 'table table-striped table-condensed'),
             'data'=>$sim,
             'attributes'=>array(
@@ -138,17 +124,6 @@ if (isSupport()) {
                     'label'=>Yii::t('app','ICC'),
                     'name' => 'icc',
                     'value' => $sim->icc,
-                    'editable' => array(
-                        'type'   => 'text',
-                        'url' => $this->createUrl('number/saveICC',array('id'=>$number->id)),
-                        'options' => array(
-                            'params' => array('YII_CSRF_TOKEN' => Yii::app()->request->csrfToken),
-                        ),
-                        'source' => $sim->icc,
-                        'success'   => 'js: function(data) {
-                            $.fn.yiiGridView.update("number-grid");
-                        }'
-                    )
                 )
             ),
         )); ?>
