@@ -809,6 +809,19 @@ class SimController extends BaseGxController {
         if ($_POST['ICCtoMove'] != '') {
             $id_arr = explode("\n", $_POST['ICCtoMove']);
 
+            foreach ($id_arr as &$idd) {
+                $idd_arr = array();
+                $idd_arr = explode("-", $idd);
+                if ($idd_arr[1]) {
+                    $start = $idd_arr[0];
+                    $end = $idd_arr[1];
+                    $idd = $start;
+                    do {
+                        $id_arr[] = $start = bcadd($start,1);
+                    } while(bccomp($start,$end));
+                }
+            }
+
             $trx=Yii::app()->db->beginTransaction();
 
             $st=microtime(true);
@@ -940,7 +953,7 @@ class SimController extends BaseGxController {
             $trx->commit();
 
             if (!empty($resNotFound)) {
-                $res='<b>следующие ICC/Номера не найдены:</b> '.implode(',',array_keys($resNotFound));
+                $res='<b>следующие ICC/Номера не найдены:</b> '.implode(', ',array_keys($resNotFound));
             } else {
                 $res='Все SIM успешно переданы';
             }
