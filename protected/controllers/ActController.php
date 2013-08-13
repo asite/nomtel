@@ -180,4 +180,26 @@ class ActController extends BaseGxController
             'report' => $report
         ));
     }
+
+    public function actionPrint($id) {
+        $this->layout = 'simply';
+
+        $model = $this->loadModel($id, 'Act');
+        if (loggedAgentId() != $model->agent_id &&
+            loggedAgentId() != $model->agent->parent_id
+        )
+            throw new CHttpException(400, Yii::t('giix', 'Your request is invalid.'));
+
+        $sim = new Sim('search');
+        $sim->unsetAttributes();
+
+        if (isset($_GET['Sim']))
+            $sim->setAttributes($_GET['Sim']);
+        $sim->act_id = $id;
+
+        $this->render('print', array(
+            'model' => $model,
+            'sim' => $sim
+        ));
+    }
 }

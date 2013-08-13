@@ -563,6 +563,8 @@ class SimController extends BaseGxController {
             $trx->commit();
 
             Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
+            Yii::app()->user->setFlash('printAct', $act->id);
+
             $sessionData->delete($key);
             $this->redirect(Yii::app()->createUrl('site/index'));
         } else {
