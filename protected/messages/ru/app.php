@@ -398,4 +398,5 @@ return array (
   'Registration address'=>'Адрес регистрации',
   'City Number'=>'Городской номер',
   'Connect sim'=>'Подключить',
+  'Select Tariff'=>'Выбор тарифа',
 );

@@ -80,6 +80,16 @@ $this->breadcrumbs = array(
                     <?php echo Yii::t('app','Tariff plan change'); ?>
                 </label>
             </div>
+            <?php
+                $this->widget('bootstrap.widgets.TbSelect2', array(
+                    'name' => 'tariff',
+                    'id' => 'tariff',
+                    'data' => $tariffs,
+                    'options' => array(
+                        'width' => '80%',
+                    )
+                ));
+            ?>
         </div>
         <div class="control-group " style="margin-bottom: 0;">
             <div class="controls" style="margin-left: 10px;">
@@ -141,7 +151,7 @@ $this->breadcrumbs = array(
             </div>
         </div>
     </div>-->
-    <div style="width: 20%;float: left;">
+    <div style="width: 30%;float: left;">
         <h3><?php echo Yii::t('app','Status') ?></h3>
         <button name="massFree" value="1" class="btn" type="submit" onclick="return confirm('Вы уверены?');">Освободить номер</button>
         <button name="massFreeWait" value="1" class="btn" type="submit" onclick="return confirm('Вы уверены?');" style="margin-top: 10px;">Отложенная сим</button>

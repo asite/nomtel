@@ -547,9 +547,9 @@ class NumberController extends BaseGxController
         if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно поставлены в очередь на освобождение.');
     }
-    
-    
-    
+
+
+
     private function getModel($v, $data) {
         if ($data['Action']=='ICC') {
             $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
@@ -607,12 +607,15 @@ class NumberController extends BaseGxController
     }
 
     public function actionMassChange() {
+        $tariffs = Tariff::model()->getComboList();
+        $tariffs = array('0'=>Yii::t('app', 'Select Tariff')) + $tariffs;
+
         if (isset($_FILES['fileField']['tmp_name'])) {
             $csv=$this->readCSV($_FILES['fileField']['tmp_name']);
             $csv[0][0] = preg_replace('~\D+~','',$csv[0][0]);
             if (strlen($csv[0][0])>11) $head = 'ICC'; else $head = 'Number';
 
-            $this->render('massChange',array('file'=>$csv,'head'=>$head));
+            $this->render('massChange',array('file'=>$csv,'head'=>$head,'tariffs'=>$tariffs));
             exit;
         }
 
@@ -623,8 +626,8 @@ class NumberController extends BaseGxController
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не загружен файл.');
                 $this->refresh();
             }
-            
-           
+
+
             $csv = unserialize($_POST['Csv']);
 
                 if ($_POST['massFree']) {
@@ -639,7 +642,7 @@ class NumberController extends BaseGxController
                     $this->setStatus($csv,$data,Number::STATUS_UNKNOWN);
                     $this->redirect(Yii::app()->request->urlReferrer);
                 }
-                
+
                 if ($_POST['massRecovery']) {
                     $this->setRecovery($csv,$data);
                     $this->redirect(Yii::app()->request->urlReferrer);
@@ -679,7 +682,9 @@ class NumberController extends BaseGxController
                     $sql ='select sim.id, sim.number, number.sim_id from sim join number on (number.sim_id=sim.parent_id) where sim.is_active=1 and sim.number in ('.substr($number,1).')';
                     $sims = Yii::app()->db->createCommand($sql)->queryAll();
                     foreach ($sims as $value) {
-                        $tariffs = Tariff::model()->findByAttributes(array('title'=>$dataCsv[$value['number']]));
+                        if ($dataCsv[$value['number']]) $tariffs = Tariff::model()->findByAttributes(array('title'=>$dataCsv[$value['number']]));
+                        else $tariffs = Tariff::model()->findByPk($_POST['tariff']);
+
                         if ($tariffs) {
                             $criteria = new CDbCriteria();
                             $criteria->addColumnCondition(array('parent_id'=>$value['sim_id']));
@@ -828,7 +833,7 @@ class NumberController extends BaseGxController
             }
         }
 
-        $this->render('massChange');
+        $this->render('massChange',array('tariffs'=>$tariffs));
     }
 
     public function actionAgentChangeIcc($sim_id) {
