@@ -553,26 +553,29 @@ class SimController extends BaseGxController {
 
             // mail -------------------------------
 
-            $criteria = new CDbCriteria();
-            $criteria->addInCondition('id', $moveSimCards);
-            $numbers=Yii::app()->db->createCommand("select number from sim where ".$criteria->condition)->queryColumn($criteria->params);
+            $agent=Agent::model()->findByPk(loggedAgentId());
+            if ($agent->email) {
+                $criteria = new CDbCriteria();
+                $criteria->addInCondition('id', $moveSimCards);
+                $numbers=Yii::app()->db->createCommand("select number from sim where ".$criteria->condition)->queryColumn($criteria->params);
 
-            $fp = fopen (Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv', "w");
+                $fp = fopen (Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv', "w");
 
-            foreach ($numbers as $fields) {
-                fputcsv($fp, array($fields));
-            }
-            fclose($fp);
+                foreach ($numbers as $fields) {
+                    fputcsv($fp, array($fields));
+                }
+                fclose($fp);
 
-            $mail = new YiiMailMessage();
-            $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
-            $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
+                $mail = new YiiMailMessage();
+                $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
+                $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
 
-            $mail->setFrom(Yii::app()->params['adminEmailFrom']);
-            $mail->setTo(Yii::app()->params['adminEmail']);
+                //$mail->setFrom(Yii::app()->params['adminEmailFrom']);
+                $mail->setTo($agent->email);
 
-            if (Yii::app()->mail->send($mail)) {
-                unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
+                if (Yii::app()->mail->send($mail)) {
+                    unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
+                }
             }
 
             // endmail ----------------------------------
