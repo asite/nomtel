@@ -399,4 +399,8 @@ return array (
   'City Number'=>'Городской номер',
   'Connect sim'=>'Подключить',
   'Select Tariff'=>'Выбор тарифа',
+  'shipped'=>'Отгрузил',
+  'took'=>'Принял',
+  'Payment of the №'=>'Оплата по счету №',
+  'Signature'=>'Подпись',
 );

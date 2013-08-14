@@ -5,17 +5,27 @@
     'attributes'=>array(
         'id',
         array(
-            'name'=>'agent_id',
+            'label'=>Yii::t('app','shipped'),
+            'value'=>$model->agent->parent
+        ),
+        array(
+            'label'=>Yii::t('app','took'),
             'value'=>$model->agent
         ),
-        'dt',
         'sum',
-        'comment',
+        array(
+            'label'=>Yii::t('app','Payment of the №'),
+            'value'=>$model->id
+        ),
+        'dt',
+        array(
+            'label'=>Yii::t('app','Signature'),
+            'value'=>'',
+        ),
     ),
 )); ?>
-
+<br/><br/><br/>
 <h2><?php echo GxHtml::encode(Sim::model()->label(2)); ?></h2>
-
 <?php
     $dataProvider = $sim->search();
     $dataProvider->pagination->pageSize = $dataProvider->totalItemCount;
