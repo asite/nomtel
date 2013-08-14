@@ -567,16 +567,20 @@ class SimController extends BaseGxController {
             $numbers=Yii::app()->db->createCommand("select number from sim where ".$criteria->condition)->queryColumn($criteria->params);
             $csv = $this->export($numbers);
 
+            $fd = fopen (Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv', "w");
+            fputs($fd, $csv);
+            fclose($fd);
+
             $mail = new YiiMailMessage();
             $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
-            $attachment = Swift_Attachment::newInstance($csv, 'csv.csv', 'application/csv');
-            $mail->attach($attachment);
+            $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
 
-            $mail->setBody('Привет');
             $mail->setFrom(Yii::app()->params['adminEmailFrom']);
             $mail->setTo('Yurka.god@gmail.com'/*Yii::app()->params['adminEmail']*/);
 
-            Yii::app()->mail->send($mail);
+            if (Yii::app()->mail->send($mail)) {
+                unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
+            }
 
             // endmail ----------------------------------
 
