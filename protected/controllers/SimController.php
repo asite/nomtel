@@ -572,7 +572,7 @@ class SimController extends BaseGxController {
             $mail->setTo('Yurka.god@gmail.com'/*Yii::app()->params['adminEmail']*/);
 
             if (Yii::app()->mail->send($mail)) {
-                //unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
+                unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
             }
 
             // endmail ----------------------------------
