@@ -527,14 +527,6 @@ class SimController extends BaseGxController {
         return $model;
     }
 
-    public function export($array, $col_sep=";", $qut='"', $row_sep="\n") {
-        foreach($array as $v) {
-            $output.="$qut".$v.$qut.$col_sep.$row_sep;
-        }
-
-        return $output;
-    }
-
     public function actionMove($key) {
         $sessionData=new SessionData(__CLASS__);
         $moveSimCards=$sessionData->get($key);
@@ -563,13 +555,14 @@ class SimController extends BaseGxController {
 
             $criteria = new CDbCriteria();
             $criteria->addInCondition('id', $moveSimCards);
-
             $numbers=Yii::app()->db->createCommand("select number from sim where ".$criteria->condition)->queryColumn($criteria->params);
-            $csv = $this->export($numbers);
 
-            $fd = fopen (Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv', "w");
-            fputs($fd, $csv);
-            fclose($fd);
+            $fp = fopen (Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv', "w");
+
+            foreach ($numbers as $fields) {
+                fputcsv($fp, array($fields));
+            }
+            fclose($fp);
 
             $mail = new YiiMailMessage();
             $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
@@ -579,7 +572,7 @@ class SimController extends BaseGxController {
             $mail->setTo('Yurka.god@gmail.com'/*Yii::app()->params['adminEmail']*/);
 
             if (Yii::app()->mail->send($mail)) {
-                unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
+                //unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
             }
 
             // endmail ----------------------------------
