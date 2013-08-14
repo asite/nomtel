@@ -527,6 +527,14 @@ class SimController extends BaseGxController {
         return $model;
     }
 
+    public function export($array, $col_sep=";", $qut='"', $row_sep="\n") {
+        foreach($array as $v) {
+            $output.="$qut".$v.$qut.$col_sep.$row_sep;
+        }
+
+        return $output;
+    }
+
     public function actionMove($key) {
         $sessionData=new SessionData(__CLASS__);
         $moveSimCards=$sessionData->get($key);
@@ -549,6 +557,29 @@ class SimController extends BaseGxController {
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
                 $this->redirect(Yii::app()->createUrl('sim/add'));
             }
+
+
+            // mail -------------------------------
+
+            $criteria = new CDbCriteria();
+            $criteria->addInCondition('id', $moveSimCards);
+
+            $numbers=Yii::app()->db->createCommand("select number from sim where ".$criteria->condition)->queryColumn($criteria->params);
+            $csv = $this->export($numbers);
+
+            $mail = new YiiMailMessage();
+            $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
+            $attachment = Swift_Attachment::newInstance($csv, 'csv.csv', 'application/csv');
+            $mail->attach($attachment);
+
+            $mail->setBody('Привет');
+            $mail->setFrom(Yii::app()->params['adminEmailFrom']);
+            $mail->setTo('Yurka.god@gmail.com'/*Yii::app()->params['adminEmail']*/);
+
+            Yii::app()->mail->send($mail);
+
+            // endmail ----------------------------------
+
 
             if ($_POST['Move']['cashPayment']==1) {
                 $payment=new Payment;
