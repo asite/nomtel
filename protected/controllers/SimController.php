@@ -569,7 +569,7 @@ class SimController extends BaseGxController {
             $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
 
             $mail->setFrom(Yii::app()->params['adminEmailFrom']);
-            $mail->setTo('Yurka.god@gmail.com'/*Yii::app()->params['adminEmail']*/);
+            $mail->setTo(Yii::app()->params['adminEmail']);
 
             if (Yii::app()->mail->send($mail)) {
                 unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
