@@ -1,9 +1,29 @@
 <h1>Восстановление номера '<?=$number->number?>'</h1>
 
+<?php $this->widget('bootstrap.widgets.TbDetailView',array(
+    'data'=>$sim,
+    'attributes'=>array(
+        array(
+            'label'=>Yii::t('app','Tariff')."<br/><br/>",
+            'value'=>$sim->tariff
+        ),
+    ),
+)); ?>
+
+<script>
+    function toggleSum() {
+        if (jQuery('input[name="CashierNumberRestore1[payment]"][value=IMMEDIATE]').is(':checked'))
+            jQuery('#CashierNumberRestore1_sum').closest('.control-group').show();
+        else
+            jQuery('#CashierNumberRestore1_sum').closest('.control-group').hide();
+    }
+
+    jQuery(toggleSum);
+</script>
 <div class="form">
 
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
-    'id' => 'operator-form',
+    'id' => 'restore-form',
     'type' => 'horizontal',
     'enableAjaxValidation' => false,
     'clientOptions'=>array('validateOnSubmit' => true, 'validateOnChange' => false),
@@ -11,12 +31,20 @@
 ?>
 
     <p class="note">
-        <?php echo Yii::t('app', 'Fields with'); ?> <span class="required">*</span> <?php echo Yii::t('app', 'are required'); ?>.
+        <?=Yii::t('app', 'Fields with')?> <span class="required">*</span> <?php echo Yii::t('app', 'are required'); ?>.
     </p>
 
-    <?php echo $form->errorSummary($model); ?>
+    <?=$form->errorSummary($model); ?>
 
-    <?php echo $form->textFieldRow($model,'icc',array('class'=>'span3','maxlength'=>25,'hint'=>'введите icc с регионом "'.$number->sim->operatorRegion->title.'"')); ?>
+    <?=$form->radioButtonListRow($model,'sim_type',MegafonAppRestoreNumber::getSimTypeLabels())?>
+
+    <?=$form->textFieldRow($model,'contact_phone',array('class'=>'span2'))?>
+
+    <?=$form->textFieldRow($model,'contact_name',array('class'=>'span2'))?>
+
+    <?=$form->radioButtonListRow($model,'payment',$model::getPaymentLabels(),array('onchange'=>'toggleSum()'))?>
+
+    <?=$form->textFieldRow($model,'sum',array('class'=>'span2'))?>
 
     <div class="form-actions">
     <?php $this->widget('bootstrap.widgets.TbButton',array(

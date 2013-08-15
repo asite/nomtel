@@ -17,6 +17,12 @@
  * NOTE, this file must be saved in UTF-8 encoding.
  */
 return array (
+  'Payment' => 'Оплата',
+  'Sim Type' => 'Тип SIM',
+  'Contact Phone' => 'Контактный телефон',
+  'PAYMENT_TYPE_IMMEDIATE'=>'Сейчас',
+  'PAYMENT_TYPE_WHEN_DONE'=>'При получении SIM',
+  'Contact Name' => 'Контактное лицо',
   'Is Making Parent Invoices'=>'Формировать акты',
   'STATUS_NO_PAYOUT'=>'Выплата не положена',
   'AgentReferralRate|AgentReferralRates' => '',

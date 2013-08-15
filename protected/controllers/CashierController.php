@@ -253,74 +253,53 @@ class CashierController extends BaseGxController
         }
 
         $number=Number::model()->findByPk($id);
+        $sim=Sim::model()->findByPk($number->sim_id);
 
-        $model=new CashierRestoreForm();
+        $megafonAppNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$number->id,'status'=>MegafonAppRestoreNumber::STATUS_PROCESSING));
+        if ($megafonAppNumber) {
+            Yii::app()->user->setFlash('error','Номер уже отправлен на восстановление в заявлении №'.$megafonAppNumber->megafon_app_restore_id.' от '.
+                $megafonAppNumber->megafonAppRestore->dt->format('d.m.Y'));
+            $this->redirect(array('serviceList'));
+        }
 
-        if (isset($_POST['CashierRestoreForm'])) {
-            $model->setAttributes($_POST['CashierRestoreForm']);
+        $model=new CashierNumberRestore1();
+        $model->setScenario('with_sum');
 
-            $model->validate();
+        if (isset($_POST['CashierNumberRestore1'])) {
+            $model->setAttributes($_POST['CashierNumberRestore1']);
 
-            $sim=Sim::model()->findByPk($number->sim_id);
+            if ($model->payment!=CashierNumberRestore1::PAYMENT_IMMEDIATE)
+                $model->setScenario('');
 
-            $blankSim=BlankSim::model()->findByAttributes(array('icc'=>$model->icc));
-            if (!$blankSim) {
-                $model->addError('icc','Пустышки с указанным icc нет в базе');
-            } else {
-                if ($blankSim->used_dt) {
-                    $model->addError('icc','Пустышка с указанным icc уже использована для восстановления');
-                }
-                if ($blankSim->operator_id!=$sim->operator_id) {
-                    $model->addError('icc','Пустышка с указанным icc относится к другому оператору');
-                }
-                if ($blankSim->operator_region_id!=$sim->operator_region_id) {
-                    $model->addError('icc','Пустышка с указанным icc относится к другому региону');
-                }
-            }
+            if ($model->validate()) {
+                $megafonAppRestore=MegafonAppRestore::getCurrent();
 
-            $errors=$model->getErrors();
-            if (empty($errors)) {
+                $megafonAppRestoreNumber=new MegafonAppRestoreNumber;
+
+                $megafonAppRestoreNumber->megafon_app_restore_id=$megafonAppRestore->id;
+                $megafonAppRestoreNumber->status=MegafonAppRestoreNumber::STATUS_PROCESSING;
+                $megafonAppRestoreNumber->number_id=$number->id;
+                $megafonAppRestoreNumber->support_operator_id=loggedSupportOperatorId();
+                $megafonAppRestoreNumber->sim_type=$model->sim_type;
+                $megafonAppRestoreNumber->contact_name=$model->contact_name;
+                $megafonAppRestoreNumber->contact_phone=$model->contact_phone;
+
                 $trx=Yii::app()->db->beginTransaction();
 
-                $blankSim->used_dt=new EDateTime();
-                $blankSim->used_support_operator_id=loggedSupportOperatorId();
-                $blankSim->used_number_id=$number->id;
-                $blankSim->save();
-
-
-                $criteria = new CDbCriteria();
-                $criteria->addCondition('parent_id=:sim_id');
-                $criteria->params = array(
-                    ':sim_id' => $number->sim_id
-                );
-
-                Sim::model()->updateAll(array('icc' => $model->icc), $criteria);
-
-                $message = "Заменить у номера ".$number->number." ICC на ".$model->icc;
-
-                $ticketId=Ticket::addMessage($number->id,$message);
-
-                $ticket = Ticket::model()->findByPk($ticketId);
-                $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
-                $ticket->internal=$ticket->text;
-                $ticket->sendMegafonNotification();
-                $ticket->save();
-
-                NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');
-
-                $cashierNumber=new CashierNumber();
-                $cashierNumber->dt=new EDateTime();
-                $cashierNumber->support_operator_id=loggedSupportOperatorId();
-                $cashierNumber->number_id=$number->id;
-                $cashierNumber->type=CashierNumber::TYPE_RESTORE;
-                $cashierNumber->ticket_id=$ticketId;
-                $cashierNumber->sum=300;
-                $cashierNumber->sum_cashier=200;
-                $cashierNumber->save();
+                if ($model->payment==CashierNumberRestore1::PAYMENT_IMMEDIATE) {
+                    $cashierDebitCredit=new CashierDebitCredit;
+                    $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
+                    $cashierDebitCredit->dt=new EDateTime();
+                    $cashierDebitCredit->sum=$model->sum;
+                    $cashierDebitCredit->comment='Восстановление номера '.$number->number;
+                    $cashierDebitCredit->save();
+                    $megafonAppRestoreNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
+                }
+                $megafonAppRestoreNumber->save();
 
                 $trx->commit();
 
-                Yii::app()->user->setFlash('success','Номер успешно восстановлен');
+                Yii::app()->user->setFlash('success','Номер добавлен в заявку на восстановление');
                 $this->redirect(array('cashier/serviceList'));
             }
         }
@@ -339,6 +318,7 @@ class CashierController extends BaseGxController
 
         $this->render('restore', array(
             'number' => $number,
+            'sim' => $sim,
             'model' => $model,
             'balancesDataProvider'=>$balancesDataProvider
         ));
