@@ -16,13 +16,14 @@
  * @property string $sim_type
  * @property string $status
  * @property string $cashier_debit_credit_id
+ * @property integer $ask_for_sum
  * @property string $contact_phone
  * @property string $contact_name
  *
- * @property CashierDebitCredit $cashierDebitCredit
  * @property Number $number
  * @property MegafonAppRestore $megafonAppRestore
  * @property SupportOperator $supportOperator
+ * @property CashierDebitCredit $cashierDebitCredit
  */
 abstract class BaseMegafonAppRestoreNumber extends BaseGxActiveRecord {
 
@@ -45,22 +46,22 @@ abstract class BaseMegafonAppRestoreNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('megafon_app_restore_id, number_id, sim_type, status', 'required'),
-			array('megafon_app_restore_id, support_operator_id', 'numerical', 'integerOnly'=>true),
+			array('megafon_app_restore_id, support_operator_id, ask_for_sum', 'numerical', 'integerOnly'=>true),
 			array('number_id, cashier_debit_credit_id, contact_phone', 'length', 'max'=>20),
 			array('sim_type', 'length', 'max'=>6),
 			array('status', 'length', 'max'=>10),
 			array('contact_name', 'length', 'max'=>100),
-			array('support_operator_id, cashier_debit_credit_id, contact_phone, contact_name', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, megafon_app_restore_id, number_id, support_operator_id, sim_type, status, cashier_debit_credit_id, contact_phone, contact_name', 'safe', 'on'=>'search'),
+			array('support_operator_id, cashier_debit_credit_id, ask_for_sum, contact_phone, contact_name', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, megafon_app_restore_id, number_id, support_operator_id, sim_type, status, cashier_debit_credit_id, ask_for_sum, contact_phone, contact_name', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
-			'cashierDebitCredit' => array(self::BELONGS_TO, 'CashierDebitCredit', 'cashier_debit_credit_id'),
 			'number' => array(self::BELONGS_TO, 'Number', 'number_id'),
 			'megafonAppRestore' => array(self::BELONGS_TO, 'MegafonAppRestore', 'megafon_app_restore_id'),
 			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
+			'cashierDebitCredit' => array(self::BELONGS_TO, 'CashierDebitCredit', 'cashier_debit_credit_id'),
 		);
 	}
 
@@ -78,12 +79,13 @@ abstract class BaseMegafonAppRestoreNumber extends BaseGxActiveRecord {
 			'sim_type' => Yii::t('app', 'Sim Type'),
 			'status' => Yii::t('app', 'Status'),
 			'cashier_debit_credit_id' => null,
+			'ask_for_sum' => Yii::t('app', 'Ask For Sum'),
 			'contact_phone' => Yii::t('app', 'Contact Phone'),
 			'contact_name' => Yii::t('app', 'Contact Name'),
-			'cashierDebitCredit' => null,
 			'number' => null,
 			'megafonAppRestore' => null,
 			'supportOperator' => null,
+			'cashierDebitCredit' => null,
 		);
 	}
 
@@ -97,6 +99,7 @@ abstract class BaseMegafonAppRestoreNumber extends BaseGxActiveRecord {
 		$criteria->compare('sim_type', $this->sim_type, true);
 		$criteria->compare('status', $this->status, true);
 		$criteria->compare('cashier_debit_credit_id', $this->cashier_debit_credit_id);
+		$criteria->compare('ask_for_sum', $this->ask_for_sum);
 		$criteria->compare('contact_phone', $this->contact_phone, true);
 		$criteria->compare('contact_name', $this->contact_name, true);
 

@@ -12,6 +12,8 @@
  * @property integer $id
  * @property string $dt
  * @property integer $numbers_count
+ * @property integer $unprocessed_numbers_count
+ * @property integer $sent_to_email
  *
  * @property MegafonAppRestoreNumber[] $megafonAppRestoreNumbers
  */
@@ -35,10 +37,11 @@ abstract class BaseMegafonAppRestore extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('dt, numbers_count', 'required'),
-			array('numbers_count', 'numerical', 'integerOnly'=>true),
+			array('dt', 'required'),
+			array('numbers_count, unprocessed_numbers_count, sent_to_email', 'numerical', 'integerOnly'=>true),
+			array('numbers_count, unprocessed_numbers_count, sent_to_email', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy'),
-			array('id, dt, numbers_count', 'safe', 'on'=>'search'),
+			array('id, dt, numbers_count, unprocessed_numbers_count, sent_to_email', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,6 +61,8 @@ abstract class BaseMegafonAppRestore extends BaseGxActiveRecord {
 			'id' => Yii::t('app', 'ID'),
 			'dt' => Yii::t('app', 'Dt'),
 			'numbers_count' => Yii::t('app', 'Numbers Count'),
+			'unprocessed_numbers_count' => Yii::t('app', 'Unprocessed Numbers Count'),
+			'sent_to_email' => Yii::t('app', 'Sent To Email'),
 			'megafonAppRestoreNumbers' => null,
 		);
 	}
@@ -68,6 +73,8 @@ abstract class BaseMegafonAppRestore extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('numbers_count', $this->numbers_count);
+		$criteria->compare('unprocessed_numbers_count', $this->unprocessed_numbers_count);
+		$criteria->compare('sent_to_email', $this->sent_to_email);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,

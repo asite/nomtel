@@ -294,6 +294,8 @@ class CashierController extends BaseGxController
                     $cashierDebitCredit->comment='Восстановление номера '.$number->number;
                     $cashierDebitCredit->save();
                     $megafonAppRestoreNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
+                } else {
+                    $megafonAppRestoreNumber->ask_for_sum=true;
                 }
                 $megafonAppRestoreNumber->save();
 
