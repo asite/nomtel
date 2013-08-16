@@ -14,7 +14,8 @@ $config = CMap::mergeArray(
             'adminEmailFrom' => 'info@asiteapp.ru',
             'numberHelpEmail' => 'alegudmail@gmail.com',
             'supportEmail' => array('alegudmail@gmail.com', '9292000001@mail.ru'),
-            'supportEmailFrom' => 'info@asiteapp.ru'
+            'supportEmailFrom' => 'info@asiteapp.ru',
+            'megafonAppRestoreEmail'=>array('9292000001@mail.ru','9612082800@mail.ru'),
         )
     )
 );

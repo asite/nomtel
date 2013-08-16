@@ -16,6 +16,7 @@ $config = CMap::mergeArray(
             'numberHelpEmail' => 'alegudmail@gmail.com',
             'supportEmail' => array('alegudmail@gmail.com'),
             'supportEmailFrom' => 'info@asiteapp.ru',
+            'megafonAppRestoreEmail'=>array('9292000001@mail.ru','9612082800@mail.ru'),
             'megafonBalanceEmails' => array(
                 'host'=>'mail.asiteplace.ru',
                 'port'=>'143',
