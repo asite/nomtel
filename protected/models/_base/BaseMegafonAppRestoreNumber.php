@@ -16,7 +16,7 @@
  * @property string $sim_type
  * @property string $status
  * @property string $cashier_debit_credit_id
- * @property integer $ask_for_sum
+ * @property integer $sim_given
  * @property string $contact_phone
  * @property string $contact_name
  *
@@ -46,13 +46,13 @@ abstract class BaseMegafonAppRestoreNumber extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('megafon_app_restore_id, number_id, sim_type, status', 'required'),
-			array('megafon_app_restore_id, support_operator_id, ask_for_sum', 'numerical', 'integerOnly'=>true),
+			array('megafon_app_restore_id, support_operator_id, sim_given', 'numerical', 'integerOnly'=>true),
 			array('number_id, cashier_debit_credit_id, contact_phone', 'length', 'max'=>20),
 			array('sim_type', 'length', 'max'=>6),
 			array('status', 'length', 'max'=>10),
 			array('contact_name', 'length', 'max'=>100),
-			array('support_operator_id, cashier_debit_credit_id, ask_for_sum, contact_phone, contact_name', 'default', 'setOnEmpty' => true, 'value' => null),
-			array('id, megafon_app_restore_id, number_id, support_operator_id, sim_type, status, cashier_debit_credit_id, ask_for_sum, contact_phone, contact_name', 'safe', 'on'=>'search'),
+			array('support_operator_id, cashier_debit_credit_id, sim_given, contact_phone, contact_name', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('id, megafon_app_restore_id, number_id, support_operator_id, sim_type, status, cashier_debit_credit_id, sim_given, contact_phone, contact_name', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -79,7 +79,7 @@ abstract class BaseMegafonAppRestoreNumber extends BaseGxActiveRecord {
 			'sim_type' => Yii::t('app', 'Sim Type'),
 			'status' => Yii::t('app', 'Status'),
 			'cashier_debit_credit_id' => null,
-			'ask_for_sum' => Yii::t('app', 'Ask For Sum'),
+			'sim_given' => Yii::t('app', 'Sim Given'),
 			'contact_phone' => Yii::t('app', 'Contact Phone'),
 			'contact_name' => Yii::t('app', 'Contact Name'),
 			'number' => null,
@@ -99,7 +99,7 @@ abstract class BaseMegafonAppRestoreNumber extends BaseGxActiveRecord {
 		$criteria->compare('sim_type', $this->sim_type, true);
 		$criteria->compare('status', $this->status, true);
 		$criteria->compare('cashier_debit_credit_id', $this->cashier_debit_credit_id);
-		$criteria->compare('ask_for_sum', $this->ask_for_sum);
+		$criteria->compare('sim_given', $this->sim_given);
 		$criteria->compare('contact_phone', $this->contact_phone, true);
 		$criteria->compare('contact_name', $this->contact_name, true);
 

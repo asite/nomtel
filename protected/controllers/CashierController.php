@@ -239,7 +239,117 @@ class CashierController extends BaseGxController
         ));
     }
 
+    private function getBalancesDataProvider($number) {
+        $sql="from balance_report_number brn
+              join balance_report br on (br.id=brn.balance_report_id)
+              where brn.number_id=:number_id";
+        $sqlParams=array(':number_id'=>$number->id);
+        $totalItemCount=Yii::app()->db->createCommand("select count(*) $sql")->queryScalar($sqlParams);
+
+        $balancesDataProvider = new CSqlDataProvider("select br.dt,brn.balance $sql order by dt desc", array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $sqlParams,
+            'pagination' => array('pageSize' => 10)
+        ));
+
+        return $balancesDataProvider;
+    }
+
+    public function actionRestoreFinish($id) {
+        $megafonAppRestoreNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$id,'status'=>MegafonAppRestoreNumber::STATUS_DONE,'sim_given'=>false));
+        if (!$megafonAppRestoreNumber) $this->redirect(array('serviceList'));
+
+        $number=Number::model()->findByPk($id);
+        $sim=Sim::model()->findByPk($number->sim_id);
+
+        $model=new CashierNumberRestoreFinishForm;
+
+        if (Yii::app()->request->isPostRequest) {
+            $model->setAttributes($_POST['CashierNumberRestoreFinishForm']);
+            if ($megafonAppRestoreNumber->cashier_debit_credit_id || $model->validate()) {
+
+                $trx=Yii::app()->db->beginTransaction();
+
+                if (!$megafonAppRestoreNumber->cashier_debit_credit_id) {
+                    $cashierDebitCredit=new CashierDebitCredit;
+                    $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
+                    $cashierDebitCredit->dt=new EDateTime();
+                    $cashierDebitCredit->sum=$model->sum;
+                    $cashierDebitCredit->comment='Восстановление номера '.$number->number;
+                    $cashierDebitCredit->save();
+                    $megafonAppRestoreNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
+                }
+
+                $megafonAppRestoreNumber->sim_given=true;
+                $megafonAppRestoreNumber->save();
+
+                $trx->commit();
+
+                Yii::app()->user->setFlash('success','Восстановление номера успешно завершено');
+                $this->redirect(array('serviceList'));
+            }
+        }
+        $this->render('restoreFinish', array(
+            'number' => $number,
+            'sim' => $sim,
+            'balancesDataProvider'=>$this->getBalancesDataProvider($number),
+            'megafonAppRestoreNumber'=>$megafonAppRestoreNumber,
+            'model'=>$model
+        ));
+    }
+
+    public function actionRestoreDoCancel($id) {
+        $megafonAppRestoreNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$id,'status'=>MegafonAppRestoreNumber::STATUS_PROCESSING));
+        if (!$megafonAppRestoreNumber) $this->redirect(array('serviceList'));
+
+        $number=Number::model()->findByPk($id);
+
+        $trx=Yii::app()->db->beginTransaction();
+
+        $megafonAppRestoreNumber->status=MegafonAppRestoreNumber::STATUS_REJECTED;
+        if ($megafonAppRestoreNumber->cashier_debit_credit_id) {
+            $cashierDebitCredit=new CashierDebitCredit;
+            $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
+            $cashierDebitCredit->dt=new EDateTime();
+            $cashierDebitCredit->sum=-$megafonAppRestoreNumber->cashierDebitCredit->sum;
+            $cashierDebitCredit->comment='Возврат денег за отклоненное восстановление номера '.$number->number;
+            $cashierDebitCredit->save();
+        }
+
+        $megafonAppRestoreNumber->save();
+
+        $trx->commit();
+
+        Yii::app()->user->setFlash('success','Восстановление номера успешно отклонено');
+        $this->redirect(array('serviceList'));
+    }
+
+    public function actionRestoreCancel($id) {
+        $megafonAppRestoreNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$id,'status'=>MegafonAppRestoreNumber::STATUS_PROCESSING));
+        if (!$megafonAppRestoreNumber) $this->redirect(array('serviceList'));
+
+        $message='Номер уже отправлен на восстановление в заявлении №'.$megafonAppRestoreNumber->megafon_app_restore_id.' от '.
+            $megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y');
+
+        $number=Number::model()->findByPk($id);
+        $sim=Sim::model()->findByPk($number->sim_id);
+
+        $this->render('restoreCancel', array(
+            'number' => $number,
+            'sim' => $sim,
+            'message' => $message,
+            'balancesDataProvider'=>$this->getBalancesDataProvider($number),
+            'megafonAppRestoreNumber'=>$megafonAppRestoreNumber
+        ));
+    }
+
     public function actionRestore($id) {
+        $megafonAppRestoreNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$id,'status'=>MegafonAppRestoreNumber::STATUS_DONE,'sim_given'=>false));
+        if ($megafonAppRestoreNumber) $this->redirect(array('restoreFinish','id'=>$id));
+
+        $megafonAppRestoreNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$id,'status'=>MegafonAppRestoreNumber::STATUS_PROCESSING));
+        if ($megafonAppRestoreNumber) $this->redirect(array('restoreCancel','id'=>$id));
+
         $criteria=$this->restoreBaseCriteria();
         $criteria->compare('n.id',$id);
 
@@ -257,8 +367,6 @@ class CashierController extends BaseGxController
 
         $megafonAppNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$number->id,'status'=>MegafonAppRestoreNumber::STATUS_PROCESSING));
         if ($megafonAppNumber) {
-            Yii::app()->user->setFlash('error','Номер уже отправлен на восстановление в заявлении №'.$megafonAppNumber->megafon_app_restore_id.' от '.
-                $megafonAppNumber->megafonAppRestore->dt->format('d.m.Y'));
             $this->redirect(array('serviceList'));
         }
 
@@ -294,9 +402,8 @@ class CashierController extends BaseGxController
                     $cashierDebitCredit->comment='Восстановление номера '.$number->number;
                     $cashierDebitCredit->save();
                     $megafonAppRestoreNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
-                } else {
-                    $megafonAppRestoreNumber->ask_for_sum=true;
                 }
+
                 $megafonAppRestoreNumber->save();
 
                 $trx->commit();
@@ -306,23 +413,11 @@ class CashierController extends BaseGxController
             }
         }
 
-        $sql="from balance_report_number brn
-              join balance_report br on (br.id=brn.balance_report_id)
-              where brn.number_id=:number_id";
-        $sqlParams=array(':number_id'=>$number->id);
-        $totalItemCount=Yii::app()->db->createCommand("select count(*) $sql")->queryScalar($sqlParams);
-
-        $balancesDataProvider = new CSqlDataProvider("select br.dt,brn.balance $sql order by dt desc", array(
-            'totalItemCount' => $totalItemCount,
-            'params' => $sqlParams,
-            'pagination' => array('pageSize' => 10)
-        ));
-
         $this->render('restore', array(
             'number' => $number,
             'sim' => $sim,
             'model' => $model,
-            'balancesDataProvider'=>$balancesDataProvider
+            'balancesDataProvider'=>$this->getBalancesDataProvider($number)
         ));
     }
 
