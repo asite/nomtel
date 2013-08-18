@@ -170,4 +170,21 @@ class BaseTbActiveForm extends TbActiveForm
         return $html;
     }
 
+    /**
+     *### .select2Row()
+     *
+     * TODO: WTF is a input of type `Select2`? Rename it to something more meaningful!
+     *
+     * Renders a select2 field row
+     *
+     * @param CModel $model
+     * @param string $attribute
+     * @param array $htmlOptions
+     * @return string
+     */
+    public function select2Row($model, $attribute, $data, $htmlOptions = array())
+    {
+        return $this->inputRow(TbInput::TYPE_SELECT2, $model, $attribute, $data, $htmlOptions);
+    }
+
 }

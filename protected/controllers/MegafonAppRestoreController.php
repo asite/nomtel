@@ -95,6 +95,24 @@ class MegafonAppRestoreController extends BaseGxController
         }
     }
 
+
+    public function actionNumberAutocomplete() {
+        $numbers=Yii::app()->db->createCommand("
+            select n.number
+            from megafon_app_restore_number marn
+            join number n on (n.id=marn.number_id)
+            where marn.status=:status and n.number like(:number)
+        ")->queryColumn(array(
+                ':status'=>MegafonAppRestoreNumber::STATUS_PROCESSING,
+                ':number'=>'%'.$_REQUEST['q'].'%'
+            ));
+
+        $res=array();
+        foreach($numbers as $number) $res[]=array('text'=>$number,'id'=>$number);
+        echo json_encode(array('results'=>$res));
+        Yii::app()->end();
+    }
+
     public function actionProcess() {
         $processModel=new MegafonAppRestoreNumberProcess();
 

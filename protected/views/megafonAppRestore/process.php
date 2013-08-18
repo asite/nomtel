@@ -21,7 +21,41 @@ $this->breadcrumbs = array(
     <?=Yii::t('app', 'Fields with')?> <span class="required">*</span> <?php echo Yii::t('app', 'are required'); ?>.
 </p>
 
-<?=$form->textFieldRow($processModel,'number',array('class'=>'span2'))?>
+<style>
+    #s2id_MegafonAppRestoreNumberProcess_number {
+        margin-left:0;
+    }
+</style>
+
+<script>
+    function autocompleteGetData(term,page) {
+        return {
+            q:term
+        }
+    }
+
+    function autocompleteGetResults(data,page) {
+        return data;
+    }
+
+    function getNumbers() {
+        return new Array();
+    }
+</script>
+
+<?=$form->select2Row($processModel,'number',null,array('asDropDownList'=>false,'options'=>array(
+    'placeholder'=>'Поиск номера',
+    'minimumInputLength'=>3,
+    'formatNoMatches'=>'js:function(term){return "Совпадений нет";}',
+    'formatSearching'=>'js:function(term){return "Поиск...";}',
+    'formatInputTooShort'=>'js:function(term){return "Введите минимум 3 цифры для поиска";}',
+    'ajax'=>array(
+        'url'=>$this->createurl('numberAutocomplete'),
+        'dataType'=>'json',
+        'data'=>'js:autocompleteGetData',
+        'results'=>'js:autocompleteGetResults'
+    ),
+),'class'=>'span2'))?>
 
 <?=$form->textFieldRow($processModel,'icc',array('class'=>'span2'))?>
 
