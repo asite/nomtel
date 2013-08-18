@@ -406,6 +406,8 @@ class CashierController extends BaseGxController
 
                 $megafonAppRestoreNumber->save();
 
+                NumberHistory::addHistoryNumber($number->id,'Номер добавлен в заявление на восстановление №'.$megafonAppRestoreNumber->megafonAppRestore->id.' от '.$megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y'));
+
                 $trx->commit();
 
                 Yii::app()->user->setFlash('success','Номер добавлен в заявку на восстановление');

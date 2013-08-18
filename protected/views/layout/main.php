@@ -156,6 +156,7 @@
             array('label' => 'Список обращений (Мегафон)', 'url' => $this->createUrl('ticketMegafon/indexAdmin'),'active'=>Yii::app()->controller->id=='ticketMegafon'),
             '',
             array('label' => 'Заявления на восстановление', 'url' => $this->createUrl('megafonAppRestore/list'),'active'=>Yii::app()->controller->id=='megafonAppRestore/list'),
+            array('label' => 'Обработка заявления', 'url' => $this->createUrl('megafonAppRestore/process'),'active'=>Yii::app()->controller->id=='megafonAppRestore/process'),
             '',
             array('label' => 'Отправка СМС', 'url' => $this->createUrl('sms/send'), 'active' => $this->route == 'sms/send'),
             '',

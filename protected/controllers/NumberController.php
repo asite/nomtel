@@ -317,53 +317,6 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
-    private function freeNumber($id, $icc=null) {
-
-        $number=$this->loadModel($id,'Number');
-
-        $sim=Sim::model()->findByAttributes(array(
-            'parent_id'=>$number->sim_id,
-            'agent_id'=>null
-        ));
-
-        if (!$sim) {
-            Yii::app()->user->setFlash('error','ошибка '.__LINE__);
-            $this->refresh();
-        }
-
-        $parent_id=$sim->parent_id;
-
-        // create new sim with same data, binded to base
-        $sim->unsetAttributes(array('id','parent_act_id','agent_id','parent_id'));
-        $sim->parent_agent_id=adminAgentId();
-        $sim->isNewRecord=true;
-        if ($icc) $sim->icc="999";
-        $sim->save();
-        $sim->parent_id=$sim->id;
-        $sim->save();
-
-
-        $number->sim_id=$sim->id;
-        $number->status=Number::STATUS_FREE;
-        $number->save();
-
-        Sim::model()->updateAll(array('is_active'=>0),'parent_id=:parent_id',array(':parent_id'=>$parent_id));
-
-        // delete subscription agreements
-        $sas=SubscriptionAgreement::model()->findAllByAttributes(array('number_id'=>$number->id));
-        foreach($sas as $sa) {
-            SubscriptionAgreementFile::model()->deleteAllByAttributes(array('subscription_agreement_id'=>$sa->id));
-            $sa->delete();
-        }
-
-        NumberHistory::addHistoryNumber($number->id,'Номер освобожден');
-
-        if ($icc) Yii::app()->user->setFlash('success','Сим отложена');
-        else Yii::app()->user->setFlash('success','Номер освобожден');
-
-
-    }
-
     public function actionSetNumberRegion() {
         if (isset($_REQUEST['setNumberRegion'])) {
             $content = file_get_contents('http://rossvyaz.ru/docs/articles/DEF-9x.html');
