@@ -19,7 +19,7 @@ $(document).ready(function(){$('#ICCtoSelect').focus();});
   ));
 ?>
 
-<label>Введите список ICC/Номеров:</label>
+<label>Введите список ICC/Номеров или диапазон ICC "89701020220147270042-89701020220147270052":</label>
 <textarea name="ICCtoMove" id="ICCtoMove" rows="20" style="width:100%"></textarea>
 
     <?php

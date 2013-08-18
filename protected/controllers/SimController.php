@@ -524,7 +524,7 @@ class SimController extends BaseGxController {
             }
         }
 
-        return true;
+        return $model;
     }
 
     public function actionMove($key) {
@@ -544,15 +544,58 @@ class SimController extends BaseGxController {
 
             $trx = Yii::app()->db->beginTransaction();
 
-            if (!$this->move($moveSimCards,$agent_id)) {
+            $act=$this->move($moveSimCards,$agent_id);
+            if (!$act) {
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
                 $this->redirect(Yii::app()->createUrl('sim/add'));
-                exit;
+            }
+
+
+            // mail -------------------------------
+
+            $agent=Agent::model()->findByPk(loggedAgentId());
+            if ($agent->email) {
+                $criteria = new CDbCriteria();
+                $criteria->addInCondition('id', $moveSimCards);
+                $numbers=Yii::app()->db->createCommand("select number from sim where ".$criteria->condition)->queryColumn($criteria->params);
+
+                $fp = fopen (Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv', "w");
+
+                foreach ($numbers as $fields) {
+                    fputcsv($fp, array($fields));
+                }
+                fclose($fp);
+
+                $mail = new YiiMailMessage();
+                $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
+                $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
+
+                //$mail->setFrom(Yii::app()->params['adminEmailFrom']);
+                $mail->setTo($agent->email);
+
+                if (Yii::app()->mail->send($mail)) {
+                    unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
+                }
+            }
+
+            // endmail ----------------------------------
+
+
+            if ($_POST['Move']['cashPayment']==1) {
+                $payment=new Payment;
+                $payment->agent_id=$act->agent_id;
+                $payment->dt=$act->dt;
+                $payment->type=Payment::TYPE_NORMAL;
+                $payment->comment='Оплата отгрузки наличными';
+                $payment->sum=$act->sum;
+                $payment->save();
             }
 
             $trx->commit();
 
             Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
+            Yii::app()->user->setFlash('printAct', $act->id);
+
             $sessionData->delete($key);
             $this->redirect(Yii::app()->createUrl('site/index'));
         } else {
@@ -797,6 +840,19 @@ class SimController extends BaseGxController {
         if ($_POST['ICCtoMove'] != '') {
             $id_arr = explode("\n", $_POST['ICCtoMove']);
 
+            foreach ($id_arr as &$idd) {
+                $idd_arr = array();
+                $idd_arr = explode("-", $idd);
+                if ($idd_arr[1]) {
+                    $start = $idd_arr[0];
+                    $end = $idd_arr[1];
+                    $idd = $start;
+                    do {
+                        $id_arr[] = $start = bcadd($start,1);
+                    } while(bccomp($start,$end));
+                }
+            }
+
             $trx=Yii::app()->db->beginTransaction();
 
             $st=microtime(true);
@@ -928,7 +984,7 @@ class SimController extends BaseGxController {
             $trx->commit();
 
             if (!empty($resNotFound)) {
-                $res='<b>следующие ICC/Номера не найдены:</b> '.implode(',',array_keys($resNotFound));
+                $res='<b>следующие ICC/Номера не найдены:</b> '.implode(', ',array_keys($resNotFound));
             } else {
                 $res='Все SIM успешно переданы';
             }
