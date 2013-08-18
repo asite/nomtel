@@ -425,19 +425,66 @@ class NumberController extends BaseGxController
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
     }
 
+    private function restoreBaseCriteria() {
+        $criteria=new CDbCriteria();
 
-       private function setRecovery($csv, $data) {
+        // look only sim records, that belongs to base
+        $criteria->addCondition('s.id=s.parent_id');
+        $criteria->compare('s.operator_id',Operator::OPERATOR_MEGAFON_ID);
+        //$criteria->addNotInCondition('n.status',array(Number::STATUS_FREE));
+
+        return $criteria;
+    }
+
+    private function restore($number)
+    {
+        static $megafonAppRestore;
+
+        $megafonAppRestoreNumber = MegafonAppRestoreNumber::model()->findByAttributes(array('number_id' => $number->id, 'status' => MegafonAppRestoreNumber::STATUS_PROCESSING));
+        if ($megafonAppRestoreNumber) return 'Номер уже на восстановлении';
+
+        $criteria = $this->restoreBaseCriteria();
+        $criteria->compare('n.id', $number->id);
+
+        $numbersCount = Yii::app()->db->createCommand("select count(*) from sim s
+            join sim s2 on (s2.parent_id=s.id and s2.agent_id is null)
+            join number n on (s.parent_id=n.sim_id) where {$criteria->condition}")->queryScalar($criteria->params);
+
+        if ($numbersCount != 1) return 'ошибка '.__LINE__;
+
+        if (!isset($megafonAppRestore)) $megafonAppRestore = MegafonAppRestore::getCurrent();
+
+        $megafonAppRestoreNumber = new MegafonAppRestoreNumber;
+
+        $megafonAppRestoreNumber->megafon_app_restore_id = $megafonAppRestore->id;
+        $megafonAppRestoreNumber->status = MegafonAppRestoreNumber::STATUS_PROCESSING;
+        $megafonAppRestoreNumber->number_id = $number->id;
+        $megafonAppRestoreNumber->support_operator_id = loggedSupportOperatorId();
+        $megafonAppRestoreNumber->sim_type = MegafonAppRestoreNumber::SIM_TYPE_NORMAL;
+        $megafonAppRestoreNumber->restore_for_selling=true;
+
+        $megafonAppRestoreNumber->save();
+
+        NumberHistory::addHistoryNumber($number->id, 'Номер добавлен в заявление на восстановление №' . $megafonAppRestoreNumber->megafonAppRestore->id . ' от ' . $megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y'));
+    }
+
+    private function setRecovery($csv, $data) {
         $trx = Yii::app()->db->beginTransaction();
         $wrongObjects = '';
         foreach ($csv as $key=>$v) {
             $model = Number::model()->findByAttributes(array('number'=>$key));
             if ($model) {
-                $model->recovery_dt = date('Y-m-d');
-                $model->save();
-            } else $wrongObjects .= $key.'; ';
+                $error=$this->restore($model);
+                if (!$error) {
+                    $model->recovery_dt = new EDateTime();
+                    $model->save();
+                } else {
+                    $wrongObjects .= "$key($error);";
+                }
+            } else $wrongObjects .= $key.'(номер не найден); ';
         }
         $trx->commit();
-        if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
+        if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные номера не поставлены на восстановление: </strong>'.$wrongObjects);
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно поставлены в очередь на освобождение.');
     }
 

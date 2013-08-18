@@ -365,11 +365,6 @@ class CashierController extends BaseGxController
         $number=Number::model()->findByPk($id);
         $sim=Sim::model()->findByPk($number->sim_id);
 
-        $megafonAppNumber=MegafonAppRestoreNumber::model()->findByAttributes(array('number_id'=>$number->id,'status'=>MegafonAppRestoreNumber::STATUS_PROCESSING));
-        if ($megafonAppNumber) {
-            $this->redirect(array('serviceList'));
-        }
-
         $model=new CashierNumberRestore1();
         $model->setScenario('with_sum');
 
