@@ -589,6 +589,13 @@ class SimController extends BaseGxController {
                 $payment->comment='Оплата отгрузки наличными';
                 $payment->sum=$act->sum;
                 $payment->save();
+
+                $cashierDebitCredit=new CashierDebitCredit;
+                $cashierDebitCredit->dt=new EDateTime;
+                $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
+                $cashierDebitCredit->comment='Отгрузка номеров по акту №'.$act->id;
+                $cashierDebitCredit->sum=$act->sum;
+                $cashierDebitCredit->save();
             }
 
             $trx->commit();
