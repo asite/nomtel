@@ -80,7 +80,6 @@ class MegafonAppRestoreController extends BaseGxController
         $sim->parent_id=$sim->id;
         $sim->save();
 
-
         $number->sim_id=$sim->id;
         $number->status=Number::STATUS_FREE;
         $number->save();

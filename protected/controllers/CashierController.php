@@ -99,7 +99,7 @@ class CashierController extends BaseGxController
                 $trx=Yii::app()->db->beginTransaction();
 
                 $sim=Sim::model()->findByPk($number->sim_id);
-                
+
                 // add acts for agent
                 if ($model->type==CashierSellForm::TYPE_AGENT) {
                     $recursiveInfo=array();
@@ -251,6 +251,9 @@ class CashierController extends BaseGxController
                 $megafonAppRestoreNumber->sim_given=true;
                 $megafonAppRestoreNumber->save();
 
+                $number->status=Number::STATUS_ACTIVE;
+                $number->save();
+
                 $trx->commit();
 
                 Yii::app()->user->setFlash('success','Восстановление номера успешно завершено');
@@ -285,6 +288,9 @@ class CashierController extends BaseGxController
         }
 
         $megafonAppRestoreNumber->save();
+
+        $number->status=Number::STATUS_ACTIVE;
+        $number->save();
 
         $trx->commit();
 
@@ -370,6 +376,9 @@ class CashierController extends BaseGxController
                 $megafonAppRestoreNumber->save();
 
                 NumberHistory::addHistoryNumber($number->id,'Номер добавлен в заявление на восстановление №'.$megafonAppRestoreNumber->megafonAppRestore->id.' от '.$megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y'));
+
+                $number->status=Number::STATUS_RESTORE;
+                $number->save();
 
                 $trx->commit();
 
