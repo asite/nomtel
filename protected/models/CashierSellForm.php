@@ -11,23 +11,33 @@ class CashierSellForm extends CFormModel
     const TYPE_BASE=0;
     const TYPE_AGENT=1;
 
-    public $icc;
+    const PAYMENT_CASH=0;
+    const PAYMENT_NOT_CASH=1;
+
     public $type;
     public $agent_id;
+    public $payment;
+    public $sum;
+    public $comment;
 
     public function rules() {
         return array(
-            array('icc,type','required'),
-            array('agent_id','safe'),
-            array('agent_id','required','on'=>'to_agent')
+            array('type,sum,payment','required'),
+            array('agent_id,comment','safe'),
+            array('sum','numerical'),
+            array('agent_id','required','on'=>'agent_id'),
+            array('agent_id,comment','required','on'=>'agent_id_comment'),
+            array('comment','required','on'=>'comment'),
         );
     }
 
     public function attributeLabels() {
         return array(
-            'icc'=>'Icc',
             'agent_id'=>Agent::label(),
-            'type'=>'Продажа'
+            'type'=>'Продажа',
+            'sum'=>'Стоимость операции',
+            'comment'=>'комментарий',
+            'payment'=>'Оплата'
         );
     }
 
@@ -35,6 +45,13 @@ class CashierSellForm extends CFormModel
         return array(
             self::TYPE_BASE=>'Розничная',
             self::TYPE_AGENT=>'Aгенту'
+        );
+    }
+
+    public function getPaymentList() {
+        return array(
+            self::PAYMENT_CASH=>'Наличными',
+            self::PAYMENT_NOT_CASH=>'Другое'
         );
     }
 }

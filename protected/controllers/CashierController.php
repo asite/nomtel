@@ -87,35 +87,19 @@ class CashierController extends BaseGxController
         $number=Number::model()->findByPk($id);
 
         $model=new CashierSellForm();
+
         if (isset($_POST['CashierSellForm'])) {
             $model->setAttributes($_POST['CashierSellForm']);
 
-            if ($model->type==CashierSellForm::TYPE_AGENT)
-                $model->setScenario('to_agent');
+            if ($model->type==CashierSellForm::TYPE_AGENT && $model->payment==CashierSellForm::PAYMENT_CASH) $model->setScenario('agent_id');
+            if ($model->type==CashierSellForm::TYPE_AGENT && $model->payment==CashierSellForm::PAYMENT_NOT_CASH) $model->setScenario('agent_id_comment');
+            if ($model->type==CashierSellForm::TYPE_BASE && $model->payment==CashierSellForm::PAYMENT_NOT_CASH) $model->setScenario('comment');
 
-            $model->validate();
-
-            $sim=Sim::model()->findByPk($number->sim_id);
-
-            $blankSim=BlankSim::model()->findByAttributes(array('icc'=>$model->icc));
-            if (!$blankSim) {
-                $model->addError('icc','Пустышки с указанным icc нет в базе');
-            } else {
-                if ($blankSim->used_dt) {
-                    $model->addError('icc','Пустышка с указанным icc уже использована для восстановления');
-                }
-                if ($blankSim->operator_id!=$sim->operator_id) {
-                    $model->addError('icc','Пустышка с указанным icc относится к другому оператору');
-                }
-                if ($blankSim->operator_region_id!=$sim->operator_region_id) {
-                    $model->addError('icc','Пустышка с указанным icc относится к другому региону');
-                }
-            }
-
-            $errors=$model->getErrors();
-            if (empty($errors)) {
+            if ($model->validate()) {
                 $trx=Yii::app()->db->beginTransaction();
 
+                $sim=Sim::model()->findByPk($number->sim_id);
+                
                 // add acts for agent
                 if ($model->type==CashierSellForm::TYPE_AGENT) {
                     $recursiveInfo=array();
@@ -164,42 +148,25 @@ class CashierController extends BaseGxController
                         }
                 }
 
+                $cashierSellNumber=new CashierSellNumber;
+                $cashierSellNumber->dt=new EDateTime;
+                $cashierSellNumber->support_operator_id=loggedSupportOperatorId();
+                $cashierSellNumber->number_id=$number->id;
+                $cashierSellNumber->sum=$model->sum;
 
-                $blankSim->used_dt=new EDateTime();
-                $blankSim->used_support_operator_id=loggedSupportOperatorId();
-                $blankSim->used_number_id=$number->id;
-                $blankSim->save();
+                if ($model->payment==CashierSellForm::PAYMENT_CASH) {
+                    $cashierDebitCredit=new CashierDebitCredit;
+                    $cashierDebitCredit->dt=$cashierSellNumber->dt;
+                    $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
+                    $cashierDebitCredit->comment='Продажа номера '.$number->number;
+                    $cashierDebitCredit->sum=$model->sum;
+                    $cashierDebitCredit->save();
 
+                    $cashierSellNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
+                }
 
-                $criteria = new CDbCriteria();
-                $criteria->addCondition('parent_id=:sim_id');
-                $criteria->params = array(
-                    ':sim_id' => $number->sim_id
-                );
-
-                Sim::model()->updateAll(array('icc' => $model->icc), $criteria);
-
-                $message = "Заменить у номера ".$number->number." ICC на ".$model->icc;
-
-                $ticketId=Ticket::addMessage($number->id,$message);
-
-                $ticket = Ticket::model()->findByPk($ticketId);
-                $ticket->status = Ticket::STATUS_IN_WORK_MEGAFON;
-                $ticket->internal=$ticket->text;
-                $ticket->sendMegafonNotification();
-                $ticket->save();
-
-                NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');
-
-                $cashierNumber=new CashierNumber();
-                $cashierNumber->dt=new EDateTime();
-                $cashierNumber->support_operator_id=loggedSupportOperatorId();
-                $cashierNumber->number_id=$number->id;
-                $cashierNumber->type=CashierNumber::TYPE_SELL;
-                $cashierNumber->ticket_id=$ticketId;
-                $cashierNumber->sum=500;
-                $cashierNumber->sum_cashier=0;
-                $cashierNumber->save();
+                $cashierSellNumber->comment=$model->comment;
+                $cashierSellNumber->save();
 
                 $number->status=Number::STATUS_SOLD;
                 $number->save();
@@ -211,10 +178,11 @@ class CashierController extends BaseGxController
             }
         }
 
+        $model->setScenario('agent_id_comment');
+
         $this->render('sell', array(
             'number' => $number,
             'model' => $model,
-            'prefixRegionModel'=>new IccPrefixRegion
         ));
     }
 
