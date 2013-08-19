@@ -54,6 +54,7 @@ class CashierController extends BaseGxController
         $criteria->compare('s.operator_id',Operator::OPERATOR_MEGAFON_ID);
         //$criteria->compare('s.icc','999');
         $criteria->compare('n.status',Number::STATUS_FREE);
+        $criteria->addInCondition('n.balance_status',array(Number::BALANCE_STATUS_NOT_CHANGING,Number::BALANCE_STATUS_NOT_CHANGING_PLUS));
 
         // sim must be not passed to any agent
         $criteria->compare('s2.parent_agent_id',adminAgentId());
