@@ -8,8 +8,8 @@
  */
 class CashierSellForm extends CFormModel
 {
-    const TYPE_BASE=0;
-    const TYPE_AGENT=1;
+    const TYPE_CLIENT='CLIENT';
+    const TYPE_AGENT='AGENT';
 
     const PAYMENT_CASH=0;
     const PAYMENT_NOT_CASH=1;
@@ -43,7 +43,7 @@ class CashierSellForm extends CFormModel
 
     public function getTypeList() {
         return array(
-            self::TYPE_BASE=>'Розничная',
+            self::TYPE_CLIENT=>'Розничная',
             self::TYPE_AGENT=>'Aгенту'
         );
     }

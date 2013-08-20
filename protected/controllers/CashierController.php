@@ -94,7 +94,7 @@ class CashierController extends BaseGxController
 
             if ($model->type==CashierSellForm::TYPE_AGENT && $model->payment==CashierSellForm::PAYMENT_CASH) $model->setScenario('agent_id');
             if ($model->type==CashierSellForm::TYPE_AGENT && $model->payment==CashierSellForm::PAYMENT_NOT_CASH) $model->setScenario('agent_id_comment');
-            if ($model->type==CashierSellForm::TYPE_BASE && $model->payment==CashierSellForm::PAYMENT_NOT_CASH) $model->setScenario('comment');
+            if ($model->type==CashierSellForm::TYPE_CLIENT && $model->payment==CashierSellForm::PAYMENT_NOT_CASH) $model->setScenario('comment');
 
             if ($model->validate()) {
                 $trx=Yii::app()->db->beginTransaction();
@@ -154,6 +154,7 @@ class CashierController extends BaseGxController
                 $cashierSellNumber->support_operator_id=loggedSupportOperatorId();
                 $cashierSellNumber->number_id=$number->id;
                 $cashierSellNumber->sum=$model->sum;
+                $cashierSellNumber->type=$model->type;
 
                 if ($model->payment==CashierSellForm::PAYMENT_CASH) {
                     $cashierDebitCredit=new CashierDebitCredit;
@@ -544,24 +545,15 @@ class CashierController extends BaseGxController
         if (!$dt) $dt=new EDateTime();
 
         if ($support_operator_id) {
-            $total_in=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number where support_operator_id=:support_operator_id and dt<:dt")->queryScalar(array(
-                ':support_operator_id'=>$support_operator_id,
-                ':dt'=>$dt->toMysqlDateTime()
-            ));
-            $total_out=Yii::app()->db->createCommand("select sum(`sum`) from cashier_collection where cashier_support_operator_id=:support_operator_id and dt<:dt")->queryScalar(array(
+            $balance=Yii::app()->db->createCommand("select sum(`sum`) from cashier_debit_credit where support_operator_id=:support_operator_id and dt<:dt")->queryScalar(array(
                 ':support_operator_id'=>$support_operator_id,
                 ':dt'=>$dt->toMysqlDateTime()
             ));
         } else {
-            $total_in=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number where dt<:dt")->queryScalar(array(
-                ':dt'=>$dt->toMysqlDateTime()
-            ));
-            $total_out=Yii::app()->db->createCommand("select sum(`sum`) from cashier_collection where dt<:dt")->queryScalar(array(
+            $balance=Yii::app()->db->createCommand("select sum(`sum`) from cashier_debit_credit where dt<:dt")->queryScalar(array(
                 ':dt'=>$dt->toMysqlDateTime()
             ));
         }
-
-        $balance=$total_in-$total_out;
 
         return $balance;
     }

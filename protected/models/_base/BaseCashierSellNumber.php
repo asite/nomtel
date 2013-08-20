@@ -12,12 +12,15 @@
  * @property integer $id
  * @property string $dt
  * @property integer $support_operator_id
+ * @property string $type
  * @property string $number_id
  * @property string $sum
  * @property string $cashier_debit_credit_id
  * @property string $comment
  *
  * @property CashierDebitCredit $cashierDebitCredit
+ * @property SupportOperator $supportOperator
+ * @property Number $number
  */
 abstract class BaseCashierSellNumber extends BaseGxActiveRecord {
 
@@ -39,20 +42,23 @@ abstract class BaseCashierSellNumber extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('dt, support_operator_id, number_id, sum', 'required'),
+			array('dt, support_operator_id, type, number_id, sum', 'required'),
 			array('support_operator_id', 'numerical', 'integerOnly'=>true),
+			array('type', 'length', 'max'=>6),
 			array('number_id, cashier_debit_credit_id', 'length', 'max'=>20),
 			array('sum', 'length', 'max'=>14),
 			array('comment', 'length', 'max'=>200),
 			array('cashier_debit_credit_id, comment', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, dt, support_operator_id, number_id, sum, cashier_debit_credit_id, comment', 'safe', 'on'=>'search'),
+			array('id, dt, support_operator_id, type, number_id, sum, cashier_debit_credit_id, comment', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
 			'cashierDebitCredit' => array(self::BELONGS_TO, 'CashierDebitCredit', 'cashier_debit_credit_id'),
+			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
+			'number' => array(self::BELONGS_TO, 'Number', 'number_id'),
 		);
 	}
 
@@ -65,12 +71,15 @@ abstract class BaseCashierSellNumber extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'dt' => Yii::t('app', 'Dt'),
-			'support_operator_id' => Yii::t('app', 'Support Operator'),
-			'number_id' => Yii::t('app', 'Number'),
+			'support_operator_id' => null,
+			'type' => Yii::t('app', 'Type'),
+			'number_id' => null,
 			'sum' => Yii::t('app', 'Sum'),
 			'cashier_debit_credit_id' => null,
 			'comment' => Yii::t('app', 'Comment'),
 			'cashierDebitCredit' => null,
+			'supportOperator' => null,
+			'number' => null,
 		);
 	}
 
@@ -80,7 +89,8 @@ abstract class BaseCashierSellNumber extends BaseGxActiveRecord {
 		$criteria->compare('id', $this->id);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('support_operator_id', $this->support_operator_id);
-		$criteria->compare('number_id', $this->number_id, true);
+		$criteria->compare('type', $this->type, true);
+		$criteria->compare('number_id', $this->number_id);
 		$criteria->compare('sum', $this->sum, true);
 		$criteria->compare('cashier_debit_credit_id', $this->cashier_debit_credit_id);
 		$criteria->compare('comment', $this->comment, true);
