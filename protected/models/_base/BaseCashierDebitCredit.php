@@ -11,11 +11,14 @@
  *
  * @property string $id
  * @property string $dt
+ * @property string $type
  * @property integer $support_operator_id
  * @property string $comment
  * @property string $sum
  *
+ * @property CashierCollection[] $cashierCollections
  * @property SupportOperator $supportOperator
+ * @property CashierSellNumber[] $cashierSellNumbers
  * @property MegafonAppRestoreNumber[] $megafonAppRestoreNumbers
  */
 abstract class BaseCashierDebitCredit extends BaseGxActiveRecord {
@@ -38,18 +41,21 @@ abstract class BaseCashierDebitCredit extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('dt, support_operator_id, comment, sum', 'required'),
+			array('dt, type, support_operator_id, comment, sum', 'required'),
 			array('support_operator_id', 'numerical', 'integerOnly'=>true),
+			array('type', 'length', 'max'=>21),
 			array('comment', 'length', 'max'=>200),
 			array('sum', 'length', 'max'=>14),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, dt, support_operator_id, comment, sum', 'safe', 'on'=>'search'),
+			array('id, dt, type, support_operator_id, comment, sum', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations() {
 		return array(
+			'cashierCollections' => array(self::HAS_MANY, 'CashierCollection', 'cashier_debit_credit_id'),
 			'supportOperator' => array(self::BELONGS_TO, 'SupportOperator', 'support_operator_id'),
+			'cashierSellNumbers' => array(self::HAS_MANY, 'CashierSellNumber', 'cashier_debit_credit_id'),
 			'megafonAppRestoreNumbers' => array(self::HAS_MANY, 'MegafonAppRestoreNumber', 'cashier_debit_credit_id'),
 		);
 	}
@@ -63,10 +69,13 @@ abstract class BaseCashierDebitCredit extends BaseGxActiveRecord {
 		return array(
 			'id' => Yii::t('app', 'ID'),
 			'dt' => Yii::t('app', 'Dt'),
+			'type' => Yii::t('app', 'Type'),
 			'support_operator_id' => null,
 			'comment' => Yii::t('app', 'Comment'),
 			'sum' => Yii::t('app', 'Sum'),
+			'cashierCollections' => null,
 			'supportOperator' => null,
+			'cashierSellNumbers' => null,
 			'megafonAppRestoreNumbers' => null,
 		);
 	}
@@ -76,6 +85,7 @@ abstract class BaseCashierDebitCredit extends BaseGxActiveRecord {
 
 		$criteria->compare('id', $this->id, true);
 		$criteria->compare('dt', $this->dt, true);
+		$criteria->compare('type', $this->type, true);
 		$criteria->compare('support_operator_id', $this->support_operator_id);
 		$criteria->compare('comment', $this->comment, true);
 		$criteria->compare('sum', $this->sum, true);

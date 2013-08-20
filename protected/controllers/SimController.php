@@ -595,6 +595,7 @@ class SimController extends BaseGxController {
                 $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
                 $cashierDebitCredit->comment='Отгрузка номеров по акту №'.$act->id;
                 $cashierDebitCredit->sum=$act->sum;
+                $cashierDebitCredit->type=CashierDebitCredit::TYPE_OTHER;
                 $cashierDebitCredit->save();
             }
 

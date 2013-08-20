@@ -68,54 +68,40 @@
 <h2>Баланс утро: <?=$morningBalance?></h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'summary-stats-grid',
-    'dataProvider' => $dataProvider,
+    'dataProvider' => $summary,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
     'columns' => array(
         array(
-            'name'=>'support_operator',
-            'header'=>'Кассир',
-            'value'=>'$data["surname"]." ".$data["name"]',
-            'visible'=>!$model->support_operator_id
-        ),
-        array(
-            'name'=>'cnt_sell',
-            'header'=>'Кол-во подтвержденных продаж',
+            'name'=>'sells',
+            'header'=>'Кол-во продаж',
             'htmlOptions'=>array('style'=>'text-align:center;')
         ),
         array(
-            'name'=>'cnt_restore',
-            'header'=>'Кол-во подтвержденных восстановлений',
+            'name'=>'restores',
+            'header'=>'Кол-во восстановлений',
             'htmlOptions'=>array('style'=>'text-align:center;')
         ),
         array(
             'name'=>'sum',
-            'header'=>'Сумма в кассу',
-            'htmlOptions'=>array('style'=>'text-align:center;')
-        ),
-        array(
-            'name'=>'sum_cashier',
-            'header'=>'Вознаграждение',
+            'header'=>'Сумма сделок',
             'htmlOptions'=>array('style'=>'text-align:center;')
         ),
     ),
 )); ?>
-<?php if (!$model->support_operator_id) { ?>
-<b>Сумма в кассу, включая неподтвержденные операции:</b> <?=$total?>
-<?php } ?>
 
 <h2>Продажи</h2>
 <?php $this->widget('TbExtendedGridViewExport', array(
     'id' => 'sell-grid',
     'dataProvider' => $cashierNumberSellDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'filter'=>$cashierNumberModel,
+    'filter'=>$cashierSellNumberModel,
     'columns' => array(
         array(
-            'name'=>'support_operator_id',
-            'header'=>'Кассир',
-            'value'=>'$data["surname"]." ".$data["name"]',
-            'filter'=>SupportOperator::getCashierComboList(),
-            'visible'=>!$model->support_operator_id
+            'name'=>'type',
+            'header'=>'Тип',
+            'htmlOptions'=>array('style'=>'text-align:center'),
+            'value'=>'CashierSellNumber::getTypeLabel($data["type"])',
+            'filter'=>CashierSellNumber::getTypeDropDownList()
         ),
         array(
             'name'=>'number',
@@ -123,15 +109,8 @@
             'htmlOptions'=>array('style'=>'text-align:center'),
         ),
         array(
-            'name'=>'confirmed',
-            'header'=>'Подтверждено',
-            'value'=>'$data["confirmed"] ? "Да":"Нет"',
-            'htmlOptions'=>array('style'=>'text-align:center'),
-            'filter'=>array('0'=>'Нет','1'=>'Да')
-        ),
-        array(
             'name'=>'sum',
-            'header'=>'Сумма в кассу',
+            'header'=>'Сумма сделки',
             'filter'=>false,
             'htmlOptions'=>array('style'=>'text-align:center'),
         ),
@@ -143,36 +122,16 @@
     'id' => 'restore-grid',
     'dataProvider' => $cashierNumberRestoreDataProvider,
     'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-    'filter'=>$cashierNumberModel,
+    'filter'=>$cashierRestoreNumberModel,
     'columns' => array(
-        array(
-            'name'=>'support_operator_id',
-            'header'=>'Кассир',
-            'value'=>'$data["surname"]." ".$data["name"]',
-            'filter'=>SupportOperator::getCashierComboList(),
-            'visible'=>!$model->support_operator_id
-        ),
         array(
             'name'=>'number',
             'header'=>'Номер',
             'htmlOptions'=>array('style'=>'text-align:center'),
         ),
         array(
-            'name'=>'confirmed',
-            'header'=>'Подтверждено',
-            'value'=>'$data["confirmed"] ? "Да":"Нет"',
-            'htmlOptions'=>array('style'=>'text-align:center'),
-            'filter'=>array('0'=>'Нет','1'=>'Да')
-        ),
-        array(
             'name'=>'sum',
-            'header'=>'Сумма в кассу',
-            'filter'=>false,
-            'htmlOptions'=>array('style'=>'text-align:center'),
-        ),
-        array(
-            'name'=>'sum_cashier',
-            'header'=>'Вознаграждение кассира',
+            'header'=>'Сумма сделки',
             'filter'=>false,
             'htmlOptions'=>array('style'=>'text-align:center'),
         ),
@@ -192,13 +151,6 @@
         'dataProvider' => $collectionDataProvider,
         'itemsCssClass' => 'table table-striped table-bordered table-condensed',
         'columns' => array(
-            array(
-                'name'=>'cashier_support_operator_id',
-                'header'=>'Кассир',
-                'value'=>'$data["surname"]." ".$data["name"]',
-                'filter'=>SupportOperator::getCashierComboList(),
-                'visible'=>!$model->support_operator_id
-            ),
             array(
                 'name'=>'dt',
                 'header'=>'Дата',

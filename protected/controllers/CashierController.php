@@ -162,6 +162,7 @@ class CashierController extends BaseGxController
                     $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
                     $cashierDebitCredit->comment='Продажа номера '.$number->number;
                     $cashierDebitCredit->sum=$model->sum;
+                    $cashierDebitCredit->type=CashierDebitCredit::TYPE_NUMBER_SELL;
                     $cashierDebitCredit->save();
 
                     $cashierSellNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
@@ -246,6 +247,7 @@ class CashierController extends BaseGxController
                     $cashierDebitCredit->dt=new EDateTime();
                     $cashierDebitCredit->sum=$model->sum;
                     $cashierDebitCredit->comment='Восстановление номера '.$number->number;
+                    $cashierDebitCredit->type=CashierDebitCredit::TYPE_NUMBER_RESTORE;
                     $cashierDebitCredit->save();
                     $megafonAppRestoreNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
                 }
@@ -286,6 +288,7 @@ class CashierController extends BaseGxController
             $cashierDebitCredit->dt=new EDateTime();
             $cashierDebitCredit->sum=-$megafonAppRestoreNumber->cashierDebitCredit->sum;
             $cashierDebitCredit->comment='Возврат денег за отклоненное восстановление номера '.$number->number;
+            $cashierDebitCredit->type=CashierDebitCredit::TYPE_NUMBER_RESTORE_REJECT;
             $cashierDebitCredit->save();
         }
 
@@ -371,6 +374,7 @@ class CashierController extends BaseGxController
                     $cashierDebitCredit->dt=new EDateTime();
                     $cashierDebitCredit->sum=$model->sum;
                     $cashierDebitCredit->comment='Восстановление номера '.$number->number;
+                    $cashierDebitCredit->type=CashierDebitCredit::TYPE_NUMBER_RESTORE;
                     $cashierDebitCredit->save();
                     $megafonAppRestoreNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
                 }
@@ -407,19 +411,16 @@ class CashierController extends BaseGxController
                 'CashierStatistic[support_operator_id]'=>$_POST['CashierStatistic']['support_operator_id'],
             ));
         }
+
         if (isset($_REQUEST['CashierStatistic'])) {
             $model->setAttributes($_REQUEST['CashierStatistic']);
         } else {
             $this->redirect(array('stats',
-                //'CashierStatistic[date_from]'=>strval(new EDateTime("-7 Day")),
-                //'CashierStatistic[date_to]'=>new EDateTime("")
                 'CashierStatistic[date_from]'=>new EDateTime("",null,'date'),
-                //'CashierStatistic[date_to]'=>new EDateTime("",null,'date')
             ));
         }
 
         $date_from=new EDateTime($model->date_from);
-        //$date_to=new EDateTime($model->date_to);
         $date_to=$date_from;
 
         $params=array(
@@ -433,92 +434,99 @@ class CashierController extends BaseGxController
 
         $where='';
         if ($model->support_operator_id) {
-            $where=' and support_operator_id=:support_operator_id';
+            $where=' and m.support_operator_id=:support_operator_id';
             $params[':support_operator_id']=$model->support_operator_id;
         }
-        $params[':role']='cashier';
 
-        $rows=Yii::app()->db->createCommand("
-            select so.surname,so.name,cnt_sell,cnt_restore,sum,sum_cashier
-            from support_operator so
-            join
-            (
-                select support_operator_id,sum(if(type='SELL',1,0)) as cnt_sell,sum(if(type='RESTORE',1,0)) as cnt_restore,sum(`sum`) as `sum`,sum(sum_cashier) as sum_cashier
-                from cashier_number
-                where confirmed=1 and dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY) $where
-                group by support_operator_id
-            ) tmp on (so.id=tmp.support_operator_id)
-            where so.role=:role
-            order by surname,name
-        ")->queryAll(true,$params);
+        $sells=Yii::app()->db->createCommand("
+            select count(*) from cashier_debit_credit m
+            where type=:type and m.dt>=:date_from and m.dt<DATE_ADD(:date_to,INTERVAL 1 DAY) $where")->
+            queryScalar(array_merge($params,array(':type'=>CashierDebitCredit::TYPE_NUMBER_SELL)));
 
+        $restores=Yii::app()->db->createCommand("
+            select count(*) from cashier_debit_credit m
+            where type=:type and m.dt>=:date_from and m.dt<DATE_ADD(:date_to,INTERVAL 1 DAY) $where")->
+            queryScalar(array_merge($params,array(':type'=>CashierDebitCredit::TYPE_NUMBER_RESTORE)));
 
-        $cashierNumber=new CashierNumberSearch2;
-        if (isset($_REQUEST['CashierNumberSearch2']))
-            $cashierNumber->setAttributes($_REQUEST['CashierNumberSearch2']);
+        $sum=Yii::app()->db->createCommand("select sum(sum) from cashier_debit_credit m where sum>0 and dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY) $where")->
+            queryScalar($params);
+
+        $summary=array(array(
+            'sells'=>$sells,
+            'restores'=>$restores,
+            'sum'=>$sum
+        ));
+
+        $cashierSellNumber=new CashierSellNumberSearch;
+        if (isset($_REQUEST['CashierSellNumberSearch']))
+            $cashierSellNumber->setAttributes($_REQUEST['CashierSellNumberSearch']);
 
         $criteria=new CDbCriteria;
         if ($model->support_operator_id) {
-            $criteria->compare('cn.support_operator_id',$model->support_operator_id);
+            $criteria->compare('csn.support_operator_id',$model->support_operator_id);
         }
-        $criteria->addCondition('type=:type');
-        $criteria->params[':type']=CashierNumber::TYPE_SELL;
 
-        $criteria->compare('cn.support_operator_id',$cashierNumber->support_operator_id);
-        $criteria->compare('n.number',$cashierNumber->number,true);
-        $criteria->addCondition('cn.dt>=:date_from and cn.dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
+        $criteria->compare('n.number',$cashierSellNumber->number,true);
+        $criteria->compare('csn.type',$cashierSellNumber->type);
+        $criteria->addCondition('cdc.dt>=:date_from and cdc.dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
+        $criteria->compare('cdc.type',CashierDebitCredit::TYPE_NUMBER_SELL);
         $criteria->params[':date_from']=$date_from->toMysqlDate();
         $criteria->params[':date_to']=$date_to->toMysqlDate();
-        $criteria->compare('cn.confirmed',$cashierNumber->confirmed);
 
-        $sql = "from cashier_number cn
-            join number n on (n.id=cn.number_id)
-            left outer join support_operator so on (so.id=cn.support_operator_id)
+        $sql = "from cashier_debit_credit cdc
+            join cashier_sell_number csn on (csn.cashier_debit_credit_id=cdc.id)
+            join number n on (n.id=csn.number_id)
             where " . $criteria->condition;
 
-
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $cashierNumberSellDataProvider = new CSqlDataProvider('select cn.support_operator_id,so.name,so.surname,n.number,cn.confirmed,cn.sum,cn.sum_cashier ' . $sql, array(
+        $cashierNumberSellDataProvider = new CSqlDataProvider('select csn.type,n.number,csn.sum ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'support_operator_id','number','confirmed','sum','sum_cashier'
+                    'type','number','sum'
                 ),
             ),
-            'pagination' => array('pageSize' => CashierNumber::ITEMS_PER_PAGE)
+            'pagination' => array('pageSize' => Number::ITEMS_PER_PAGE)
         ));
 
+        $cashierRestoreNumber=new CashierRestoreNumberSearch;
+        if (isset($_REQUEST['CashierRestoreNumberSearch']))
+            $cashierRestoreNumber->setAttributes($_REQUEST['CashierRestoreNumberSearch']);
 
-        $criteria->params[':type']=CashierNumber::TYPE_RESTORE;
+        $criteria=new CDbCriteria;
+        if ($model->support_operator_id) {
+            $criteria->compare('cdc.support_operator_id',$model->support_operator_id);
+        }
+
+        $criteria->compare('n.number',$cashierRestoreNumber->number,true);
+        $criteria->addCondition('cdc.dt>=:date_from and cdc.dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
+        $criteria->compare('cdc.type',CashierDebitCredit::TYPE_NUMBER_RESTORE);
+        $criteria->params[':date_from']=$date_from->toMysqlDate();
+        $criteria->params[':date_to']=$date_to->toMysqlDate();
+
+        $sql = "from cashier_debit_credit cdc
+            join megafon_app_restore_number marn on (marn.cashier_debit_credit_id=cdc.id)
+            join number n on (n.id=marn.number_id)
+            where " . $criteria->condition;
 
         $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
 
-        $cashierNumberRestoreDataProvider = new CSqlDataProvider('select cn.support_operator_id,so.name,so.surname,n.number,cn.confirmed,cn.sum,cn.sum_cashier ' . $sql, array(
+        $cashierNumberRestoreDataProvider = new CSqlDataProvider('select n.number,cdc.sum ' . $sql, array(
             'totalItemCount' => $totalItemCount,
             'params' => $criteria->params,
             'sort' => array(
                 'attributes' => array(
-                    'support_operator_id','number','confirmed','sum','sum_cashier'
+                    'number','sum'
                 ),
             ),
-            'pagination' => array('pageSize' => CashierNumber::ITEMS_PER_PAGE)
+            'pagination' => array('pageSize' => Number::ITEMS_PER_PAGE)
         ));
 
-
-        // total statistic
-        $total=Yii::app()->db->createCommand("select sum(`sum`) from cashier_number cn where cn.dt>=:date_from and cn.dt<DATE_ADD(:date_to,INTERVAL 1 DAY)")->queryScalar(array(
-            ':date_from'=>$date_from->toMysqlDate(),
-            ':date_to'=>$date_to->toMysqlDate()
-        ));
-
-        //if ($model->support_operator_id) {
-            $collection=new CashierCollection;
-            $collection->cashier_support_operator_id=$model->support_operator_id;
-            $collectionDataProvider=$collection->search();
-        //}
-
+        $collection=new CashierCollection;
+        $collection->cashier_support_operator_id=$model->support_operator_id;
+        $collectionDataProvider=$collection->search();
 
         $curDate=new EDateTime($date_from->toMysqlDate());
         $tomorrowDate=$curDate->modifiedCopy('+1 DAY');
@@ -528,12 +536,13 @@ class CashierController extends BaseGxController
         $eveningBalance=$this->getBalance($model->support_operator_id,$tomorrowDate);
 
         $this->render('stats',array(
-            'dataProvider'=>new CArrayDataProvider($rows),
+            'summary'=>new CArrayDataProvider($summary),
             'model'=>$model,
             'cashierNumberSellDataProvider'=>$cashierNumberSellDataProvider,
             'cashierNumberRestoreDataProvider'=>$cashierNumberRestoreDataProvider,
-            'cashierNumberModel'=>$cashierNumber,
-            'total'=>$total,
+            'cashierRestoreNumberModel'=>$cashierRestoreNumber,
+            'cashierSellNumberModel'=>$cashierSellNumber,
+            //'total'=>$total,
             'balance'=>$balance,
             'collectionDataProvider'=>$collectionDataProvider,
             'morningBalance'=>$morningBalance,
@@ -555,7 +564,7 @@ class CashierController extends BaseGxController
             ));
         }
 
-        return $balance;
+        return number_format($balance,2);
     }
 
     public function actionCollectionStep1($cashier_support_operator_id) {
@@ -599,6 +608,15 @@ class CashierController extends BaseGxController
         if (isset($_REQUEST['code'])) {
             if ($_REQUEST['code']==$data['code']) {
 
+                $cashierDebitCredit=new CashierDebitCredit;
+                $cashierDebitCredit->dt=$collection->dt;
+                $cashierDebitCredit->support_operator_id=$collection->cashier_support_operator_id;
+                $cashierDebitCredit->comment='Инкассация '.$collection->collectorSupportOperator;
+                $cashierDebitCredit->sum=-$collection->sum;
+                $cashierDebitCredit->type=CashierDebitCredit::TYPE_COLLECTION;
+                $cashierDebitCredit->save();
+
+                $collection->cashier_debit_credit_id=$cashierDebitCredit->id;
                 $collection->save();
                 $sd->delete($key);
 
