@@ -13,7 +13,7 @@ CHANGE `sum` `sum` decimal(14,2) NOT NULL COMMENT 'сумма' AFTER `number_id`
 ADD `cashier_debit_credit_id` bigint(20) NULL AFTER `sum`,
 DROP `confirmed`,
 ADD `comment` varchar(200) NULL COMMENT 'комментарий при безнал. оплате',
-ADD FOREIGN KEY (`cashier_debit_credit`) REFERENCES `cashier_debit_credit` (`id`),
+ADD FOREIGN KEY (`cashier_debit_credit_id`) REFERENCES `cashier_debit_credit` (`id`),
 RENAME TO `cashier_sell_number`,
 COMMENT='Номера, проданные/восстановленные кассиром';
         ");
