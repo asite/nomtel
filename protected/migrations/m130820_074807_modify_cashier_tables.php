@@ -4,6 +4,8 @@ class m130820_074807_modify_cashier_tables extends CDbMigration
 {
 	public function up()
 	{
+        $this->execute("TRUNCATE TABLE `megafon_app_restore_number`");
+        $this->execute("TRUNCATE TABLE `megafon_app_restore`");
         $this->execute("TRUNCATE TABLE `cashier_collection`");
         $this->execute("TRUNCATE TABLE `cashier_sell_number`");
         $this->execute("TRUNCATE TABLE `cashier_debit_credit`");
