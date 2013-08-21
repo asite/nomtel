@@ -1,5 +1,31 @@
 <h1>Продажа номера '<?=$number->number?>'</h1>
 
+<div class="w80 cfix">
+    <div style="float:left;width:45%;">
+        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+            'data'=>$number,
+            'attributes'=>array(
+                array(
+                    'name'=>'balance_status',
+                    'value'=>$number->getBalanceStatusLabel($number->balance_status)
+                ),
+                'sim.icc',
+                'sim.operator'
+            ),
+        )); ?>
+    </div>
+    <div style="float:left;width:45%;">
+        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+            'data'=>$number,
+            'attributes'=>array(
+                'balance',
+                'sim.tariff'
+            ),
+        )); ?>
+    </div>
+</div>
+
+
 <div class="form">
 
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
