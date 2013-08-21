@@ -524,6 +524,58 @@ class CashierController extends BaseGxController
             'pagination' => array('pageSize' => Number::ITEMS_PER_PAGE)
         ));
 
+        $cashierDebitCredit=new CashierDebitCredit;
+        if (isset($_REQUEST['CashierDebitCredit']))
+            $cashierDebitCredit->setAttributes($_REQUEST['CashierDebitCredit']);
+
+        $criteria = new CDbCriteria;
+
+        if ($model->support_operator_id) {
+            $criteria->compare('support_operator_id',$model->support_operator_id);
+        }
+
+        $criteria->compare('type', $cashierDebitCredit->type);
+        $criteria->compare('comment', $cashierDebitCredit->comment, true);
+        $criteria->addNotInCondition('type',array(CashierDebitCredit::TYPE_NUMBER_SELL,CashierDebitCredit::TYPE_NUMBER_RESTORE,CashierDebitCredit::TYPE_COLLECTION));
+        $criteria->addCondition('dt>=:date_from and dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
+        $criteria->params[':date_from']=$date_from->toMysqlDate();
+        $criteria->params[':date_to']=$date_to->toMysqlDate();
+
+        $otherDataProvider=new CActiveDataProvider($cashierDebitCredit, array(
+            'criteria' => $criteria,
+            'pagination' => array('pageSize' => Number::ITEMS_PER_PAGE)
+        ));
+
+        $criteria=new CDbCriteria;
+        if ($model->support_operator_id) {
+            $criteria->compare('cdc.support_operator_id',$model->support_operator_id);
+        }
+
+        $criteria->compare('cdc.type',$cashierRestoreNumber->number,true);
+        $criteria->addCondition('cdc.dt>=:date_from and cdc.dt<DATE_ADD(:date_to,INTERVAL 1 DAY)');
+        $criteria->compare('cdc.type',CashierDebitCredit::TYPE_NUMBER_RESTORE);
+        $criteria->params[':date_from']=$date_from->toMysqlDate();
+        $criteria->params[':date_to']=$date_to->toMysqlDate();
+
+        $sql = "from cashier_debit_credit cdc
+            join megafon_app_restore_number marn on (marn.cashier_debit_credit_id=cdc.id)
+            join number n on (n.id=marn.number_id)
+            where " . $criteria->condition;
+
+        $totalItemCount = Yii::app()->db->createCommand('select count(*) ' . $sql)->queryScalar($criteria->params);
+
+        $cashierNumberRestoreDataProvider = new CSqlDataProvider('select n.number,cdc.sum ' . $sql, array(
+            'totalItemCount' => $totalItemCount,
+            'params' => $criteria->params,
+            'sort' => array(
+                'attributes' => array(
+                    'number','sum'
+                ),
+            ),
+            'pagination' => array('pageSize' => Number::ITEMS_PER_PAGE)
+        ));
+
+
         $collection=new CashierCollection;
         $collection->cashier_support_operator_id=$model->support_operator_id;
         $collectionDataProvider=$collection->search();
@@ -542,7 +594,8 @@ class CashierController extends BaseGxController
             'cashierNumberRestoreDataProvider'=>$cashierNumberRestoreDataProvider,
             'cashierRestoreNumberModel'=>$cashierRestoreNumber,
             'cashierSellNumberModel'=>$cashierSellNumber,
-            //'total'=>$total,
+            'otherDataProvider'=>$otherDataProvider,
+            'otherDataModel'=>$cashierDebitCredit,
             'balance'=>$balance,
             'collectionDataProvider'=>$collectionDataProvider,
             'morningBalance'=>$morningBalance,

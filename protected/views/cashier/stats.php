@@ -1,4 +1,4 @@
-<h1>Статистика по кассе</h1>
+<h1>Баланс кассы</h1>
 
 <div class="cfix">
     <?php $form=$this->beginWidget('BaseTbActiveForm',array(
@@ -138,6 +138,23 @@
     ),
 )); ?>
 
+<h2>Другое</h2>
+<?php $this->widget('TbExtendedGridViewExport', array(
+    'id' => 'other-grid',
+    'dataProvider' => $otherDataProvider,
+    'itemsCssClass' => 'table table-striped table-bordered table-condensed',
+    'filter'=>$otherDataModel,
+    'columns' => array(
+        'comment',
+        array(
+            'name'=>'sum',
+            'header'=>'Сумма сделки',
+            'filter'=>false,
+            'htmlOptions'=>array('style'=>'text-align:center'),
+        ),
+    ),
+)); ?>
+
 <h2>Инкассации
     <?php if (Yii::app()->user->role=='cashier') { ?>
     <?php $this->widget("bootstrap.widgets.TbButton",array(
@@ -168,5 +185,6 @@
             ),
         ),
     )); ?>
+
 
 <h2>Баланс вечер: <?=$eveningBalance?></h2>
