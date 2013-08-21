@@ -22,6 +22,10 @@ class MegafonAppRestoreController extends BaseGxController
         $megafonAppRestore->generateDocument(false);
     }
 
+    public function actionDownloadUnrestoredSummary() {
+        MegafonAppRestore::generateUnrestoredReport(false);
+    }
+
     private static function getProcessingNumbersDataProvider() {
         $model = new MegafonAllRestoreNumberSearch();
         $model->unsetAttributes();

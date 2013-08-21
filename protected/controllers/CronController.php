@@ -42,11 +42,14 @@ class CronController extends Controller
 
         $megafonAppRestores=MegafonAppRestore::model()->findAll("dt<:dt and sent_to_email=0",array(':dt'=>$current->dt->toMysqlDate()));
         foreach($megafonAppRestores as $megafonAppRestore) {
-            $fileName=$megafonAppRestore->generateDocument(true);
+            $fileNameMegafonAppRestore=$megafonAppRestore->generateDocument(true);
+            $fileNameRestoredReport=$megafonAppRestore->generateUnrestoredReport(true);
 
             $mail = new YiiMailMessage();
             $mail->setSubject('Заявление на восстановление номеров мегафон №'.$megafonAppRestore->id.' от '.$megafonAppRestore->dt->format('d.m.Y'));
-            $mail->attach(Swift_Attachment::fromPath($fileName));
+            $mail->attach(Swift_Attachment::fromPath($fileNameMegafonAppRestore));
+            $mail->attach(Swift_Attachment::fromPath($fileNameRestoredReport));
+
 
             $mail->setFrom(Yii::app()->params['adminEmailFrom']);
             $mail->setTo(Yii::app()->params['megafonAppRestoreEmail']);
@@ -56,7 +59,8 @@ class CronController extends Controller
                 $megafonAppRestore->save();
             }
 
-            unlink($fileName);
+            unlink($fileNameMegafonAppRestore);
+            unlink($fileNameRestoredReport);
         }
     }
 }

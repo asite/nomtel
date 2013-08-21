@@ -24,7 +24,7 @@ class MegafonAppRestore extends BaseMegafonAppRestore
         return $model;
     }
 
-    public function generateDocument($storeToDisk) {
+    static private function generateDocumentNumbersText($numbers) {
         $text="</w:t></w:r></w:p>";
 
         $sim_type_names=array(
@@ -32,7 +32,8 @@ class MegafonAppRestore extends BaseMegafonAppRestore
             MegafonAppRestoreNumber::SIM_TYPE_MICRO=>'микро',
             MegafonAppRestoreNumber::SIM_TYPE_NANO=>'нано',
         );
-        foreach($this->megafonAppRestoreNumbers as $number) {
+
+        foreach($numbers as $number) {
             $item="
                     <w:p>
                         <w:pPr>
@@ -96,12 +97,37 @@ class MegafonAppRestore extends BaseMegafonAppRestore
                 </w:rPr>
                 <w:t xml:space=\"preserve\">";
 
+        return $text;
+    }
+
+    public function generateDocument($storeToDisk) {
         $filename=DocumentGenerator::generate('megafon_app_restore.docx','megafon_app_restore_'.$this->dt.'.docx',array(
             'day'=>$this->dt->format('d'),
             'month'=>Yii::app()->dateFormatter->format('MMMM',$this->dt->getTimestamp()),
             'year'=>$this->dt->format('Y'),
             'id'=>$this->id,
-            'text'=>$text
+            'text'=>self::generateDocumentNumbersText($this->megafonAppRestoreNumbers)
+        ),$storeToDisk);
+
+        return $filename;
+    }
+
+    static public function generateUnrestoredReport($storeToDisk) {
+        $currentMegafonAppRestore=self::getCurrent();
+
+        $numbers=MegafonAppRestoreNumber::model()->findAllBySql(
+            'select * from megafon_app_restore_number where megafon_app_restore_id<:id and status=:status order by id asc',
+            array(
+                ':id'=>$currentMegafonAppRestore->id-1,
+                ':status'=>MegafonAppRestoreNumber::STATUS_PROCESSING,
+            ));
+
+        $filename=DocumentGenerator::generate('megafon_app_restore.docx','megafon_unrestored_summary_'.$currentMegafonAppRestore->dt.'.docx',array(
+            'day'=>$currentMegafonAppRestore->dt->format('d'),
+            'month'=>Yii::app()->dateFormatter->format('MMMM',$currentMegafonAppRestore->dt->getTimestamp()),
+            'year'=>$currentMegafonAppRestore->dt->format('Y'),
+            'id'=>$currentMegafonAppRestore->id.'-NOT-PROCESSED',
+            'text'=>self::generateDocumentNumbersText($numbers)
         ),$storeToDisk);
 
         return $filename;
