@@ -54,7 +54,7 @@ class CashierController extends BaseGxController
         $criteria->compare('s.operator_id',Operator::OPERATOR_MEGAFON_ID);
         //$criteria->compare('s.icc','999');
         $criteria->compare('n.status',Number::STATUS_FREE);
-        $criteria->addInCondition('n.balance_status',array(Number::BALANCE_STATUS_NOT_CHANGING,Number::BALANCE_STATUS_NOT_CHANGING_PLUS));
+        $criteria->addInCondition('n.balance_status',array(Number::BALANCE_STATUS_NOT_CHANGING,Number::BALANCE_STATUS_NOT_CHANGING_PLUS,Number::BALANCE_STATUS_CLOSED));
 
         // sim must be not passed to any agent
         $criteria->compare('s2.parent_agent_id',adminAgentId());
@@ -101,10 +101,18 @@ class CashierController extends BaseGxController
 
                 $sim=Sim::model()->findByPk($number->sim_id);
 
+                if ($model->type==CashierSellForm::TYPE_CLIENT) {
+                    $supportOperator=SupportOperator::model()->findByPk(loggedSupportOperatorId());
+                    $agent=Agent::model()->findByAttributes(array('user_id'=>$supportOperator->user_id));
+                    $model->agent_id=$agent->id;
+                }
+
                 // add acts for agent
-                if ($model->type==CashierSellForm::TYPE_AGENT) {
+                $destDesc='';
+                if ($model->agent_id) {
                     $recursiveInfo=array();
                     $destAgent=Agent::model()->findByPk($model->agent_id);
+                    $destDesc='агенту {Agent:'.$destAgent->id.'}';
 
                     $agent=$destAgent;
                     while($agent) {
@@ -173,6 +181,8 @@ class CashierController extends BaseGxController
 
                 $number->status=Number::STATUS_SOLD;
                 $number->save();
+
+                NumberHistory::addHistoryNumber($number->id,"Номер продан $destDesc за {$model->sum} р");
 
                 $trx->commit();
 
