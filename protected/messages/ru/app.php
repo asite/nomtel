@@ -17,6 +17,7 @@
  * NOTE, this file must be saved in UTF-8 encoding.
  */
 return array (
+  'RESTORE_FOR_SELLING'=>'На восстановлении продажа',
   'RESTORE'=>'На восстановлении',
   'AgentReferralRate|AgentReferralRates' => '',
   'All' => '',

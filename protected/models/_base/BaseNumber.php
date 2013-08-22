@@ -74,7 +74,7 @@ abstract class BaseNumber extends BaseGxActiveRecord {
 			array('support_operator_id, user_id, support_passport_need_validation', 'numerical', 'integerOnly'=>true),
 			array('sim_id, codeword, service_password, short_number', 'length', 'max'=>20),
 			array('number, number_city, personal_account', 'length', 'max'=>50),
-			array('status', 'length', 'max'=>7),
+			array('status', 'length', 'max'=>19),
 			array('balance_status', 'length', 'max'=>17),
 			array('sim_price, number_price, balance', 'length', 'max'=>14),
 			array('support_status', 'length', 'max'=>12),

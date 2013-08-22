@@ -465,7 +465,7 @@ class NumberController extends BaseGxController
 
         $megafonAppRestoreNumber->save();
 
-        $number->status=Number::STATUS_RESTORE;
+        $number->status=Number::STATUS_RESTORE_FOR_SELLING;
 
         NumberHistory::addHistoryNumber($number->id, 'Номер добавлен в заявление на восстановление №' . $megafonAppRestoreNumber->megafonAppRestore->id . ' от ' . $megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y'));
     }
