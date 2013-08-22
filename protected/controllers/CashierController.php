@@ -164,7 +164,7 @@ class CashierController extends BaseGxController
                 $cashierSellNumber->sum=$model->sum;
                 $cashierSellNumber->type=$model->type;
 
-                if ($model->payment==CashierSellForm::PAYMENT_CASH) {
+                //if ($model->payment==CashierSellForm::PAYMENT_CASH) {
                     $cashierDebitCredit=new CashierDebitCredit;
                     $cashierDebitCredit->dt=$cashierSellNumber->dt;
                     $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
@@ -174,7 +174,7 @@ class CashierController extends BaseGxController
                     $cashierDebitCredit->save();
 
                     $cashierSellNumber->cashier_debit_credit_id=$cashierDebitCredit->id;
-                }
+                //}
 
                 $cashierSellNumber->comment=$model->comment;
                 $cashierSellNumber->save();
