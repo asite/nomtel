@@ -64,8 +64,6 @@ class MegafonAppRestoreController extends BaseGxController
     }
 
     public function restoreNumberForClient($number,$icc) {
-        $number->status=Number::STATUS_ACTIVE;
-        $number->save();
         Sim::model()->updateAll(array('icc'=>$icc),'parent_id=:parent_id',array(':parent_id'=>$number->sim_id));
     }
 
