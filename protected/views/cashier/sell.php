@@ -79,7 +79,7 @@
 <?php $this->endWidget(); ?>
 <script>
 function toggleAgentId() {
-    if ($("input[name='CashierSellForm[type]']:checked").val()==1) {
+    if ($("input[name='CashierSellForm[type]']:checked").val()=='AGENT') {
         $("#agent_id").show();
     } else {
         $("#agent_id").hide();
