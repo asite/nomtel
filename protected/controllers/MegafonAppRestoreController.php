@@ -133,7 +133,7 @@ class MegafonAppRestoreController extends BaseGxController
                         $megafonAppRestoreNumber->status=MegafonAppRestoreNumber::STATUS_DONE;
                         $megafonAppRestoreNumber->save();
 
-                        NumberHistory::addHistoryNumber($number->id,'Номер успешно восстановлен по заявлению №'.$megafonAppRestoreNumber->megafonAppRestore->id.' от '.$megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y'));
+                        NumberHistory::addHistoryNumber($number->id,'Номер успешно восстановлен по заявлению №'.$megafonAppRestoreNumber->megafonAppRestore->id.' от '.$megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y').', новый ICC '.$processModel->icc);
 
                         if ($megafonAppRestoreNumber->restore_for_selling)
                             $this->restoreNumberForSelling($number,$processModel->icc);
