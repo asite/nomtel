@@ -569,13 +569,13 @@ class SimController extends BaseGxController {
                 $mail = new YiiMailMessage();
                 $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
                 $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
-
-                //$mail->setFrom(Yii::app()->params['adminEmailFrom']);
+                $mail->setBody('');
+                $mail->setFrom(Yii::app()->params['adminEmailFrom']);
                 $mail->setTo($agent->email);
 
                 if (Yii::app()->mail->send($mail)) {
                     unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
-                }
+                } else {print_r('no'); exit;}
             }
 
             // endmail ----------------------------------
