@@ -320,10 +320,10 @@ class BonusReportController extends BaseGxController
 
         $rows = $sheet->getHighestRow();
 
-        if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
+       /* if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
             $this->errorInvalidFormat(__LINE__);
         if ($sheet->getCellByColumnAndRow(30, 5)->getValue() != 'Выручка для расчёта вознаграждения без учёта НДС, руб.')
-            $this->errorInvalidFormat(__LINE__);
+            $this->errorInvalidFormat(__LINE__);*/
 
         $simBonus = array();
         $sum = 0;

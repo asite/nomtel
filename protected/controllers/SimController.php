@@ -856,8 +856,8 @@ class SimController extends BaseGxController {
                     $end = $idd_arr[1];
                     $idd = $start;
                     do {
-                        $id_arr[] = $start = bcadd($start,1);
-                    } while(bccomp($start,$end));
+                        $id_arr[] = $start = $start+1;
+                    } while($start<$end);
                 }
             }
 
