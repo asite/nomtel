@@ -6,5 +6,6 @@
 </head>
 <body>
     <?php echo $content?>
+    <?php include('jivo.php');?>
 </body>
 </html>
