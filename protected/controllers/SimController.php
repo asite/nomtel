@@ -569,13 +569,13 @@ class SimController extends BaseGxController {
                 $mail = new YiiMailMessage();
                 $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
                 $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
-
-                //$mail->setFrom(Yii::app()->params['adminEmailFrom']);
+                $mail->setBody('');
+                $mail->setFrom(Yii::app()->params['adminEmailFrom']);
                 $mail->setTo($agent->email);
 
                 if (Yii::app()->mail->send($mail)) {
                     unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
-                }
+                } else {print_r('no'); exit;}
             }
 
             // endmail ----------------------------------
@@ -856,8 +856,8 @@ class SimController extends BaseGxController {
                     $end = $idd_arr[1];
                     $idd = $start;
                     do {
-                        $id_arr[] = $start = bcadd($start,1);
-                    } while(bccomp($start,$end));
+                        $id_arr[] = $start = $start+1;
+                    } while($start<$end);
                 }
             }
 
@@ -910,7 +910,12 @@ class SimController extends BaseGxController {
                 $quotedIds=array();
                 foreach($id_arr as $id) $quotedIds[]=Yii::app()->db->quoteValue(trim($id));
                 $in='('.implode(',',$quotedIds).')';
-                $sims=Sim::model()->findAllBySql("select * from sim where (number in $in or icc in $in) and id=parent_id and is_active=1");
+                $sims=Sim::model()->findAllBySql("
+                    select s.*
+                    from sim s
+                    join number n on (s.id=n.sim_id)
+                    where (s.number in $in or s.icc in $in) and s.id=s.parent_id and s.is_active=1
+                ");
             } else {
                 $sims=array();
             }

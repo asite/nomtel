@@ -27,7 +27,7 @@ class BonusReportController extends BaseGxController
             // get payment ids for deletion
             $paymentIds = Yii::app()->db->createCommand(
                 "select payment_id from bonus_report_agent
-                 where bonus_report_agent.bonus_report_id=:bonus_report_id")->queryColumn(array(':bonus_report_id' => $id));
+                 where payment_id is not null and bonus_report_agent.bonus_report_id=:bonus_report_id")->queryColumn(array(':bonus_report_id' => $id));
 
             BonusReportAgent::model()->deleteAllByAttributes(array('bonus_report_id' => $id));
             BonusReportNumber::model()->deleteAllByAttributes(array('bonus_report_id' => $id));
@@ -320,10 +320,10 @@ class BonusReportController extends BaseGxController
 
         $rows = $sheet->getHighestRow();
 
-        if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
+       /* if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
             $this->errorInvalidFormat(__LINE__);
         if ($sheet->getCellByColumnAndRow(30, 5)->getValue() != 'Выручка для расчёта вознаграждения без учёта НДС, руб.')
-            $this->errorInvalidFormat(__LINE__);
+            $this->errorInvalidFormat(__LINE__);*/
 
         $simBonus = array();
         $sum = 0;

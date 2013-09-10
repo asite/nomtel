@@ -57,7 +57,7 @@ switch ($_SERVER['SERVER_NAME']) {
         
     case 'valvit.ru':
         define('LANGUAGE', 'ru');
-
+        define('TIMEZONE', 'Asia/Yeakaterinburg');
         define('YII_DEBUG', false);
         $config = 'server_web_asite2_production.php';
         break;
