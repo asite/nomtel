@@ -1,3 +1,1 @@
-<?php
-
-?>
+<?php if (Yii::app()->user->hasFlash('printAct')): ?><script>window.open('/act/print/id/<?php echo Yii::app()->user->getFlash("printAct"); ?>');</script><?php endif; ?>

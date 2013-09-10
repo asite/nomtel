@@ -27,7 +27,7 @@ class BonusReportController extends BaseGxController
             // get payment ids for deletion
             $paymentIds = Yii::app()->db->createCommand(
                 "select payment_id from bonus_report_agent
-                 where bonus_report_agent.bonus_report_id=:bonus_report_id")->queryColumn(array(':bonus_report_id' => $id));
+                 where payment_id is not null and bonus_report_agent.bonus_report_id=:bonus_report_id")->queryColumn(array(':bonus_report_id' => $id));
 
             BonusReportAgent::model()->deleteAllByAttributes(array('bonus_report_id' => $id));
             BonusReportNumber::model()->deleteAllByAttributes(array('bonus_report_id' => $id));

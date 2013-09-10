@@ -10,8 +10,15 @@ class Controller extends CController
     public function filters()
     {
         return array(
-            'accessControl' // required to enable accessRules
+            'accessControl', // required to enable accessRules
+            'forcedPasswordChange'
         );
+    }
+
+    public function filterForcedPasswordChange($filterChain) {
+        if ($this->route!='site/forcedPasswordChange' && Yii::app()->user->getState('require_password_change')) $this->redirect(array('site/forcedPasswordChange'));
+
+        $filterChain->run();
     }
 
     public function additionalAccessRules()

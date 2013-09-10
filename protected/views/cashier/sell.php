@@ -1,5 +1,31 @@
 <h1>Продажа номера '<?=$number->number?>'</h1>
 
+<div class="w80 cfix">
+    <div style="float:left;width:45%;">
+        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+            'data'=>$number,
+            'attributes'=>array(
+                array(
+                    'name'=>'balance_status',
+                    'value'=>$number->getBalanceStatusLabel($number->balance_status)
+                ),
+                'sim.icc',
+                'sim.operator'
+            ),
+        )); ?>
+    </div>
+    <div style="float:left;width:45%;">
+        <?php $this->widget('bootstrap.widgets.TbDetailView',array(
+            'data'=>$number,
+            'attributes'=>array(
+                'balance',
+                'sim.tariff'
+            ),
+        )); ?>
+    </div>
+</div>
+
+
 <div class="form">
 
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
@@ -16,26 +42,6 @@
 
     <?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->textFieldRow($model,'icc',array('class'=>'span3','maxlength'=>25,'hint'=>'введите icc с регионом "'.$number->sim->operatorRegion->title.'"')); ?>
-
-    <?php $this->widget('TbExtendedGridViewExport', array(
-        'id' => 'number-grid',
-        'dataProvider' => $prefixRegionModel->search(),
-        'itemsCssClass' => 'table table-striped table-bordered table-condensed',
-        'columns' => array(
-            'icc_prefix',
-            array(
-                'name'=>'operator_id',
-                'header'=>'Оператор',
-                'value'=>'$data["operator"]',
-            ),
-            array(
-                'name'=>'operator_region_id',
-                'header'=>'Регион',
-                'value'=>'$data["operatorRegion"]',
-            ),
-        ),
-    )); ?>
     <?php echo $form->radioButtonListRow($model,'type',CashierSellForm::getTypeList(),array('onchange'=>'toggleAgentId()')); ?>
 
     <div class="control-group" id="agent_id" <?php if($model->type!=CashierSellForm::TYPE_AGENT){ ?>style="display:none;"<?php }?> >
@@ -55,6 +61,13 @@
         </div>
     </div>
 
+    <?php echo $form->textFieldRow($model,'sum',array('class'=>'span2')); ?>
+
+    <?php echo $form->radioButtonListRow($model,'payment',CashierSellForm::getPaymentList(),array('onchange'=>'toggleComment()')); ?>
+    <div style="display:none" id="sum_id">
+    <?php echo $form->textFieldRow($model,'comment',array('class'=>'span2')); ?>
+    </div>
+
     <div class="form-actions">
     <?php $this->widget('bootstrap.widgets.TbButton',array(
         'buttonType'=>'submit',
@@ -66,10 +79,20 @@
 <?php $this->endWidget(); ?>
 <script>
 function toggleAgentId() {
-    if ($("input[name='CashierSellForm[type]']:checked").val()==1) {
+    if ($("input[name='CashierSellForm[type]']:checked").val()=='AGENT') {
         $("#agent_id").show();
     } else {
         $("#agent_id").hide();
     }
 }
+
+function toggleComment() {
+    if ($("input[name='CashierSellForm[payment]']:checked").val()==1) {
+        $("#sum_id").show();
+    } else {
+        $("#sum_id").hide();
+    }
+}
+
+$(function(){toggleAgentId();toggleComment();});
 </script>

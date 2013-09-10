@@ -14,6 +14,7 @@
  * @property string $type
  * @property string $dt
  * @property string $sum
+ * @property integer $sim_count
  * @property string $comment
  *
  * @property Agent $agent
@@ -41,13 +42,13 @@ abstract class BaseAct extends BaseGxActiveRecord {
 	public function rules() {
 		return array(
 			array('agent_id, type, dt, sum', 'required'),
-			array('agent_id', 'numerical', 'integerOnly'=>true),
+			array('agent_id, sim_count', 'numerical', 'integerOnly'=>true),
 			array('type', 'length', 'max'=>6),
 			array('sum', 'length', 'max'=>14),
 			array('comment', 'safe'),
-			array('comment', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('sim_count, comment', 'default', 'setOnEmpty' => true, 'value' => null),
             array('dt','date','format'=>'dd.MM.yyyy HH:mm:ss'),
-			array('id, agent_id, type, dt, sum, comment', 'safe', 'on'=>'search'),
+			array('id, agent_id, type, dt, sum, sim_count, comment', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -71,6 +72,7 @@ abstract class BaseAct extends BaseGxActiveRecord {
 			'type' => Yii::t('app', 'Type'),
 			'dt' => Yii::t('app', 'Dt'),
 			'sum' => Yii::t('app', 'Sum'),
+			'sim_count' => Yii::t('app', 'Sim Count'),
 			'comment' => Yii::t('app', 'Comment'),
 			'agent' => null,
 			'sims' => null,
@@ -86,6 +88,7 @@ abstract class BaseAct extends BaseGxActiveRecord {
 		$criteria->compare('type', $this->type, true);
 		$criteria->compare('dt', $this->dt, true);
 		$criteria->compare('sum', $this->sum, true);
+		$criteria->compare('sim_count', $this->sim_count);
 		$criteria->compare('comment', $this->comment, true);
 
 		$dataProvider=new CActiveDataProvider($this, array(

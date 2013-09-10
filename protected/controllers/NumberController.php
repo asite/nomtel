@@ -317,113 +317,6 @@ class NumberController extends BaseGxController
             throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
     }
 
-    public function actionSaveICC($id) {
-        if (Yii::app()->getRequest()->getIsPostRequest()) {
-
-                $trx=Yii::app()->db->beginTransaction();
-
-                $number = Number::model()->findByPk($id);
-
-                $sim=Sim::model()->findByPk($number->sim_id);
-
-                $blankSim=BlankSim::model()->findByAttributes(array('icc'=>$_POST['value']));
-                if (!$blankSim) {
-                    $this->ajaxError('Пустышки с указанным icc нет в базе');
-                }
-                if ($blankSim->used_dt) {
-                    $this->ajaxError('Пустышка с указанным icc уже использована для восстановления');
-                }
-                if ($blankSim->operator_id!=$sim->operator_id) {
-                    $this->ajaxError('Пустышка с указанным icc относится к другому оператору');
-                }
-                if ($blankSim->operator_region_id!=$sim->operator_region_id) {
-                    $this->ajaxError('Пустышка с указанным icc относится к другому региону');
-                }
-
-                $blankSim->used_dt=new EDateTime();
-                $blankSim->used_support_operator_id=loggedSupportOperatorId();
-                $blankSim->used_number_id=$number->id;
-                $blankSim->save();
-
-
-                $criteria = new CDbCriteria();
-                $criteria->addCondition('parent_id=:sim_id');
-                $criteria->params = array(
-                    ':sim_id' => $number->sim_id
-                );
-
-                Sim::model()->updateAll(array('icc' => $_POST['value']), $criteria);
-
-                $message = "Заменить у номера ".$number->number." ICC на ".$_POST['value'];
-                Ticket::addMessage($number->id,$message);
-
-                NumberHistory::addHistoryNumber($number->id,'Установлен новый ICC: "'.$_POST['value'].'"');
-
-                $trx->commit();
-            try {
-
-            } catch (CDbException $e) {
-                $this->ajaxError(Yii::t("app", "Error"));
-            }
-        } else
-            throw new CHttpException(400, Yii::t('app', 'Your request is invalid.'));
-    }
-
-    private function freeNumber($id, $icc=null) {
-
-        $number=$this->loadModel($id,'Number');
-
-        $sim=Sim::model()->findByAttributes(array(
-            'parent_id'=>$number->sim_id,
-            'agent_id'=>null
-        ));
-
-        if (!$sim) {
-            Yii::app()->user->setFlash('error','ошибка '.__LINE__);
-            $this->refresh();
-        }
-
-        $parent_id=$sim->parent_id;
-
-        // create new sim with same data, binded to base
-        $sim->unsetAttributes(array('id','parent_act_id','agent_id','parent_id'));
-        $sim->parent_agent_id=adminAgentId();
-        $sim->isNewRecord=true;
-        if ($icc) $sim->icc="999";
-        $sim->save();
-        $sim->parent_id=$sim->id;
-        $sim->save();
-
-
-        $number->sim_id=$sim->id;
-        $number->status=Number::STATUS_FREE;
-        $number->save();
-
-        Sim::model()->updateAll(array('is_active'=>0),'parent_id=:parent_id',array(':parent_id'=>$parent_id));
-
-        // delete subscription agreements
-        $sas=SubscriptionAgreement::model()->findAllByAttributes(array('number_id'=>$number->id));
-        foreach($sas as $sa) {
-            SubscriptionAgreementFile::model()->deleteAllByAttributes(array('subscription_agreement_id'=>$sa->id));
-            $sa->delete();
-        }
-
-        NumberHistory::addHistoryNumber($number->id,'Номер освобожден');
-
-        if ($icc) Yii::app()->user->setFlash('success','Сим отложена');
-        else Yii::app()->user->setFlash('success','Номер освобожден');
-
-
-    }
-
-    public function actionFree($id, $icc=false) {
-        $trx=Yii::app()->db->beginTransaction();
-            $this->freeNumber($id, $icc);
-        $trx->commit();
-
-        $this->redirect(Yii::app()->request->urlReferrer);
-    }
-
     public function actionSetNumberRegion() {
         if (isset($_REQUEST['setNumberRegion'])) {
             $content = file_get_contents('http://rossvyaz.ru/docs/articles/DEF-9x.html');
@@ -532,24 +425,73 @@ class NumberController extends BaseGxController
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно освобождены.');
     }
 
+    private function restoreBaseCriteria() {
+        $criteria=new CDbCriteria();
 
-       private function setRecovery($csv, $data) {
+        // look only sim records, that belongs to base
+        $criteria->addCondition('s.id=s.parent_id');
+        $criteria->compare('s.operator_id',Operator::OPERATOR_MEGAFON_ID);
+        //$criteria->addNotInCondition('n.status',array(Number::STATUS_FREE));
+
+        return $criteria;
+    }
+
+    private function restore($number)
+    {
+        static $megafonAppRestore;
+
+        $megafonAppRestoreNumber = MegafonAppRestoreNumber::model()->findByAttributes(array('number_id' => $number->id, 'status' => MegafonAppRestoreNumber::STATUS_PROCESSING));
+        if ($megafonAppRestoreNumber) return 'Номер уже на восстановлении';
+
+        $criteria = $this->restoreBaseCriteria();
+        $criteria->compare('n.id', $number->id);
+
+        $numbersCount = Yii::app()->db->createCommand("select count(*) from sim s
+            join sim s2 on (s2.parent_id=s.id and s2.agent_id is null)
+            join number n on (s.parent_id=n.sim_id) where {$criteria->condition}")->queryScalar($criteria->params);
+
+        if ($numbersCount != 1) return 'ошибка '.__LINE__;
+
+        if (!isset($megafonAppRestore)) $megafonAppRestore = MegafonAppRestore::getCurrent();
+
+        $megafonAppRestoreNumber = new MegafonAppRestoreNumber;
+
+        $megafonAppRestoreNumber->megafon_app_restore_id = $megafonAppRestore->id;
+        $megafonAppRestoreNumber->status = MegafonAppRestoreNumber::STATUS_PROCESSING;
+        $megafonAppRestoreNumber->number_id = $number->id;
+        $megafonAppRestoreNumber->support_operator_id = loggedSupportOperatorId();
+        $megafonAppRestoreNumber->sim_type = MegafonAppRestoreNumber::SIM_TYPE_NORMAL;
+        $megafonAppRestoreNumber->restore_for_selling=true;
+
+        $megafonAppRestoreNumber->save();
+
+        $number->status=Number::STATUS_RESTORE_FOR_SELLING;
+
+        NumberHistory::addHistoryNumber($number->id, 'Номер добавлен в заявление на восстановление №' . $megafonAppRestoreNumber->megafonAppRestore->id . ' от ' . $megafonAppRestoreNumber->megafonAppRestore->dt->format('d.m.Y'));
+    }
+
+    private function setRecovery($csv, $data) {
         $trx = Yii::app()->db->beginTransaction();
         $wrongObjects = '';
         foreach ($csv as $key=>$v) {
             $model = Number::model()->findByAttributes(array('number'=>$key));
             if ($model) {
-                $model->recovery_dt = date('Y-m-d');
-                $model->save();
-            } else $wrongObjects .= $key.'; ';
+                $error=$this->restore($model);
+                if (!$error) {
+                    $model->recovery_dt = new EDateTime();
+                    $model->save();
+                } else {
+                    $wrongObjects .= "$key($error);";
+                }
+            } else $wrongObjects .= $key.'(номер не найден); ';
         }
         $trx->commit();
-        if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные объекты не найдены: </strong>'.$wrongObjects);
+        if ($wrongObjects) Yii::app()->user->setFlash('warning', '<strong>Данные номера не поставлены на восстановление: </strong>'.$wrongObjects);
         Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Номера успешно поставлены в очередь на освобождение.');
     }
-    
-    
-    
+
+
+
     private function getModel($v, $data) {
         if ($data['Action']=='ICC') {
             $sim = Sim::model()->findByAttributes(array('icc'=>$v[0]),array('order'=>'id DESC'));
@@ -607,12 +549,15 @@ class NumberController extends BaseGxController
     }
 
     public function actionMassChange() {
+        $tariffs = Tariff::model()->getComboList();
+        $tariffs = array('0'=>Yii::t('app', 'Select Tariff')) + $tariffs;
+
         if (isset($_FILES['fileField']['tmp_name'])) {
             $csv=$this->readCSV($_FILES['fileField']['tmp_name']);
             $csv[0][0] = preg_replace('~\D+~','',$csv[0][0]);
             if (strlen($csv[0][0])>11) $head = 'ICC'; else $head = 'Number';
 
-            $this->render('massChange',array('file'=>$csv,'head'=>$head));
+            $this->render('massChange',array('file'=>$csv,'head'=>$head,'tariffs'=>$tariffs));
             exit;
         }
 
@@ -623,8 +568,8 @@ class NumberController extends BaseGxController
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Не загружен файл.');
                 $this->refresh();
             }
-            
-           
+
+
             $csv = unserialize($_POST['Csv']);
 
                 if ($_POST['massFree']) {
@@ -639,7 +584,7 @@ class NumberController extends BaseGxController
                     $this->setStatus($csv,$data,Number::STATUS_UNKNOWN);
                     $this->redirect(Yii::app()->request->urlReferrer);
                 }
-                
+
                 if ($_POST['massRecovery']) {
                     $this->setRecovery($csv,$data);
                     $this->redirect(Yii::app()->request->urlReferrer);
@@ -679,7 +624,9 @@ class NumberController extends BaseGxController
                     $sql ='select sim.id, sim.number, number.sim_id from sim join number on (number.sim_id=sim.parent_id) where sim.is_active=1 and sim.number in ('.substr($number,1).')';
                     $sims = Yii::app()->db->createCommand($sql)->queryAll();
                     foreach ($sims as $value) {
-                        $tariffs = Tariff::model()->findByAttributes(array('title'=>$dataCsv[$value['number']]));
+                        if ($dataCsv[$value['number']]) $tariffs = Tariff::model()->findByAttributes(array('title'=>$dataCsv[$value['number']]));
+                        else $tariffs = Tariff::model()->findByPk($_POST['tariff']);
+
                         if ($tariffs) {
                             $criteria = new CDbCriteria();
                             $criteria->addColumnCondition(array('parent_id'=>$value['sim_id']));
@@ -828,7 +775,7 @@ class NumberController extends BaseGxController
             }
         }
 
-        $this->render('massChange');
+        $this->render('massChange',array('tariffs'=>$tariffs));
     }
 
     public function actionAgentChangeIcc($sim_id) {

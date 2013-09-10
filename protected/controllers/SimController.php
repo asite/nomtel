@@ -510,6 +510,9 @@ class SimController extends BaseGxController {
 
         Yii::app()->db->createCommand($sql)->execute(array(':parent_agent_id'=>$source_agent_id));
 
+        $model->updateSimCount();
+        $model->save();
+
         //add NumberHistory
         $criteria = new CDbCriteria();
         $criteria->addInCondition('id', $moveSimCards);
@@ -521,7 +524,7 @@ class SimController extends BaseGxController {
             }
         }
 
-        return true;
+        return $model;
     }
 
     public function actionMove($key) {
@@ -541,15 +544,66 @@ class SimController extends BaseGxController {
 
             $trx = Yii::app()->db->beginTransaction();
 
-            if (!$this->move($moveSimCards,$agent_id)) {
+            $act=$this->move($moveSimCards,$agent_id);
+            if (!$act) {
                 Yii::app()->user->setFlash('error', '<strong>Ошибка</strong> Отсутствуют данные для передачи.');
                 $this->redirect(Yii::app()->createUrl('sim/add'));
-                exit;
+            }
+
+
+            // mail -------------------------------
+
+            $agent=Agent::model()->findByPk(loggedAgentId());
+            if ($agent->email) {
+                $criteria = new CDbCriteria();
+                $criteria->addInCondition('id', $moveSimCards);
+                $numbers=Yii::app()->db->createCommand("select number from sim where ".$criteria->condition)->queryColumn($criteria->params);
+
+                $fp = fopen (Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv', "w");
+
+                foreach ($numbers as $fields) {
+                    fputcsv($fp, array($fields));
+                }
+                fclose($fp);
+
+                $mail = new YiiMailMessage();
+                $mail->setSubject('Вам были отгружены номера по акту №'.$act->id.' от '.$act->dt);
+                $mail->attach(Swift_Attachment::fromPath(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv'));
+                $mail->setBody('');
+                $mail->setFrom(Yii::app()->params['adminEmailFrom']);
+                $mail->setTo($agent->email);
+
+                if (Yii::app()->mail->send($mail)) {
+                    unlink(Yii::getPathOfAlias('webroot').'/var/temp/shipping_'.$act->id.'.csv');
+                } else {print_r('no'); exit;}
+            }
+
+            // endmail ----------------------------------
+
+
+            if ($_POST['Move']['cashPayment']==1) {
+                $payment=new Payment;
+                $payment->agent_id=$act->agent_id;
+                $payment->dt=$act->dt;
+                $payment->type=Payment::TYPE_NORMAL;
+                $payment->comment='Оплата отгрузки наличными';
+                $payment->sum=$act->sum;
+                $payment->save();
+
+                $cashierDebitCredit=new CashierDebitCredit;
+                $cashierDebitCredit->dt=new EDateTime;
+                $cashierDebitCredit->support_operator_id=loggedSupportOperatorId();
+                $cashierDebitCredit->comment='Отгрузка номеров по акту №'.$act->id;
+                $cashierDebitCredit->sum=$act->sum;
+                $cashierDebitCredit->type=CashierDebitCredit::TYPE_OTHER;
+                $cashierDebitCredit->save();
             }
 
             $trx->commit();
 
             Yii::app()->user->setFlash('success', '<strong>Операция прошла успешно</strong> Данные успешно передены агенту.');
+            Yii::app()->user->setFlash('printAct', $act->id);
+
             $sessionData->delete($key);
             $this->redirect(Yii::app()->createUrl('site/index'));
         } else {
@@ -794,6 +848,19 @@ class SimController extends BaseGxController {
         if ($_POST['ICCtoMove'] != '') {
             $id_arr = explode("\n", $_POST['ICCtoMove']);
 
+            foreach ($id_arr as &$idd) {
+                $idd_arr = array();
+                $idd_arr = explode("-", $idd);
+                if ($idd_arr[1]) {
+                    $start = $idd_arr[0];
+                    $end = $idd_arr[1];
+                    $idd = $start;
+                    do {
+                        $id_arr[] = $start = bcadd($start,1);
+                    } while(bccomp($start,$end));
+                }
+            }
+
             $trx=Yii::app()->db->beginTransaction();
 
             $st=microtime(true);
@@ -843,7 +910,12 @@ class SimController extends BaseGxController {
                 $quotedIds=array();
                 foreach($id_arr as $id) $quotedIds[]=Yii::app()->db->quoteValue(trim($id));
                 $in='('.implode(',',$quotedIds).')';
-                $sims=Sim::model()->findAllBySql("select * from sim where (number in $in or icc in $in) and id=parent_id and is_active=1");
+                $sims=Sim::model()->findAllBySql("
+                    select s.*
+                    from sim s
+                    join number n on (s.id=n.sim_id)
+                    where (s.number in $in or s.icc in $in) and s.id=s.parent_id and s.is_active=1
+                ");
             } else {
                 $sims=array();
             }
@@ -916,10 +988,16 @@ class SimController extends BaseGxController {
             if (!empty($simParentIdsToSetInactive))
                 Yii::app()->db->createCommand("update sim set is_active=0 where parent_id in (".implode(',',$simParentIdsToSetInactive).')')->execute();
 
+            foreach($recursiveInfo as $rInfo)
+                if (!$rInfo['act']->isNewRecord) {
+                    $rInfo['act']->updateSimCount();
+                    $rInfo['act']->save();
+                }
+
             $trx->commit();
 
             if (!empty($resNotFound)) {
-                $res='<b>следующие ICC/Номера не найдены:</b> '.implode(',',array_keys($resNotFound));
+                $res='<b>следующие ICC/Номера не найдены:</b> '.implode(', ',array_keys($resNotFound));
             } else {
                 $res='Все SIM успешно переданы';
             }

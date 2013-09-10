@@ -52,8 +52,12 @@ class AgentController extends BaseGxController
     {
         $result = array();
 
-        if (isset($_POST['Agent']))
+        if (isset($_POST['Agent'])) {
             $model->setAttributes($_POST['Agent']);
+            $model->phone_1=Number::getNumberFromFormatted($model->phone_1);
+            $model->phone_2=Number::getNumberFromFormatted($model->phone_2);
+            $model->phone_3=Number::getNumberFromFormatted($model->phone_3);
+        }
 
         $model->validate();
 
@@ -85,6 +89,8 @@ class AgentController extends BaseGxController
     public function actionCreate()
     {
         $model = new Agent;
+        $model->require_password_change=true;
+
         $user = new User('create');
         $user->status = ModelLoggableBehavior::STATUS_ACTIVE;
 
@@ -102,6 +108,8 @@ class AgentController extends BaseGxController
             $errors = $this->validate($model, $user, $referralRates);
 
             if (empty($errors)) {
+                $user->sendSmsWithLoginData($model->phone_1);
+
                 $user->encryptPwd();
                 $this->save($model, $user, $referralRates);
 
@@ -135,6 +143,7 @@ class AgentController extends BaseGxController
 
             if (empty($errors)) {
                 if ($user->password != '') {
+                    $user->sendSmsWithLoginData($model->phone_1);
                     $user->encryptPwd();
                 } else {
                     $user->password = $password;

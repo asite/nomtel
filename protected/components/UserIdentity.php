@@ -32,6 +32,7 @@ class UserIdentity extends CUserIdentity
                     $this->setState('agentId', $agent->id);
                     $this->setState('role',$agent->id==adminAgentId() ? 'admin':'agent');
                     $this->setState('username',$agent->user->username);
+                    $this->setState('require_password_change',$agent->require_password_change);
                     if ($agent->id==adminAgentId())
                         $this->setState('supportOperatorId',SupportOperator::OPERATOR_ADMIN_ID);
                     return true;

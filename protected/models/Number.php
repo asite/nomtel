@@ -9,6 +9,8 @@ class Number extends BaseNumber
     const STATUS_ACTIVE = 'ACTIVE';
     const STATUS_BLOCKED = 'BLOCKED';
     const STATUS_SOLD = 'SOLD';
+    const STATUS_RESTORE = 'RESTORE';
+    const STATUS_RESTORE_FOR_SELLING = 'RESTORE_FOR_SELLING';
 
     const SUPPORT_SMS_STATUS_OFFICE = 'OFFICE';
     const SUPPORT_SMS_STATUS_EMAIL = 'EMAIL';
@@ -182,7 +184,9 @@ class Number extends BaseNumber
                 self::STATUS_FREE=>Yii::t('app','FREE'),
                 self::STATUS_ACTIVE=>Yii::t('app','ACTIVE'),
                 self::STATUS_BLOCKED=>Yii::t('app','BLOCKED'),
-                self::STATUS_SOLD=>Yii::t('app','SOLD')
+                self::STATUS_SOLD=>Yii::t('app','SOLD'),
+                self::STATUS_RESTORE=>Yii::t('app','RESTORE'),
+                self::STATUS_RESTORE_FOR_SELLING => Yii::t('app','RESTORE_FOR_SELLING'),
             );
         }
 

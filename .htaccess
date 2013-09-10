@@ -3,6 +3,9 @@ php_flag magic_quotes_runtime off
 
 AddDefaultCharset UTF-8
 
+php_flag error_reporting 0
+php_value date.timezone Asia/Yekaterinburg
+
 # Enable browser site caching
 #<IfModule mod_expires.c>
 #  ExpiresActive On

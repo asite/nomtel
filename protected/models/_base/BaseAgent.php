@@ -33,6 +33,7 @@
  * @property integer $is_agent
  * @property integer $is_bonus
  * @property integer $is_making_parent_invoices
+ * @property integer $require_password_change
  *
  * @property Act[] $acts
  * @property User $user
@@ -68,17 +69,18 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 
 	public function rules() {
 		return array(
-			array('name, surname, middle_name, phone_1, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address', 'required'),
-			array('parent_id, user_id, taking_orders, is_agent, is_bonus, is_making_parent_invoices', 'numerical', 'integerOnly'=>true),
+			array('name, surname, middle_name, phone_1', 'required'),
+			array('parent_id, user_id, taking_orders, is_agent, is_bonus, is_making_parent_invoices, require_password_change', 'numerical', 'integerOnly'=>true),
 			array('name, surname, middle_name, city, email, skype', 'length', 'max'=>100),
 			array('phone_1, phone_2, phone_3', 'length', 'max'=>50),
 			array('icq, passport_number', 'length', 'max'=>20),
 			array('passport_series', 'length', 'max'=>10),
 			array('passport_issuer, birth_place, registration_address', 'length', 'max'=>200),
-			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, taking_orders, is_agent, is_bonus, is_making_parent_invoices', 'default', 'setOnEmpty' => true, 'value' => null),
+			array('passport_issue_date, birth_date', 'safe'),
+			array('parent_id, user_id, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, taking_orders, is_agent, is_bonus, is_making_parent_invoices, require_password_change', 'default', 'setOnEmpty' => true, 'value' => null),
             array('passport_issue_date','date','format'=>'dd.MM.yyyy'),
             array('birth_date','date','format'=>'dd.MM.yyyy'),
-			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, taking_orders, is_agent, is_bonus, is_making_parent_invoices', 'safe', 'on'=>'search'),
+			array('id, parent_id, user_id, name, surname, middle_name, phone_1, phone_2, phone_3, city, email, skype, icq, passport_series, passport_number, passport_issue_date, passport_issuer, birth_date, birth_place, registration_address, taking_orders, is_agent, is_bonus, is_making_parent_invoices, require_password_change', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -131,6 +133,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 			'is_agent' => Yii::t('app', 'Is Agent'),
 			'is_bonus' => Yii::t('app', 'Is Bonus'),
 			'is_making_parent_invoices' => Yii::t('app', 'Is Making Parent Invoices'),
+			'require_password_change' => Yii::t('app', 'Require Password Change'),
 			'acts' => null,
 			'user' => null,
 			'parent' => null,
@@ -174,6 +177,7 @@ abstract class BaseAgent extends BaseGxActiveRecord {
 		$criteria->compare('is_agent', $this->is_agent);
 		$criteria->compare('is_bonus', $this->is_bonus);
 		$criteria->compare('is_making_parent_invoices', $this->is_making_parent_invoices);
+		$criteria->compare('require_password_change', $this->require_password_change);
 
 		$dataProvider=new CActiveDataProvider($this, array(
 			'criteria' => $criteria,
