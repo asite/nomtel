@@ -14,8 +14,27 @@ class MegafonBalanceEmailImporter
         return false;
     }
 
+    private function convertTextForParsing($text) {
+        // decode hex characters
+        $text=preg_replace_callback('/=([0-9a-fA-F]{2})/',function($m){return chr(hexdec($m[1]));},$text);
+
+        // delete = at string end
+        $text=preg_replace('/=[\n\r]+/','',$text);
+
+        // delete body and html tags
+        $text=preg_replace('%^.*<body>(.*)</body>.*%s','$1',$text);
+
+        // covert text to utf 8
+        $text=mb_convert_encoding($text,'UTF-8','WINDOWS-1251');
+
+        // decode html entities
+        $text=html_entity_decode($text,ENT_COMPAT | ENT_HTML401,'UTF-8');
+
+        return $text;
+    }
+
     private function parse($mail) {
-        $mail=mb_convert_encoding($mail,'UTF-8','WINDOWS-1251');
+        $mail=$this->convertTextForParsing($mail);
 
         Yii::log("parse mail\n".$mail,CLogger::LEVEL_INFO,'mail_parser');
 
