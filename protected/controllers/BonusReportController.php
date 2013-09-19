@@ -5,7 +5,7 @@ class BonusReportController extends BaseGxController
     public function filters()
     {
         return array_merge(parent::filters(), array(
-            array('LoggingFilter +load')
+            array('LoggingFilter +load +download')
         ));
     }
 
@@ -14,6 +14,138 @@ class BonusReportController extends BaseGxController
         return array(
             array('allow', 'actions' => array('list', 'view'), 'roles' => array('agent')),
         );
+    }
+
+    public function actionDownload($id,$agent_id) {
+        $bonusReport=BonusReport::model()->findByPk($id);
+        $agent=Agent::model()->findByPk($agent_id);
+
+        if (!$bonusReport || !$agent) throw new CHttpException(404);
+
+        $numbers=Yii::app()->db->createCommand("
+            select n.number,t.title as tariff,brn.turnover,brn.sum
+            from bonus_report_number brn
+            join number n on (n.id=brn.number_id)
+            join sim s on (s.id=n.sim_id)
+            join tariff t on (t.id=s.tariff_id)
+            where brn.bonus_report_id=:id and brn.parent_agent_id=:agent_id
+        ")->queryAll(true,array('id'=>$id,'agent_id'=>$agent_id));
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->setActiveSheetIndex(0);
+        $sheet=$objPHPExcel->getActiveSheet();
+
+        $sheet->getColumnDimension('A')->setWidth(15);
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(22);
+
+
+        $sheet->SetCellValue('A1', "Отчет по вознаграждению '{$bonusReport->comment}'");
+        $sheet->getStyle('A1')->getFont()->applyFromArray(array('size'=>20,'bold'=>true));
+        $sheet->getRowDimension(1)->setRowHeight(30);
+
+        $sheet->SetCellValue('A2', "Aгент");
+        $sheet->getStyle('A2')->getFont()->applyFromArray(array('bold'=>true,'italic'=>true));
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->SetCellValue('B2', strval($agent));
+        $sheet->getStyle('B2')->getFont()->applyFromArray(array('italic'=>true));
+
+        $sheet->SetCellValue('A5', "Номера с вознаграждением");
+        $sheet->getStyle('A5')->getFont()->applyFromArray(array('size'=>20,'bold'=>true));
+        $sheet->getRowDimension(5)->setRowHeight(30);
+
+        $sheet->SetCellValue('A6', "Номер");
+        $sheet->SetCellValue('B6', "Тариф");
+        $sheet->SetCellValue('C6', "Оборот (руб)");
+        $sheet->SetCellValue('D6', "Доход агента (руб)");
+
+        $sheet->getStyle("A6:D6")->getFont()->setBold(true);
+
+        $start_row=6;
+        $row=7;
+        $turnover_total=0;
+        $sum_total=0;
+        $count=0;
+        foreach($numbers as $number)
+            if ($number['sum']>0) {
+                $sheet->SetCellValue("A$row", $number['number']);
+                $sheet->SetCellValue("B$row", $number['tariff']);
+                $sheet->SetCellValue("C$row", floatval($number['turnover']));
+                $sheet->SetCellValue("D$row", floatval($number['sum']));
+
+                $count++;
+                $sum_total+=$number['sum'];
+                $turnover_total+=$number['turnover'];
+                $row++;
+            }
+
+        $sheet->SetCellValue("A$row", 'ИТОГО:');
+        $sheet->SetCellValue("B$row", 'Количество номеров (шт):');
+        $sheet->SetCellValue("C$row", "Оборот (руб)");
+        $sheet->SetCellValue("D$row", "Вознаграждение (руб)");
+
+        $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+
+        $row++;
+        $sheet->SetCellValue("A$row", '');
+        $sheet->SetCellValue("B$row", $count);
+        $sheet->SetCellValue("C$row", $turnover_total);
+        $sheet->SetCellValue("D$row", $sum_total);
+
+        $sheet->getStyle("A$start_row:D$row")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+
+        $row+=2;
+        $sheet->SetCellValue("A$row", "Номера без вознаграждения");
+        $sheet->getStyle("A$row")->getFont()->applyFromArray(array('size'=>20,'bold'=>true));
+        $sheet->getRowDimension($row)->setRowHeight(30);
+
+        $row++;
+        $sheet->SetCellValue("A$row", "Номер");
+        $sheet->SetCellValue("B$row", "Тариф");
+        $sheet->SetCellValue("C$row", "Оборот (руб)");
+        $sheet->SetCellValue("D$row", "Доход агента (руб)");
+        $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+
+        $start_row=$row;
+        $row++;
+        $turnover_total=0;
+        $sum_total=0;
+        $count=0;
+        foreach($numbers as $number)
+            if ($number['sum']==0) {
+                $sheet->SetCellValue("A$row", $number['number']);
+                $sheet->SetCellValue("B$row", $number['tariff']);
+                $sheet->SetCellValue("C$row", floatval($number['turnover']));
+                $sheet->SetCellValue("D$row", floatval($number['sum']));
+
+                $count++;
+                $sum_total+=$number['sum'];
+                $turnover_total+=$number['turnover'];
+                $row++;
+            }
+
+        $sheet->SetCellValue("A$row", 'ИТОГО:');
+        $sheet->SetCellValue("B$row", 'Количество номеров (шт):');
+        $sheet->SetCellValue("C$row", "Оборот (руб)");
+        $sheet->SetCellValue("D$row", "Вознаграждение (руб)");
+        $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+
+        $row++;
+        $sheet->SetCellValue("A$row", '');
+        $sheet->SetCellValue("B$row", $count);
+        $sheet->SetCellValue("C$row", $turnover_total);
+        $sheet->SetCellValue("D$row", $sum_total);
+        $sheet->getStyle("A$start_row:D$row")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+
+        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+
+        header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Pragma: private');
+        header("Content-Disposition: attachment; filename=\"bonus_report_{$id}_{$agent_id}.xlsx\"");
+        $objWriter->save('php://output');
+
+        exit;
     }
 
     public function actionDelete($id)
