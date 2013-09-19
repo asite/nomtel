@@ -14,9 +14,13 @@ class MegafonBalanceEmailImporter
         return false;
     }
 
+    public static function convertTextForParsingHelper($m) {
+	return chr(hexdec($m[1]));
+    }
+    
     private function convertTextForParsing($text) {
         // decode hex characters
-        $text=preg_replace_callback('/=([0-9a-fA-F]{2})/',function($m){return chr(hexdec($m[1]));},$text);
+        $text=preg_replace_callback('/=([0-9a-fA-F]{2})/',array('MegafonBalanceEmailImporter','convertTextForParsingHelper'),$text);
 
         // delete = at string end
         $text=preg_replace('/=[\n\r]+/','',$text);
