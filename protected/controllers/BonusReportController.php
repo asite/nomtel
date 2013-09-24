@@ -351,7 +351,10 @@ class BonusReportController extends BaseGxController
         // so, we must check for duplicates
         $processedSims=array();
         foreach ($simAgent as $v) {
-            if ($processedSims[$v['sim_id']]) continue;
+            if ($processedSims[$v['sim_id']]) {
+                $this->errorInvalidFormat(__LINE__." duplicate found '{$v['sim_id']}'");
+            }
+
             $processedSims[$v['sim_id']]=true;
 
             $bonus = $this->roundSum($simBonus[$v['sim_id']]);
@@ -394,7 +397,6 @@ class BonusReportController extends BaseGxController
         $bonusReportAgent->payment_id = $payment->id;
 
         foreach ($agentsBonuses as $agent_id => $data) {
-            $sum = $this->roundSum($data['sum'] - $data['sum_referrals']);
 
             unset($bonusReportAgent->id);
             $bonusReportAgent->isNewRecord = true;
@@ -468,7 +470,8 @@ class BonusReportController extends BaseGxController
             if ($ctn == '') continue;
             if (!preg_match('%^\d{10}$%', $ctn)) $this->errorInvalidFormat(__LINE__ . " $row '$ctn'");
 
-            $simBonus[$ctn] = $bonus;
+            if ($simBonus[$ctn]>0) echo "$ctn ";
+            $simBonus[$ctn] += $bonus;
         }
 
         $book->disconnectWorksheets();
@@ -484,7 +487,7 @@ class BonusReportController extends BaseGxController
         // get agents, to which bonused sims was sent
         $simAgent = $db->createCommand("select number as sim_id,parent_agent_id as agent_id
             from sim
-            where operator_id=" . Operator::OPERATOR_BEELINE_ID .
+            where is_active=1 and operator_id=" . Operator::OPERATOR_BEELINE_ID .
             " and parent_agent_id is not null and agent_id is null and number in (" .
             implode(',', $numbers) . ") order by sim.id desc")->queryAll();
 
@@ -534,7 +537,7 @@ class BonusReportController extends BaseGxController
             if ($ctn == 'Итого:') break;
             if (!preg_match('%^\d{7,8}$%', $ctn)) $this->errorInvalidFormat(__LINE__ . " $row '$ctn'");
 
-            $simBonus[$ctn] = $bonus;
+            $simBonus[$ctn] += $bonus;
         }
 
         $book->disconnectWorksheets();
@@ -550,7 +553,7 @@ class BonusReportController extends BaseGxController
         // get agents, to which bonused sims was sent
         $simAgent = $db->createCommand("select personal_account as sim_id,IF(tariff_id=".Tariff::TARIFF_TERRITORY_ID.",1,parent_agent_id) as agent_id
             from sim
-            where operator_id=" . Operator::OPERATOR_MEGAFON_ID . " and agent_id is null and personal_account in (" .
+            where is_active=1 and operator_id=" . Operator::OPERATOR_MEGAFON_ID . " and agent_id is null and personal_account in (" .
             implode(',', $personal_accounts) . ")".
             " and tariff_id!=".Tariff::TARIFF_TERRITORY_ID.
             " order by sim.id desc")->queryAll();
