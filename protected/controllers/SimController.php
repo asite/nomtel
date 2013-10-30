@@ -29,10 +29,10 @@ class SimController extends BaseGxController {
         $activeTabs = array('tab1' => false, 'tab2' => false,'tab3' => false);
         $model = new Sim;
 
-        $companyListArray = Company::getDropDownList();
-        $regionListArray = OperatorRegion::getDropDownList();
-        $tariffListArray = Tariff::getDropDownList();
-        $agentListArray = array('0'=>'БАЗА')+Agent::getComboList();
+        //$companyListArray = Company::getDropDownList();
+        //$regionListArray = OperatorRegion::getDropDownList();
+        //$tariffListArray = Tariff::getDropDownList();
+        //$agentListArray = array('0'=>'БАЗА')+Agent::getComboList();
 
         if (isset($_POST['Sim'])) {
             $model->setAttributes($_POST['Sim']);
@@ -40,16 +40,16 @@ class SimController extends BaseGxController {
             $data = $_POST['Sim'];
         }
 
+        $existingNumber = array();
 
         if (isset($_FILES['Delivery']) && $_FILES['Delivery']) {
             $sims = array();
             $transaction = Yii::app()->db->beginTransaction();
             $i = 0;
-            for ($f = 1; $f <= count($_FILES['Delivery']['tmp_name']['fileField']); $f++) {
-                $file = $_FILES['Delivery']['tmp_name']['fileField'][$f];
-                $file_name = $_FILES['Delivery']['name']['fileField'][$f];
+            for ($fc = 1; $fc <= count($_FILES['Delivery']['tmp_name']['fileField']); $fc++) {
+                $file = $_FILES['Delivery']['tmp_name']['fileField'][$fc];
+                $file_name = $_FILES['Delivery']['name']['fileField'][$fc];
                 if ($file) {
-
                     // add bilain sim
                     if ($_POST['Sim']['operator_id'] == Operator::OPERATOR_BEELINE_ID) {
                         $activeTabs['tab1'] = true;
@@ -61,27 +61,24 @@ class SimController extends BaseGxController {
                             $text = preg_replace('/(\s){2,}/', "$1", $text);
                             $sim = explode(" ", $text);
 
-                            if (!isset($sim[2])) $sim[2] = '';
-
-                            if ($sim[0] && $sim[1]) {
+                            if ($sim[0] && $sim[1] && $sim[2]) {
                                 $model = new Sim;
                                 $model->setAttributes($data);
+                                $model->agent_id = NULL;
+                                $model->parent_agent_id = adminAgentId();
                                 $model->number_price = 0;
                                 $model->personal_account = $sim[0];
                                 $model->icc = $sim[1];
                                 $model->number = $sim[2];
-                                //print_r($model->countByAttributes(array('icc'=>$sim[1],'number'=>$sim[2]))); exit;
-                                //try {
-                                if ($model->countByAttributes(array('number' => $sim[2])) == 0) {
+                                if ($model->countByAttributes(array('number'=>$sim[2])) == 0) {
                                     $model->save();
                                     $model->parent_id = $model->id;
                                     $model->save();
-                                    $sims[$i]['id'] = $model->id;
-                                    $sims[$i]['personal_account'] = $sim[0];
-                                    $sims[$i]['icc'] = $sim[1];
-                                    $sims[$i++]['number'] = $sim[2];
-                                }
-                                //} catch(Exception $e) {}
+
+                                    Number::addNumber($model);
+
+                                    $sims[$i++] = array('id'=>$model->id, 'personal_account'=>$sim[0], 'icc'=>$sim[1], 'number'=>$sim[2]);
+                                } else $existingNumber[]=$sim[2];
                             }
                         }
 
@@ -91,10 +88,8 @@ class SimController extends BaseGxController {
                         Yii::import('application.vendors.PHPExcel', true);
                         if (preg_match('%\.xls$%', $file_name)) {
                             $objReader = new PHPExcel_Reader_Excel5;
-                            $file_type = 'xls';
                         } elseif (preg_match('%\.xlsx$%', $file_name)) {
                             $objReader = new PHPExcel_Reader_Excel2007;
-                            $file_type = 'xlsx';
                         } else die('error');
                         $objPHPExcel = $objReader->load(@$file);
                         $objWorksheet = $objPHPExcel->getActiveSheet();
@@ -103,13 +98,7 @@ class SimController extends BaseGxController {
                         $highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
 
                         $sim = $ids = array();
-                        $sim_count = 0;
                         for ($row = 1; $row <= $highestRow; $row++) {
-                            /*for ($col = 0; $col <= $highestColumnIndex; ++$col) {
-                                $info = $objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
-                                if ($col == 0 && $info != '') $sim[0] = $info;
-                                if (preg_match('%- (\d{10})$%', $info, $matches)) $sim[1] = $matches[1];
-                            }*/
                             $sim[0] = $objWorksheet->getCellByColumnAndRow(0, $row)->getValue();
                             $sim[1] = $objWorksheet->getCellByColumnAndRow(1, $row)->getValue();
                             $sim[2] = $objWorksheet->getCellByColumnAndRow(2, $row)->getValue();
@@ -122,27 +111,19 @@ class SimController extends BaseGxController {
                                 $model->personal_account = $sim[0];
                                 $model->number = $sim[1];
                                 $model->icc = $sim[2];
-                                //try {
-
                                 if ($model->countByAttributes(array('number' => $sim[1])) == 0) {
                                     $model->save();
                                     $model->parent_id = $model->id;
                                     $model->save();
-                                    $sim_count++;
 
                                     Number::addNumber($model);
 
-                                    $sims[$i]['id'] = $model->id;
-                                    $sims[$i]['personal_account'] = $sim[0];
-                                    $sims[$i]['icc'] = $sim[2];
-                                    $sims[$i++]['number'] = $sim[1];
-                                    $ids[$model->id]=$model->id;
-                                    //} catch(Exception $e) { }
-                                }
+                                    $sims[$i++] = array('id'=>$model->id, 'personal_account'=>$sim[0], 'icc'=>$sim[2], 'number'=>$sim[1]);
+                                } else $existingNumber[]=$sim[1];
                             }
                         }
 
-                        if ($data['agent_id']) {
+                        /*if ($data['agent_id']) {
 
                             $transaction->commit();
 
@@ -150,11 +131,14 @@ class SimController extends BaseGxController {
                             $key=$sessionData->add($ids);
 
                             $this->redirect(array('move', 'key' => $key));
-                        }
+                        }*/
                     }
                 }
             }
             $transaction->commit();
+
+            if (!empty($existingNumber)) Yii::app()->user->setFlash('warning', 'Данные номера уже были добавлены ранее: '.implode('; ',$existingNumber));
+
             Yii::app()->user->setFlash('act', serialize($sims));
             Yii::app()->user->setFlash('activeTabs', serialize($activeTabs));
             $this->refresh();
@@ -164,10 +148,10 @@ class SimController extends BaseGxController {
         $this->render('delivery', array(
             'model' => $model,
             'activeTabs' => $activeTabs,
-            'company' => $companyListArray,
-            'regionList' => $regionListArray,
-            'tariffList' => $tariffListArray,
-            'agentList' => $agentListArray,
+            //'company' => $companyListArray,
+            //'regionList' => $regionListArray,
+            //'tariffList' => $tariffListArray,
+            //'agentList' => $agentListArray,
         ));
     }
 

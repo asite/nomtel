@@ -22,7 +22,7 @@
         if (isKrylow()) {
             $menuLeft=array_merge($menuLeft,array(
                 array('label' => Yii::t('app', 'addAct'), 'url' => $this->createUrl('sim/delivery'), 'active' => $this->route == 'sim/delivery'),
-                array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
+                //array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
             ));
         }
         $menuLeft=array_merge($menuLeft,array(
@@ -131,7 +131,7 @@
             array('label' => Yii::t('app', 'My Profile'), 'url' => $this->createUrl('agent/update', array('id' => loggedAgentId())), 'active' => Yii::app()->request->url == $this->createUrl('agent/update', array('id' => loggedAgentId()))),
             array('label' => Yii::t('app', 'MenuSim'), 'itemOptions' => array('class' => 'nav-header')),
             array('label' => Yii::t('app', 'addAct'), 'url' => $this->createUrl('sim/delivery'), 'active' => $this->route == 'sim/delivery'),
-            array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
+            //array('label' => Yii::t('app', 'addSim'), 'url' => $this->createUrl('sim/add'), 'active' => $this->route == 'sim/add'),
             array('label' => BlankSim::label(2), 'url' => $this->createUrl('blankSim/admin'), 'active' => $this->id=='blankSim'),
             array('label' => 'Баланс кассы', 'url' => $this->createUrl('cashier/stats'), 'active' => $this->id=='cashier/stats'),
             array('label' => Yii::t('app','Mass change'), 'url' => $this->createUrl('number/massChange'), 'active' => $this->route=='number/massChange'),

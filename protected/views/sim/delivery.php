@@ -40,6 +40,7 @@ $this->breadcrumbs = array(
 ?>
 
 <?php ob_start(); ?>
+<div class="delivery_help">Для загрузки накладной файлы должны иметь следующую <a target="_blank" href="/static/beeline_example.png">структуру</a>.</div>
 
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
   'id' => 'add-bilain',
@@ -66,12 +67,14 @@ $this->breadcrumbs = array(
   </div>
 </div>
 
+<?php /* ?>
 <div>
   <?php echo $form->dropDownListRow($model, 'company_id', $company); ?>
 </div>
 <div>
   <?php echo $form->dropDownListRow($model, 'operator_region_id', $regionList[1]); ?>
 </div>
+<?php */ ?>
 <br/><br/>
 
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'AddDelivery'), array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
@@ -110,7 +113,7 @@ $this->breadcrumbs = array(
 <?php $tab1 = ob_get_contents();  ob_end_clean(); ?>
 
 <?php ob_start(); ?>
-<div class="delivery_help">Формат ввода: 1 столбец - личный номер; 2 столбец - номер телефона; 3 столбец - ICC</div>
+<div class="delivery_help">Для загрузки накладной файлы должны иметь следующую <a target="_blank" href="">структуру</a>.</div>
 <?php $form = $this->beginWidget('BaseTbActiveForm', array(
   'id' => 'add-megafon',
     'type' => 'horizontal',
@@ -135,7 +138,7 @@ $this->breadcrumbs = array(
     </div>
   </div>
 </div>
-
+<?php /* ?>
 <div>
   <?php echo $form->dropDownListRow($model, 'company_id', $company); ?>
 </div>
@@ -158,6 +161,7 @@ $this->breadcrumbs = array(
     </div>
   </div>
 </div>
+<?php */ ?>
 <br/><br/>
 
 <?php echo CHtml::htmlButton('<i class="icon-ok icon-white"></i> '.Yii::t('app', 'AddDelivery'), array('class'=>'btn btn-primary', 'type'=>'submit')); ?>
