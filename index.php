@@ -32,6 +32,9 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', false);
         $config = 'server_web_asite_production.php';
         break;
+        
+        
+     
 
     case 'www.500099.ru':
     case '500099.ru':
@@ -54,18 +57,20 @@ switch ($_SERVER['SERVER_NAME']) {
         define('YII_DEBUG', true);
         $config = 'server_web_asite_development.php';
         break;
-        
     case 'valvit.ru':
         define('LANGUAGE', 'ru');
-
+        define('TIMEZONE', 'Asia/Yeakaterinburg');
         define('YII_DEBUG', false);
         $config = 'server_web_asite2_production.php';
         break;
-
-
+    case '061211.ru':
+      define('LANGUAGE', 'ru');
+        define('TIMEZONE', 'Europe/Moscow');
+        define('YII_DEBUG', true);
+        $config = 'server_web_asite3_production.php';
+       break;
     default:
-        die('unknown domain name');
-        break;
+	die('unknown hostname');
 }
 
 // include main yii file

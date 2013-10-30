@@ -38,6 +38,12 @@ $this->breadcrumbs = array(
         array(
             'name'=>'sum',
             'htmlOptions' => array('style'=>'text-align:center;'),
+        ),
+        array(
+            'header'=>'',
+            'htmlOptions' => array('style'=>'text-align:center;'),
+            'type'=>'html',
+            'value'=>'CHtml::link("Отчет",Yii::app()->controller->createUrl("bonusReport/download",array("id"=>$data->bonus_report_id,"agent_id"=>$data->agent_id)))'
         )
     ),
 )); ?>

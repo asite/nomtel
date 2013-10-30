@@ -37,9 +37,16 @@ switch (gethostname()) {
     if(strpos(dirname(__FILE__), 'dev')) $base_config_name = 'server_console_asite_development.php';
         break;
         
-    
+    case 'www.valvit.ru':
+        $base_config_name = 'server_web_asite2_production.php';
+        break;
+
+    case 'www.061211.ru':
+	date_default_timezone_set('Europe/Moscow');
+        $base_config_name = 'server_web_asite3_production.php';
+	break;    
     default:
-         $base_config_name = 'server_web_asite2_production.php';
+         die('unknown domain name');
 }
 
 return CMap::mergeArray($common_config, include($base_config_name));

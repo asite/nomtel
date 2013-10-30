@@ -5,7 +5,7 @@ class BonusReportController extends BaseGxController
     public function filters()
     {
         return array_merge(parent::filters(), array(
-            array('LoggingFilter +load')
+            array('LoggingFilter +load +download')
         ));
     }
 
@@ -14,6 +14,138 @@ class BonusReportController extends BaseGxController
         return array(
             array('allow', 'actions' => array('list', 'view'), 'roles' => array('agent')),
         );
+    }
+
+    public function actionDownload($id,$agent_id) {
+        $bonusReport=BonusReport::model()->findByPk($id);
+        $agent=Agent::model()->findByPk($agent_id);
+
+        if (!$bonusReport || !$agent) throw new CHttpException(404);
+
+        $numbers=Yii::app()->db->createCommand("
+            select n.number,t.title as tariff,brn.turnover,brn.sum
+            from bonus_report_number brn
+            join number n on (n.id=brn.number_id)
+            join sim s on (s.id=n.sim_id)
+            join tariff t on (t.id=s.tariff_id)
+            where brn.bonus_report_id=:id and brn.parent_agent_id=:agent_id
+        ")->queryAll(true,array('id'=>$id,'agent_id'=>$agent_id));
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->setActiveSheetIndex(0);
+        $sheet=$objPHPExcel->getActiveSheet();
+
+        $sheet->getColumnDimension('A')->setWidth(15);
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(22);
+
+
+        $sheet->SetCellValue('A1', "Отчет по вознаграждению '{$bonusReport->comment}'");
+        $sheet->getStyle('A1')->getFont()->applyFromArray(array('size'=>20,'bold'=>true));
+        $sheet->getRowDimension(1)->setRowHeight(30);
+
+        $sheet->SetCellValue('A2', "Aгент");
+        $sheet->getStyle('A2')->getFont()->applyFromArray(array('bold'=>true,'italic'=>true));
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $sheet->SetCellValue('B2', strval($agent));
+        $sheet->getStyle('B2')->getFont()->applyFromArray(array('italic'=>true));
+
+        $sheet->SetCellValue('A5', "Номера с вознаграждением");
+        $sheet->getStyle('A5')->getFont()->applyFromArray(array('size'=>20,'bold'=>true));
+        $sheet->getRowDimension(5)->setRowHeight(30);
+
+        $sheet->SetCellValue('A6', "Номер");
+        $sheet->SetCellValue('B6', "Тариф");
+        $sheet->SetCellValue('C6', "Оборот (руб)");
+        $sheet->SetCellValue('D6', "Доход агента (руб)");
+
+        $sheet->getStyle("A6:D6")->getFont()->setBold(true);
+
+        $start_row=6;
+        $row=7;
+        $turnover_total=0;
+        $sum_total=0;
+        $count=0;
+        foreach($numbers as $number)
+            if ($number['sum']>0) {
+                $sheet->SetCellValue("A$row", $number['number']);
+                $sheet->SetCellValue("B$row", $number['tariff']);
+                $sheet->SetCellValue("C$row", floatval($number['turnover']));
+                $sheet->SetCellValue("D$row", floatval($number['sum']));
+
+                $count++;
+                $sum_total+=$number['sum'];
+                $turnover_total+=$number['turnover'];
+                $row++;
+            }
+
+        $sheet->SetCellValue("A$row", 'ИТОГО:');
+        $sheet->SetCellValue("B$row", 'Количество номеров (шт):');
+        $sheet->SetCellValue("C$row", "Оборот (руб)");
+        $sheet->SetCellValue("D$row", "Вознаграждение (руб)");
+
+        $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+
+        $row++;
+        $sheet->SetCellValue("A$row", '');
+        $sheet->SetCellValue("B$row", $count);
+        $sheet->SetCellValue("C$row", $turnover_total);
+        $sheet->SetCellValue("D$row", $sum_total);
+
+        $sheet->getStyle("A$start_row:D$row")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+
+        $row+=2;
+        $sheet->SetCellValue("A$row", "Номера без вознаграждения");
+        $sheet->getStyle("A$row")->getFont()->applyFromArray(array('size'=>20,'bold'=>true));
+        $sheet->getRowDimension($row)->setRowHeight(30);
+
+        $row++;
+        $sheet->SetCellValue("A$row", "Номер");
+        $sheet->SetCellValue("B$row", "Тариф");
+        $sheet->SetCellValue("C$row", "Оборот (руб)");
+        $sheet->SetCellValue("D$row", "Доход агента (руб)");
+        $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+
+        $start_row=$row;
+        $row++;
+        $turnover_total=0;
+        $sum_total=0;
+        $count=0;
+        foreach($numbers as $number)
+            if ($number['sum']==0) {
+                $sheet->SetCellValue("A$row", $number['number']);
+                $sheet->SetCellValue("B$row", $number['tariff']);
+                $sheet->SetCellValue("C$row", floatval($number['turnover']));
+                $sheet->SetCellValue("D$row", floatval($number['sum']));
+
+                $count++;
+                $sum_total+=$number['sum'];
+                $turnover_total+=$number['turnover'];
+                $row++;
+            }
+
+        $sheet->SetCellValue("A$row", 'ИТОГО:');
+        $sheet->SetCellValue("B$row", 'Количество номеров (шт):');
+        $sheet->SetCellValue("C$row", "Оборот (руб)");
+        $sheet->SetCellValue("D$row", "Вознаграждение (руб)");
+        $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
+
+        $row++;
+        $sheet->SetCellValue("A$row", '');
+        $sheet->SetCellValue("B$row", $count);
+        $sheet->SetCellValue("C$row", $turnover_total);
+        $sheet->SetCellValue("D$row", $sum_total);
+        $sheet->getStyle("A$start_row:D$row")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+
+        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+
+        header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Pragma: private');
+        header("Content-Disposition: attachment; filename=\"bonus_report_{$id}_{$agent_id}.xlsx\"");
+        $objWriter->save('php://output');
+
+        exit;
     }
 
     public function actionDelete($id)
@@ -219,7 +351,10 @@ class BonusReportController extends BaseGxController
         // so, we must check for duplicates
         $processedSims=array();
         foreach ($simAgent as $v) {
-            if ($processedSims[$v['sim_id']]) continue;
+            if ($processedSims[$v['sim_id']]) {
+                $this->errorInvalidFormat(__LINE__." duplicate found '{$v['sim_id']}'");
+            }
+
             $processedSims[$v['sim_id']]=true;
 
             $bonus = $this->roundSum($simBonus[$v['sim_id']]);
@@ -262,7 +397,6 @@ class BonusReportController extends BaseGxController
         $bonusReportAgent->payment_id = $payment->id;
 
         foreach ($agentsBonuses as $agent_id => $data) {
-            $sum = $this->roundSum($data['sum'] - $data['sum_referrals']);
 
             unset($bonusReportAgent->id);
             $bonusReportAgent->isNewRecord = true;
@@ -320,10 +454,10 @@ class BonusReportController extends BaseGxController
 
         $rows = $sheet->getHighestRow();
 
-        if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
+       /* if ($sheet->getCellByColumnAndRow(12, 5)->getValue() != 'Номер CTN')
             $this->errorInvalidFormat(__LINE__);
         if ($sheet->getCellByColumnAndRow(30, 5)->getValue() != 'Выручка для расчёта вознаграждения без учёта НДС, руб.')
-            $this->errorInvalidFormat(__LINE__);
+            $this->errorInvalidFormat(__LINE__);*/
 
         $simBonus = array();
         $sum = 0;
@@ -336,7 +470,8 @@ class BonusReportController extends BaseGxController
             if ($ctn == '') continue;
             if (!preg_match('%^\d{10}$%', $ctn)) $this->errorInvalidFormat(__LINE__ . " $row '$ctn'");
 
-            $simBonus[$ctn] = $bonus;
+            if ($simBonus[$ctn]>0) echo "$ctn ";
+            $simBonus[$ctn] += $bonus;
         }
 
         $book->disconnectWorksheets();
@@ -352,7 +487,7 @@ class BonusReportController extends BaseGxController
         // get agents, to which bonused sims was sent
         $simAgent = $db->createCommand("select number as sim_id,parent_agent_id as agent_id
             from sim
-            where operator_id=" . Operator::OPERATOR_BEELINE_ID .
+            where is_active=1 and operator_id=" . Operator::OPERATOR_BEELINE_ID .
             " and parent_agent_id is not null and agent_id is null and number in (" .
             implode(',', $numbers) . ") order by sim.id desc")->queryAll();
 
@@ -402,7 +537,7 @@ class BonusReportController extends BaseGxController
             if ($ctn == 'Итого:') break;
             if (!preg_match('%^\d{7,8}$%', $ctn)) $this->errorInvalidFormat(__LINE__ . " $row '$ctn'");
 
-            $simBonus[$ctn] = $bonus;
+            $simBonus[$ctn] += $bonus;
         }
 
         $book->disconnectWorksheets();
@@ -418,7 +553,7 @@ class BonusReportController extends BaseGxController
         // get agents, to which bonused sims was sent
         $simAgent = $db->createCommand("select personal_account as sim_id,IF(tariff_id=".Tariff::TARIFF_TERRITORY_ID.",1,parent_agent_id) as agent_id
             from sim
-            where operator_id=" . Operator::OPERATOR_MEGAFON_ID . " and agent_id is null and personal_account in (" .
+            where is_active=1 and operator_id=" . Operator::OPERATOR_MEGAFON_ID . " and agent_id is null and personal_account in (" .
             implode(',', $personal_accounts) . ")".
             " and tariff_id!=".Tariff::TARIFF_TERRITORY_ID.
             " order by sim.id desc")->queryAll();

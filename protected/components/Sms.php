@@ -10,7 +10,7 @@ class Sms
 
         $number=urlencode($number);
         $message=urlencode($message);
-        file_get_contents("http://api.infosmska.ru/interfaces/SendMessages.ashx?login=ghz&pwd=zerozz&phones=7$number&sender=nomtel&message=$message");
+        file_get_contents("http://api.infosmska.ru/interfaces/SendMessages.ashx?login=ghz&pwd=zerozz&phones=7$number&sender=valvit&message=$message");
 
     }
 }

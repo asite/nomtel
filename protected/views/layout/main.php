@@ -247,5 +247,8 @@ var s = document.createElement('script'); s.type = 'text/javascript'; s.async = 
 <!-- /Yandex.Metrika counter -->
 
 <?}?>
+
+<?php include('jivo.php');?>
+
 </body>
 </html>

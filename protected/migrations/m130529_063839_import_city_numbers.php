@@ -16,7 +16,7 @@ class m130529_063839_import_city_numbers extends CDbMigration
 
     public function safeUp()
     {
-    	//$this->execute("ALTER TABLE `number` ADD `number_city` varchar(50) COLLATE 'utf8_general_ci' NULL COMMENT 'городской номер' AFTER `number`, COMMENT='Хранит данные по номеру';");
+    	$this->execute("ALTER TABLE `number` ADD `number_city` varchar(50) COLLATE 'utf8_general_ci' NULL COMMENT 'городской номер' AFTER `number`, COMMENT='Хранит данные по номеру';");
 
         $csv=$this->readCSV(dirname(__FILE__).'/m130529_063839_import_city_numbers.csv');
 
