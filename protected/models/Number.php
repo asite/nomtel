@@ -212,12 +212,12 @@ class Number extends BaseNumber
         return $labels;
     }
 
-    public function getSupportSMSStatusLabel($status) {
+    public static function getSupportSMSStatusLabel($status) {
         $labels=self::getSupportSMSStatusLabels();
         return $labels[$status];
     }
 
-    public function getStatusLabel($status) {
+    public static function getStatusLabel($status) {
         $labels=self::getStatusLabels();
         return $labels[$status];
     }
@@ -245,7 +245,7 @@ class Number extends BaseNumber
         return $labels;
     }
 
-    public function getSupportStatusLabel($status) {
+    public static function getSupportStatusLabel($status) {
         $labels=self::getSupportStatusLabels();
         return $labels[$status];
     }
@@ -271,7 +271,7 @@ class Number extends BaseNumber
         return $labels;
     }
 
-    public function getBalanceStatusLabel($status) {
+    public static function getBalanceStatusLabel($status) {
         $labels=self::getBalanceStatusLabels();
         return $labels[$status];
     }

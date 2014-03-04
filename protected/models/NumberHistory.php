@@ -91,7 +91,7 @@ class NumberHistory extends BaseNumberHistory
             return '"'.CHtml::encode($model).'"';
     }
 
-    public function replaceShortcutsByLinks($str='') {
+    public static function replaceShortcutsByLinks($str='') {
         return preg_replace_callback("%{([a-zA-Z0-9]+):(\d+)}%",'NumberHistory::parseStr',$str);
     }
 }

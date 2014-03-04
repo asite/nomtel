@@ -8,7 +8,7 @@ $this->breadcrumbs = array(
 
 <h1><?php echo GxHtml::encode($model->label(2)); ?></h1>
 
-<? $this->widget('bootstrap.widgets.TbButton',array('url'=>$this->createUrl("downloadUnrestoredSummary"),'label'=>'Скачать отчет о невосстановленных номерах (кроме последнего отосланного отчета)'))?>
+<?php $this->widget('bootstrap.widgets.TbButton',array('url'=>$this->createUrl("downloadUnrestoredSummary"),'label'=>'Скачать отчет о невосстановленных номерах (кроме последнего отосланного отчета)'))?>
 
 <?php /*
 <a class="btn" style="margin-bottom:10px;" href="<?php echo $this->createUrl('create') ?>"><?php echo Yii::t('app', 'Create') ?></a>

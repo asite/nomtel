@@ -211,7 +211,7 @@
 </div>
 </div>
 </div>
-<?  if (Yii::app()->user->role == 'number') {?>
+<?php  if (Yii::app()->user->role == 'number') {?>
 <!-- BEGIN JIVOSITE CODE {literal} -->
 <script type='text/javascript'>
 (function(){ var widget_id = '42083';
@@ -246,7 +246,7 @@ var s = document.createElement('script'); s.type = 'text/javascript'; s.async = 
 <noscript><div><img src="//mc.yandex.ru/watch/20314267" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->
 
-<?}?>
+<?php } ?>
 
 <?php include('jivo.php');?>
 

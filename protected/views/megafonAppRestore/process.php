@@ -43,7 +43,7 @@ $this->breadcrumbs = array(
     }
 </script>
 
-<?=$form->select2Row($processModel,'number',null,array('asDropDownList'=>false,'options'=>array(
+<?=$form->select2Row($processModel,'number',array('asDropDownList'=>false,'options'=>array(
     'placeholder'=>'Поиск номера',
     'minimumInputLength'=>3,
     'formatNoMatches'=>'js:function(term){return "Совпадений нет";}',

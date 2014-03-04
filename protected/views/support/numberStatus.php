@@ -269,4 +269,4 @@ $this->widget('bootstrap.widgets.TbFileUpload', array(
 <?php if ($person_files!='') Yii::app()->clientScript->registerScript('File-form',"UploaderAddFiles('File-form',$person_files);",CClientScript::POS_READY); ?>
 <script>$(function(){statusProcessVisibleItems();});</script>
 <script>setInterval('checkUploadSize()',250);</script>
-<? } ?>
+<?php } ?>

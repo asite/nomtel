@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL & ~E_NOTICE);
+
 // This is the configuration for yiic console application.
 // Any writable CConsoleApplication properties can be configured here.
 $common_config = array(
@@ -19,12 +21,14 @@ $common_config = array(
         'application.extensions.giix-components.*'
     ),
 );
-define('TIMEZONE', 'Asia/Ekaterenburg');
+
+define('TIMEZONE', 'Asia/Yekaterinburg');
 $base_config_name = array();
 
 switch (gethostname()) {
     case 'primacomp':
     case 'primaworkvirt':
+    case 'air-pavel.lan':
         $base_config_name = 'server_console_development.php';
         break;
     case 'h2068869.stratoserver.net':
@@ -48,5 +52,7 @@ switch (gethostname()) {
     default:
          die('unknown domain name');
 }
+
+date_default_timezone_set(TIMEZONE);
 
 return CMap::mergeArray($common_config, include($base_config_name));

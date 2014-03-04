@@ -182,9 +182,10 @@ class BaseTbActiveForm extends TbActiveForm
      * @param array $htmlOptions
      * @return string
      */
+/*
     public function select2Row($model, $attribute, $data, $htmlOptions = array())
     {
         return $this->inputRow(TbInput::TYPE_SELECT2, $model, $attribute, $data, $htmlOptions);
     }
-
+*/
 }
